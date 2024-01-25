@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, HttpLink, ApolloLink } from '@apollo/clien
 
 function createApolloClient(context = {}) {
   const httpLink = new HttpLink({
-    uri: 'http://localhost:3000/graphql',
+    uri: process.env.NEXT_PUBLIC_GRAPHQL_API_URI,
     credentials: 'include', // 'same-origin' if same origin or 'include' if cross-origin
     headers: {
       ...context,
