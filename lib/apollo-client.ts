@@ -1,6 +1,6 @@
 import { ApolloClient, InMemoryCache, HttpLink, ApolloLink } from '@apollo/client';
 
-const uri = process.env.NODE_ENV == 'development' ? 'http://localhost:3000/api/graphql' : 'https://staffplan-ui.fermion.dev/graphql';
+const uri = process.env.NEXT_PUBLIC_GRAPHQL_API_URI || 'http://localhost:3000/api/graphql'
 
 function createApolloClient(context = {}) {
   const httpLink = new HttpLink({
