@@ -6,23 +6,23 @@ import withApollo from '../lib/withApollo';
 
 const GET_DATA = gql`
 {
-  userAssignments (userId: 2) {
+  userAssignments {
     id
     project {
       id
       name
       status
-      
+
       assignments {
         id
         status
-      	
+
         user {
           id
           name
           email
         }
-        
+
         workWeeks {
           cweek
           year
@@ -30,7 +30,7 @@ const GET_DATA = gql`
           actualHours
         }
       }
-      
+
       client {
         name
       }
