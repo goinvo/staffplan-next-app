@@ -5,7 +5,8 @@ const uri = process.env.NEXT_PUBLIC_GRAPHQL_API_URI || 'http://localhost:3000/ap
 function createApolloClient(context = {}) {
   const httpLink = new HttpLink({
     uri: uri,
-    credentials: 'include', // 'same-origin' if same origin or 'include' if cross-origin
+    // 'same-origin' if same origin or 'include' if cross-origin
+    credentials: 'include',
     headers: {
       ...context,
     },
