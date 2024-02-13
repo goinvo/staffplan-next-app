@@ -27,19 +27,17 @@ const WeekDisplay: React.FC = () => {
         weeks.push({
             date: currentDate.getDate(),
             month: months[currentDate.getMonth()],
-            year: currentDate.getMonth() === startDate.getFullYear() ? currentDate.getFullYear().toString() : "",
+            year: currentDate.getFullYear().toString(),
         });
         if (lastMonthLabel !== months[currentDate.getMonth()]) {
             lastMonthLabel = months[currentDate.getMonth()];
-            monthLabels.push(lastMonthLabel);
+            monthLabels.push(lastMonthLabel + (currentDate.getMonth() == 0 ? " " + currentDate.getFullYear() : ""));
         } else {
             monthLabels.push("");
         }
 
         currentDate.setDate(currentDate.getDate() + 7);
     }
-
-    console.log(weeks);
 
     const scrollToToday = () => {
         const today = new Date();
@@ -54,8 +52,8 @@ const WeekDisplay: React.FC = () => {
         }
     };
 
+    // On component mount, scroll to today
     useEffect(() => {
-        // Optionally, auto-scroll to today on component mount
         scrollToToday();
     }, []);
 
@@ -75,6 +73,7 @@ const WeekDisplay: React.FC = () => {
         if (container) {
             const newScrollPosition = scrollStartX - dx;
             container.scrollLeft = newScrollPosition;
+            console.log(container.scrollLeft);
         }
     };
 
@@ -100,12 +99,12 @@ const WeekDisplay: React.FC = () => {
             <button onClick={scrollToToday} className="p-2 rounded-full bg-gray-300">Today</button>
             <div
                 ref={weekContainerRef}
-                className="overflow-x-auto flex grow cursor-grab"
+                className="overflow-x-auto flex grow cursor-grab scrollbar-hide"
                 onMouseDown={onDragStart}
             >
                 <div className="flex space-x-2 min-w-max select-none">
                     {weeks.map((week, index) => (
-                        <div key={index} className="flex flex-col">
+                        <div key={index} className="flex flex-col w-8 text-nowrap">
                             <div className="flex flex-row grow">{monthLabels[index]}</div>
                             <div className="flex flex-row grow-0">{week.date}</div>
                         </div>
