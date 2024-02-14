@@ -59,12 +59,6 @@ const HomePage: React.FC = () => {
 
   if (loading) return <p className="text-gray-600">Loading...</p>;
   if (error) return <p className="text-red-600">Error :(</p>;
-
-  return (
-    <div>
-      {/* Render your page with data from the query */}
-    </div>
-  );
 };
 
 export default withApollo(HomePage);
