@@ -69,7 +69,7 @@ const HomePage: React.FC = () => {
 	if (loading) return <p className="text-gray-600">Loading...</p>;
 	if (error) return <p className="text-red-600">Error :(</p>;
 
-	return JSON.stringify(data);
+	return <>This is the / page</>
 };
 
 export default withApollo(HomePage);

@@ -7,7 +7,7 @@ const Navbar: React.FC = () => {
       <div className="flex items-center space-x-4">
         <div className="placeholder-logo">Logo</div>
         <Link href="/projects" className="hover:underline">Projects</Link>
-        <Link href="/people" className="hover:underline">People</Link>
+        <Link href="#" className="hover:underline">People</Link>
       </div>
     </nav>
   );
