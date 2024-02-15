@@ -10,9 +10,9 @@ const GET_DATA = gql`
 	clients {
 	  id
 	  projects {
-		id
 		name
 		status
+		paymentFrequency
 		users {
 		  id
 		  name
