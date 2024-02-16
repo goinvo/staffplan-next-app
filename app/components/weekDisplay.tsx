@@ -68,12 +68,11 @@ const WeekDisplay: React.FC = () => {
 
     const onDragMove = (event: MouseEvent) => {
         if (!isDragging) return;
-        const dx = event.pageX - startX;
         const container = weekContainerRef.current;
         if (container) {
+            const dx = event.pageX - startX;
             const newScrollPosition = scrollStartX - dx;
             container.scrollLeft = newScrollPosition;
-            console.log(container.scrollLeft);
         }
     };
 
