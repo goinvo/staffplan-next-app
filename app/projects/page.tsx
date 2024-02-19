@@ -4,7 +4,6 @@ import withApollo from "@/lib/withApollo";
 import apolloClient from "@/lib/apollo-client";
 import { gql, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import AddAssignment from "../components/addAssignment";
 
 const GET_DATA = gql`
 {
