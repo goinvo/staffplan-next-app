@@ -4,6 +4,7 @@ import withApollo from "@/lib/withApollo";
 import apolloClient from "@/lib/apollo-client";
 import { gql, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
+import AddAssignment from "../components/addAssignment";
 
 const GET_DATA = gql`
 {
@@ -25,7 +26,7 @@ const GET_DATA = gql`
   }
 `;
 
-export const Projects: React.FC = () => {
+const Projects: React.FC = () => {
 	const [clientSide, setClientSide] = useState(false);
 
 	useEffect(() => {
@@ -45,4 +46,5 @@ export const Projects: React.FC = () => {
 	return JSON.stringify(data);
 };
 
-export default withApollo(Projects);
+export default withApollo(Projects)
+
