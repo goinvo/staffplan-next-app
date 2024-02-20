@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "./components/navbar";
 import ActionBar from "./components/actionbar";
 import WeekDisplay from "./components/weekDisplay";
+import AddAssignment from "./components/addAssignment";
 
 const inter = Inter({ subsets: ["latin"] });
 

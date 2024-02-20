@@ -52,9 +52,9 @@ export default function AddDropdown() {
 					<div className="py-1">
 						<Menu.Item>
 							{({ active }) => (
-								<a href="#" className={dropdownSelectedItemClass(active)}>
+								<span className={dropdownSelectedItemClass(active)}>
 									Assignment
-								</a>
+								</span>
 							)}
 						</Menu.Item>
 						<Menu.Item>
