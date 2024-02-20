@@ -1,11 +1,11 @@
 // components/ActionBar.tsx
 import React from 'react';
-
+import AddDropdown from './addDropdown';
 const ActionBar: React.FC = () => {
   return (
     <div className="flex justify-between items-center bg-gray-50 p-4">
       <div className="flex items-center space-x-4">
-        <div className="w-8 h-8 rounded-full border-2 border-gray-400 flex justify-center items-center">+</div>
+        <AddDropdown/>
         <div className="flex items-center space-x-1 bg-gray-200 p-1 rounded-full">
           <div className="w-8 h-8 flex justify-center items-center rounded-l-full bg-white">Sort</div>
           <div className="w-8 h-8 flex justify-center items-center rounded-r-full bg-white">Sidebar</div>
