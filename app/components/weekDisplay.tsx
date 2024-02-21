@@ -1,6 +1,6 @@
 
 'use client'
-import React, { useEffect, useRef, useState } from 'react';
+import React, { use, useEffect, useRef, useState } from 'react';
 
 type WeekEntry = {
     date: number;
@@ -8,36 +8,76 @@ type WeekEntry = {
     year: string;
 };
 
+type WeeksAndLabels = {
+    weeks: WeekEntry[];
+    monthLabels: string[];
+};
+
+type IndexWindow = {
+    min: number;
+    max: number;
+};
+
 const WeekDisplay: React.FC = () => {
+    const windowScrollThreshold = 100;
+    const numWeeks = 52;
+    const startYear = 2024;
     const weekContainerRef = useRef<HTMLDivElement>(null);
     const [isDragging, setIsDragging] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const [indexWindow, setIndexWindow] = useState<IndexWindow>({ min: 0, max: numWeeks });
     const [startX, setStartX] = useState(0);
     const [scrollStartX, setScrollStartX] = useState(0);
 
-    // Starting date for the component
-    const startDate = new Date(2024, 0, 1);
-    const weeks: WeekEntry[] = [];
-    const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // Days in each month, assuming February has 28 days (non-leap year)
+    // Starting date for the component. This will be the date when the index is 0. We recommend 1 Jan 2024, as it's a Monday.
+    const startDate = new Date(startYear, 0, 1);
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    let currentDate = new Date(startDate);
-    let monthLabels: string[] = [];
-    let lastMonthLabel = "";
+    const [weeks, setWeeks] = useState<WeekEntry[]>([]);
+    const [monthLabels, setMonthLabels] = useState<string[]>([]);
+    const [currDistFromLeft, setCurrDistFromLeft] = useState(0);
+    const [currDistFromRight, setCurrDistFromRight] = useState(0);
 
-    for (let i = 0; i < 52; i++) {
-        weeks.push({
-            date: currentDate.getDate(),
-            month: months[currentDate.getMonth()],
-            year: currentDate.getFullYear().toString(),
-        });
-        if (lastMonthLabel !== months[currentDate.getMonth()]) {
-            lastMonthLabel = months[currentDate.getMonth()];
-            monthLabels.push(lastMonthLabel + (currentDate.getMonth() == 0 ? " " + currentDate.getFullYear() : ""));
-        } else {
-            monthLabels.push("");
+    const generateWeeksForYear = (beginYear: number, numWeeks: number = 52): WeeksAndLabels => {
+        const weeks: WeekEntry[] = [];
+        const monthLabels: string[] = [];
+
+        // Calculate the offset for the first week relative to 2024-01-01 by finding the number of days between the two dates and modulo 7 (add 7 to ensure positive result)
+        let currentDate = new Date(beginYear, 0, 1)
+        const offset = Math.abs(currentDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24) % 7;
+        currentDate.setDate(currentDate.getDate() + offset); // Clone the beginDate to avoid mutating the original date
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        let lastMonthLabel = "";
+
+        for (let i = 0; i < numWeeks; i++) {
+            weeks.push({
+                date: currentDate.getDate(),
+                month: months[currentDate.getMonth()],
+                year: currentDate.getFullYear().toString(),
+            });
+
+            // Determine if the month label should be added
+            const currentMonthLabel = months[currentDate.getMonth()] + (currentDate.getMonth() === 0 ? " " + currentDate.getFullYear() : "");
+            if (lastMonthLabel !== currentMonthLabel) {
+                monthLabels.push(currentMonthLabel);
+                lastMonthLabel = currentMonthLabel;
+            } else {
+                monthLabels.push(""); // No label for this entry
+            }
+
+            currentDate.setDate(currentDate.getDate() + 7); // Move to the next week
         }
 
-        currentDate.setDate(currentDate.getDate() + 7);
-    }
+        return { weeks, monthLabels };
+    };
+
+    // On component mount, generate the weeks and month labels and scroll to today
+    useEffect(() => {
+        const { weeks, monthLabels } = generateWeeksForYear(startYear, numWeeks);
+        setWeeks(weeks);
+        setMonthLabels(monthLabels);
+        scrollToToday();
+        console.log(weekContainerRef);
+    }, []);
 
     const scrollToToday = () => {
         const today = new Date();
@@ -52,11 +92,6 @@ const WeekDisplay: React.FC = () => {
         }
     };
 
-    // On component mount, scroll to today
-    useEffect(() => {
-        scrollToToday();
-    }, []);
-
     const onDragStart = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         setIsDragging(true);
         setStartX(event.pageX);
@@ -66,6 +101,14 @@ const WeekDisplay: React.FC = () => {
         }
     };
 
+    const scrollLeft = () => {
+        console.log("scroll left");
+    };
+
+    const scrollRight = () => {
+        console.log("scroll right");
+    };
+
     const onDragMove = (event: MouseEvent) => {
         if (!isDragging) return;
         const dx = event.pageX - startX;
@@ -73,8 +116,15 @@ const WeekDisplay: React.FC = () => {
         if (container) {
             const newScrollPosition = scrollStartX - dx;
             container.scrollLeft = newScrollPosition;
-            console.log(container.scrollLeft);
+
+            if (container.scrollLeft - indexWindow.min < windowScrollThreshold) {
+                console.log("scroll left");
+                scrollLeft();
+            } else if (container.scrollLeft - indexWindow.min > container.scrollWidth - container.clientWidth - windowScrollThreshold) {
+                scrollRight();
+            }
         }
+
     };
 
     const onDragEnd = () => {
@@ -106,7 +156,7 @@ const WeekDisplay: React.FC = () => {
                     {weeks.map((week, index) => (
                         <div key={index} className="flex flex-col w-8 text-nowrap">
                             <div className="flex flex-row grow">{monthLabels[index]}</div>
-                            <div className="flex flex-row grow-0">{week.date}</div>
+                            <div className={"flex flex-row grow-0" + (index == selectedIndex ? " bg-gray-300" : "")} onClick={(e) => setSelectedIndex(index)}>{week.date}</div>
                         </div>
                     ))}
                 </div>
