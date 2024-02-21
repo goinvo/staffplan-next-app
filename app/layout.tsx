@@ -5,6 +5,7 @@ import Navbar from "./components/navbar";
 import ActionBar from "./components/actionbar";
 import WeekDisplay from "./components/weekDisplay";
 import AddAssignment from "./components/addAssignmentModal";
+import { Suspense } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,7 +25,9 @@ export default function RootLayout({
 				<Navbar />
 				<ActionBar />
 				<WeekDisplay />
-        <AddAssignment/>
+				<Suspense>
+					<AddAssignment />
+				</Suspense>
 				{children}
 			</body>
 		</html>
