@@ -8,7 +8,7 @@ interface ProjectDatepickerIf {
 	};
 }
 export default function ProjctDatepicker({
-	projectDates,
+	projectDates
 }: ProjectDatepickerIf) {
 	const [dateValues, setDateValues] = useState({
 		startDate: projectDates.startDate,

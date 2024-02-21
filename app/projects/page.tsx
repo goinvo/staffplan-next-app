@@ -5,23 +5,23 @@ import { gql, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 
 const GET_DATA = gql`
-{
-	clients {
-	  id
-	  projects {
-		name
-		status
-		paymentFrequency
-		users {
-		  id
-		  name
-		  companies{
-			name
-		  }
+	{
+		clients {
+			id
+			projects {
+				name
+				status
+				paymentFrequency
+				users {
+					id
+					name
+					companies {
+						name
+					}
+				}
+			}
 		}
-	  }
 	}
-  }
 `;
 
 const Projects: React.FC = () => {
@@ -40,9 +40,12 @@ const Projects: React.FC = () => {
 		errorPolicy: "all",
 	});
 	if (loading) return <p> LOADING</p>;
-	if (error) return <p>ERROR</p>
-	return JSON.stringify(data);
+	if (error) return <p>ERROR</p>;
+	return (
+		<div>
+			<p>Placeholder Text</p>
+		</div>
+	);
 };
 
-export default withApollo(Projects)
-
+export default withApollo(Projects);
