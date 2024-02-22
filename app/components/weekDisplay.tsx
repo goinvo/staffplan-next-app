@@ -1,7 +1,10 @@
 
 'use client'
-import React, { use, useEffect, useRef, useState } from 'react';
-
+import React, { useState, useRef, useEffect } from "react";
+import useInfiniteScroll, {
+    InfiniteScrollRef,
+    ScrollDirection
+} from "react-easy-infinite-scroll-hook";
 type WeekEntry = {
     date: number;
     month: string;
@@ -13,31 +16,18 @@ type WeeksAndLabels = {
     monthLabels: string[];
 };
 
-type IndexWindow = {
-    min: number;
-    max: number;
+type YearWindow = {
+    start: number;
+    end: number;
 };
 
-const WeekDisplay: React.FC = () => {
-    const windowScrollThreshold = 100;
-    const numWeeks = 52;
-    const startYear = 2024;
-    const weekContainerRef = useRef<HTMLDivElement>(null);
-    const [isDragging, setIsDragging] = useState(false);
-    const [selectedIndex, setSelectedIndex] = useState(0);
-    const [indexWindow, setIndexWindow] = useState<IndexWindow>({ min: 0, max: numWeeks });
-    const [startX, setStartX] = useState(0);
-    const [scrollStartX, setScrollStartX] = useState(0);
+const createItems = (length = 52): WeeksAndLabels =>
+generateWeeksForYear(2024, length);
 
-    // Starting date for the component. This will be the date when the index is 0. We recommend 1 Jan 2024, as it's a Monday.
-    const startDate = new Date(startYear, 0, 1);
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const [weeks, setWeeks] = useState<WeekEntry[]>([]);
-    const [monthLabels, setMonthLabels] = useState<string[]>([]);
-    const [currDistFromLeft, setCurrDistFromLeft] = useState(0);
-    const [currDistFromRight, setCurrDistFromRight] = useState(0);
+const loadMore = async (year: number, length = 52): Promise<WeeksAndLabels> =>
+    new Promise((res) => setTimeout(() => res(createItems(length)), 52));
 
-    const generateWeeksForYear = (beginYear: number, numWeeks: number = 52): WeeksAndLabels => {
+    const generateWeeksForYear = (beginYear: number, numWeeks: number = 52, startDate: Date = new Date(2024, 0, 1)): WeeksAndLabels => {
         const weeks: WeekEntry[] = [];
         const monthLabels: string[] = [];
 
@@ -70,14 +60,47 @@ const WeekDisplay: React.FC = () => {
         return { weeks, monthLabels };
     };
 
-    // On component mount, generate the weeks and month labels and scroll to today
-    useEffect(() => {
-        const { weeks, monthLabels } = generateWeeksForYear(startYear, numWeeks);
-        setWeeks(weeks);
-        setMonthLabels(monthLabels);
-        scrollToToday();
-        console.log(weekContainerRef);
-    }, []);
+
+const WeekDisplay = () => {
+    const numWeeks = 52;
+    const startYear = 2024;
+    const startDate = new Date(startYear, 0, 1);
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const [weeks, setWeeks] = useState<WeekEntry[]>([]);
+    const [monthLabels, setMonthLabels] = useState<string[]>([]);
+    const [data, setData] = useState<WeeksAndLabels>(createItems());
+    const [startX, setStartX] = useState(0);
+    const [scrollStartX, setScrollStartX] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [yearWindow, setYearWindow] = useState<YearWindow>({ start: startYear, end: startYear });
+
+
+    const loadMoreWeeks = async (direction: ScrollDirection) => {
+        try {
+            if (direction === ScrollDirection.LEFT) {
+                yearWindow.start -= 1;
+                const newData = await loadMore(yearWindow.start);
+                setIsLoading(true);
+
+                setData((prev) => ({weeks: [...newData.weeks, ...prev.weeks], monthLabels: [...newData.monthLabels, ...prev.monthLabels]} as WeeksAndLabels));
+            } else {
+                yearWindow.end += 1;
+                const newData = await loadMore(yearWindow.end);
+                setIsLoading(true);
+
+                setData((prev) => ({weeks: [...prev.weeks, ...newData.weeks], monthLabels: [...prev.monthLabels, ...newData.monthLabels]} as WeeksAndLabels));
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const weekContainerRef: InfiniteScrollRef<HTMLDivElement> = useInfiniteScroll({
+        next: loadMoreWeeks,
+        columnCount: data.weeks.length,
+        hasMore: { left: true, right: true }
+    });
 
     const scrollToToday = () => {
         const today = new Date();
@@ -92,6 +115,7 @@ const WeekDisplay: React.FC = () => {
         }
     };
 
+
     const onDragStart = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         setIsDragging(true);
         setStartX(event.pageX);
@@ -101,14 +125,6 @@ const WeekDisplay: React.FC = () => {
         }
     };
 
-    const scrollLeft = () => {
-        console.log("scroll left");
-    };
-
-    const scrollRight = () => {
-        console.log("scroll right");
-    };
-
     const onDragMove = (event: MouseEvent) => {
         if (!isDragging) return;
         const dx = event.pageX - startX;
@@ -116,13 +132,6 @@ const WeekDisplay: React.FC = () => {
         if (container) {
             const newScrollPosition = scrollStartX - dx;
             container.scrollLeft = newScrollPosition;
-
-            if (container.scrollLeft - indexWindow.min < windowScrollThreshold) {
-                console.log("scroll left");
-                scrollLeft();
-            } else if (container.scrollLeft - indexWindow.min > container.scrollWidth - container.clientWidth - windowScrollThreshold) {
-                scrollRight();
-            }
         }
 
     };
@@ -149,20 +158,21 @@ const WeekDisplay: React.FC = () => {
             <button onClick={scrollToToday} className="p-2 rounded-full bg-gray-300">Today</button>
             <div
                 ref={weekContainerRef}
-                className="overflow-x-auto flex grow cursor-grab scrollbar-hide"
+                className="flex flex-row overflow-x-auto cursor-grab scrollbar-hide"
                 onMouseDown={onDragStart}
             >
                 <div className="flex space-x-2 min-w-max select-none">
-                    {weeks.map((week, index) => (
-                        <div key={index} className="flex flex-col w-8 text-nowrap">
-                            <div className="flex flex-row grow">{monthLabels[index]}</div>
-                            <div className={"flex flex-row grow-0" + (index == selectedIndex ? " bg-gray-300" : "")} onClick={(e) => setSelectedIndex(index)}>{week.date}</div>
-                        </div>
-                    ))}
+                {data.weeks.map((week, index) => (
+                    <div className="flex flex-col w-8 text-nowrap" key={index}>
+                            <div className="flex flex-row grow">{data.monthLabels[index]}</div>
+                            <div className={"flex flex-row grow-0"}>{week.date}</div>
+                    </div>
+                ))}
                 </div>
             </div>
+            {isLoading && <div>Loading...</div>}
         </div>
     );
-};
+}
 
 export default WeekDisplay;
