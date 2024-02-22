@@ -4,6 +4,7 @@ import withApollo from "@/lib/withApollo";
 import apolloClient from "@/lib/apollo-client";
 import { gql, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
+import UsersList from "../components/usersList";
 
 const GET_DATA = gql`
 {
@@ -41,7 +42,7 @@ const Projects: React.FC = () => {
 	});
 	if (loading) return <p> LOADING</p>;
 	if (error) return <p>ERROR</p>
-	return JSON.stringify(data);
+	return <UsersList data={data} />;
 };
 
 export default withApollo(Projects)
