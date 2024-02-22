@@ -21,11 +21,11 @@ type YearWindow = {
     end: number;
 };
 
-const createItems = (length = 52): WeeksAndLabels =>
-generateWeeksForYear(2024, length);
+const createItems = (year:number, length = 52): WeeksAndLabels =>
+generateWeeksForYear(year, length);
 
 const loadMore = async (year: number, length = 52): Promise<WeeksAndLabels> =>
-    new Promise((res) => setTimeout(() => res(createItems(length)), 52));
+    new Promise((res) => setTimeout(() => res(createItems(year, length)), 52));
 
     const generateWeeksForYear = (beginYear: number, numWeeks: number = 52, startDate: Date = new Date(2024, 0, 1)): WeeksAndLabels => {
         const weeks: WeekEntry[] = [];
@@ -68,7 +68,7 @@ const WeekDisplay = () => {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const [weeks, setWeeks] = useState<WeekEntry[]>([]);
     const [monthLabels, setMonthLabels] = useState<string[]>([]);
-    const [data, setData] = useState<WeeksAndLabels>(createItems());
+    const [data, setData] = useState<WeeksAndLabels>(createItems(startYear));
     const [startX, setStartX] = useState(0);
     const [scrollStartX, setScrollStartX] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
