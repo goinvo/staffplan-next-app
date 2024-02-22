@@ -115,6 +115,14 @@ const WeekDisplay = () => {
         }
     };
 
+    const scrollWeeks = (direction: 'left' | 'right') => {
+        const container = weekContainerRef.current;
+        if (container) {
+          const scrollWidth = container.offsetWidth;
+          container.scrollBy({ left: (direction == 'left' ? -scrollWidth : scrollWidth), behavior: 'smooth' });
+        }
+      };
+
 
     const onDragStart = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         setIsDragging(true);
@@ -156,6 +164,7 @@ const WeekDisplay = () => {
     return (
         <div className="flex items-center space-x-4 my-4">
             <button onClick={scrollToToday} className="p-2 rounded-full bg-gray-300">Today</button>
+            <button onClick={() => scrollWeeks('left')} className="p-2 rounded-full bg-gray-300">Left</button>
             <div
                 ref={weekContainerRef}
                 className="flex flex-row overflow-x-auto cursor-grab scrollbar-hide"
@@ -164,12 +173,13 @@ const WeekDisplay = () => {
                 <div className="flex space-x-2 min-w-max select-none">
                 {data.weeks.map((week, index) => (
                     <div className="flex flex-col w-8 text-nowrap" key={index}>
-                            <div className="flex flex-row grow">{data.monthLabels[index]}</div>
-                            <div className={"flex flex-row grow-0"}>{week.date}</div>
+                        <div className="flex flex-row grow">{data.monthLabels[index]}</div>
+                        <div className={"flex flex-row grow-0"}>{week.date}</div>
                     </div>
                 ))}
                 </div>
             </div>
+            <button onClick={() => scrollWeeks('right')} className="p-2 rounded-full bg-gray-300">Right</button>
             {isLoading && <div>Loading...</div>}
         </div>
     );
