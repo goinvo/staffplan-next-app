@@ -103,21 +103,19 @@ const AddAssignment = () => {
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_ASSIGNMENT);
-
 	if (loading || mutationLoading) return <p> LOADING</p>;
 	if (error || mutationError) return <p>ERROR</p>;
 	const handleSubmit = () => {
 		upsertAssignment({
 			variables: {
-				projectId: selectedProject?.id,
-				userId: selectedUser?.id,
-				status: selectedProject?.status,
-				startsOn: selectedProject?.startDate,
-				endsOn: selectedProject?.endDate,
+				projectId: selectedProject.id,
+				userId: selectedUser.id,
+				status: selectedProject.status,
+				startsOn: selectedProject.startDate,
+				endsOn: selectedProject.endDate,
 			},
 		});
 	};
-	console.log(selectedProject, selectedUser);
 	return (
 		<>
 			{showModal && (
