@@ -1,59 +1,56 @@
-import React, { useState } from "react";
-interface ProjectDatepickerIf {
-	projectDates: {
-		id: number;
-		name: string;
-		startDate: string;
-		endDate: string;
-	};
-}
+
+import React, { SetStateAction, Dispatch } from "react";
+import { ProjectType } from "./addAssignmentModal";
+
 export default function ProjctDatepicker({
-	projectDates
-}: ProjectDatepickerIf) {
-	const [dateValues, setDateValues] = useState({
-		startDate: projectDates.startDate,
-		endDate: projectDates.endDate,
-	});
+	projectDates,
+	setDates,
+}:{projectDates:ProjectType, setDates: Dispatch<SetStateAction<ProjectType>>}) {
 	const handleStartDateChange = (newDate: string) => {
-		setDateValues({ ...dateValues, startDate: newDate });
+		setDates((project) => ({ ...project, startDate: newDate }));
 	};
 	const handleEndDateChange = (newDate: string) => {
-		setDateValues({ ...dateValues, endDate: newDate });
+		setDates((project) => ({ ...project, endDate: newDate }));
 	};
 	const handleCoverDurationClick = () => {
-		setDateValues({
-			startDate: projectDates.startDate,
-			endDate: projectDates.endDate,
-		});
+		if (projectDates) {
+			setDates((project) => ({
+				...project,
+				startDate: projectDates.startDate,
+				endDate: projectDates.endDate,
+			}));
+		}
 	};
 	return (
 		<div className="flex justify-between">
 			<div className="w-48">
 				<label className="block mb-2">Start</label>
 				<input
-				className="w-full px-4 py-2 border rounded-md "
+					className="w-full px-4 py-2 border rounded-md "
 					type="date"
 					id="startDate"
 					name="project-start"
-					value={dateValues.startDate}
+					value={projectDates.startDate  || ""}
 					onChange={(e) => handleStartDateChange(e.target.value)}
 				/>
-				<span onClick={handleCoverDurationClick} style={{ color: "teal" }}>
-				Cover Project Span
-			</span>
+				<span
+					onClick={handleCoverDurationClick}
+					style={{ color: "teal" }}
+				>
+					Cover Project Span
+				</span>
 			</div>
 			<div className="w-48">
 				<label className="block mb-2 ">End</label>
 				<input
-				className="w-full px-4 py-2 border rounded-md"
+					className="w-full px-4 py-2 border rounded-md"
 					type="date"
 					id="endDate"
 					name="project-end"
-					value={dateValues.endDate}
+					value={projectDates?.endDate || ""}
 					onChange={(e) => handleEndDateChange(e.target.value)}
-					/>
-					</div>
-			
+				/>
+			</div>
 		</div>
 	);
 }

@@ -5,7 +5,7 @@ import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import ProjectDatepicker from "./projectDatepicker";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useMutation } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
 
 const GET_DATA = gql`
@@ -13,6 +13,7 @@ const GET_DATA = gql`
 		clients {
 			id
 			projects {
+				id
 				name
 				status
 				paymentFrequency
@@ -32,34 +33,50 @@ const GET_DATA = gql`
 	}
 `;
 
-interface SelectedProject {
-	id: number;
+const UPSERT_ASSIGNMENT = gql`
+	mutation UpsertAssignment(
+		$id: ID
+		$projectId: ID!
+		$userId: ID!
+		$status: String!
+		$startsOn: ISO8601Date
+		$endsOn: ISO8601Date
+	) {
+		upsertAssignment(
+			id: $id
+			projectId: $projectId
+			userId: $userId
+			status: $status
+			startsOn: $startsOn
+			endsOn: $endsOn
+		) {
+			project {
+				id
+			}
+			startsOn
+			endsOn
+			status
+			user {
+				id
+			}
+		}
+	}
+`;
+
+export interface ProjectType {
+	id: number | null;
 	paymentFrequency: string;
 	name: string;
 	status: string;
 	users: [];
-	startDate: string;
-	endDate: string;
+	startDate: string | null;
+	endDate: string | null;
 }
-interface SelectedUser {
-	id: number;
+interface UserType {
+	id: number | null;
 	name: string;
 }
 
-// REMOVE PLACEHOLDERS AFTER BACKEND HAS THE START AND END DATES
-const placeholderProject = {
-	id:111,
-	startDate:"2024-01-22",
-	endDate:"2024-02-24",
-	paymentFrequency: "monthly",
-	name: "PLACEHOLDER PROJECT",
-	status: "ACTIVE",
-	users: []
-}
-const placeholderDates ={
-	startDate:"2024-01-22",
-	endDate:"2024-02-24",
-}
 const AddAssignment = () => {
 	const [clientSide, setClientSide] = useState(false);
 	useEffect(() => {
@@ -67,12 +84,11 @@ const AddAssignment = () => {
 	}, []);
 	const searchParams = useSearchParams();
 	const showModal = searchParams.get("modal");
-	const [selectedUser, setSelectedUser] = useState<SelectedUser | "">("");
-	const [selectedProject, setSelectedProject] = useState<SelectedProject | "">(
-		""
-	);
-	const handleProjectSelect = (selectedProject: SelectedProject) => {
-		setSelectedProject({...placeholderDates,...selectedProject});
+	const [selectedUser, setSelectedUser] = useState<UserType>({id:null,name:"Select"});
+	const [selectedProject, setSelectedProject] =
+		useState<ProjectType>({id:null, paymentFrequency:"",name:"Select",status:"",users:[], startDate:null, endDate:null});
+	const handleProjectSelect = (selectedProject: ProjectType) => {
+		setSelectedProject(selectedProject);
 	};
 	const { loading, error, data } = useQuery(GET_DATA, {
 		context: {
@@ -83,8 +99,25 @@ const AddAssignment = () => {
 		skip: !clientSide,
 		errorPolicy: "all",
 	});
-	if (loading) return <p> LOADING</p>;
-	if (error) return <p>ERROR</p>;
+	const [
+		upsertAssignment,
+		{ data: mutationData, loading: mutationLoading, error: mutationError },
+	] = useMutation(UPSERT_ASSIGNMENT);
+
+	if (loading || mutationLoading) return <p> LOADING</p>;
+	if (error || mutationError) return <p>ERROR</p>;
+	const handleSubmit = () => {
+		upsertAssignment({
+			variables: {
+				projectId: selectedProject?.id,
+				userId: selectedUser?.id,
+				status: selectedProject?.status,
+				startsOn: selectedProject?.startDate,
+				endsOn: selectedProject?.endDate,
+			},
+		});
+	};
+	console.log(selectedProject, selectedUser);
 	return (
 		<>
 			{showModal && (
@@ -118,9 +151,7 @@ const AddAssignment = () => {
 																		<Listbox.Button className="relative cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6">
 																			<span className="flex items-center">
 																				<span className="ml-3 block truncate">
-																					{selectedUser
-																						? selectedUser.name
-																						: "Select"}
+																					{selectedUser.name}
 																				</span>
 																			</span>
 																			<span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
@@ -141,7 +172,7 @@ const AddAssignment = () => {
 																	>
 																		<Listbox.Options className="absolute z-10 mt-1 max-h-56 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
 																			{data?.users?.map(
-																				(user: SelectedUser) => (
+																				(user: UserType) => (
 																					<Listbox.Option
 																						key={user.id}
 																						className={({ active }) =>
@@ -204,9 +235,7 @@ const AddAssignment = () => {
 																		<Listbox.Button className="relative cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6">
 																			<span className="flex items-center">
 																				<span className="ml-3 block truncate">
-																					{selectedProject
-																						? selectedProject.name
-																						: "Select"}
+																					{selectedProject.name}
 																				</span>
 																			</span>
 																			<span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
@@ -226,52 +255,56 @@ const AddAssignment = () => {
 																		leaveTo="opacity-0"
 																	>
 																		<Listbox.Options className="absolute z-10 mt-1 max-h-56 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-																			{data?.clients?.map((client: { projects: SelectedProject[]; }) => {
-																				return client.projects.map(
-																					(project: SelectedProject) => (
-																						<Listbox.Option
-																							key={`${project.id} + ${project.name}`}
-																							className={({ active }) =>
-																								active
-																									? "bg-indigo-600 text-white"
-																									: "text-gray-900 relative cursor-default select-none py-2 pl-3 pr-9"
-																							}
-																							value={project}
-																						>
-																							{({ selected, active }) => (
-																								<>
-																									<div className="flex items-center">
-																										<span
-																											className={
-																												selected
-																													? "font-semibold"
-																													: "font-normal ml-3 block truncate"
-																											}
-																										>
-																											{project.name}
-																										</span>
-																									</div>
+																			{data?.clients?.map(
+																				(client: {
+																					projects: ProjectType[];
+																				}) => {
+																					return client.projects.map(
+																						(project: ProjectType) => (
+																							<Listbox.Option
+																								key={`${project.id} + ${project.name}`}
+																								className={({ active }) =>
+																									active
+																										? "bg-indigo-600 text-white"
+																										: "text-gray-900 relative cursor-default select-none py-2 pl-3 pr-9"
+																								}
+																								value={project}
+																							>
+																								{({ selected, active }) => (
+																									<>
+																										<div className="flex items-center">
+																											<span
+																												className={
+																													selected
+																														? "font-semibold"
+																														: "font-normal ml-3 block truncate"
+																												}
+																											>
+																												{project.name}
+																											</span>
+																										</div>
 
-																									{selected ? (
-																										<span
-																											className={
-																												active
-																													? "text-white"
-																													: "text-indigo-600 absolute inset-y-0 right-0 flex items-center pr-4"
-																											}
-																										>
-																											<CheckIcon
-																												className="h-5 w-5"
-																												aria-hidden="true"
-																											/>
-																										</span>
-																									) : null}
-																								</>
-																							)}
-																						</Listbox.Option>
-																					)
-																				);
-																			})}
+																										{selected ? (
+																											<span
+																												className={
+																													active
+																														? "text-white"
+																														: "text-indigo-600 absolute inset-y-0 right-0 flex items-center pr-4"
+																												}
+																											>
+																												<CheckIcon
+																													className="h-5 w-5"
+																													aria-hidden="true"
+																												/>
+																											</span>
+																										) : null}
+																									</>
+																								)}
+																							</Listbox.Option>
+																						)
+																					);
+																				}
+																			)}
 																		</Listbox.Options>
 																	</Transition>
 																</div>
@@ -306,8 +339,10 @@ const AddAssignment = () => {
 															</div>
 														</div>
 													</div>
-													{/* RESET TO SELECTED PROJECT ONCE BACKEND HAS START AND END DATE */}
-													<ProjectDatepicker projectDates={selectedProject ? selectedProject : placeholderProject} />
+													<ProjectDatepicker
+														projectDates={selectedProject}
+														setDates={setSelectedProject}
+													/>
 												</div>
 
 												<div className="flex mb-4 justify-between">
@@ -337,6 +372,7 @@ const AddAssignment = () => {
 															href="/projects"
 															type="submit"
 															className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+															onClick={handleSubmit}
 														>
 															Assign
 														</Link>
