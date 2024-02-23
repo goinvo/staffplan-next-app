@@ -74,7 +74,7 @@ export interface ProjectType {
 	startsOn: string | null;
 	endsOn: string | null;
 }
-interface UserType {
+export interface UserType {
 	id: number | null;
 	name: string;
 }
@@ -105,8 +105,8 @@ const AddAssignment = () => {
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_ASSIGNMENT);
-	if (loading || mutationLoading) return <p> LOADING</p>;
-	if (error || mutationError) return <p>ERROR</p>;
+	if (loading || mutationLoading) return <p> LOADING ASSIGNMENTS</p>;
+	if (error || mutationError) return <p>ERROR ASSIGNMENTS</p>;
 	const handleSubmit = () => {
 		upsertAssignment({
 			variables: {
