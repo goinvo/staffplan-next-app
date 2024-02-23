@@ -17,6 +17,8 @@ const GET_DATA = gql`
 				name
 				status
 				paymentFrequency
+				startsOn
+				endsOn
 				users {
 					id
 					name
@@ -69,8 +71,8 @@ export interface ProjectType {
 	name: string;
 	status: string;
 	users: [];
-	startDate: string | null;
-	endDate: string | null;
+	startsOn: string | null;
+	endsOn: string | null;
 }
 interface UserType {
 	id: number | null;
@@ -86,7 +88,7 @@ const AddAssignment = () => {
 	const showModal = searchParams.get("modal");
 	const [selectedUser, setSelectedUser] = useState<UserType>({id:null,name:"Select"});
 	const [selectedProject, setSelectedProject] =
-		useState<ProjectType>({id:null, paymentFrequency:"",name:"Select",status:"",users:[], startDate:null, endDate:null});
+		useState<ProjectType>({id:null, paymentFrequency:"",name:"Select",status:"",users:[], startsOn:null, endsOn:null});
 	const handleProjectSelect = (selectedProject: ProjectType) => {
 		setSelectedProject(selectedProject);
 	};
@@ -111,8 +113,8 @@ const AddAssignment = () => {
 				projectId: selectedProject.id,
 				userId: selectedUser.id,
 				status: selectedProject.status,
-				startsOn: selectedProject.startDate,
-				endsOn: selectedProject.endDate,
+				startsOn: selectedProject.startsOn,
+				endsOn: selectedProject.endsOn,
 			},
 		});
 	};
@@ -338,7 +340,7 @@ const AddAssignment = () => {
 														</div>
 													</div>
 													<ProjectDatepicker
-														projectDates={selectedProject}
+														selectedProject={selectedProject}
 														setDates={setSelectedProject}
 													/>
 												</div>

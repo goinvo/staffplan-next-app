@@ -1,24 +1,32 @@
 
-import React, { SetStateAction, Dispatch } from "react";
+import React, { SetStateAction, Dispatch,useState } from "react";
 import { ProjectType } from "./addAssignmentModal";
 
+interface DateType {
+	startDate:string | null;
+	endDate:string | null
+}
 export default function ProjctDatepicker({
-	projectDates,
+	selectedProject,
 	setDates,
-}:{projectDates:ProjectType, setDates: Dispatch<SetStateAction<ProjectType>>}) {
+}:{selectedProject:ProjectType, setDates: Dispatch<SetStateAction<ProjectType>>}) {
+	const [projectDates, setProjectDates] = useState<DateType>({startDate:"",endDate:""})
 	const handleStartDateChange = (newDate: string) => {
-		setDates((project) => ({ ...project, startDate: newDate }));
+		setDates((project) => ({ ...project, startsOn: newDate }));
+		setProjectDates({...projectDates, startDate:newDate})
 	};
 	const handleEndDateChange = (newDate: string) => {
-		setDates((project) => ({ ...project, endDate: newDate }));
+		setDates((project) => ({ ...project, endsOn: newDate }));
+		setProjectDates({...projectDates, endDate:newDate})
 	};
 	const handleCoverDurationClick = () => {
-		if (projectDates) {
+		if (selectedProject) {
 			setDates((project) => ({
 				...project,
-				startDate: projectDates.startDate,
-				endDate: projectDates.endDate,
-			}));
+				startDate: selectedProject.startsOn,
+				endDate: selectedProject.endsOn,
+			}))
+			setProjectDates({startDate: selectedProject.startsOn, endDate: selectedProject.endsOn});
 		}
 	};
 	return (
@@ -30,7 +38,7 @@ export default function ProjctDatepicker({
 					type="date"
 					id="startDate"
 					name="project-start"
-					value={projectDates.startDate  || ""}
+					value={projectDates.startDate || ""}
 					onChange={(e) => handleStartDateChange(e.target.value)}
 				/>
 				<span
@@ -47,7 +55,7 @@ export default function ProjctDatepicker({
 					type="date"
 					id="endDate"
 					name="project-end"
-					value={projectDates?.endDate || ""}
+					value={projectDates.endDate || ""}
 					onChange={(e) => handleEndDateChange(e.target.value)}
 				/>
 			</div>
