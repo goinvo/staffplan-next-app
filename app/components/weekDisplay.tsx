@@ -5,10 +5,13 @@ import useInfiniteScroll, {
     InfiniteScrollRef,
     ScrollDirection
 } from "react-easy-infinite-scroll-hook";
+
+const { getWeek } = require('date-fns');
+
 type WeekEntry = {
     date: number;
     month: string;
-    year: string;
+    year: number;
 };
 
 type WeeksAndLabels = {
@@ -42,7 +45,7 @@ const generateWeeksForYear = (beginYear: number, numWeeks: number = 52, startDat
         weeks.push({
             date: currentDate.getDate(),
             month: months[currentDate.getMonth()],
-            year: currentDate.getFullYear().toString(),
+            year: currentDate.getFullYear(),
         });
 
         // Determine if the month label should be added
@@ -60,13 +63,6 @@ const generateWeeksForYear = (beginYear: number, numWeeks: number = 52, startDat
     return { weeks, monthLabels };
 };
 
-// Helper function to calculate week number from a date
-const getWeekNumber = (date: Date): number => {
-    const startOfYear = new Date(date.getFullYear(), 0, 1);
-    const pastDaysOfYear = (date.getTime() - startOfYear.getTime()) / 86400000;
-    return Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7);
-};
-
 const weekWidth = 32;
 
 const WeekDisplay = () => {
@@ -82,7 +78,6 @@ const WeekDisplay = () => {
     const [isDragging, setIsDragging] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [yearWindow, setYearWindow] = useState<YearWindow>({ start: startYear + 1, end: startYear + 1 });
-
 
     const loadMoreWeeks = async (direction: ScrollDirection) => {
         try {
@@ -186,8 +181,10 @@ const WeekDisplay = () => {
                                 <div className={"flex flex-row grow-0"}>{week.date}</div>
                                 <div className={"flex flex-row grow-0 h-32 border-l relative"}>
                                     <div className={"w-8 h-32 top-0 left-0 absolute bg-gray-100"}></div>
-                                    {(week.year == startYear.toString() && week.date == 1 && week.month == 'Jan') &&
-                                        <div className="w-32 h-8 bg-black border rounded absolute top-0 left-0 z-40"></div>
+                                    {(week.year == 2023 && week.date == 25 && week.month == 'Dec') &&
+                                        <div className="w-32 h-8 bg-gray-400 border rounded absolute top-0 left-0 z-40">
+                                            {getWeek(new Date(week.year, months.indexOf(week.month), week.date))}
+                                        </div>
                                     }
                                 </div>
                             </div>
