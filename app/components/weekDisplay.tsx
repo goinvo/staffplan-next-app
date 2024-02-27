@@ -179,14 +179,15 @@ const WeekDisplay = () => {
                     className="flex flex-row overflow-x-auto cursor-grab scrollbar-hide"
                     onMouseDown={onDragStart}
                 >
-                    <div className="flex space-x-2 min-w-max select-none">
+                    <div className="flex min-w-max select-none">
                         {data.weeks.map((week, index) => (
                             <div className="flex flex-col w-8 text-nowrap" key={index}>
                                 <div className="flex flex-row grow">{data.monthLabels[index]}</div>
                                 <div className={"flex flex-row grow-0"}>{week.date}</div>
                                 <div className={"flex flex-row grow-0 h-32 border-l relative"}>
+                                    <div className={"w-8 h-32 top-0 left-0 absolute bg-gray-100"}></div>
                                     {(week.year == startYear.toString() && week.date == 1 && week.month == 'Jan') &&
-                                    <div className="w-32 h-8 bg-black border rounded absolute top-0 left-0 z-40"></div>
+                                        <div className="w-32 h-8 bg-black border rounded absolute top-0 left-0 z-40"></div>
                                     }
                                 </div>
                             </div>
