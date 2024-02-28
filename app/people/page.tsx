@@ -1,29 +1,23 @@
 "use client";
 import React, { useEffect, useState, Fragment } from "react";
 import withApollo from "@/lib/withApollo";
-import { gql, useQuery, useLazyQuery } from "@apollo/client";
+import { gql, useQuery, useLazyQuery, useMutation } from "@apollo/client";
 import { ProjectType, UserType } from "../components/addAssignmentModal";
 import { DateTime } from "luxon";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
+import { WorkWeek, WorkweekType } from "../components/workWeek";
 
 interface AssignmentType {
 	id: number;
 	endsOn: string | null;
 	startsOn: string | null;
 	status: string;
-	user: UserType;
+	assignedUser: UserType;
 	workWeeks: [];
 	project: ProjectType;
 }
 
-interface WorkweekType {
-	actualHours: number;
-	estimatedHours: number;
-	assignmentId: number;
-	cweek: number;
-	year: number;
-}
 const GET_USER_ASSIGNMENTS = gql`
 	query getUserAssignments($selectedUserId: ID!) {
 		userAssignments(userId: $selectedUserId) {
@@ -31,11 +25,12 @@ const GET_USER_ASSIGNMENTS = gql`
 			startsOn
 			endsOn
 			status
-			user {
+			assignedUser {
 				name
 				id
 			}
 			workWeeks {
+				id
 				actualHours
 				assignmentId
 				cweek
@@ -59,8 +54,6 @@ const GET_USER_LIST = gql`
 		}
 	}
 `;
-const workWeekDate = (weekYear: number, weekNumber: number) =>
-	DateTime.fromObject({ weekYear, weekNumber }).toLocaleString();
 
 const PeopleView: React.FC = () => {
 	const [clientSide, setClientSide] = useState(false);
@@ -93,23 +86,28 @@ const PeopleView: React.FC = () => {
 			called,
 		},
 	] = useLazyQuery(GET_USER_ASSIGNMENTS, {
-		variables: { selectedUserId: 1 },
+		variables: { selectedUserId: selectedUser.id },
 	});
+
 	if (called && userAssignmentLoading) return <p>Loading User Assignments</p>;
 	if (userListLoading) return <p>Loading Users</p>;
 	if (userListError) return <p>Error Loading Users</p>;
 	if (userAssignmentError) return <p>Error Loading User Assignments</p>;
-
-	if (userAssignmentData) console.log("USER ASSIGNMENTS", userAssignmentData);
-	if (userListData) console.log("USERS DATA", userListData);
-
+	const projectWorkWeek = (date: string) => {
+		return {
+			cweek: DateTime.fromISO(date).toFormat("W"),
+			year: DateTime.fromISO(date).toFormat("kkkk"),
+		};
+	};
 	const handleChange = (user: UserType) => {
-		console.log(user, "handle change");
 		setSelectedUser(user);
 		getUserAssignments({ variables: { selectedUserId: user.id } });
 	};
+
+	if (userAssignmentData) console.log(userAssignmentData);
+
 	return (
-		<div>
+		<div className="flex">
 			<Listbox value={selectedUser} onChange={handleChange}>
 				{({ open }) => (
 					<>
@@ -189,19 +187,20 @@ const PeopleView: React.FC = () => {
 					</>
 				)}
 			</Listbox>
+			<div className="flex-1">
 			{userAssignmentData ? (
 				userAssignmentData.userAssignments.map((assignment: AssignmentType) => (
-					<div key={assignment.id}>
+					<div key={assignment.id} className="flex">
 						<p className="text-xl underline">
 							Project Name: {assignment.project.name}
 						</p>
-						{assignment.project.endsOn ? (
-							<p>Project End Date: {assignment.project.endsOn}</p>
+						{assignment.project.startsOn ? (
+							<p>Project Start Date: {assignment.project.startsOn}</p>
 						) : (
 							""
 						)}
-						{assignment.project.startsOn ? (
-							<p>Project Start Date: {assignment.project.startsOn}</p>
+						{assignment.project.endsOn ? (
+							<p>Project End Date: {assignment.project.endsOn}</p>
 						) : (
 							""
 						)}
@@ -211,33 +210,32 @@ const PeopleView: React.FC = () => {
 							<p>Starts On: {assignment.startsOn}</p>
 							<p>Ends On: {assignment.endsOn}</p>
 						</div>
+						{assignment.project.startsOn ? (
+							<p>
+								Project Work Week:
+								{projectWorkWeek(assignment.project.startsOn).cweek}
+							</p>
+						) : (
+							""
+						)}
 						<div className="p-3">
-							{assignment.workWeeks.map((workweek: WorkweekType) => {
-								return (
-									<div
-										className="border-5 pb-3"
-										key={`workweek ${assignment.id}`}
-									>
-										{workweek ? (
-											<p>
-												Week of: {workWeekDate(workweek.year, workweek.cweek)}
-											</p>
-										) : (
-											""
-										)}
-										<p>Calendar Week: {workweek.cweek}</p>
-										<p>Year: {workweek.year}</p>
-										<p>Estimated Hours: {workweek.estimatedHours}</p>
-										<p>Actual Hours: {workweek.actualHours}</p>
-									</div>
-								);
-							})}
+							{assignment.workWeeks.map(
+								(workweek: WorkweekType["workWeek"]) => {
+									return (
+										<WorkWeek
+											key={`workweek${workweek.id}`}
+											workWeek={workweek}
+										/>
+									);
+								}
+							)}
 						</div>
 					</div>
 				))
 			) : (
 				<p>User has no Assignments</p>
 			)}
+			</div>
 		</div>
 	);
 };

@@ -119,6 +119,7 @@ const AddAssignment = () => {
 			},
 		});
 	};
+
 	return (
 		<>
 			{showModal && (
