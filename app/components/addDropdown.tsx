@@ -1,8 +1,10 @@
-"use client";
+"use client"
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
+import Link from "next/link";
 
 export default function AddDropdown() {
+
 	const dropdownSelectedItemClass = (isActive: boolean) =>
 		isActive
 			? "px-4 py-2 block border-b-2 hover:border-gray-200 text-sm"
@@ -52,9 +54,14 @@ export default function AddDropdown() {
 					<div className="py-1">
 						<Menu.Item>
 							{({ active }) => (
-								<a href="#" className={dropdownSelectedItemClass(active)}>
-									Assignment
-								</a>
+								<>
+									<Link
+										href={"?modal=true"}
+										className={dropdownSelectedItemClass(active)}
+									>
+										Assignment
+									</Link>
+								</>
 							)}
 						</Menu.Item>
 						<Menu.Item>

@@ -8,6 +8,9 @@ const Navbar: React.FC = () => {
         <div className="placeholder-logo">Logo</div>
         <Link href="/projects" className="hover:underline">Projects</Link>
         <Link href="#" className="hover:underline">People</Link>
+        <div className="flex justify-between space-x-10">
+        <Link href="#" className="hover:underline">My Plan</Link>
+        </div>
       </div>
     </nav>
   );
