@@ -5,6 +5,7 @@ import useInfiniteScroll, {
     InfiniteScrollRef,
     ScrollDirection
 } from "react-easy-infinite-scroll-hook";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const { getWeek } = require('date-fns');
 
@@ -170,9 +171,8 @@ const WeekDisplay = () => {
 
     return (
         <div className="relative">
-            <div className="flex items-center space-x-4 my-4">
-                <button onClick={scrollToToday} className="p-2 rounded-full bg-gray-300">Today</button>
-                <button onClick={() => scrollWeeks('left')} className="p-2 rounded-full bg-gray-300">Left</button>
+            <div className="flex items-center my-4">
+                <button onClick={() => scrollWeeks('left')} className="p-2 rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center"><FaChevronLeft className="timeline-text-accent" /></button>
                 <div
                     ref={weekContainerRef}
                     className="flex flex-row overflow-x-auto cursor-grab scrollbar-hide"
@@ -181,8 +181,8 @@ const WeekDisplay = () => {
                     <div className="flex min-w-max select-none">
                         {data.weeks.map((week, index) => (
                             <div className="flex flex-col text-nowrap" style={{ width: weekWidth + "px" }} key={index}>
-                                <div className="flex flex-row grow">{data.monthLabels[index]}</div>
-                                <div className={"flex flex-row grow-0"}>{week.date}</div>
+                                <div className="flex flex-row grow text-sm">{data.monthLabels[index]}</div>
+                                <div className={"flex flex-row grow-0 text-sm"}>{week.date}</div>
                                 <div className={"flex flex-row grow-0 h-32 border-l relative"}>
                                     <div className={"h-32 top-0 left-0 absolute bg-gray-100"} style={{ width: weekWidth + "px" }}></div>
                                     {(week.year == 2023 && week.date == 25 && week.month == 'Dec') &&
@@ -195,7 +195,7 @@ const WeekDisplay = () => {
                         ))}
                     </div>
                 </div>
-                <button onClick={() => scrollWeeks('right')} className="p-2 rounded-full bg-gray-300">Right</button>
+                <button onClick={() => scrollWeeks('right')} className="p-2 rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center"><FaChevronRight className="timeline-text-accent" /></button>
                 {isLoading && <div>Loading...</div>}
             </div>
         </div>

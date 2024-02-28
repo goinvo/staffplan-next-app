@@ -18,6 +18,7 @@
   --actionbar-main: var(--accent-green);
   --actionbar-search: #8899A8;
 
+  --timeline-accent: var(--accent-green);
   --timeline-bar-bg: #E5E7EB;
   --timeline-bar-fill: #02AAA4;
   --timeline-actual: #7084A3;
@@ -83,4 +84,12 @@
 
 .actionbar-search {
   background-color: var(--actionbar-search);
+}
+
+.timeline-bar-bg {
+  background-color: var(--timeline-bar-bg);
+}
+
+.timeline-text-accent {
+  color: var(--timeline-accent);
 }
