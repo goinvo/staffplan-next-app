@@ -72,7 +72,7 @@ const WeekDisplay = () => {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const [weeks, setWeeks] = useState<WeekEntry[]>([]);
     const [monthLabels, setMonthLabels] = useState<string[]>([]);
-    const [data, setData] = useState<WeeksAndLabels>(createItems(startYear + 1));
+    const [data, setData] = useState<WeeksAndLabels>(createItems(startYear + 1)); // This is called twice at start, so offset it so the years are correct
     const [startX, setStartX] = useState(0);
     const [scrollStartX, setScrollStartX] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -83,8 +83,10 @@ const WeekDisplay = () => {
         try {
             if (direction === ScrollDirection.LEFT) {
                 yearWindow.start -= 1;
+                console.log(weekContainerRef);
                 const newData = await loadMore(yearWindow.start);
                 setIsLoading(true);
+                setScrollStartX(scrollStartX + (weekWidth * numWeeks));
 
                 setData((prev) => ({ weeks: [...newData.weeks, ...prev.weeks], monthLabels: [...newData.monthLabels, ...prev.monthLabels] } as WeeksAndLabels));
             } else {
@@ -102,7 +104,9 @@ const WeekDisplay = () => {
     const weekContainerRef: InfiniteScrollRef<HTMLDivElement> = useInfiniteScroll({
         next: loadMoreWeeks,
         columnCount: data.weeks.length,
-        hasMore: { left: true, right: true }
+        hasMore: { left: true, right: true },
+        scrollThreshold: 0.1,
+        windowScroll: false,
     });
 
     const scrollToToday = () => {
@@ -176,11 +180,11 @@ const WeekDisplay = () => {
                 >
                     <div className="flex min-w-max select-none">
                         {data.weeks.map((week, index) => (
-                            <div className="flex flex-col w-8 text-nowrap" key={index}>
+                            <div className="flex flex-col text-nowrap" style={{ width: weekWidth + "px" }} key={index}>
                                 <div className="flex flex-row grow">{data.monthLabels[index]}</div>
                                 <div className={"flex flex-row grow-0"}>{week.date}</div>
                                 <div className={"flex flex-row grow-0 h-32 border-l relative"}>
-                                    <div className={"w-8 h-32 top-0 left-0 absolute bg-gray-100"}></div>
+                                    <div className={"h-32 top-0 left-0 absolute bg-gray-100"} style={{ width: weekWidth + "px" }}></div>
                                     {(week.year == 2023 && week.date == 25 && week.month == 'Dec') &&
                                         <div className="w-32 h-8 bg-gray-400 border rounded absolute top-0 left-0 z-40">
                                             {getWeek(new Date(week.year, months.indexOf(week.month), week.date))}
