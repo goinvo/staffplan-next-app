@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect, useState, Fragment } from "react";
 import withApollo from "@/lib/withApollo";
-import { gql, useQuery, useLazyQuery, useMutation } from "@apollo/client";
+import { gql, useQuery, useLazyQuery } from "@apollo/client";
 import { ProjectType, UserType } from "../components/addAssignmentModal";
-import { DateTime } from "luxon";
+import { DateTime, Interval } from "luxon";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { WorkWeek, WorkweekType } from "../components/workWeek";
@@ -61,9 +61,11 @@ const PeopleView: React.FC = () => {
 		id: null,
 		name: "Select",
 	});
+
 	useEffect(() => {
 		setClientSide(true);
 	}, []);
+
 	const {
 		loading: userListLoading,
 		error: userListError,
@@ -77,6 +79,7 @@ const PeopleView: React.FC = () => {
 		skip: !clientSide,
 		errorPolicy: "all",
 	});
+
 	const [
 		getUserAssignments,
 		{
@@ -93,22 +96,68 @@ const PeopleView: React.FC = () => {
 	if (userListLoading) return <p>Loading Users</p>;
 	if (userListError) return <p>Error Loading Users</p>;
 	if (userAssignmentError) return <p>Error Loading User Assignments</p>;
-	const projectWorkWeek = (date: string) => {
+
+	const parseProjectDates = (date: string) => {
 		return {
-			cweek: DateTime.fromISO(date).toFormat("W"),
-			year: DateTime.fromISO(date).toFormat("kkkk"),
+			cweek: parseInt(DateTime.fromISO(date).toFormat("W")),
+			year: parseInt(DateTime.fromISO(date).toFormat("kkkk")),
 		};
 	};
-	const handleChange = (user: UserType) => {
+
+	const parseWorkWeekDate = (weekYear: number, weekNumber: number) => {
+		return DateTime.fromObject({ weekYear, weekNumber }).toISODate();
+	};
+
+	//an array of workWeeks with a formatted date added to the object
+	const workWeekArr = userAssignmentData?.userAssignments.flatMap(
+		(assignment: AssignmentType) =>
+			assignment.workWeeks.map((week: WorkweekType) => {
+				const date = parseWorkWeekDate(week.year, week.cweek);
+				return { workWeek: week, date };
+			})
+	);
+
+	//an array of calendar dates
+	const calWeekDatesArr: string[] = Interval.fromDateTimes(
+		//we set the start date to monday to ensure it captures that week
+		DateTime.now().set({ weekday: 1 }),
+		//we set the end date to tuesday to ensure it captures the monday of that week
+		DateTime.now().endOf("year").set({ weekday: 1 })
+	)
+		.splitBy({ days: 1 })
+		.filter((dur: Interval<true>) => dur.start.weekday === 1)
+		.map((dur: Interval<true>) => dur.start.toISODate());
+
+	//compare work week data and array of weeks and generate components accordingly
+	const workWeekComponentsArr = (
+		calWeekDatesArr: string[],
+		workWeekArr: { workWeek: WorkweekType; date: string }[],
+		assignmentId: number
+	) => {
+		return calWeekDatesArr.map((date) => {
+			//if a workWeek entry exists for a date include it in the array of work week inputs
+			const existingWeek = workWeekArr?.find(
+				(week: { workWeek: WorkweekType; date: string }) =>
+					week.date == date && week.workWeek.assignmentId == assignmentId
+			);
+			if (existingWeek) {
+				return (
+					<WorkWeek key={existingWeek.date} workWeek={existingWeek.workWeek} />
+				);
+			}
+			const { cweek, year } = parseProjectDates(date);
+			return <WorkWeek key={date} workWeek={{ assignmentId, cweek, year }} />;
+		});
+	};
+
+	const handleUserChange = (user: UserType) => {
 		setSelectedUser(user);
 		getUserAssignments({ variables: { selectedUserId: user.id } });
 	};
 
-	if (userAssignmentData) console.log(userAssignmentData);
-
 	return (
-		<div className="flex">
-			<Listbox value={selectedUser} onChange={handleChange}>
+		<div className="flex flex-col">
+			<Listbox value={selectedUser} onChange={handleUserChange}>
 				{({ open }) => (
 					<>
 						<div className="w-1/2 mr-2">
@@ -187,54 +236,58 @@ const PeopleView: React.FC = () => {
 					</>
 				)}
 			</Listbox>
-			<div className="flex-1">
-			{userAssignmentData ? (
-				userAssignmentData.userAssignments.map((assignment: AssignmentType) => (
-					<div key={assignment.id} className="flex">
-						<p className="text-xl underline">
-							Project Name: {assignment.project.name}
-						</p>
-						{assignment.project.startsOn ? (
-							<p>Project Start Date: {assignment.project.startsOn}</p>
-						) : (
-							""
-						)}
-						{assignment.project.endsOn ? (
-							<p>Project End Date: {assignment.project.endsOn}</p>
-						) : (
-							""
-						)}
-						<div className="p-3">
-							<p>Assignment Status: {assignment.status}</p>
-							Assignment Duration
-							<p>Starts On: {assignment.startsOn}</p>
-							<p>Ends On: {assignment.endsOn}</p>
-						</div>
-						{assignment.project.startsOn ? (
-							<p>
-								Project Work Week:
-								{projectWorkWeek(assignment.project.startsOn).cweek}
-							</p>
-						) : (
-							""
-						)}
-						<div className="p-3">
-							{assignment.workWeeks.map(
-								(workweek: WorkweekType["workWeek"]) => {
-									return (
-										<WorkWeek
-											key={`workweek${workweek.id}`}
-											workWeek={workweek}
-										/>
-									);
-								}
-							)}
-						</div>
-					</div>
-				))
-			) : (
-				<p>User has no Assignments</p>
-			)}
+
+			<div className="flex flex-col items-start">
+				{userAssignmentData ? (
+					userAssignmentData.userAssignments.map(
+						(assignment: AssignmentType) => (
+							<div key={assignment.id} className="flex">
+								<div>
+									<p className="text-xl underline">
+										Project Name: {assignment.project.name}
+									</p>
+									{assignment.project.startsOn ? (
+										<p>Project Start Date: {assignment.project.startsOn}</p>
+									) : (
+										""
+									)}
+									{assignment.project.endsOn ? (
+										<p>Project End Date: {assignment.project.endsOn}</p>
+									) : (
+										""
+									)}
+									<div className="p-3">
+										<span>Assignment Status:{assignment.status}</span>
+										<br />
+										<span>Assignment Duration</span>
+										<br />
+										<span>Starts On: {assignment.startsOn}</span>
+										<br />
+										<span>Ends On: {assignment.endsOn}</span>
+										<br />
+									</div>
+								</div>
+								{assignment.project.startsOn ? (
+									<p>
+										Project Work Week:
+										{parseProjectDates(assignment.project.startsOn).cweek}
+									</p>
+								) : (
+									""
+								)}
+								<div className="p-3 flex">
+									{workWeekComponentsArr(
+										calWeekDatesArr,
+										workWeekArr,
+										assignment.id
+									)}
+								</div>
+							</div>
+						)
+					)
+				) : (
+					<p>User has no Assignments</p>
+				)}
 			</div>
 		</div>
 	);

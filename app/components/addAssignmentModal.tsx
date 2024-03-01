@@ -58,7 +58,7 @@ const UPSERT_ASSIGNMENT = gql`
 			startsOn
 			endsOn
 			status
-			user {
+			assignedUser {
 				id
 			}
 		}
