@@ -7,7 +7,7 @@ import useInfiniteScroll, {
 } from "react-easy-infinite-scroll-hook";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-const { getWeek } = require('date-fns');
+const { getWeek, eachWeekOfInterval, differenceInCalendarDays, addDays } = require('date-fns');
 
 type WeekEntry = {
     date: number;
@@ -25,41 +25,48 @@ type YearWindow = {
     end: number;
 };
 
-const createItems = (year: number, length = 52): WeeksAndLabels =>
-    generateWeeksForYear(year, length);
+const createItems = (year: number): WeeksAndLabels =>
+    generateWeeksForYear(year);
 
-const loadMore = async (year: number, length = 52): Promise<WeeksAndLabels> =>
-    new Promise((res) => setTimeout(() => res(createItems(year, length)), 52));
+const loadMore = async (year: number): Promise<WeeksAndLabels> =>
+    new Promise((res) => setTimeout(() => res(createItems(year))));
 
-const generateWeeksForYear = (beginYear: number, numWeeks: number = 52, startDate: Date = new Date(2024, 0, 1)): WeeksAndLabels => {
+const generateWeeksForYear = (beginYear: number, startDate: Date = new Date()): WeeksAndLabels => {
     const weeks: WeekEntry[] = [];
     const monthLabels: string[] = [];
 
-    // Calculate the offset for the first week relative to 2024-01-01 by finding the number of days between the two dates and modulo 7 (add 7 to ensure positive result)
     let currentDate = new Date(beginYear, 0, 1)
-    const offset = Math.abs(currentDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24) % 7;
-    currentDate.setDate(currentDate.getDate() + offset); // Clone the beginDate to avoid mutating the original date
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     let lastMonthLabel = "";
 
-    for (let i = 0; i < numWeeks; i++) {
+    const firstDate = addDays(currentDate, 1);
+    const lastDate = new Date(beginYear, 11, 31);
+
+    const weeksInYear = eachWeekOfInterval({ start: firstDate, end: lastDate });
+
+    // If the first week is in the previous year, skip it
+    if (weeksInYear[0].getFullYear() < beginYear) {
+        weeksInYear.shift();
+    }
+
+    for (const date of weeksInYear) {
         weeks.push({
-            date: currentDate.getDate(),
-            month: months[currentDate.getMonth()],
-            year: currentDate.getFullYear(),
+            date: date.getDate(),
+            month: months[date.getMonth()],
+            year: date.getFullYear(),
         });
 
         // Determine if the month label should be added
-        const currentMonthLabel = months[currentDate.getMonth()] + (currentDate.getMonth() === 0 ? " " + currentDate.getFullYear() : "");
+        const currentMonthLabel = months[date.getMonth()] + (date.getMonth() === 0 ? " " + date.getFullYear() : "");
         if (lastMonthLabel !== currentMonthLabel) {
             monthLabels.push(currentMonthLabel);
             lastMonthLabel = currentMonthLabel;
         } else {
             monthLabels.push(""); // No label for this entry
         }
-
-        currentDate.setDate(currentDate.getDate() + 7); // Move to the next week
     }
+
+    console.log("Weeks: ", eachWeekOfInterval({start: firstDate, end: lastDate}));
 
     return { weeks, monthLabels };
 };
@@ -67,12 +74,9 @@ const generateWeeksForYear = (beginYear: number, numWeeks: number = 52, startDat
 const weekWidth = 32;
 
 const WeekDisplay = () => {
-    const numWeeks = 52;
-    const startYear = 2024;
-    const startDate = new Date(startYear, 0, 1);
+    const today = new Date();
+    const startYear = today.getFullYear();
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const [weeks, setWeeks] = useState<WeekEntry[]>([]);
-    const [monthLabels, setMonthLabels] = useState<string[]>([]);
     const [data, setData] = useState<WeeksAndLabels>(createItems(startYear + 1)); // This is called twice at start, so offset it so the years are correct
     const [startX, setStartX] = useState(0);
     const [scrollStartX, setScrollStartX] = useState(0);
@@ -86,10 +90,13 @@ const WeekDisplay = () => {
                 yearWindow.start -= 1;
                 console.log(weekContainerRef);
                 const newData = await loadMore(yearWindow.start);
-                setIsLoading(true);
-                setScrollStartX(scrollStartX + (weekWidth * numWeeks));
 
+                setIsLoading(true);
+                setScrollStartX(scrollStartX + (weekWidth * newData.weeks.length));
+
+                console.log("Weeks: ", newData.weeks);
                 setData((prev) => ({ weeks: [...newData.weeks, ...prev.weeks], monthLabels: [...newData.monthLabels, ...prev.monthLabels] } as WeeksAndLabels));
+                console.log(data);
             } else {
                 yearWindow.end += 1;
                 const newData = await loadMore(yearWindow.end);
@@ -112,7 +119,7 @@ const WeekDisplay = () => {
 
     const scrollToToday = () => {
         const today = new Date();
-        const weekIndex = weeks.findIndex(week => {
+        const weekIndex = data.weeks.findIndex(week => {
             const weekDate = new Date(today.getFullYear(), months.indexOf(week.month), week.date);
             return today >= weekDate;
         });
@@ -185,7 +192,7 @@ const WeekDisplay = () => {
                                 <div className={"flex flex-row grow-0 text-sm"}>{week.date}</div>
                                 <div className={"flex flex-row grow-0 h-32 border-l relative"}>
                                     <div className={"h-32 top-0 left-0 absolute bg-gray-100"} style={{ width: weekWidth + "px" }}></div>
-                                    {(week.year == 2023 && week.date == 25 && week.month == 'Dec') &&
+                                    {(week.year == 2023 && week.date == 31 && week.month == 'Dec') &&
                                         <div className="w-32 h-8 bg-gray-400 border rounded absolute top-0 left-0 z-40">
                                             {getWeek(new Date(week.year, months.indexOf(week.month), week.date))}
                                         </div>
