@@ -82,7 +82,7 @@ export const WorkWeek = ({ workWeek }: WorkWeekProps) => {
 	if (mutationLoading) return <p> LOADING WORK WEEKS</p>;
 	if (mutationError) return <p>ERROR ADJUSTING TIME</p>;
 	const workWeekDate = (weekYear: number, weekNumber: number) => {
-		return DateTime.fromObject({ weekYear, weekNumber }).toLocaleString();
+		return DateTime.fromObject({ weekYear, weekNumber }).toFormat("LL/dd");
 	};
 
 	return (
@@ -96,7 +96,7 @@ export const WorkWeek = ({ workWeek }: WorkWeekProps) => {
 					""
 				)}
 				<Formik
-					onSubmit={(values, actions) => onSubmitUpsert(values)}
+					onSubmit={(values) => onSubmitUpsert(values)}
 					initialValues={initialValues}
 				>
 					{({ handleSubmit, handleChange, dirty, values, resetForm }) => (
