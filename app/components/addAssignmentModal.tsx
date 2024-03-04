@@ -4,7 +4,7 @@ import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import ProjectDatepicker from "./projectDatepicker";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, usePathname } from "next/navigation";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
 
@@ -58,7 +58,7 @@ const UPSERT_ASSIGNMENT = gql`
 			startsOn
 			endsOn
 			status
-			user {
+			assignedUser {
 				id
 			}
 		}
@@ -85,6 +85,7 @@ const AddAssignment = () => {
 		setClientSide(true);
 	}, []);
 	const searchParams = useSearchParams();
+	const pathName = usePathname();
 	const showModal = searchParams.get("modal");
 	const [selectedUser, setSelectedUser] = useState<UserType>({id:null,name:"Select"});
 	const [selectedProject, setSelectedProject] =
@@ -118,6 +119,7 @@ const AddAssignment = () => {
 			},
 		});
 	};
+
 	return (
 		<>
 			{showModal && (
@@ -362,14 +364,14 @@ const AddAssignment = () => {
 													</div>
 													<div className="mr-2">
 														<Link
-															href="/projects"
+															href={pathName}
 															type="button"
 															className="p-2 text-sm font-semibold leading-6 text-gray-900"
 														>
 															Cancel
 														</Link>
 														<Link
-															href="/projects"
+															href={pathName}
 															type="submit"
 															className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 															onClick={handleSubmit}
