@@ -66,8 +66,6 @@ const generateWeeksForYear = (beginYear: number, startDate: Date = new Date()): 
         }
     }
 
-    console.log("Weeks: ", eachWeekOfInterval({start: firstDate, end: lastDate}));
-
     return { weeks, monthLabels };
 };
 
@@ -94,9 +92,7 @@ const WeekDisplay = () => {
                 setIsLoading(true);
                 setScrollStartX(scrollStartX + (weekWidth * newData.weeks.length));
 
-                console.log("Weeks: ", newData.weeks);
                 setData((prev) => ({ weeks: [...newData.weeks, ...prev.weeks], monthLabels: [...newData.monthLabels, ...prev.monthLabels] } as WeeksAndLabels));
-                console.log(data);
             } else {
                 yearWindow.end += 1;
                 const newData = await loadMore(yearWindow.end);
