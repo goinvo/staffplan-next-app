@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { gql, useMutation } from "@apollo/client";
 import { DateTime } from "luxon";
 import { Formik } from "formik";
-export interface WorkweekType {
+export interface WorkWeekType {
 	id?: number;
 	actualHours?: number;
 	estimatedHours?: number;
@@ -12,7 +12,7 @@ export interface WorkweekType {
 	year: number;
 }
 interface WorkWeekProps {
-	workWeek: WorkweekType;
+	workWeek: WorkWeekType;
 }
 interface UpsertValues {
 	actualHours: number | string;

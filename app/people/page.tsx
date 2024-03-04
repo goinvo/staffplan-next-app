@@ -6,7 +6,7 @@ import { ProjectType, UserType } from "../components/addAssignmentModal";
 import { DateTime, Interval } from "luxon";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
-import { WorkWeek, WorkweekType } from "../components/workWeek";
+import { WorkWeek, WorkWeekType } from "../components/workWeek";
 
 interface AssignmentType {
 	id: number;
@@ -88,7 +88,7 @@ const PeopleView: React.FC = () => {
 			error: userAssignmentError,
 			called,
 		},
-	] = useLazyQuery(GET_USER_ASSIGNMENTS, {
+	] = useLazyQuery(GET_USER_ASSIGNMENTS,{
 		variables: { selectedUserId: selectedUser.id },
 	});
 
@@ -113,7 +113,7 @@ const PeopleView: React.FC = () => {
 	//an array of workWeeks with a formatted date added to the object
 	const workWeekArr = userAssignmentData?.userAssignments.flatMap(
 		(assignment: AssignmentType) =>
-			assignment.workWeeks.map((week: WorkweekType) => {
+			assignment.workWeeks.map((week: WorkWeekType) => {
 				const date = parseWorkWeekDate(week.year, week.cweek);
 				return { workWeek: week, date };
 			})
@@ -148,14 +148,14 @@ const PeopleView: React.FC = () => {
 			assignmentStartDate: string | null,
 			assignmentEndDate: string | null
 		) => string[],
-		workWeekArr: { workWeek: WorkweekType; date: string }[],
+		workWeekArr: { workWeek: WorkWeekType; date: string }[],
 		assignmentId: number
 	) => {
 		return calWeekDatesArr(assignmentStartDate, assignmentEndDate).map(
 			(date: string) => {
 				//if a workWeek entry exists for a date include it in the array of work week inputs
 				const existingWeek = workWeekArr?.find(
-					(week: { workWeek: WorkweekType; date: string }) =>
+					(week: { workWeek: WorkWeekType; date: string }) =>
 						week.date == date && week.workWeek.assignmentId == assignmentId
 				);
 				if (existingWeek) {
