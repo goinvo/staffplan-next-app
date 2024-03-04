@@ -44,10 +44,15 @@ export default function AddDropdown() {
 							)}
 						</Menu.Item>
 						<Menu.Item>
-							{({ active }) => (
-								<a href="#" className={dropdownSelectedItemClass(active)}>
-									Project
-								</a>
+						{({ active }) => (
+								<>
+									<Link
+										href={"?projectmodal=true"}
+										className={dropdownSelectedItemClass(active)}
+									>
+										Project
+									</Link>
+								</>
 							)}
 						</Menu.Item>
 					</div>
@@ -56,7 +61,7 @@ export default function AddDropdown() {
 							{({ active }) => (
 								<>
 									<Link
-										href={"?modal=true"}
+										href={"?assignmentmodal=true"}
 										className={dropdownSelectedItemClass(active)}
 									>
 										Assignment

@@ -1,32 +1,61 @@
-
-import React, { SetStateAction, Dispatch,useState } from "react";
-import { ProjectType } from "./addAssignmentModal";
-
-interface DateType {
-	startDate:string | null;
-	endDate:string | null
+import React, { SetStateAction, Dispatch, useState } from "react";
+import { ProjectType, ProjectValuesType } from "./addProjectModal";
+export interface DateType {
+	startDate: string | null;
+	endDate: string | null;
 }
 export default function ProjctDatepicker({
 	selectedProject,
 	setDates,
-}:{selectedProject:ProjectType, setDates: Dispatch<SetStateAction<ProjectType>>}) {
-	const [projectDates, setProjectDates] = useState<DateType>({startDate:"",endDate:""})
+	setProjectModalDates,
+	modalSource,
+}: {
+	selectedProject?: ProjectType;
+	setDates?: Dispatch<SetStateAction<ProjectType>>;
+	setProjectModalDates?: Dispatch<SetStateAction<ProjectValuesType>>;
+	modalSource: string;
+}) {
+	const [projectDates, setProjectDates] = useState<DateType>({
+		startDate: "",
+		endDate: "",
+	});
 	const handleStartDateChange = (newDate: string) => {
-		setDates((project) => ({ ...project, startsOn: newDate }));
-		setProjectDates({...projectDates, startDate:newDate})
+		if (modalSource === "addAssignment" && setDates) {
+			setDates((project: ProjectType) => ({ ...project, startsOn: newDate }));
+			setProjectDates({ ...projectDates, startDate: newDate });
+		}
+		if (modalSource === "addProject" && setProjectModalDates) {
+			setProjectModalDates((project: ProjectValuesType) => ({
+				...project,
+				startsOn: newDate,
+			}));
+			setProjectDates({ ...projectDates, startDate: newDate });
+		}
 	};
 	const handleEndDateChange = (newDate: string) => {
-		setDates((project) => ({ ...project, endsOn: newDate }));
-		setProjectDates({...projectDates, endDate:newDate})
+		if (modalSource === "addAssignment" && setDates) {
+			setDates((project: ProjectType) => ({ ...project, endsOn: newDate }));
+			setProjectDates({ ...projectDates, endDate: newDate });
+		}
+		if (modalSource === "addProject" && setProjectModalDates) {
+			setProjectModalDates((project: ProjectValuesType) => ({
+				...project,
+				endsOn: newDate,
+			}));
+			setProjectDates({ ...projectDates, endDate: newDate });
+		}
 	};
 	const handleCoverDurationClick = () => {
-		if (selectedProject) {
+		if (selectedProject && setDates) {
 			setDates((project) => ({
 				...project,
 				startDate: selectedProject.startsOn,
 				endDate: selectedProject.endsOn,
-			}))
-			setProjectDates({startDate: selectedProject.startsOn, endDate: selectedProject.endsOn});
+			}));
+			setProjectDates({
+				startDate: selectedProject.startsOn,
+				endDate: selectedProject.endsOn,
+			});
 		}
 	};
 	return (
@@ -41,12 +70,13 @@ export default function ProjctDatepicker({
 					value={projectDates.startDate || ""}
 					onChange={(e) => handleStartDateChange(e.target.value)}
 				/>
-				<span
-					onClick={handleCoverDurationClick}
-					style={{ color: "teal" }}
-				>
-					Cover Project Span
-				</span>
+				{modalSource === "addAssignment" ? (
+					<span onClick={handleCoverDurationClick} style={{ color: "teal" }}>
+						Cover Project Span
+					</span>
+				) : (
+					""
+				)}
 			</div>
 			<div className="w-48">
 				<label className="block mb-2 ">End</label>
