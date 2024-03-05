@@ -115,7 +115,7 @@ const AddAssignment = () => {
 			{showModal && (
 				<div
 					className="relative z-10"
-					aria-labelledby="modal-title"
+					aria-labelledby="assignment-modal"
 					role="dialog"
 					aria-modal="true"
 				>

@@ -60,35 +60,35 @@ export default function ProjctDatepicker({
 	};
 	return (
 		<div className="flex justify-between">
-			<div className="w-48">
-				<label className="block mb-2">Start</label>
-				<input
-					className="w-full px-4 py-2 border rounded-md "
-					type="date"
-					id="startDate"
-					name="project-start"
-					value={projectDates.startDate || ""}
-					onChange={(e) => handleStartDateChange(e.target.value)}
-				/>
-				{modalSource === "addAssignment" ? (
-					<span onClick={handleCoverDurationClick} style={{ color: "teal" }}>
-						Cover Project Span
-					</span>
-				) : (
-					""
-				)}
-			</div>
-			<div className="w-48">
-				<label className="block mb-2 ">End</label>
-				<input
-					className="w-full px-4 py-2 border rounded-md"
-					type="date"
-					id="endDate"
-					name="project-end"
-					value={projectDates.endDate || ""}
-					onChange={(e) => handleEndDateChange(e.target.value)}
-				/>
-			</div>
-		</div>
+    <div className="w-48 mr-4">
+        <label className="block mb-2">Start</label>
+        <input
+            className="w-full px-4 py-2 border rounded-md"
+            type="date"
+            id="startDate"
+            name="project-start"
+            value={projectDates.startDate || ""}
+            onChange={(e) => handleStartDateChange(e.target.value)}
+        />
+        {modalSource === "addAssignment" ? (
+            <span onClick={handleCoverDurationClick} style={{ color: "teal" }}>
+                Cover Project Span
+            </span>
+        ) : (
+            ""
+        )}
+    </div>
+    <div className="w-48">
+        <label className="block mb-2">End</label>
+        <input
+            className="w-full px-4 py-2 border rounded-md"
+            type="date"
+            id="endDate"
+            name="project-end"
+            value={projectDates.endDate || ""}
+            onChange={(e) => handleEndDateChange(e.target.value)}
+        />
+    </div>
+</div>
 	);
 }
