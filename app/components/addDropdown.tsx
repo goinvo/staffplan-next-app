@@ -2,6 +2,7 @@
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import Link from "next/link";
+import React from "react";
 
 export default function AddDropdown() {
 
@@ -11,7 +12,7 @@ export default function AddDropdown() {
 			: "text-gray-900 block px-4 py-2 text-sm";
 
 	return (
-		<Menu as="div" className="relative inline-block text-left z-40">
+		<Menu as="div" className="relative inline-block text-left z-40" id="add-dropdown" data-testid="add-dropdown">
 			<div>
 				<Menu.Button className="actionbar-bg-accent actionbar-text-accent w-8 h-8 rounded-full flex justify-center items-center">
 					+

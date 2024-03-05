@@ -17,8 +17,10 @@ const config: Config = {
 module.exports = {
     testEnvironment: "jsdom",
     transform: {
-        '^.+\\.[tj]sx?$': 'babel-jest', // Transform both `.ts`, `.tsx`, `.js`, and `.jsx` files
-    },
+        '^.+\\.(t|j)sx?$': '@swc/jest',
+      },
+      // Since we are using TypeScript, include the file extensions
+      moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
