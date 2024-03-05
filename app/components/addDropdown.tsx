@@ -13,7 +13,7 @@ export default function AddDropdown() {
 	return (
 		<Menu as="div" className="relative inline-block text-left">
 			<div>
-				<Menu.Button className="w-8 h-8 rounded-full border-2 border-gray-400 flex justify-center items-center">
+				<Menu.Button className="actionbar-bg-accent actionbar-text-accent w-8 h-8 rounded-full flex justify-center items-center">
 					+
 				</Menu.Button>
 			</div>

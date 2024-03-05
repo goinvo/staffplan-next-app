@@ -6,15 +6,32 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+
+  --accent-green: #72DDC3;
+  --accent-blue: #3758F9;
+  
+  --navbar-bg: #121F35;
+  --navbar-main: #FFFFFF;
+  --navbar-accent: var(--accent-green);
+
+  --actionbar-bg: #435064;
+  --actionbar-main: var(--accent-green);
+  --actionbar-search: #8899A8;
+
+  --timeline-accent: var(--accent-green);
+  --timeline-bar-bg: #E5E7EB;
+  --timeline-bar-fill: #02AAA4;
+  --timeline-actual: #7084A3;
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
+    
   }
-}
+} */
 
 @layer utilities {
   .text-balance {
@@ -29,4 +46,50 @@
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.navbar {
+  background-color: var(--navbar-bg);
+  color: var(--navbar-main);
+}
+
+.navbar-text-accent {
+  color: var(--navbar-accent);
+}
+
+.navbar-border-accent {
+  border-color: var(--navbar-accent);
+}
+
+.actionbar {
+  background-color: var(--actionbar-bg);
+  color: var(--actionbar-main);
+}
+
+.actionbar-bg-accent {
+  background-color: var(--actionbar-main);
+}
+
+.actionbar-text-accent {
+  color: var(--actionbar-bg);
+}
+
+.actionbar-text-search {
+  color: var(--actionbar-search);
+}
+
+.actionbar-border-accent {
+  border-color: var(--actionbar-main);
+}
+
+.actionbar-search {
+  background-color: var(--actionbar-search);
+}
+
+.timeline-bar-bg {
+  background-color: var(--timeline-bar-bg);
+}
+
+.timeline-text-accent {
+  color: var(--timeline-accent);
 }
