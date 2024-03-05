@@ -9,7 +9,7 @@ const ActionBar: React.FC = () => {
       <div className="flex items-center space-x-4">
         <AddDropdown/>
         <div className="flex items-center border actionbar-border-accent rounded-full">
-          <div className="w-12 h-8 flex justify-center items-center rounded-l-full bg-white"><FaSortAmountDown /></div>
+          <div className="w-12 h-8 flex justify-center items-center rounded-l-full actionbar-bg-accent actionbar-text-accent"><FaSortAmountDown /></div>
           <div className="border-l actionbar-border-accent w-12 h-8 flex justify-center items-center rounded-r-full"><FaExpand /></div>
         </div>
         <div className="border-l-2 border-gray-400 h-6"></div>

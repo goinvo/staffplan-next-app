@@ -11,7 +11,7 @@ export default function AddDropdown() {
 			: "text-gray-900 block px-4 py-2 text-sm";
 
 	return (
-		<Menu as="div" className="relative inline-block text-left">
+		<Menu as="div" className="relative inline-block text-left z-40">
 			<div>
 				<Menu.Button className="actionbar-bg-accent actionbar-text-accent w-8 h-8 rounded-full flex justify-center items-center">
 					+

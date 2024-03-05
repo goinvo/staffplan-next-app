@@ -188,7 +188,7 @@ const WeekDisplay = () => {
                                 <div className={"flex flex-row grow-0 h-32 border-l relative"}>
                                     <div className={"h-32 top-0 left-0 absolute bg-gray-100"} style={{ width: weekWidth + "px" }}></div>
                                     {(week.year == 2023 && week.date == 31 && week.month == 'Dec') &&
-                                        <div className="w-32 h-8 bg-gray-400 border rounded absolute top-0 left-0 z-40">
+                                        <div className="w-32 h-8 bg-gray-400 border rounded absolute top-0 left-0 z-20">
                                             {getWeek(new Date(week.year, months.indexOf(week.month), week.date))}
                                         </div>
                                     }
