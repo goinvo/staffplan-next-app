@@ -2,12 +2,12 @@
 import React, { useEffect, useState, Fragment } from "react";
 import withApollo from "@/lib/withApollo";
 import { gql, useQuery, useLazyQuery } from "@apollo/client";
-import { ProjectType, UserType } from "../components/addAssignmentModal";
+import {UserType } from "../components/addAssignmentModal";
 import { DateTime, Interval } from "luxon";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { WorkWeek, WorkWeekType } from "../components/workWeek";
-
+import { ProjectType } from "../components/addProjectModal";
 interface AssignmentType {
 	id: number;
 	endsOn: string | null;

@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useSearchParams, usePathname } from "next/navigation";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
-
+import { ProjectType } from "./addProjectModal";
 const GET_DATA = gql`
 	{
 		clients {
@@ -64,16 +64,6 @@ const UPSERT_ASSIGNMENT = gql`
 		}
 	}
 `;
-
-export interface ProjectType {
-	id: number | null;
-	paymentFrequency: string;
-	name: string;
-	status: string;
-	users: [];
-	startsOn: string | null;
-	endsOn: string | null;
-}
 export interface UserType {
 	id: number | null;
 	name: string;
@@ -86,7 +76,7 @@ const AddAssignment = () => {
 	}, []);
 	const searchParams = useSearchParams();
 	const pathName = usePathname();
-	const showModal = searchParams.get("modal");
+	const showModal = searchParams.get("assignmentmodal");
 	const [selectedUser, setSelectedUser] = useState<UserType>({id:null,name:"Select"});
 	const [selectedProject, setSelectedProject] =
 		useState<ProjectType>({id:null, paymentFrequency:"",name:"Select",status:"",users:[], startsOn:null, endsOn:null});
@@ -344,6 +334,7 @@ const AddAssignment = () => {
 													<ProjectDatepicker
 														selectedProject={selectedProject}
 														setDates={setSelectedProject}
+														modalSource={"addAssignment"}
 													/>
 												</div>
 
