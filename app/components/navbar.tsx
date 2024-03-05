@@ -8,7 +8,7 @@ const Navbar: React.FC = () => {
       <div className="flex items-center space-x-4 h-full">
         <div className="placeholder-logo">Logo</div>
         <Link href="/projects" className="flex h-full justify-between items-center hover:underline">Projects</Link>
-        <Link href="#" className="flex h-full justify-between items-center border-b-2 navbar-border-accent hover:underline"><b>People</b></Link>
+        <Link href="/people" className="flex h-full justify-between items-center border-b-2 navbar-border-accent hover:underline"><b>People</b></Link>
       </div>
       <div className="flex items-center space-x-4 py-4">
         <Link href="#" className="navbar-text-accent hover:underline">My Plan</Link>
