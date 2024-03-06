@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useState, Fragment } from "react";
+import React, { useEffect, useState, useCallback, Fragment } from "react";
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import withApollo from "@/lib/withApollo";
 import { gql, useQuery, useLazyQuery } from "@apollo/client";
 import { ProjectType, UserType } from "../components/addAssignmentModal";
@@ -7,6 +8,8 @@ import { DateTime, Interval } from "luxon";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { WorkWeek, WorkWeekType } from "../components/workWeek";
+
+export const dynamic = 'force-dynamic'
 
 interface AssignmentType {
 	id: number;
@@ -61,6 +64,9 @@ const PeopleView: React.FC = () => {
 		id: null,
 		name: "Select",
 	});
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const pathname = usePathname();
 
 	useEffect(() => {
 		setClientSide(true);
@@ -88,7 +94,7 @@ const PeopleView: React.FC = () => {
 			error: userAssignmentError,
 			called,
 		},
-	] = useLazyQuery(GET_USER_ASSIGNMENTS,{
+	] = useLazyQuery(GET_USER_ASSIGNMENTS, {
 		variables: { selectedUserId: selectedUser.id },
 	});
 
@@ -172,7 +178,20 @@ const PeopleView: React.FC = () => {
 		);
 	};
 
+	const createQueryString = 
+		(name: string, value: string) => {
+			const params = new URLSearchParams(searchParams.toString())
+			params.set(name, value)
+
+			return params.toString()
+		}
+	
+
 	const handleUserChange = (user: UserType) => {
+
+		router.push(pathname + '/' + encodeURIComponent(user.name))
+		console.log('user', user)
+
 		setSelectedUser(user);
 		getUserAssignments({ variables: { selectedUserId: user.id } });
 	};
