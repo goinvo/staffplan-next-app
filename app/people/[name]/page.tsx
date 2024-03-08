@@ -56,7 +56,7 @@ const UserPage: React.FC = () => {
 	const searchParams = useSearchParams();
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<UserType>({
-		id: null,
+		id: NaN,
 		name: "Select",
 	});
 
