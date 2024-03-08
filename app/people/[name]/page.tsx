@@ -3,7 +3,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import withApollo from '@/lib/withApollo';
 import { gql, useQuery, useLazyQuery } from "@apollo/client";
-import { ProjectType, UserType } from "../../components/addAssignmentModal";
+import { UserType } from "../../components/addAssignmentModal";
 import { parseProjectDates, parseWorkWeekDate, workWeekComponentsArr, AssignmentType, calWeekDatesArr, workWeekArr } from "../../people/helperFunctions";
 
 const GET_USER_ASSIGNMENTS = gql`
