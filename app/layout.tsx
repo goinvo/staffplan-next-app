@@ -3,7 +3,6 @@ import { Open_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/navbar";
 import ActionBar from "./components/actionbar";
-import WeekDisplay from "./components/weekDisplay";
 import AddAssignment from "./components/addAssignmentModal";
 import { Suspense } from "react";
 
@@ -25,7 +24,6 @@ export default function RootLayout({
 			<body className={open_sans.className}>
 				<Navbar />
 				<ActionBar />
-				<WeekDisplay />
 				<Suspense>
 					<AddAssignment />
 				</Suspense>

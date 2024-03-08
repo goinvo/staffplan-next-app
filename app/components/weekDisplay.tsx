@@ -1,16 +1,43 @@
 'use client'
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, ReactNode } from "react";
 import useInfiniteScroll, {
     InfiniteScrollRef,
     ScrollDirection
 } from "react-easy-infinite-scroll-hook";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import SideList, { sideListGutterHeight } from "./sideList";
+import { WorkWeekType } from "./workWeek";
 
-const { getWeek, eachWeekOfInterval, differenceInCalendarDays, addDays } = require('date-fns');
+const { getWeek, startOfYear, eachWeekOfInterval, differenceInCalendarDays, addDays } = require('date-fns');
+
+export interface SideLabelComponents {
+    labelContents: React.ReactNode[];
+    setDivHeights: (heights: number[]) => void;
+    offset: number;
+};
+
+export type WeekCellData = {
+    workWeeks: WorkWeekType[];
+};
+
+export type WeekDisplayProps = {
+    labelContents: React.ReactNode[];
+    weekCellDataArray?: WeekCellData[];
+    onMouseOverWeek?: (week: number, year: number, cellId?: number) => void;
+    onMouseClickWeek?: (week: number, year: number, cellId?: number) => void;
+    selectedCell?: selectedCell;
+};
+
+export type selectedCell = {
+    week: number;
+    year: number;
+    rowId?: number;
+};
 
 type WeekEntry = {
     date: number;
-    month: string;
+    week: number;
+    month: number;
     year: number;
 };
 
@@ -30,7 +57,7 @@ const createItems = (year: number): WeeksAndLabels =>
 const loadMore = async (year: number): Promise<WeeksAndLabels> =>
     new Promise((res) => setTimeout(() => res(createItems(year))));
 
-const generateWeeksForYear = (beginYear: number, startDate: Date = new Date()): WeeksAndLabels => {
+const generateWeeksForYear = (beginYear: number): WeeksAndLabels => {
     const weeks: WeekEntry[] = [];
     const monthLabels: string[] = [];
 
@@ -48,15 +75,16 @@ const generateWeeksForYear = (beginYear: number, startDate: Date = new Date()): 
         weeksInYear.shift();
     }
 
-    for (const date of weeksInYear) {
+    for (let dateIndex = 0; dateIndex < weeksInYear.length; dateIndex++) {
         weeks.push({
-            date: date.getDate(),
-            month: months[date.getMonth()],
-            year: date.getFullYear(),
+            date: weeksInYear[dateIndex].getDate(),
+            week: dateIndex,
+            month: weeksInYear[dateIndex].getMonth(),
+            year: weeksInYear[dateIndex].getFullYear(),
         });
 
         // Determine if the month label should be added
-        const currentMonthLabel = months[date.getMonth()] + (date.getMonth() === 0 ? " " + date.getFullYear() : "");
+        const currentMonthLabel = months[weeksInYear[dateIndex].getMonth()] + (weeksInYear[dateIndex].getMonth() === 0 ? " " + weeksInYear[dateIndex].getFullYear() : "");
         if (lastMonthLabel !== currentMonthLabel) {
             monthLabels.push(currentMonthLabel);
             lastMonthLabel = currentMonthLabel;
@@ -68,9 +96,9 @@ const generateWeeksForYear = (beginYear: number, startDate: Date = new Date()): 
     return { weeks, monthLabels };
 };
 
-const weekWidth = 32;
+const weekWidth = 64;
 
-const WeekDisplay = () => {
+const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, weekCellDataArray, onMouseOverWeek, onMouseClickWeek, selectedCell }) => {
     const today = new Date();
     const startYear = today.getFullYear();
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -80,12 +108,12 @@ const WeekDisplay = () => {
     const [isDragging, setIsDragging] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [yearWindow, setYearWindow] = useState<YearWindow>({ start: startYear + 1, end: startYear + 1 });
+    const [sideLabelDivHeights, setSideLabelDivHeights] = useState<number[]>([]);
 
     const loadMoreWeeks = async (direction: ScrollDirection) => {
         try {
             if (direction === ScrollDirection.LEFT) {
                 yearWindow.start -= 1;
-                console.log(weekContainerRef);
                 const newData = await loadMore(yearWindow.start);
 
                 setIsLoading(true);
@@ -115,7 +143,7 @@ const WeekDisplay = () => {
     const scrollToToday = () => {
         const today = new Date();
         const weekIndex = data.weeks.findIndex(week => {
-            const weekDate = new Date(today.getFullYear(), months.indexOf(week.month), week.date);
+            const weekDate = new Date(today.getFullYear(), week.month, week.date);
             return today >= weekDate;
         });
         const container = weekContainerRef.current;
@@ -173,11 +201,12 @@ const WeekDisplay = () => {
 
     return (
         <div className="relative">
+            <SideList labelContents={labelContents} setDivHeights={setSideLabelDivHeights} offset={48}/>
             <div className="flex items-center my-4">
                 <button onClick={() => scrollWeeks('left')} className="p-2 rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center"><FaChevronLeft className="timeline-text-accent" /></button>
                 <div
                     ref={weekContainerRef}
-                    className="flex flex-row overflow-x-auto cursor-grab scrollbar-hide"
+                    className="flex flex-row overflow-x-auto scrollbar-hide cursor-grab"
                     onMouseDown={onDragStart}
                 >
                     <div className="flex min-w-max select-none">
@@ -185,13 +214,18 @@ const WeekDisplay = () => {
                             <div className="flex flex-col text-nowrap" style={{ width: weekWidth + "px" }} key={index}>
                                 <div className="flex flex-row grow text-sm">{data.monthLabels[index]}</div>
                                 <div className={"flex flex-row grow-0 text-sm"}>{week.date}</div>
-                                <div className={"flex flex-row grow-0 h-32 border-l relative"}>
-                                    <div className={"h-32 top-0 left-0 absolute bg-gray-100"} style={{ width: weekWidth + "px" }}></div>
-                                    {(week.year == 2023 && week.date == 31 && week.month == 'Dec') &&
-                                        <div className="w-32 h-8 bg-gray-400 border rounded absolute top-0 left-0 z-20">
-                                            {getWeek(new Date(week.year, months.indexOf(week.month), week.date))}
-                                        </div>
-                                    }
+                                <div className={"flex flex-row grow-0 relative"}>
+                                    <div className={"top-0 left-0 timeline-grid-gap-bg"} style={{ width: weekWidth + "px" }} key={index}>
+                                        {sideLabelDivHeights.map((height, rowIndex) => {
+                                            return <div className="flex border-l timeline-grid-bg timeline-grid-border" style={{ height: height + sideListGutterHeight * 2, marginBottom: sideListGutterHeight }} key={rowIndex} 
+                                            onMouseOver={onMouseOverWeek ? () => onMouseOverWeek(week.week, week.year, rowIndex) : () => {}}
+                                            onMouseDown={onMouseClickWeek ? () => onMouseClickWeek(week.week, week.year, rowIndex) : () => {}}>
+                                                {selectedCell && selectedCell.week === week.week && selectedCell.year === week.year && selectedCell.rowId == rowIndex && 
+                                                <div className="flex w-4 h-4 rounded-full bg-blue-500"></div>
+                                                }
+                                            </div>
+                                        })}
+                                    </div>
                                 </div>
                             </div>
                         ))}

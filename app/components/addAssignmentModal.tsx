@@ -65,10 +65,15 @@ const UPSERT_ASSIGNMENT = gql`
 	}
 `;
 
+export interface ClientType {
+	name: string;
+}
+
 export interface ProjectType {
 	id: number | null;
 	paymentFrequency: string;
 	name: string;
+	client: ClientType;
 	status: string;
 	users: [];
 	startsOn: string | null;
@@ -89,7 +94,7 @@ const AddAssignment = () => {
 	const showModal = searchParams.get("modal");
 	const [selectedUser, setSelectedUser] = useState<UserType>({id:null,name:"Select"});
 	const [selectedProject, setSelectedProject] =
-		useState<ProjectType>({id:null, paymentFrequency:"",name:"Select",status:"",users:[], startsOn:null, endsOn:null});
+		useState<ProjectType>({id:null, paymentFrequency:"", name:"Select", client: {name: ""}, status:"", users:[], startsOn:null, endsOn:null});
 	const handleProjectSelect = (selectedProject: ProjectType) => {
 		setSelectedProject(selectedProject);
 	};

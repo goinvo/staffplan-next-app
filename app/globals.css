@@ -19,9 +19,13 @@
   --actionbar-search: #8899A8;
 
   --timeline-accent: var(--accent-green);
+  --timeline-grid-bg: #E9EAF2;
+  --timeline-grid-gap-bg: #F0F0F6;
+  --timeline-grid-border: #FAFAFA;
   --timeline-bar-bg: #E5E7EB;
   --timeline-bar-fill: #02AAA4;
   --timeline-actual: #7084A3;
+  --timeline-stroke-below: #D1D5DB;
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -88,6 +92,18 @@
 
 .timeline-bar-bg {
   background-color: var(--timeline-bar-bg);
+}
+
+.timeline-grid-bg {
+  background-color: var(--timeline-grid-bg);
+}
+
+.timeline-grid-gap-bg {
+  background-color: var(--timeline-grid-gap-bg);
+}
+
+.timeline-grid-border {
+  border-color: var(--timeline-grid-border);
 }
 
 .timeline-text-accent {

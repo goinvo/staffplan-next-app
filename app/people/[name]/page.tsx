@@ -5,6 +5,7 @@ import withApollo from '@/lib/withApollo';
 import { gql, useQuery, useLazyQuery } from "@apollo/client";
 import { ProjectType, UserType } from "../../components/addAssignmentModal";
 import { parseProjectDates, parseWorkWeekDate, workWeekComponentsArr, AssignmentType, calWeekDatesArr, workWeekArr } from "../../people/helperFunctions";
+import WeekDisplay, { WeekCellData, selectedCell } from "../../components/weekDisplay";
 
 const GET_USER_ASSIGNMENTS = gql`
 	query getUserAssignments($selectedUserId: ID!) {
@@ -28,6 +29,9 @@ const GET_USER_ASSIGNMENTS = gql`
 			project {
 				name
 				id
+				client {
+					name
+				}
 				startsOn
 				endsOn
 			}
@@ -52,6 +56,7 @@ const UserPage: React.FC = () => {
 		id: null,
 		name: "Select",
 	});
+	const [selectedCell, setselectedCell] = useState<selectedCell>({ week: 0, year: 0, rowId: 0 });
 
 	const [
 		getUserAssignments,
@@ -92,11 +97,6 @@ const UserPage: React.FC = () => {
 		return null;
 	}
 
-	console.log(searchParams);
-	if (params.id) {
-		console.log(decodeURIComponent(params.name.toString()));
-	}
-
 	useEffect(() => {
 		setClientSide(true);
 	}, []);
@@ -106,19 +106,11 @@ const UserPage: React.FC = () => {
 			const name = decodeURIComponent(params.name.toString());
 			const userId = getUserIdFromName(name);
 			if (userId) {
-				setSelectedUser({ id: userId, name }); // Adjust if necessary
+				setSelectedUser({ id: userId, name });
 				getUserAssignments({ variables: { selectedUserId: userId } });
 			}
 		}
-		// Dependencies array includes userListData to re-run this effect when userListData changes.
-		// Make sure to include all dependencies correctly.
 	}, [clientSide, userListData, params.name]);
-
-	useEffect(() => {
-		if (userAssignmentData) {
-			console.log(userAssignmentData); // Or perform any action to display this data
-		}
-	}, [userAssignmentData]);
 
 	if (called && userAssignmentLoading) return <p>Loading User Assignments for {decodeURIComponent(params.name.toString())}</p>;
 	if (userListLoading) return <p>Finding user...</p>;
@@ -128,6 +120,21 @@ const UserPage: React.FC = () => {
 	return (
 		<div>
 			<h1>Assignments for {decodeURIComponent(params.name.toString())}</h1>
+			{userAssignmentData &&
+				userAssignmentData.userAssignments &&
+				<WeekDisplay labelContents={userAssignmentData.userAssignments.map((assignment: AssignmentType) => (
+					<div key={assignment.id}>
+						<div>{assignment.project.client.name}</div>
+						<div>{assignment.project.name}</div>
+					</div>
+				))} 
+				weekCellDataArray={userAssignmentData.userAssignments.map((assignment: AssignmentType) => {
+
+				})}
+				onMouseOverWeek={(week, year, rowId) => {setselectedCell({week, year, rowId})}}
+				onMouseClickWeek={(week, year, rowId) => {console.log(week, year, rowId)}}
+				selectedCell={selectedCell}
+				/>}
 			<div className="flex flex-col items-start">
 				{
 					userAssignmentData ? (
