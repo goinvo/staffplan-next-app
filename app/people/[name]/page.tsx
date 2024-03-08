@@ -5,12 +5,12 @@ import withApollo from "@/lib/withApollo";
 import { gql, useQuery, useLazyQuery } from "@apollo/client";
 import { UserType } from "../../components/addAssignmentModal";
 import {
-	parseProjectDates,
-	parseWorkWeekDate,
-	workWeekComponentsArr,
 	AssignmentType,
 	calWeekDatesArr,
+	parseProjectDates,
+	parseWorkWeekDate,
 	workWeekArr,
+	workWeekComponentsArr,
 } from "../../people/helperFunctions";
 
 const GET_USER_ASSIGNMENTS = gql`

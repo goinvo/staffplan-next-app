@@ -3,13 +3,13 @@ import { WorkWeek, WorkWeekType } from "../components/workWeek";
 import { ProjectType, UserType } from "../components/addAssignmentModal";
 
 export interface AssignmentType {
-	id: number;
+	assignedUser: UserType;
 	endsOn: string | null;
+	id: number;
+	project: ProjectType;
 	startsOn: string | null;
 	status: string;
-	assignedUser: UserType;
 	workWeeks: [];
-	project: ProjectType;
 }
 
 export interface userAssignmentDataType {
