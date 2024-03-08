@@ -3,7 +3,8 @@ import React from "react";
 import withApollo from "@/lib/withApollo";
 import { gql, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import { ProjectType, UserType } from "../components/addAssignmentModal";
+import { UserType } from "../components/addAssignmentModal";
+import { ProjectType } from "../components/addProjectModal";
 interface ClientType {
 	id: number;
 	name: string;
