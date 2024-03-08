@@ -2,54 +2,16 @@
 import { useParams, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import withApollo from "@/lib/withApollo";
-import { gql, useQuery, useLazyQuery } from "@apollo/client";
-import { UserType } from "../../components/addAssignmentModal";
+import { useQuery, useLazyQuery } from "@apollo/client";
+import { UserType, AssignmentType } from "../typeInterfaces";
 import {
-	AssignmentType,
 	calWeekDatesArr,
 	parseProjectDates,
 	parseWorkWeekDate,
 	workWeekArr,
 	workWeekComponentsArr,
 } from "../../people/helperFunctions";
-
-const GET_USER_ASSIGNMENTS = gql`
-	query getUserAssignments($selectedUserId: ID!) {
-		userAssignments(userId: $selectedUserId) {
-			id
-			startsOn
-			endsOn
-			status
-			assignedUser {
-				name
-				id
-			}
-			workWeeks {
-				id
-				actualHours
-				assignmentId
-				cweek
-				estimatedHours
-				year
-			}
-			project {
-				name
-				id
-				startsOn
-				endsOn
-			}
-		}
-	}
-`;
-
-const GET_USER_LIST = gql`
-	{
-		users {
-			id
-			name
-		}
-	}
-`;
+import { GET_USER_ASSIGNMENTS, GET_USER_LIST } from "../gqlQueries";
 
 const UserPage: React.FC = () => {
 	const params = useParams();
@@ -99,7 +61,6 @@ const UserPage: React.FC = () => {
 		return null;
 	};
 
-	console.log(searchParams);
 	if (params.id) {
 		console.log(decodeURIComponent(params.name.toString()));
 	}

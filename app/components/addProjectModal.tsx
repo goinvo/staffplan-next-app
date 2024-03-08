@@ -1,82 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import ProjectDatepicker from "./projectDatepicker";
-import Link from "next/link";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
-import { gql, useQuery, useMutation } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
 import { Field, Formik, FormikValues } from "formik";
-export interface ClientType {
-	description: string;
-	id: number;
-	name: string;
-	projects?: [ProjectType];
-}
-export interface ProjectType {
-	endsOn: string | null;
-	id: number;
-	name: string;
-	paymentFrequency: string;
-	startsOn: string | null;
-	status: string;
-	users: [];
-}
-
-export interface ProjectValuesType {
-	endsOn: string;
-	hours: number;
-	name: string;
-	numOfFTE: string;
-	numOfWeeks: string;
-	startsOn: string;
-	paymentFrequency: string;
-	cost: number;
-}
-
-const GET_DATA = gql`
-	{
-		clients {
-			description
-			id
-			name
-			projects {
-				id
-				name
-			}
-			status
-		}
-	}
-`;
-
-const UPSERT_PROJECT = gql`
-	mutation UpsertProjectUpdate(
-		$clientId: ID
-		$name: String
-		$status: String
-		$startsOn: ISO8601Date
-		$endsOn: ISO8601Date
-	) {
-		upsertProject(
-			clientId: $clientId
-			name: $name
-			status: $status
-			startsOn: $startsOn
-			endsOn: $endsOn
-		) {
-			id
-			client {
-				id
-				name
-			}
-			name
-			status
-			cost
-			paymentFrequency
-			startsOn
-			endsOn
-		}
-	}
-`;
+import { ClientType } from "../people/typeInterfaces";
+import { GET_CLIENT_DATA, UPSERT_PROJECT } from "../people/gqlQueries";
 
 const AddProject = () => {
 	const [clientSide, setClientSide] = useState(false);
@@ -102,7 +32,7 @@ const AddProject = () => {
 	const pathName = usePathname();
 	const showModal = searchParams.get("projectmodal");
 
-	const { loading, error, data } = useQuery(GET_DATA, {
+	const { loading, error, data } = useQuery(GET_CLIENT_DATA, {
 		context: {
 			headers: {
 				cookie: clientSide ? document.cookie : null,
@@ -167,7 +97,6 @@ const AddProject = () => {
 										<div>
 											<Formik
 												onSubmit={(e) => {
-													console.log("CLICKED SUBMIT");
 													onSubmitUpsert(e);
 												}}
 												initialValues={initialValues}
@@ -176,10 +105,7 @@ const AddProject = () => {
 												{({
 													handleSubmit,
 													handleChange,
-													dirty,
 													values,
-													resetForm,
-													setFieldValue,
 													setErrors,
 												}) => (
 													<form
@@ -196,10 +122,7 @@ const AddProject = () => {
 																		id="projectName"
 																		name="name"
 																		value={values.name}
-																		onChange={(e) => {
-																			handleChange(e);
-																			console.log(values);
-																		}}
+																		onChange={handleChange}
 																		className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
 																		placeholder="Enter Name"
 																	/>
@@ -215,7 +138,6 @@ const AddProject = () => {
 																>
 																	<option value={"SELECT"}>SELECT</option>
 																	{data?.clients?.map((client: ClientType) => {
-																		// console.log(client,"CLIENT")
 																		return (
 																			<option
 																				key={`${client.id} + ${client.name}`}

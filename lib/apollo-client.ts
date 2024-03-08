@@ -36,7 +36,7 @@ function createApolloClient(context = {}) {
 				errorPolicy: "all",
 			},
 		},
-		// connectToDevTools: true,
+		connectToDevTools: true,
 		cache: new InMemoryCache({
 			addTypename:true
 		}),

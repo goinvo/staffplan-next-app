@@ -1,21 +1,10 @@
 import { DateTime, Interval } from "luxon";
-import { WorkWeek, WorkWeekType } from "../components/workWeek";
-import { UserType } from "../components/addAssignmentModal";
-import { ProjectType } from "../components/addProjectModal";
-export interface AssignmentType {
-	assignedUser: UserType;
-	endsOn: string | null;
-	id: number;
-	project: ProjectType;
-	startsOn: string | null;
-	status: string;
-	workWeeks: [];
-}
-
-export interface userAssignmentDataType {
-	userAssignments: AssignmentType[];
-}
-
+import { WorkWeek } from "../components/workWeek";
+import {
+	AssignmentType,
+	UserAssignmentDataType,
+	WorkWeekType,
+} from "./typeInterfaces";
 // convert a human readable date to calendar week and year
 export const parseProjectDates = (date: string) => {
 	return {
@@ -30,7 +19,7 @@ export const parseWorkWeekDate = (weekYear: number, weekNumber: number) => {
 };
 
 // returns an array of workWeeks with a formatted date added to the object
-export const workWeekArr = (userAssignmentData: userAssignmentDataType) => {
+export const workWeekArr = (userAssignmentData: UserAssignmentDataType) => {
 	return userAssignmentData?.userAssignments.flatMap(
 		(assignment: AssignmentType) =>
 			assignment.workWeeks.map((week: WorkWeekType) => {

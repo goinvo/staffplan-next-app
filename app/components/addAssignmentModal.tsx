@@ -1,73 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import ProjectDatepicker from "./projectDatepicker";
-import Link from "next/link";
+import { UserType } from "../people/typeInterfaces";
 import { useSearchParams, useRouter } from "next/navigation";
-import { gql, useQuery, useMutation } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
-import { ProjectType } from "./addProjectModal";
+import { ProjectType } from "../people/typeInterfaces";
 import { Field, Formik, FormikValues } from "formik";
-
-const GET_DATA = gql`
-	{
-		clients {
-			id
-			projects {
-				id
-				name
-				status
-				paymentFrequency
-				startsOn
-				endsOn
-				users {
-					id
-					name
-					companies {
-						name
-					}
-				}
-			}
-		}
-		users {
-			id
-			name
-		}
-	}
-`;
-const UPSERT_ASSIGNMENT = gql`
-	mutation UpsertAssignment(
-		$id: ID
-		$projectId: ID!
-		$userId: ID!
-		$status: String!
-		$startsOn: ISO8601Date
-		$endsOn: ISO8601Date
-	) {
-		upsertAssignment(
-			id: $id
-			projectId: $projectId
-			userId: $userId
-			status: $status
-			startsOn: $startsOn
-			endsOn: $endsOn
-		) {
-			project {
-				id
-			}
-			startsOn
-			endsOn
-			status
-			assignedUser {
-				id
-			}
-		}
-	}
-`;
-export interface UserType {
-	id?: number;
-	name: string;
-}
-
+import { GET_ASSIGNMENT_DATA, UPSERT_ASSIGNMENT } from "../people/gqlQueries";
 const AddAssignment = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const router = useRouter();
@@ -84,7 +24,7 @@ const AddAssignment = () => {
 		dates: { endsOn: "", startsOn: "" },
 	};
 
-	const { loading, error, data } = useQuery(GET_DATA, {
+	const { loading, error, data } = useQuery(GET_ASSIGNMENT_DATA, {
 		context: {
 			headers: {
 				cookie: clientSide ? document.cookie : null,
@@ -109,18 +49,16 @@ const AddAssignment = () => {
 			variables: {
 				projectId: projectId,
 				userId: userId,
-				status: status,
+				status: status ? "active" : "archived",
 				startsOn: dates.startsOn,
 				endsOn: dates.endsOn,
 			},
-		})
-		// .then((res) => {
-		// 	console.log(res,"RESULTS")
-		// 	router.push("/projects");
-		// });
+		}).then((res) => {
+			router.push("/projects");
+		});
 	};
 	const onCancel = () => router.push("/projects");
-	if(mutationData) console.log(mutationData)
+	if (mutationData) console.log(mutationData);
 	return (
 		<>
 			{showModal && (
@@ -139,15 +77,19 @@ const AddAssignment = () => {
 									<div className="sm:flex-auto ">
 										<div>
 											<Formik
-												onSubmit={(e)=>onSubmitUpsert(e)}
+												onSubmit={(e) => onSubmitUpsert(e)}
 												initialValues={initialValues}
 											>
 												{({
 													handleChange,
 													values,
-													setErrors
+													setErrors,
+													handleSubmit,
 												}) => (
-													<form className="max-w-lg mx-auto">
+													<form
+														className="max-w-lg mx-auto"
+														onSubmit={handleSubmit}
+													>
 														<div className="flex mb-4">
 															<label>
 																User
@@ -243,7 +185,7 @@ const AddAssignment = () => {
 																</label>
 															</div>
 															<div className="mr-2">
-															<button
+																<button
 																	type="button"
 																	className="p-2 text-sm font-semibold leading-6 text-gray-900"
 																	onClick={() => {

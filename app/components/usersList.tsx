@@ -2,8 +2,6 @@
 import React from "react";
 
 const UsersList: React.FC<any> = (data: any) => {
-	console.log(data);
-
 	if (data && data.data && data.data.users) {
 		const users = data.data.users;
 		return (
