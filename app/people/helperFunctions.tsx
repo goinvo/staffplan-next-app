@@ -1,7 +1,7 @@
 import { DateTime, Interval } from "luxon";
 import { WorkWeek, WorkWeekType } from "../components/workWeek";
-import { ProjectType, UserType } from "../components/addAssignmentModal";
-
+import { UserType } from "../components/addAssignmentModal";
+import { ProjectType } from "../components/addProjectModal";
 export interface AssignmentType {
 	assignedUser: UserType;
 	endsOn: string | null;
