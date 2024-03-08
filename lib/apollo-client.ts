@@ -1,6 +1,5 @@
 import {
 	ApolloClient,
-	ApolloLink,
 	from,
 	HttpLink,
 	InMemoryCache,
@@ -21,7 +20,7 @@ function createApolloClient(context = {}) {
 		},
 	});
 
-	const errorLink = onError(({ networkError }) => {
+	const errorLink = onError(({ networkError, graphQLErrors }) => {
 		if ((networkError as ServerError).statusCode === 403) {
 			return window.location.replace(signinURL);
 		}
@@ -31,12 +30,16 @@ function createApolloClient(context = {}) {
 		defaultOptions: {
 			query: {
 				errorPolicy: "all",
+				fetchPolicy:"cache-first"
 			},
 			mutate: {
-				errorPolicy: "ignore",
+				errorPolicy: "all",
 			},
 		},
-		cache: new InMemoryCache(),
+		// connectToDevTools: true,
+		cache: new InMemoryCache({
+			addTypename:true
+		}),
 	});
 }
 

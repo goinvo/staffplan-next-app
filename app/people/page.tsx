@@ -3,7 +3,7 @@ import React, { useEffect, useState, useCallback, Fragment } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import withApollo from "@/lib/withApollo";
 import { gql, useQuery, useLazyQuery } from "@apollo/client";
-import { UserType } from "../components/addAssignmentModal";
+import {UserType } from "../components/addAssignmentModal";
 import { DateTime, Interval } from "luxon";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
@@ -54,7 +54,7 @@ const GET_USER_LIST = gql`
 const PeopleView: React.FC = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<UserType>({
-		id: null,
+		id: NaN,
 		name: "Select",
 	});
 	const router = useRouter();
@@ -90,7 +90,7 @@ const PeopleView: React.FC = () => {
 						<div className="w-1/2 mr-2">
 							<Listbox.Label className="block text-sm font-medium leading-6 text-gray-900">
 								Person
-							</Listbox.Label>
+						
 							<div className="relative mt-2">
 								<Listbox.Button className="relative cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6">
 									<span className="flex items-center">
@@ -106,7 +106,7 @@ const PeopleView: React.FC = () => {
 									</span>
 								</Listbox.Button>
 							</div>
-
+							</Listbox.Label>
 							<Transition
 								show={open}
 								as={Fragment}

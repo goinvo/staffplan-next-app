@@ -32,7 +32,7 @@ export default function AddDropdown() {
 				leaveFrom="transform opacity-100 scale-100"
 				leaveTo="transform opacity-0 scale-95"
 			>
-				<Menu.Items className="absolute left-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+				<Menu.Items className="absolute left-0 z-50 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 					<div className="py-1">
 						<Menu.Item>
 							{() => (
@@ -49,10 +49,15 @@ export default function AddDropdown() {
 							)}
 						</Menu.Item>
 						<Menu.Item>
-							{({ active }) => (
-								<a href="#" className={dropdownSelectedItemClass(active)}>
-									Project
-								</a>
+						{({ active }) => (
+								<>
+									<Link
+										href={"?projectmodal=true"}
+										className={dropdownSelectedItemClass(active)}
+									>
+										Project
+									</Link>
+								</>
 							)}
 						</Menu.Item>
 					</div>
@@ -61,7 +66,7 @@ export default function AddDropdown() {
 							{({ active }) => (
 								<>
 									<Link
-										href={"?modal=true"}
+										href={"?assignmentmodal=true"}
 										className={dropdownSelectedItemClass(active)}
 									>
 										Assignment

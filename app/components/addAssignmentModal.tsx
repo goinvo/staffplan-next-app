@@ -1,12 +1,12 @@
 "use client";
-import { useState, Fragment, useEffect } from "react";
-import { Listbox, Transition } from "@headlessui/react";
-import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
+import { useState, useEffect } from "react";
 import ProjectDatepicker from "./projectDatepicker";
 import Link from "next/link";
-import { useSearchParams, usePathname } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
+import { ProjectType } from "./addProjectModal";
+import { Field, Formik, FormikValues } from "formik";
 
 const GET_DATA = gql`
 	{
@@ -34,7 +34,6 @@ const GET_DATA = gql`
 		}
 	}
 `;
-
 const UPSERT_ASSIGNMENT = gql`
 	mutation UpsertAssignment(
 		$id: ID
@@ -64,45 +63,27 @@ const UPSERT_ASSIGNMENT = gql`
 		}
 	}
 `;
-
-export interface ProjectType {
-	id: number | null;
-	paymentFrequency: string;
-	name: string;
-	status: string;
-	users: [];
-	startsOn: string | null;
-	endsOn: string | null;
-}
 export interface UserType {
-	id: number | null;
+	id?: number;
 	name: string;
 }
 
 const AddAssignment = () => {
 	const [clientSide, setClientSide] = useState(false);
+	const router = useRouter();
 	useEffect(() => {
 		setClientSide(true);
 	}, []);
 	const searchParams = useSearchParams();
-	const pathName = usePathname();
-	const showModal = searchParams.get("modal");
-	const [selectedUser, setSelectedUser] = useState<UserType>({
-		id: null,
-		name: "Select",
-	});
-	const [selectedProject, setSelectedProject] = useState<ProjectType>({
-		id: null,
-		paymentFrequency: "",
-		name: "Select",
-		status: "",
-		users: [],
-		startsOn: null,
-		endsOn: null,
-	});
-	const handleProjectSelect = (selectedProject: ProjectType) => {
-		setSelectedProject(selectedProject);
+	const showModal = searchParams.get("assignmentmodal");
+
+	const initialValues = {
+		status: false,
+		userId: "",
+		projectId: "",
+		dates: { endsOn: "", startsOn: "" },
 	};
+
 	const { loading, error, data } = useQuery(GET_DATA, {
 		context: {
 			headers: {
@@ -118,14 +99,19 @@ const AddAssignment = () => {
 	] = useMutation(UPSERT_ASSIGNMENT);
 	if (loading || mutationLoading) return <p> LOADING ASSIGNMENTS</p>;
 	if (error || mutationError) return <p>ERROR ASSIGNMENTS</p>;
-	const handleSubmit = () => {
+	const onSubmitUpsert = ({
+		projectId,
+		userId,
+		status,
+		dates,
+	}: FormikValues) => {
 		upsertAssignment({
 			variables: {
-				projectId: selectedProject.id,
-				userId: selectedUser.id,
-				status: selectedProject.status,
-				startsOn: selectedProject.startsOn,
-				endsOn: selectedProject.endsOn,
+				projectId: projectId,
+				userId: userId,
+				status: status,
+				startsOn: dates.startsOn,
+				endsOn: dates.endsOn,
 			},
 		})
 		// .then((res) => {
@@ -140,7 +126,7 @@ const AddAssignment = () => {
 			{showModal && (
 				<div
 					className="relative z-10"
-					aria-labelledby="modal-title"
+					aria-labelledby="assignment-modal"
 					role="dialog"
 					aria-modal="true"
 				>
@@ -213,37 +199,37 @@ const AddAssignment = () => {
 															</label>
 														</div>
 
-												<div className="flex">
-													<div className="border-b border-gray-900/10 pb-12">
-														<div className="mt-10 grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-10">
-															<div className="sm:col-span-1">
-																<label
-																	htmlFor="hoursperweek"
-																	className="block text-sm font-medium leading-6 text-gray-900"
-																>
-																	Hours/Week
-																</label>
-																<div className="mt-2">
-																	<div className="rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-																		<input
-																			type="number"
-																			min="1"
-																			name="hoursperweek"
-																			id="hoursperweek"
-																			autoComplete="hoursperweek"
-																			className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-																			placeholder="40"
-																		/>
+														<div className="flex">
+															<div className="border-b border-gray-900/10 pb-12">
+																<div className="mt-10 grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-10">
+																	<div className="sm:col-span-1">
+																		<label
+																			htmlFor="hoursperweek"
+																			className="block text-sm font-medium leading-6 text-gray-900"
+																		>
+																			Hours/Week
+																		</label>
+																		<div className="mt-2">
+																			<div className="rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+																				<input
+																					type="number"
+																					min="1"
+																					name="hoursperweek"
+																					id="hoursperweek"
+																					autoComplete="hoursperweek"
+																					className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+																					placeholder="40"
+																				/>
+																			</div>
+																		</div>
 																	</div>
 																</div>
 															</div>
+															<Field
+																name="dates"
+																component={ProjectDatepicker}
+															/>
 														</div>
-													</div>
-													<ProjectDatepicker
-														selectedProject={selectedProject}
-														setDates={setSelectedProject}
-													/>
-												</div>
 
 														<div className="flex mb-4 justify-between">
 															<div className="mr-2">
