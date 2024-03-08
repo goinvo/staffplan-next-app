@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState, useCallback, Fragment } from "react";
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import withApollo from "@/lib/withApollo";
 import { gql, useQuery, useLazyQuery } from "@apollo/client";
 import { UserType } from "../components/addAssignmentModal";
@@ -8,7 +8,11 @@ import { DateTime, Interval } from "luxon";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { WorkWeek, WorkWeekType } from "../components/workWeek";
-import { parseProjectDates, parseWorkWeekDate, AssignmentType } from "../people/helperFunctions";
+import {
+	parseProjectDates,
+	parseWorkWeekDate,
+	AssignmentType,
+} from "../people/helperFunctions";
 
 const GET_USER_ASSIGNMENTS = gql`
 	query getUserAssignments($selectedUserId: ID!) {
@@ -75,7 +79,7 @@ const PeopleView: React.FC = () => {
 	});
 
 	const handleUserChange = (user: UserType) => {
-		router.push(pathname + '/' + encodeURIComponent(user.name.toString()));
+		router.push(pathname + "/" + encodeURIComponent(user.name.toString()));
 	};
 
 	return (

@@ -87,9 +87,19 @@ const AddAssignment = () => {
 	const searchParams = useSearchParams();
 	const pathName = usePathname();
 	const showModal = searchParams.get("modal");
-	const [selectedUser, setSelectedUser] = useState<UserType>({id:null,name:"Select"});
-	const [selectedProject, setSelectedProject] =
-		useState<ProjectType>({id:null, paymentFrequency:"",name:"Select",status:"",users:[], startsOn:null, endsOn:null});
+	const [selectedUser, setSelectedUser] = useState<UserType>({
+		id: null,
+		name: "Select",
+	});
+	const [selectedProject, setSelectedProject] = useState<ProjectType>({
+		id: null,
+		paymentFrequency: "",
+		name: "Select",
+		status: "",
+		users: [],
+		startsOn: null,
+		endsOn: null,
+	});
 	const handleProjectSelect = (selectedProject: ProjectType) => {
 		setSelectedProject(selectedProject);
 	};
@@ -173,50 +183,48 @@ const AddAssignment = () => {
 																		leaveTo="opacity-0"
 																	>
 																		<Listbox.Options className="absolute z-10 mt-1 max-h-56 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-																			{data?.users?.map(
-																				(user: UserType) => (
-																					<Listbox.Option
-																						key={user.id}
-																						className={({ active }) =>
-																							active
-																								? "bg-indigo-600 text-white"
-																								: "text-gray-900 relative cursor-default select-none py-2 pl-3 pr-9"
-																						}
-																						value={user}
-																					>
-																						{({ selected, active }) => (
-																							<>
-																								<div className="flex items-center">
-																									<span
-																										className={
-																											selected
-																												? "font-semibold"
-																												: "font-normal ml-3 block truncate"
-																										}
-																									>
-																										{user.name}
-																									</span>
-																								</div>
+																			{data?.users?.map((user: UserType) => (
+																				<Listbox.Option
+																					key={user.id}
+																					className={({ active }) =>
+																						active
+																							? "bg-indigo-600 text-white"
+																							: "text-gray-900 relative cursor-default select-none py-2 pl-3 pr-9"
+																					}
+																					value={user}
+																				>
+																					{({ selected, active }) => (
+																						<>
+																							<div className="flex items-center">
+																								<span
+																									className={
+																										selected
+																											? "font-semibold"
+																											: "font-normal ml-3 block truncate"
+																									}
+																								>
+																									{user.name}
+																								</span>
+																							</div>
 
-																								{selected ? (
-																									<span
-																										className={
-																											active
-																												? "text-white"
-																												: "text-indigo-600 absolute inset-y-0 right-0 flex items-center pr-4"
-																										}
-																									>
-																										<CheckIcon
-																											className="h-5 w-5"
-																											aria-hidden="true"
-																										/>
-																									</span>
-																								) : null}
-																							</>
-																						)}
-																					</Listbox.Option>
-																				)
-																			)}
+																							{selected ? (
+																								<span
+																									className={
+																										active
+																											? "text-white"
+																											: "text-indigo-600 absolute inset-y-0 right-0 flex items-center pr-4"
+																									}
+																								>
+																									<CheckIcon
+																										className="h-5 w-5"
+																										aria-hidden="true"
+																									/>
+																								</span>
+																							) : null}
+																						</>
+																					)}
+																				</Listbox.Option>
+																			))}
 																		</Listbox.Options>
 																	</Transition>
 																</div>

@@ -1,23 +1,28 @@
-
-import React, { SetStateAction, Dispatch,useState } from "react";
+import React, { SetStateAction, Dispatch, useState } from "react";
 import { ProjectType } from "./addAssignmentModal";
 
 interface DateType {
-	startDate:string | null;
-	endDate:string | null
+	startDate: string | null;
+	endDate: string | null;
 }
 export default function ProjctDatepicker({
 	selectedProject,
 	setDates,
-}:{selectedProject:ProjectType, setDates: Dispatch<SetStateAction<ProjectType>>}) {
-	const [projectDates, setProjectDates] = useState<DateType>({startDate:"",endDate:""})
+}: {
+	selectedProject: ProjectType;
+	setDates: Dispatch<SetStateAction<ProjectType>>;
+}) {
+	const [projectDates, setProjectDates] = useState<DateType>({
+		startDate: "",
+		endDate: "",
+	});
 	const handleStartDateChange = (newDate: string) => {
 		setDates((project) => ({ ...project, startsOn: newDate }));
-		setProjectDates({...projectDates, startDate:newDate})
+		setProjectDates({ ...projectDates, startDate: newDate });
 	};
 	const handleEndDateChange = (newDate: string) => {
 		setDates((project) => ({ ...project, endsOn: newDate }));
-		setProjectDates({...projectDates, endDate:newDate})
+		setProjectDates({ ...projectDates, endDate: newDate });
 	};
 	const handleCoverDurationClick = () => {
 		if (selectedProject) {
@@ -25,8 +30,11 @@ export default function ProjctDatepicker({
 				...project,
 				startDate: selectedProject.startsOn,
 				endDate: selectedProject.endsOn,
-			}))
-			setProjectDates({startDate: selectedProject.startsOn, endDate: selectedProject.endsOn});
+			}));
+			setProjectDates({
+				startDate: selectedProject.startsOn,
+				endDate: selectedProject.endsOn,
+			});
 		}
 	};
 	return (
@@ -41,10 +49,7 @@ export default function ProjctDatepicker({
 					value={projectDates.startDate || ""}
 					onChange={(e) => handleStartDateChange(e.target.value)}
 				/>
-				<span
-					onClick={handleCoverDurationClick}
-					style={{ color: "teal" }}
-				>
+				<span onClick={handleCoverDurationClick} style={{ color: "teal" }}>
 					Cover Project Span
 				</span>
 			</div>
