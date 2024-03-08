@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import ProjectDatepicker from "./projectDatepicker";
 import Link from "next/link";
-	import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
 import { Field, Formik, FormikValues } from "formik";
@@ -80,7 +80,7 @@ const UPSERT_PROJECT = gql`
 
 const AddProject = () => {
 	const [clientSide, setClientSide] = useState(false);
-	const router = useRouter()
+	const router = useRouter();
 	// const [projectNameExists, setProjectNameExists] = useState(false);
 	useEffect(() => {
 		setClientSide(true);
@@ -146,8 +146,9 @@ const AddProject = () => {
 				startsOn: values.dates.startsOn,
 				endsOn: values.dates.endsOn,
 			},
-		}).then(()=> router.push("/projects"))
+		}).then(() => router.push("/projects"));
 	};
+	const onCancel = () => router.push("/projects");
 	return (
 		<>
 			{showModal && (
@@ -179,6 +180,7 @@ const AddProject = () => {
 													values,
 													resetForm,
 													setFieldValue,
+													setErrors,
 												}) => (
 													<form
 														onSubmit={handleSubmit}
@@ -367,13 +369,16 @@ const AddProject = () => {
 														{/* section 5 */}
 														<div className="flex mb-4 justify-between">
 															<div className="mr-2">
-																<Link
-																	href={pathName}
+																<button
 																	type="button"
 																	className="p-2 text-sm font-semibold leading-6 text-gray-900"
+																	onClick={() => {
+																		onCancel();
+																		setErrors({});
+																	}}
 																>
 																	Cancel
-																</Link>
+																</button>
 																<button
 																	type="submit"
 																	className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"

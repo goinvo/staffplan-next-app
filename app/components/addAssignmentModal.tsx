@@ -119,7 +119,7 @@ const AddAssignment = () => {
 		// 	router.push("/projects");
 		// });
 	};
-	// const onCancel = () => router.push("/projects");
+	const onCancel = () => router.push("/projects");
 	if(mutationData) console.log(mutationData)
 	return (
 		<>
@@ -143,12 +143,9 @@ const AddAssignment = () => {
 												initialValues={initialValues}
 											>
 												{({
-													handleSubmit,
 													handleChange,
-													dirty,
 													values,
-													resetForm,
-													setFieldValue,
+													setErrors
 												}) => (
 													<form className="max-w-lg mx-auto">
 														<div className="flex mb-4">
@@ -246,12 +243,16 @@ const AddAssignment = () => {
 																</label>
 															</div>
 															<div className="mr-2">
-																{/* <button
-																	onClick={onCancel}
+															<button
+																	type="button"
 																	className="p-2 text-sm font-semibold leading-6 text-gray-900"
+																	onClick={() => {
+																		onCancel();
+																		setErrors({});
+																	}}
 																>
 																	Cancel
-																</button> */}
+																</button>
 																<button
 																	type="submit"
 																	className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
