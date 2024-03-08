@@ -67,6 +67,7 @@ export const WorkWeek = ({ workWeek }: WorkWeekProps) => {
 	});
 
 	const onSubmitUpsert = (values: UpsertValues) => {
+		console.log(values,"VALUES UPSERT")
 		upsertWorkweek({
 			variables: {
 				assignmentId: values.assignmentId,
@@ -84,7 +85,6 @@ export const WorkWeek = ({ workWeek }: WorkWeekProps) => {
 	const workWeekDate = (weekYear: number, weekNumber: number) => {
 		return DateTime.fromObject({ weekYear, weekNumber }).toFormat("LL/dd");
 	};
-
 	return (
 		<div className="p-1">
 			<div className="border-5 pb-3" key={`workweek ${workWeek.assignmentId}`}>
