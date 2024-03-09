@@ -6,9 +6,9 @@ import useInfiniteScroll, {
 } from "react-easy-infinite-scroll-hook";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import SideList, { sideListGutterHeight } from "./sideList";
-import { WorkWeekType } from "./workWeek";
+import { render } from "@testing-library/react";
 
-const { getWeek, startOfYear, eachWeekOfInterval, differenceInCalendarDays, addDays } = require('date-fns');
+const { eachWeekOfInterval, addDays } = require('date-fns');
 
 export interface SideLabelComponents {
     labelContents: React.ReactNode[];
@@ -16,22 +16,18 @@ export interface SideLabelComponents {
     offset: number;
 };
 
-export type WeekCellData = {
-    workWeeks: WorkWeekType[];
-};
-
 export type WeekDisplayProps = {
     labelContents: React.ReactNode[];
-    weekCellDataArray?: WeekCellData[];
-    onMouseOverWeek?: (week: number, year: number, cellId?: number) => void;
-    onMouseClickWeek?: (week: number, year: number, cellId?: number) => void;
+    onMouseOverWeek?: (week: number, year: number, cellId: number) => void;
+    onMouseClickWeek?: (week: number, year: number, cellId: number) => void;
+    renderCell?: (week: number, year: number, cellId: number, isSelected: boolean) => ReactNode;
     selectedCell?: selectedCell;
 };
 
 export type selectedCell = {
     week: number;
     year: number;
-    rowId?: number;
+    rowId: number;
 };
 
 type WeekEntry = {
@@ -98,16 +94,16 @@ const generateWeeksForYear = (beginYear: number): WeeksAndLabels => {
 
 const weekWidth = 64;
 
-const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, weekCellDataArray, onMouseOverWeek, onMouseClickWeek, selectedCell }) => {
+const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWeek, onMouseClickWeek, renderCell, selectedCell }) => {
     const today = new Date();
     const startYear = today.getFullYear();
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const [data, setData] = useState<WeeksAndLabels>(createItems(startYear + 1)); // This is called twice at start, so offset it so the years are correct
+    const [data, setData] = useState<WeeksAndLabels>(createItems(startYear));
     const [startX, setStartX] = useState(0);
     const [scrollStartX, setScrollStartX] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [yearWindow, setYearWindow] = useState<YearWindow>({ start: startYear + 1, end: startYear + 1 });
+    const [yearWindow, setYearWindow] = useState<YearWindow>({ start: startYear, end: startYear});
     const [sideLabelDivHeights, setSideLabelDivHeights] = useState<number[]>([]);
 
     const loadMoreWeeks = async (direction: ScrollDirection) => {
@@ -220,8 +216,10 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, weekCellDataAr
                                             return <div className="flex border-l timeline-grid-bg timeline-grid-border" style={{ height: height + sideListGutterHeight * 2, marginBottom: sideListGutterHeight }} key={rowIndex} 
                                             onMouseOver={onMouseOverWeek ? () => onMouseOverWeek(week.week, week.year, rowIndex) : () => {}}
                                             onMouseDown={onMouseClickWeek ? () => onMouseClickWeek(week.week, week.year, rowIndex) : () => {}}>
-                                                {selectedCell && selectedCell.week === week.week && selectedCell.year === week.year && selectedCell.rowId == rowIndex && 
-                                                <div className="flex w-4 h-4 rounded-full bg-blue-500"></div>
+                                                {
+                                                <div className="flex flex-col">
+                                                    {renderCell ? renderCell(week.week, week.year, rowIndex, (selectedCell && selectedCell.week === week.week && selectedCell.year === week.year && selectedCell.rowId == rowIndex) || false) : <div></div>}
+                                                </div>
                                                 }
                                             </div>
                                         })}
@@ -236,6 +234,6 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, weekCellDataAr
             </div>
         </div>
     );
-}
+};
 
 export default WeekDisplay;
