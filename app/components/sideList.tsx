@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from 'react';
 
 export const sideListGutterHeight = 8;
 
-const UsersList: React.FC<SideLabelComponents> = React.memo(({ labelContents, setDivHeights, offset }) => {
+const UsersList: React.FC<SideLabelComponents> = ({ labelContents, setDivHeights, offset }) => {
   // Use useRef to keep references to the div elements
   const divRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -29,6 +29,6 @@ const UsersList: React.FC<SideLabelComponents> = React.memo(({ labelContents, se
       </div>
     </div>
   );
-});
+};
 
 export default UsersList;
