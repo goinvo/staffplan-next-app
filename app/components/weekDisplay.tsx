@@ -74,7 +74,7 @@ const generateWeeksForYear = (beginYear: number): WeeksAndLabels => {
     for (let dateIndex = 0; dateIndex < weeksInYear.length; dateIndex++) {
         weeks.push({
             date: weeksInYear[dateIndex].getDate(),
-            week: dateIndex,
+            week: dateIndex + 1,
             month: weeksInYear[dateIndex].getMonth(),
             year: weeksInYear[dateIndex].getFullYear(),
         });
