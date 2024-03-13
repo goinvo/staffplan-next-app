@@ -83,7 +83,7 @@ const AddProject = () => {
 		<>
 			{showModal && (
 				<div
-					className="relative z-10"
+					className="relative z-50"
 					aria-labelledby="project-modal"
 					role="dialog"
 					aria-modal="true"
