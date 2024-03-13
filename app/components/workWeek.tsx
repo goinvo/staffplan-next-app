@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { DateTime } from "luxon";
 import { Formik } from "formik";
-import { WorkWeekProps, UpsertValues } from "../people/typeInterfaces";
-import { UPSERT_WORKWEEK } from "../people/gqlQueries";
+import { WorkWeekProps, UpsertValues } from "../typeInterfaces";
+import { UPSERT_WORKWEEK } from "../gqlQueries";
 export const WorkWeek = ({ workWeek }: WorkWeekProps) => {
 	const [isEditing, setIsEditing] = useState<Boolean>(false);
 

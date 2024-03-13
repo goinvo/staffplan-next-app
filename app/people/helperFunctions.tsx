@@ -4,7 +4,7 @@ import {
 	AssignmentType,
 	UserAssignmentDataType,
 	WorkWeekType,
-} from "./typeInterfaces";
+} from "../typeInterfaces";
 // convert a human readable date to calendar week and year
 export const parseProjectDates = (date: string) => {
 	return {

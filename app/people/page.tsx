@@ -5,8 +5,8 @@ import withApollo from "@/lib/withApollo";
 import {  useQuery } from "@apollo/client";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
-import { UserType } from "./typeInterfaces";
-import { GET_USER_LIST } from "./gqlQueries";
+import { UserType } from "../typeInterfaces";
+import { GET_USER_LIST } from "../gqlQueries";
 import WeekDisplay from "../components/weekDisplay";
 
 const PeopleView: React.FC = () => {

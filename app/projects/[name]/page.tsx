@@ -15,7 +15,7 @@ import {
 	workWeekComponentsArr,
 } from "../../people/helperFunctions";
 
-const UserPage: React.FC = () => {
+const ProjectPage: React.FC = () => {
 	const params = useParams();
 	const searchParams = useSearchParams();
 	const [clientSide, setClientSide] = useState(false);
@@ -268,4 +268,4 @@ const UserPage: React.FC = () => {
 	);
 };
 
-export default withApollo(UserPage);
+export default withApollo(ProjectPage);

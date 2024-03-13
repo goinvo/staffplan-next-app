@@ -1,13 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import ProjectDatepicker from "./projectDatepicker";
-import { UserType } from "../people/typeInterfaces";
+import { UserType } from "../typeInterfaces";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
-import { ProjectType } from "../people/typeInterfaces";
+import { ProjectType } from "../typeInterfaces";
 import { Field, Formik, FormikValues } from "formik";
-import { GET_ASSIGNMENT_DATA, UPSERT_ASSIGNMENT } from "../people/gqlQueries";
+import { GET_ASSIGNMENT_DATA, UPSERT_ASSIGNMENT } from "../gqlQueries";
 const AddAssignment = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const router = useRouter();

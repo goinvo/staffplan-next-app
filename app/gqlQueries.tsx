@@ -67,6 +67,7 @@ export const GET_PROJECT_DATA = gql`
 		}
 	}
 `;
+
 export const GET_USER_ASSIGNMENTS = gql`
 	query getUserAssignments($selectedUserId: ID!) {
 		userAssignments(userId: $selectedUserId) {
