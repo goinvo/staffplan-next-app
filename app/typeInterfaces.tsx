@@ -72,4 +72,4 @@ export type WorkWeekRenderData = {
 	estimatedHours: number;
 	actualHours: number;
 	assignmentId?: number;
-}
+};

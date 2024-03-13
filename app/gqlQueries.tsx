@@ -138,6 +138,23 @@ export const UPSERT_ASSIGNMENT = gql`
 		}
 	}
 `;
+
+export const UPSERT_CLIENT = gql`
+mutation UpsertClient($clientId:ID,$name:String, $description:String,$status:String){
+	upsertClient(
+	  id:$clientId,
+	  name:$name,
+	  description:$description,
+	  status:$status
+	){
+	  id
+	  name
+	  description
+	  status
+	}
+	
+  }`
+
 export const UPSERT_PROJECT = gql`
 	mutation UpsertProjectUpdate(
 		$clientId: ID

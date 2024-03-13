@@ -10,6 +10,9 @@ import { Field, Formik, FormikValues } from "formik";
 import { GET_ASSIGNMENT_DATA, UPSERT_ASSIGNMENT } from "../gqlQueries";
 const AddAssignment = () => {
 	const [clientSide, setClientSide] = useState(false);
+	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
+		{}
+	);
 	const router = useRouter();
 	useEffect(() => {
 		setClientSide(true);
@@ -45,6 +48,7 @@ const AddAssignment = () => {
 		status,
 		dates,
 	}: FormikValues) => {
+		console.log("SUBMIT TRIGGERED");
 		upsertAssignment({
 			variables: {
 				projectId: projectId,
@@ -53,11 +57,69 @@ const AddAssignment = () => {
 				startsOn: dates.startsOn,
 				endsOn: dates.endsOn,
 			},
-		}).then((res) => {
-			router.push("/projects");
+		}).then(() => {
+			router.back();
 		});
 	};
-	const onCancel = () => router.push("/projects");
+	const onCancel = () => router.back();
+	const validateForm = (values: FormikValues) => {
+		const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
+		if (!values.userId) {
+			errors.userId = "User is required";
+		}
+		if (values.userId) {
+			const foundUser = data?.users?.find(
+				({ id }: UserType) => id === values.userId
+			);
+			if (!foundUser) {
+				errors.userId = "Must select a valid User";
+			}
+		}
+		if (!values.projectId) {
+			errors.projectId = "Project is required";
+		}
+		if (values.projectId) {
+			const foundProject = data?.clients.find(
+				(client: { projects: ProjectType[] }) => {
+					return client.projects.find(
+						(project: ProjectType) => project.id === values.projectId
+					);
+				}
+			);
+			if (!foundProject) {
+				errors.projectId = "Must select a valid Project";
+			}
+		}
+		if (values.dates) {
+			const startDate = new Date(values.dates.startsOn);
+			const endDate = new Date(values.dates.endsOn);
+			if (startDate > endDate) {
+				console.log("1 possible error");
+				errors.dates = { endsOn: "Start must be before end" };
+			}
+			if (
+				startDate.toString() === "Invalid Date" ||
+				endDate.toString() === "Invalid Date"
+			) {
+				console.log("2 possible error");
+				errors.dates = { endsOn: "Must select both dates" };
+			}
+		}
+		console.log(errors);
+		return errors;
+	};
+	
+	const handleProjectSelection = (
+		projectId: React.ChangeEvent<HTMLInputElement>
+	) => {
+		data?.clients?.map((client: { projects: ProjectType[] }) => {
+			const existingProject = client.projects.find(
+				(project: ProjectType) =>
+					project.id.toString() === projectId.target.value
+			);
+			if (existingProject) setSelectedProject(existingProject);
+		});
+	};
 	if (mutationData) console.log(mutationData);
 	return (
 		<>
@@ -79,12 +141,17 @@ const AddAssignment = () => {
 											<Formik
 												onSubmit={(e) => onSubmitUpsert(e)}
 												initialValues={initialValues}
+												validate={validateForm}
 											>
 												{({
 													handleChange,
 													values,
 													setErrors,
 													handleSubmit,
+													handleBlur,
+													errors,
+													touched,
+													isValid,
 												}) => (
 													<form
 														className="max-w-lg mx-auto"
@@ -99,7 +166,7 @@ const AddAssignment = () => {
 																	name="userId"
 																	id="userId"
 																>
-																	<option value={"SELECT"}>SELECT</option>
+																	<option value={""}>SELECT</option>
 																	{data?.users?.map((user: UserType) => {
 																		return (
 																			<option
@@ -116,12 +183,17 @@ const AddAssignment = () => {
 															<label>
 																Project
 																<Field
-																	onChange={handleChange}
+																	onChange={(
+																		e: React.ChangeEvent<HTMLInputElement>
+																	) => {
+																		handleProjectSelection(e);
+																		handleChange(e);
+																	}}
 																	as="select"
 																	name="projectId"
 																	id="projectId"
 																>
-																	<option value={"SELECT"}>SELECT</option>
+																	<option value={""}>SELECT</option>
 																	{data?.clients?.map(
 																		(client: { projects: ProjectType[] }) => {
 																			return client.projects.map(
@@ -168,11 +240,12 @@ const AddAssignment = () => {
 																</div>
 															</div>
 															<Field
+																selectedProject={selectedProject}
+																handleBlur={handleBlur}
 																name="dates"
 																component={ProjectDatepicker}
 															/>
 														</div>
-
 														<div className="flex mb-4 justify-between">
 															<div className="mr-2">
 																<label className="inline-block pl-[0.15rem] hover:cursor-pointer">
@@ -197,10 +270,28 @@ const AddAssignment = () => {
 																</button>
 																<button
 																	type="submit"
+																	disabled={!isValid}
 																	className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 																>
 																	Save
 																</button>
+																{errors.dates &&
+																	(touched.dates?.startsOn ||
+																		touched.dates?.endsOn) && (
+																		<div className="text-red-500">
+																			{errors.dates?.endsOn}
+																		</div>
+																	)}
+																{errors.userId && touched.userId && (
+																	<div className="text-red-500">
+																		{errors.userId}
+																	</div>
+																)}
+																{errors.projectId && touched.projectId && (
+																	<div className="text-red-500">
+																		{errors.projectId}
+																	</div>
+																)}
 															</div>
 														</div>
 													</form>

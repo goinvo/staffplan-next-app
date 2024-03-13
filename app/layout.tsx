@@ -6,6 +6,7 @@ import ActionBar from "./components/actionbar";
 import AddAssignment from "./components/addAssignmentModal";
 import AddProject from "./components/addProjectModal";
 import { Suspense } from "react";
+import AddClient from "./components/addClient";
 
 const open_sans = Open_Sans({ subsets: ["latin"] });
 
@@ -28,6 +29,7 @@ export default function RootLayout({
 				<Suspense>
 					<AddAssignment />
 					<AddProject/>
+					<AddClient/>
 				</Suspense>
 				{children}
 			</body>

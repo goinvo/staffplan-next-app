@@ -1,21 +1,24 @@
 "use client";
 import { useState, useEffect } from "react";
 import ProjectDatepicker from "./projectDatepicker";
-import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
 import { Field, Formik, FormikValues } from "formik";
-import { ClientType } from "../typeInterfaces";
-import { GET_CLIENT_DATA, UPSERT_PROJECT } from "../gqlQueries";
+import { ClientType, ProjectType } from "../typeInterfaces";
+import {
+	GET_CLIENT_DATA,
+	UPSERT_PROJECT,
+} from "../gqlQueries";
 
 const AddProject = () => {
 	const [clientSide, setClientSide] = useState(false);
+	const [selectedClient, setSelectedClient] = useState<number | string>("");
 	const router = useRouter();
-	// const [projectNameExists, setProjectNameExists] = useState(false);
+	const searchParams = useSearchParams();
 	useEffect(() => {
 		setClientSide(true);
 	}, []);
-
 	const initialValues = {
 		client: "",
 		dates: { endsOn: "", startsOn: "" },
@@ -28,8 +31,6 @@ const AddProject = () => {
 		status: false,
 	};
 
-	const searchParams = useSearchParams();
-	const pathName = usePathname();
 	const showModal = searchParams.get("projectmodal");
 
 	const { loading, error, data } = useQuery(GET_CLIENT_DATA, {
@@ -55,18 +56,6 @@ const AddProject = () => {
 
 	//checks to see if the project name is already in use by the client, this will likely change this will be replaced by validation
 
-	// const projectNameExists = (data: { clients: [ClientType] }) => {
-	// 	const selectedClientProjects = data.clients.find((client) => {
-	// 		if (client.id === selectedClient.id) return client;
-	// 	});
-	// 	const projectExists = selectedClientProjects?.projects?.find((project) => {
-	// 		if (project.name === values.name) {
-	// 			return project;
-	// 		}
-	// 	});
-	// 	return projectExists;
-	// };
-
 	const onSubmitUpsert = (values: FormikValues) => {
 		upsertProject({
 			variables: {
@@ -76,9 +65,59 @@ const AddProject = () => {
 				startsOn: values.dates.startsOn,
 				endsOn: values.dates.endsOn,
 			},
-		}).then(() => router.push("/projects"));
+		}).then(() => router.back());
 	};
-	const onCancel = () => router.push("/projects");
+	const onCancel = () => router.back();
+	const validateForm = (values: FormikValues) => {
+		const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
+		if (!values.client) {
+			errors.client = "Client is required";
+		}
+		if (values.client) {
+			const foundClient = data?.clients?.find(
+				({ id }: ClientType) => id === values.client
+			);
+			if (!foundClient) {
+				errors.client = "Must select a valid Client";
+			}
+		}
+		if (!values.name) {
+			errors.name = "Project Name is required";
+		}
+		if (values.name) {
+			const currentClient = data.clients.find((client: ClientType) => {
+				if (client.id === selectedClient) return client;
+			});
+			const projectNameExists = currentClient?.projects?.find(
+				(project: ProjectType) => {
+					if (project.name === values.name) {
+						return project;
+					}
+				}
+			);
+			if (projectNameExists) {
+				errors.name = "Project name already in use";
+			}
+		}
+		if (!values.dates) {
+			errors.dates = { endsOn: "Dates are required" };
+		}
+		if (values.dates) {
+			const startDate = new Date(values.dates.startsOn);
+			const endDate = new Date(values.dates.endsOn);
+			if (startDate > endDate) {
+				errors.dates = { endsOn: "Start must be before end" };
+			}
+			if (
+				startDate.toString() === "Invalid Date" ||
+				endDate.toString() === "Invalid Date"
+			) {
+				errors.dates = { endsOn: "Must select both dates" };
+			}
+		}
+		console.log(errors);
+		return errors;
+	};
 	return (
 		<>
 			{showModal && (
@@ -100,13 +139,17 @@ const AddProject = () => {
 													onSubmitUpsert(e);
 												}}
 												initialValues={initialValues}
-												validator={() => ({})}
+												validate={validateForm}
 											>
 												{({
 													handleSubmit,
 													handleChange,
 													values,
 													setErrors,
+													handleBlur,
+													errors,
+													touched,
+													isValid,
 												}) => (
 													<form
 														onSubmit={handleSubmit}
@@ -122,7 +165,16 @@ const AddProject = () => {
 																		id="projectName"
 																		name="name"
 																		value={values.name}
-																		onChange={handleChange}
+																		onBlur={handleBlur}
+																		onChange={(e) => {
+																			handleChange(e);
+																			console.log(
+																				e,
+																				"EVENT",
+																				touched,
+																				"TOUCHED"
+																			);
+																		}}
 																		className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
 																		placeholder="Enter Name"
 																	/>
@@ -130,13 +182,18 @@ const AddProject = () => {
 															</div>
 															<div className="w-1/3 mr-4 flex flex-col">
 																<Field
-																	onChange={handleChange}
+																	onChange={(
+																		e: React.ChangeEvent<HTMLInputElement>
+																	) => {
+																		handleChange(e);
+																		setSelectedClient(e.target.value);
+																	}}
 																	as="select"
-																	// value={values.client}
+																	value={values.client}
 																	name="client"
 																	id="client"
 																>
-																	<option value={"SELECT"}>SELECT</option>
+																	<option value={""}>SELECT</option>
 																	{data?.clients?.map((client: ClientType) => {
 																		return (
 																			<option
@@ -166,6 +223,7 @@ const AddProject = () => {
 															<div className="w-1/5 mr-4 flex flex-col">
 																<Field
 																	name="dates"
+																	handleBlur={handleBlur}
 																	component={ProjectDatepicker}
 																/>
 															</div>
@@ -303,10 +361,28 @@ const AddProject = () => {
 																</button>
 																<button
 																	type="submit"
+																	disabled={!isValid}
 																	className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 																>
 																	Save
 																</button>
+																{errors.dates &&
+																	(touched.dates?.startsOn ||
+																		touched.dates?.endsOn) && (
+																		<div className="text-red-500">
+																			{errors.dates?.endsOn}
+																		</div>
+																	)}
+																{errors.name && touched.name && (
+																	<div className="text-red-500">
+																		{errors.name}
+																	</div>
+																)}
+																{errors.client && touched.client && (
+																	<div className="text-red-500">
+																		{errors.client}
+																	</div>
+																)}
 															</div>
 														</div>
 													</form>
