@@ -19,6 +19,7 @@ export interface ProjectType {
 	endsOn: string | null;
 	id: number;
 	name: string;
+	client: ClientType;
 	paymentFrequency: string;
 	startsOn: string | null;
 	status: string;
@@ -62,4 +63,12 @@ export interface WorkWeekType {
 	assignmentId: number;
 	cweek: number;
 	year: number;
+}
+
+export type WorkWeekRenderData = {
+	cweek: number;
+	year: number;
+	estimatedHours: number;
+	actualHours: number;
+	assignmentId?: number;
 }

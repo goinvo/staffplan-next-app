@@ -5,9 +5,89 @@ import { UserType } from "../people/typeInterfaces";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
+<<<<<<< HEAD
 import { ProjectType } from "../people/typeInterfaces";
 import { Field, Formik, FormikValues } from "formik";
 import { GET_ASSIGNMENT_DATA, UPSERT_ASSIGNMENT } from "../people/gqlQueries";
+=======
+
+const GET_DATA = gql`
+	{
+		clients {
+			id
+			projects {
+				id
+				name
+				status
+				paymentFrequency
+				startsOn
+				endsOn
+				users {
+					id
+					name
+					companies {
+						name
+					}
+				}
+			}
+		}
+		users {
+			id
+			name
+		}
+	}
+`;
+
+const UPSERT_ASSIGNMENT = gql`
+	mutation UpsertAssignment(
+		$id: ID
+		$projectId: ID!
+		$userId: ID!
+		$status: String!
+		$startsOn: ISO8601Date
+		$endsOn: ISO8601Date
+	) {
+		upsertAssignment(
+			id: $id
+			projectId: $projectId
+			userId: $userId
+			status: $status
+			startsOn: $startsOn
+			endsOn: $endsOn
+		) {
+			project {
+				id
+			}
+			startsOn
+			endsOn
+			status
+			assignedUser {
+				id
+			}
+		}
+	}
+`;
+
+export interface ClientType {
+	name: string;
+}
+
+export interface ProjectType {
+	id: number | null;
+	paymentFrequency: string;
+	name: string;
+	client: ClientType;
+	status: string;
+	users: [];
+	startsOn: string | null;
+	endsOn: string | null;
+}
+export interface UserType {
+	id: number | null;
+	name: string;
+}
+
+>>>>>>> ShirleyDynamicRoutingPeople
 const AddAssignment = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const router = useRouter();
@@ -15,6 +95,7 @@ const AddAssignment = () => {
 		setClientSide(true);
 	}, []);
 	const searchParams = useSearchParams();
+<<<<<<< HEAD
 	const showModal = searchParams.get("assignmentmodal");
 
 	const initialValues = {
@@ -22,6 +103,15 @@ const AddAssignment = () => {
 		userId: "",
 		projectId: "",
 		dates: { endsOn: "", startsOn: "" },
+=======
+	const pathName = usePathname();
+	const showModal = searchParams.get("modal");
+	const [selectedUser, setSelectedUser] = useState<UserType>({id:null,name:"Select"});
+	const [selectedProject, setSelectedProject] =
+		useState<ProjectType>({id:null, paymentFrequency:"", name:"Select", client: {name: ""}, status:"", users:[], startsOn:null, endsOn:null});
+	const handleProjectSelect = (selectedProject: ProjectType) => {
+		setSelectedProject(selectedProject);
+>>>>>>> ShirleyDynamicRoutingPeople
 	};
 
 	const { loading, error, data } = useQuery(GET_ASSIGNMENT_DATA, {
