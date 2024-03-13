@@ -7,6 +7,7 @@ import useInfiniteScroll, {
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import SideList, { sideListGutterHeight } from "./sideList";
 import { render } from "@testing-library/react";
+import { getWeek } from "date-fns";
 
 const { eachWeekOfInterval, addDays } = require('date-fns');
 
@@ -74,7 +75,7 @@ const generateWeeksForYear = (beginYear: number): WeeksAndLabels => {
     for (let dateIndex = 0; dateIndex < weeksInYear.length; dateIndex++) {
         weeks.push({
             date: weeksInYear[dateIndex].getDate(),
-            week: dateIndex + 1,
+            week: getWeek(weeksInYear[dateIndex]),
             month: weeksInYear[dateIndex].getMonth(),
             year: weeksInYear[dateIndex].getFullYear(),
         });
