@@ -1,53 +1,12 @@
 "use client";
 import React, { useState } from "react";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { DateTime } from "luxon";
 import { Formik } from "formik";
-export interface WorkWeekType {
-	id?: number;
-	actualHours?: number;
-	estimatedHours?: number;
-	assignmentId: number;
-	cweek: number;
-	year: number;
-}
-interface WorkWeekProps {
-	workWeek: WorkWeekType;
-}
-interface UpsertValues {
-	actualHours: number | string;
-	estimatedHours: number | string;
-	assignmentId: number;
-	cweek: number;
-	year: number;
-}
-
+import { WorkWeekProps, UpsertValues } from "../people/typeInterfaces";
+import { UPSERT_WORKWEEK } from "../people/gqlQueries";
 export const WorkWeek = ({ workWeek }: WorkWeekProps) => {
 	const [isEditing, setIsEditing] = useState<Boolean>(false);
-	const UPSERT_WORKWEEK = gql`
-		mutation UpsertWorkWeek(
-			$assignmentId: ID!
-			$cweek: Int!
-			$year: Int!
-			$estHours: Int
-			$actHours: Int
-		) {
-			upsertWorkWeek(
-				assignmentId: $assignmentId
-				cweek: $cweek
-				year: $year
-				estimatedHours: $estHours
-				actualHours: $actHours
-			) {
-				id
-				assignmentId
-				estimatedHours
-				actualHours
-				year
-				cweek
-			}
-		}
-	`;
 
 	const initialValues = {
 		actualHours: workWeek.actualHours || "",
@@ -60,11 +19,7 @@ export const WorkWeek = ({ workWeek }: WorkWeekProps) => {
 	const [
 		upsertWorkweek,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
-	] = useMutation(UPSERT_WORKWEEK, {
-		onCompleted(mutationData) {
-			console.log(mutationData, "DATADATA");
-		},
-	});
+	] = useMutation(UPSERT_WORKWEEK, {});
 
 	const onSubmitUpsert = (values: UpsertValues) => {
 		upsertWorkweek({
@@ -84,7 +39,6 @@ export const WorkWeek = ({ workWeek }: WorkWeekProps) => {
 	const workWeekDate = (weekYear: number, weekNumber: number) => {
 		return DateTime.fromObject({ weekYear, weekNumber }).toFormat("LL/dd");
 	};
-
 	return (
 		<div className="p-1">
 			<div className="border-5 pb-3" key={`workweek ${workWeek.assignmentId}`}>

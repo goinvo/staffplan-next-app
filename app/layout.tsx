@@ -5,6 +5,7 @@ import Navbar from "./components/navbar";
 import ActionBar from "./components/actionbar";
 import WeekDisplay from "./components/weekDisplay";
 import AddAssignment from "./components/addAssignmentModal";
+import AddProject from "./components/addProjectModal";
 import { Suspense } from "react";
 
 const open_sans = Open_Sans({ subsets: ["latin"] });
@@ -28,6 +29,7 @@ export default function RootLayout({
 				<WeekDisplay />
 				<Suspense>
 					<AddAssignment />
+					<AddProject/>
 				</Suspense>
 				{children}
 			</body>

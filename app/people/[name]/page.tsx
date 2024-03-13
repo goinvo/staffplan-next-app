@@ -1,55 +1,24 @@
-'use client'
-import { useParams, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
-import withApollo from '@/lib/withApollo';
-import { gql, useQuery, useLazyQuery } from "@apollo/client";
-import { ProjectType, UserType } from "../../components/addAssignmentModal";
-import { parseProjectDates, parseWorkWeekDate, workWeekComponentsArr, AssignmentType, calWeekDatesArr, workWeekArr } from "../../people/helperFunctions";
-
-const GET_USER_ASSIGNMENTS = gql`
-	query getUserAssignments($selectedUserId: ID!) {
-		userAssignments(userId: $selectedUserId) {
-			id
-			startsOn
-			endsOn
-			status
-			assignedUser {
-				name
-				id
-			}
-			workWeeks {
-				id
-				actualHours
-				assignmentId
-				cweek
-				estimatedHours
-				year
-			}
-			project {
-				name
-				id
-				startsOn
-				endsOn
-			}
-		}
-	}
-`;
-
-const GET_USER_LIST = gql`
-	{
-		users {
-			id
-			name
-		}
-	}
-`;
+"use client";
+import { useParams, useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import withApollo from "@/lib/withApollo";
+import { useQuery, useLazyQuery } from "@apollo/client";
+import { UserType, AssignmentType } from "../typeInterfaces";
+import {
+	calWeekDatesArr,
+	parseProjectDates,
+	parseWorkWeekDate,
+	workWeekArr,
+	workWeekComponentsArr,
+} from "../../people/helperFunctions";
+import { GET_USER_ASSIGNMENTS, GET_USER_LIST } from "../gqlQueries";
 
 const UserPage: React.FC = () => {
 	const params = useParams();
 	const searchParams = useSearchParams();
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<UserType>({
-		id: null,
+		id: NaN,
 		name: "Select",
 	});
 
@@ -90,9 +59,8 @@ const UserPage: React.FC = () => {
 			}
 		}
 		return null;
-	}
+	};
 
-	console.log(searchParams);
 	if (params.id) {
 		console.log(decodeURIComponent(params.name.toString()));
 	}
@@ -120,69 +88,79 @@ const UserPage: React.FC = () => {
 		}
 	}, [userAssignmentData]);
 
-	if (called && userAssignmentLoading) return <p>Loading User Assignments for {decodeURIComponent(params.name.toString())}</p>;
+	if (called && userAssignmentLoading)
+		return (
+			<p>
+				Loading User Assignments for{" "}
+				{decodeURIComponent(params.name.toString())}
+			</p>
+		);
 	if (userListLoading) return <p>Finding user...</p>;
 	if (userListError) return <p>Error Loading Users List</p>;
-	if (userAssignmentError) return <p>Error Loading User Assignments for {decodeURIComponent(params.name.toString())}</p>;
+	if (userAssignmentError)
+		return (
+			<p>
+				Error Loading User Assignments for{" "}
+				{decodeURIComponent(params.name.toString())}
+			</p>
+		);
 
 	return (
 		<div>
 			<h1>Assignments for {decodeURIComponent(params.name.toString())}</h1>
 			<div className="flex flex-col items-start">
-				{
-					userAssignmentData ? (
-						userAssignmentData.userAssignments.map(
-							(assignment: AssignmentType) => (
-								<div key={assignment.id} className="flex">
-									<div>
-										<p className="text-xl underline">
-											Project Name: {assignment.project.name}
-										</p>
-										{assignment.project.startsOn ? (
-											<p>Project Start Date: {assignment.project.startsOn}</p>
-										) : (
-											""
-										)}
-										{assignment.project.endsOn ? (
-											<p>Project End Date: {assignment.project.endsOn}</p>
-										) : (
-											""
-										)}
-										<div className="p-3">
-											<span>Assignment Status:{assignment.status}</span>
-											<br />
-											<span>Assignment Duration</span>
-											<br />
-											<span>Starts On: {assignment.startsOn}</span>
-											<br />
-											<span>Ends On: {assignment.endsOn}</span>
-											<br />
-										</div>
-									</div>
+				{userAssignmentData ? (
+					userAssignmentData.userAssignments.map(
+						(assignment: AssignmentType) => (
+							<div key={assignment.id} className="flex">
+								<div>
+									<p className="text-xl underline">
+										Project Name: {assignment.project.name}
+									</p>
 									{assignment.project.startsOn ? (
-										<p>
-											Project Work Week:
-											{parseProjectDates(assignment.project.startsOn).cweek}
-										</p>
+										<p>Project Start Date: {assignment.project.startsOn}</p>
 									) : (
 										""
 									)}
-									<div className="p-3 flex">
-										{workWeekComponentsArr(
-											assignment.startsOn,
-											assignment.endsOn,
-											calWeekDatesArr,
-											workWeekArr(userAssignmentData),
-											assignment.id
-										)}
+									{assignment.project.endsOn ? (
+										<p>Project End Date: {assignment.project.endsOn}</p>
+									) : (
+										""
+									)}
+									<div className="p-3">
+										<span>Assignment Status:{assignment.status}</span>
+										<br />
+										<span>Assignment Duration</span>
+										<br />
+										<span>Starts On: {assignment.startsOn}</span>
+										<br />
+										<span>Ends On: {assignment.endsOn}</span>
+										<br />
 									</div>
 								</div>
-							)
+								{assignment.project.startsOn ? (
+									<p>
+										Project Work Week:
+										{parseProjectDates(assignment.project.startsOn).cweek}
+									</p>
+								) : (
+									""
+								)}
+								<div className="p-3 flex">
+									{workWeekComponentsArr(
+										assignment.startsOn,
+										assignment.endsOn,
+										calWeekDatesArr,
+										workWeekArr(userAssignmentData),
+										assignment.id
+									)}
+								</div>
+							</div>
 						)
-					) : (
-						<p>User has no Assignments</p>
 					)
-				}
+				) : (
+					<p>User has no Assignments</p>
+				)}
 			</div>
 		</div>
 	);
