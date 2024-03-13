@@ -1,6 +1,7 @@
 export interface AssignmentType {
 	assignedUser: UserType;
 	endsOn: string | null;
+	client: ClientType;
 	id: number;
 	project: ProjectType;
 	startsOn: string | null;

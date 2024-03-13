@@ -27,6 +27,7 @@ export const GET_ASSIGNMENT_DATA = gql`
 		}
 	}
 `;
+
 export const GET_CLIENT_DATA = gql`
 	{
 		clients {
@@ -88,6 +89,9 @@ export const GET_USER_ASSIGNMENTS = gql`
 			project {
 				name
 				id
+				client {
+					name
+				}
 				startsOn
 				endsOn
 			}
