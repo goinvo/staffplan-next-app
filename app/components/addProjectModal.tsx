@@ -5,8 +5,8 @@ import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
 import { Field, Formik, FormikValues } from "formik";
-import { ClientType } from "../people/typeInterfaces";
-import { GET_CLIENT_DATA, UPSERT_PROJECT } from "../people/gqlQueries";
+import { ClientType } from "../typeInterfaces";
+import { GET_CLIENT_DATA, UPSERT_PROJECT } from "../gqlQueries";
 
 const AddProject = () => {
 	const [clientSide, setClientSide] = useState(false);
