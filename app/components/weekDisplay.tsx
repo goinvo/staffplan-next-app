@@ -106,7 +106,7 @@ const generateWeeksForYear = (beginYear: number): WeeksAndLabels => {
 	return { weeks, monthLabels };
 };
 
-const weekWidth = 64;
+export const weekWidth = 64;
 
 const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWeek, onMouseClickWeek, renderCell, selectedCell }) => {
     const today = new Date();

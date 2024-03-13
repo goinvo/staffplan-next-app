@@ -5,15 +5,9 @@ import withApollo from "@/lib/withApollo";
 import { useQuery, useLazyQuery, useMutation } from "@apollo/client";
 import { UserType, AssignmentType, WorkWeekRenderData, WorkWeekType } from "../../typeInterfaces";
 import { UPSERT_WORKWEEK, GET_USER_ASSIGNMENTS, GET_USER_LIST } from "../../gqlQueries";
-import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
+import WeekDisplay, { selectedCell, weekWidth } from "../../components/weekDisplay";
 import { set } from 'date-fns';
-import {
-	calWeekDatesArr,
-	parseProjectDates,
-	parseWorkWeekDate,
-	workWeekArr,
-	workWeekComponentsArr,
-} from "../../people/helperFunctions";
+import { drawBar } from "../../people/helperFunctions";
 
 const UserPage: React.FC = () => {
 	const params = useParams();
@@ -94,7 +88,7 @@ const UserPage: React.FC = () => {
 		if (rowId != undefined) {
 			if (!workWeekDataLookupMap[rowId]) {
 				workWeekDataLookupMap[rowId] = new Map();
-			} 
+			}
 			if (!workWeekDataLookupMap[rowId]?.has(workWeekData.year)) {
 				workWeekDataLookupMap[rowId]?.set(workWeekData.year, new Map());
 			}
@@ -132,6 +126,8 @@ const UserPage: React.FC = () => {
 		}
 		setWasSelectedCellEdited(true);
 	}
+
+
 
 	const renderCell = (cweek: number, year: number, rowIndex: number, isSelected: boolean) => {
 		const workWeekData = lookupWorkWeekData(rowIndex, year, cweek);
@@ -251,6 +247,7 @@ const UserPage: React.FC = () => {
 	return (
 		<div>
 			<h1>Assignments for {decodeURIComponent(params.name.toString())}</h1>
+
 			{userAssignmentData &&
 				userAssignmentData.userAssignments &&
 				<WeekDisplay labelContents={userAssignmentData.userAssignments.map((assignment: AssignmentType) => (

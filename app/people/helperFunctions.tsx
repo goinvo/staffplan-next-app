@@ -78,3 +78,45 @@ export const workWeekComponentsArr = (
 		}
 	);
 };
+
+export const drawBar = (xOffset: number, targetCornerRadius: number, barHeight: number, fullBarHeight: number, fullBarWidth: number, hasLeftConnection: boolean = false, hasRightConnection: boolean = false) => {
+	const cornerRadius = Math.min(targetCornerRadius, barHeight);
+	if (!hasLeftConnection && !hasRightConnection) {
+		return (
+			<path d={"M " + xOffset + ", " + (cornerRadius + (fullBarHeight - barHeight))
+				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 1 " + cornerRadius + "," + (cornerRadius * -1)
+				+ " h " + (fullBarWidth - 2 * cornerRadius) +
+				" a " + cornerRadius + "," + cornerRadius + " 0 0 1 " + cornerRadius + "," + cornerRadius
+				+ " v " + (barHeight - cornerRadius) + " h " + (fullBarWidth * -1) + " z"}
+				fill="blue" />
+		)
+	} else if (hasLeftConnection && !hasRightConnection) {
+		return (
+			<path d={"M " + xOffset + ", " + (fullBarHeight - barHeight - cornerRadius)
+				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 0 " + cornerRadius + "," + cornerRadius
+				+ " h " + (fullBarWidth - cornerRadius * 2)
+				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 1 " + cornerRadius + "," + cornerRadius
+				+ " v " + (barHeight - cornerRadius) + " h " + (fullBarWidth * -1) + " z"}
+				fill="blue" />
+		)
+	} else if (!hasLeftConnection && hasRightConnection) {
+		return (
+			<path d={"M " + xOffset + ", " + (cornerRadius + (fullBarHeight - barHeight))
+				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 1 " + cornerRadius + "," + (cornerRadius * -1)
+				+ " h " + (fullBarWidth - 2 * cornerRadius) +
+				" a " + cornerRadius + "," + cornerRadius + " 0 0 0 " + cornerRadius + "," + (cornerRadius * -1)
+				+ " v " + (barHeight + cornerRadius) + " h " + (fullBarWidth * -1) + " z"}
+				fill="blue" />
+		)
+	} else {
+		return (
+			<path d={"M " + xOffset + ", " + (fullBarHeight - barHeight - cornerRadius)
+				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 0 " + cornerRadius + "," + cornerRadius
+				+ " h " + (fullBarWidth - 2 * cornerRadius) +
+				" a " + cornerRadius + "," + cornerRadius + " 0 0 0 " + cornerRadius + "," + (cornerRadius * -1)
+				+ " v " + (barHeight + cornerRadius) + " h " + (fullBarWidth * -1) + " z"}
+				fill="blue" />
+		)
+	}
+
+}
