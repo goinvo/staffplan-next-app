@@ -48,7 +48,6 @@ const AddAssignment = () => {
 		status,
 		dates,
 	}: FormikValues) => {
-		console.log("SUBMIT TRIGGERED");
 		upsertAssignment({
 			variables: {
 				projectId: projectId,
@@ -94,18 +93,15 @@ const AddAssignment = () => {
 			const startDate = new Date(values.dates.startsOn);
 			const endDate = new Date(values.dates.endsOn);
 			if (startDate > endDate) {
-				console.log("1 possible error");
 				errors.dates = { endsOn: "Start must be before end" };
 			}
 			if (
 				startDate.toString() === "Invalid Date" ||
 				endDate.toString() === "Invalid Date"
 			) {
-				console.log("2 possible error");
 				errors.dates = { endsOn: "Must select both dates" };
 			}
 		}
-		console.log(errors);
 		return errors;
 	};
 	
@@ -120,7 +116,6 @@ const AddAssignment = () => {
 			if (existingProject) setSelectedProject(existingProject);
 		});
 	};
-	if (mutationData) console.log(mutationData);
 	return (
 		<>
 			{showModal && (

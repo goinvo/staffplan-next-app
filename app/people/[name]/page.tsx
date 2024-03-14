@@ -35,7 +35,6 @@ const UserPage: React.FC = () => {
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_WORKWEEK, {
 		onCompleted(mutationData) {
-			console.log(mutationData, "DATADATA");
 		},
 	});
 
