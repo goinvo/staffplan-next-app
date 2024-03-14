@@ -1,5 +1,6 @@
 import {
 	ApolloClient,
+	ApolloLink,
 	from,
 	HttpLink,
 	InMemoryCache,
@@ -20,13 +21,24 @@ function createApolloClient(context = {}) {
 		},
 	});
 
+	const csrfMiddleware = new ApolloLink((operation, forward) => {
+		// add the CSRF token to headers
+		operation.setContext(({ headers = {} }) => ({
+			headers: {
+				"X-Csrf-Token": localStorage.getItem("csrf-token"),
+			}
+		}));
+
+		return forward(operation);
+	})
+
 	const errorLink = onError(({ networkError, graphQLErrors }) => {
 		if ((networkError as ServerError).statusCode === 403) {
 			return window.location.replace(signinURL);
 		}
 	});
 	return new ApolloClient({
-		link: from([errorLink, httpLink]),
+		link: from([csrfMiddleware, errorLink, httpLink]),
 		defaultOptions: {
 			query: {
 				errorPolicy: "all",
