@@ -6,7 +6,7 @@ import ActionBar from "./components/actionbar";
 import AddAssignment from "./components/addAssignmentModal";
 import AddProject from "./components/addProjectModal";
 import { Suspense } from "react";
-import AddClient from "./components/addClient";
+import AddClient from "./components/addClientModal";
 
 const open_sans = Open_Sans({ subsets: ["latin"] });
 
