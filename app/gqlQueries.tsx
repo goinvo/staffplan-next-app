@@ -108,6 +108,24 @@ export const GET_USER_LIST = gql`
 	}
 `;
 
+export const GET_ALL_PROJECTS_DATA = gql`
+	{
+	currentCompany{
+		projects {
+		id
+		name
+		client {
+			name
+		}
+		workWeeks {
+			actualHours
+			estimatedHours
+		}
+		}
+	}
+	}
+`;
+
 //mutations
 export const UPSERT_ASSIGNMENT = gql`
 	mutation UpsertAssignment(

@@ -79,6 +79,7 @@ export const workWeekComponentsArr = (
 	);
 };
 
+// Draws a bar with rounded corners for the schedule
 export const drawBar = (xOffset: number, targetCornerRadius: number, barHeight: number, fullBarHeight: number, fullBarWidth: number, hasLeftConnection: boolean = false, hasRightConnection: boolean = false) => {
 	const cornerRadius = Math.min(targetCornerRadius, barHeight);
 	if (!hasLeftConnection && !hasRightConnection) {
