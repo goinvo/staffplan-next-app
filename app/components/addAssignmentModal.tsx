@@ -104,7 +104,7 @@ const AddAssignment = () => {
 		}
 		return errors;
 	};
-	
+
 	const handleProjectSelection = (
 		projectId: React.ChangeEvent<HTMLInputElement>
 	) => {
@@ -152,85 +152,88 @@ const AddAssignment = () => {
 														className="max-w-lg mx-auto"
 														onSubmit={handleSubmit}
 													>
-														<div className="flex mb-4">
-															<label>
-																User
-																<Field
-																	onChange={handleChange}
-																	as="select"
-																	name="userId"
-																	id="userId"
-																>
-																	<option value={""}>SELECT</option>
-																	{data?.users?.map((user: UserType) => {
-																		return (
-																			<option
-																				key={`${user.id} + ${user.name}`}
-																				value={user.id}
-																			>
-																				{" "}
-																				{user.name}
-																			</option>
-																		);
-																	})}
-																</Field>
-															</label>
-															<label>
-																Project
-																<Field
-																	onChange={(
-																		e: React.ChangeEvent<HTMLInputElement>
-																	) => {
-																		handleProjectSelection(e);
-																		handleChange(e);
-																	}}
-																	as="select"
-																	name="projectId"
-																	id="projectId"
-																>
-																	<option value={""}>SELECT</option>
-																	{data?.clients?.map(
-																		(client: { projects: ProjectType[] }) => {
-																			return client.projects.map(
-																				(project: ProjectType) => (
-																					<option
-																						key={`${project.id} + ${project.name}`}
-																						value={project.id}
-																					>
-																						{" "}
-																						{project.name}
-																					</option>
-																				)
+														{/* SECTION 1 */}
+														<div className="flex mb-4 pb-2 border-b-4">
+															<div className="w-1/2 mr-4 flex flex-col">
+																<label>
+																	User
+																	<Field
+																		onChange={handleChange}
+																		as="select"
+																		name="userId"
+																		id="userId"
+																		className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+																	>
+																		<option value={""}>SELECT</option>
+																		{data?.users?.map((user: UserType) => {
+																			return (
+																				<option
+																					key={`${user.id} + ${user.name}`}
+																					value={user.id}
+																				>
+																					{" "}
+																					{user.name}
+																				</option>
 																			);
-																		}
-																	)}
-																</Field>
-															</label>
+																		})}
+																	</Field>
+																</label>
+															</div>
+															<div className="w-1/2 mr-4 flex flex-col">
+																<label>
+																	Project
+																	<Field
+																		className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+																		onChange={(
+																			e: React.ChangeEvent<HTMLInputElement>
+																		) => {
+																			handleProjectSelection(e);
+																			handleChange(e);
+																		}}
+																		as="select"
+																		name="projectId"
+																		id="projectId"
+																	>
+																		<option value={""}>SELECT</option>
+																		{data?.clients?.map(
+																			(client: { projects: ProjectType[] }) => {
+																				return client.projects.map(
+																					(project: ProjectType) => (
+																						<option
+																							key={`${project.id} + ${project.name}`}
+																							value={project.id}
+																						>
+																							{" "}
+																							{project.name}
+																						</option>
+																					)
+																				);
+																			}
+																		)}
+																	</Field>
+																</label>
+															</div>
 														</div>
-
-														<div className="flex">
-															<div className="border-b border-gray-900/10 pb-12">
-																<div className="mt-10 grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-10">
-																	<div className="sm:col-span-1">
-																		<label
-																			htmlFor="hoursperweek"
-																			className="block text-sm font-medium leading-6 text-gray-900"
-																		>
-																			Hours/Week
-																		</label>
-																		<div className="mt-2">
-																			<div className="rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-																				<input
-																					type="number"
-																					min="1"
-																					name="hoursperweek"
-																					id="hoursperweek"
-																					autoComplete="hoursperweek"
-																					className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-																					placeholder="40"
-																				/>
-																			</div>
-																		</div>
+														{/* SECTION 2 */}
+														<div className="flex mb-4 pb-2 border-b-4">
+															<div className="w-1/5 mr-4 flex flex-col">
+																<label
+																	htmlFor="hoursperweek"
+																	className="block text-sm font-medium leading-6 text-gray-900"
+																>
+																	Hours/Week
+																</label>
+																<div className="mt-2">
+																	<div className="rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+																		<input
+																			type="number"
+																			min="1"
+																			name="hoursperweek"
+																			id="hoursperweek"
+																			autoComplete="hoursperweek"
+																			className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+																			placeholder="40"
+																		/>
 																	</div>
 																</div>
 															</div>
@@ -239,8 +242,10 @@ const AddAssignment = () => {
 																handleBlur={handleBlur}
 																name="dates"
 																component={ProjectDatepicker}
+						
 															/>
 														</div>
+														{/* SECTION 3 */}
 														<div className="flex mb-4 justify-between">
 															<div className="mr-2">
 																<label className="inline-block pl-[0.15rem] hover:cursor-pointer">
