@@ -5,15 +5,8 @@ import withApollo from "@/lib/withApollo";
 import { useQuery, useLazyQuery, useMutation } from "@apollo/client";
 import { UserType, AssignmentType, WorkWeekRenderData, WorkWeekType } from "../../typeInterfaces";
 import { UPSERT_WORKWEEK, GET_USER_ASSIGNMENTS, GET_USER_LIST } from "../../gqlQueries";
-import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
-import { set } from 'date-fns';
-import {
-	calWeekDatesArr,
-	parseProjectDates,
-	parseWorkWeekDate,
-	workWeekArr,
-	workWeekComponentsArr,
-} from "../../people/helperFunctions";
+import WeekDisplay, { selectedCell, weekWidth } from "../../components/weekDisplay";
+import { eachWeekOfInterval, endOfYear, startOfYear, getISOWeeksInYear } from "date-fns";
 
 const UserPage: React.FC = () => {
 	const params = useParams();
@@ -90,11 +83,14 @@ const UserPage: React.FC = () => {
 		return null;
 	};
 
-	const addWorkWeekDataToLookupMap = (workWeekData: WorkWeekRenderData, rowId: number) => {
+	const addWorkWeekData = (workWeekData: WorkWeekRenderData, rowId: number) => {
+		// Add new data to storage of consecutive
+
+		// Add data to the lookup map
 		if (rowId != undefined) {
 			if (!workWeekDataLookupMap[rowId]) {
 				workWeekDataLookupMap[rowId] = new Map();
-			} 
+			}
 			if (!workWeekDataLookupMap[rowId]?.has(workWeekData.year)) {
 				workWeekDataLookupMap[rowId]?.set(workWeekData.year, new Map());
 			}
@@ -111,10 +107,10 @@ const UserPage: React.FC = () => {
 		const newWorkWeekData = lookupWorkWeekData(selectedCell.rowId, selectedCell.year, selectedCell.week);
 		if (newWorkWeekData) {
 			newWorkWeekData.estimatedHours = newEstimatedHours;
-			addWorkWeekDataToLookupMap(newWorkWeekData, selectedCell.rowId);
+			addWorkWeekData(newWorkWeekData, selectedCell.rowId);
 		} else {
 			const newWorkWeekData = { cweek: selectedCell.week, year: selectedCell.year, estimatedHours: newEstimatedHours, actualHours: parseInt(currActHours), assignmentId: rowIdtoAssignmentIdMap.get(selectedCell.rowId) };
-			addWorkWeekDataToLookupMap(newWorkWeekData, selectedCell.rowId);
+			addWorkWeekData(newWorkWeekData, selectedCell.rowId);
 		}
 		setWasSelectedCellEdited(true);
 	}
@@ -125,13 +121,15 @@ const UserPage: React.FC = () => {
 		const newWorkWeekData = lookupWorkWeekData(selectedCell.rowId, selectedCell.year, selectedCell.week);
 		if (newWorkWeekData) {
 			newWorkWeekData.actualHours = newActualHours;
-			addWorkWeekDataToLookupMap(newWorkWeekData, selectedCell.rowId);
+			addWorkWeekData(newWorkWeekData, selectedCell.rowId);
 		} else {
 			const newWorkWeekData = { cweek: selectedCell.week, year: selectedCell.year, estimatedHours: parseInt(currEstHours), actualHours: newActualHours, assignmentId: rowIdtoAssignmentIdMap.get(selectedCell.rowId) };
-			addWorkWeekDataToLookupMap(newWorkWeekData, selectedCell.rowId);
+			addWorkWeekData(newWorkWeekData, selectedCell.rowId);
 		}
 		setWasSelectedCellEdited(true);
 	}
+
+
 
 	const renderCell = (cweek: number, year: number, rowIndex: number, isSelected: boolean) => {
 		const workWeekData = lookupWorkWeekData(rowIndex, year, cweek);
@@ -225,10 +223,12 @@ const UserPage: React.FC = () => {
 		);
 		workWeekData.forEach((assignmentWeeks: WorkWeekRenderData[], index) => {
 			assignmentWeeks.forEach((week: WorkWeekRenderData) => {
-				addWorkWeekDataToLookupMap(week, index);
+				addWorkWeekData(week, index);
 			});
 			rowIdtoAssignmentIdMap.set(index, userAssignmentData.userAssignments[index].id);
 		});
+
+		console.log(workWeekDataLookupMap, "LOOKUPMAP");
 	}, [userAssignmentData]);
 
 	if (called && userAssignmentLoading)
