@@ -5,7 +5,7 @@ import { ProjectType } from "../typeInterfaces";
 
 interface DatePickerProps extends FieldProps {
 	selectedProject: ProjectType;
-	handleBlur:FocusEventHandler
+	handleBlur: FocusEventHandler;
 }
 
 export default function ProjctDatepicker(props: DatePickerProps) {
@@ -13,10 +13,11 @@ export default function ProjctDatepicker(props: DatePickerProps) {
 		field: { name, value, onChange },
 		form: { setFieldValue },
 		selectedProject,
-		handleBlur
+		handleBlur,
 	} = props;
 	const searchParams = useSearchParams();
 	const assignmentModal = searchParams.get("assignmentmodal");
+	const projectModal = searchParams.get("projectmodal");
 
 	const handleCoverDurationClick = () => {
 		if (selectedProject.startsOn && selectedProject.endsOn) {
@@ -24,6 +25,12 @@ export default function ProjctDatepicker(props: DatePickerProps) {
 				startsOn: selectedProject.startsOn,
 				endsOn: selectedProject.endsOn,
 			});
+		}
+	};
+	const handleEndDateProjectModal = () => {
+		if (projectModal) {
+			setFieldValue("hourlyRate", 0)
+			setFieldValue("cost", 0)
 		}
 	};
 	return (
@@ -63,7 +70,10 @@ export default function ProjctDatepicker(props: DatePickerProps) {
 						id="endDate"
 						name={`${name}.endsOn`}
 						value={value.endsOn}
-						onChange={onChange}
+						onChange={(e) => {
+							onChange(e);
+							handleEndDateProjectModal()
+						}}
 						onBlur={handleBlur}
 					/>
 				</label>
