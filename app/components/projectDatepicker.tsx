@@ -31,6 +31,8 @@ export default function ProjctDatepicker(props: DatePickerProps) {
 		if (projectModal) {
 			setFieldValue("hourlyRate", 0)
 			setFieldValue("cost", 0)
+			setFieldValue("hours", 0)
+			setFieldValue("numOfFTE", 0)
 		}
 	};
 	return (
