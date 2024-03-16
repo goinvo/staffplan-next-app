@@ -1,10 +1,13 @@
 import { DateTime, Interval } from "luxon";
-import { WorkWeek } from "../components/workWeek";
+import { differenceInWeeks } from "date-fns";
+import { WorkWeek } from "./components/workWeek";
 import {
 	AssignmentType,
 	UserAssignmentDataType,
 	WorkWeekType,
-} from "../typeInterfaces";
+	UserAssignmentDataMapType,
+	WorkWeekBlockType,
+} from "./typeInterfaces";
 // convert a human readable date to calendar week and year
 export const parseProjectDates = (date: string) => {
 	return {
@@ -78,6 +81,110 @@ export const workWeekComponentsArr = (
 		}
 	);
 };
+
+export function getDateFromWeekAndYear(cweek: number, year: number): Date {
+	const firstDayOfYear = new Date(year, 0, 1);
+	const dayOfWeek = firstDayOfYear.getDay();
+	const firstMondayOfYear = new Date(year, 0, 1 + ((8 - dayOfWeek) % 7));
+	return new Date(firstMondayOfYear.getFullYear(), firstMondayOfYear.getMonth(), firstMondayOfYear.getDate() + (cweek - 1) * 7);
+}
+
+export function processUserAssignmentDataMap(userAssignmentDataMap: any): UserAssignmentDataMapType {
+	const processedDataMap: UserAssignmentDataMapType = {};
+  
+	userAssignmentDataMap.currentCompany.users.forEach((user: any) => {
+	  const userId = user.id;
+	  processedDataMap[userId] = {};
+  
+	  user.assignments.forEach((assignment: any) => {
+		assignment.workWeeks.forEach((workWeek: WorkWeekType) => {
+		  const projectName = assignment.project.name;
+		  const estimatedHours = workWeek.estimatedHours || 0;
+		  const startDate = getDateFromWeekAndYear(workWeek.cweek, workWeek.year);
+  
+		  if (!processedDataMap[userId][projectName]) {
+			processedDataMap[userId][projectName] = [];
+		  }
+  
+		  const workWeekBlocks = processedDataMap[userId][projectName];
+		  const lastBlock = workWeekBlocks[workWeekBlocks.length - 1];
+  
+		  if (
+			lastBlock &&
+			lastBlock.estimatedHours === estimatedHours &&
+			differenceInWeeks(startDate, lastBlock.startDate) === 1
+		  ) {
+			lastBlock.workWeeks.push(workWeek);
+		  } else {
+			workWeekBlocks.push({
+			  estimatedHours,
+			  startDate,
+			  workWeeks: [workWeek],
+			});
+		  }
+		});
+	  });
+	});
+  
+	return processedDataMap;
+  }
+  
+  export function addWorkWeekToDataMap(
+	userAssignmentDataMap: UserAssignmentDataMapType,
+	userId: string,
+	projectName: string,
+	workWeek: WorkWeekType
+  ): void {
+	if (!userAssignmentDataMap[userId]) {
+	  userAssignmentDataMap[userId] = {};
+	}
+  
+	if (!userAssignmentDataMap[userId][projectName]) {
+	  userAssignmentDataMap[userId][projectName] = [];
+	}
+  
+	const workWeekBlocks = userAssignmentDataMap[userId][projectName];
+	const lastBlock = workWeekBlocks[workWeekBlocks.length - 1];
+	const startDate = getDateFromWeekAndYear(workWeek.cweek, workWeek.year);
+  
+	if (
+	  lastBlock &&
+	  lastBlock.estimatedHours === workWeek.estimatedHours &&
+	  differenceInWeeks(startDate, lastBlock.startDate) === 1
+	) {
+	  lastBlock.workWeeks.push(workWeek);
+	  lastBlock.workWeeks.sort((a, b) => getDateFromWeekAndYear(a.cweek, a.year).getTime() - getDateFromWeekAndYear(b.cweek, b.year).getTime());
+	} else {
+	  workWeekBlocks.push({
+		estimatedHours: workWeek.estimatedHours || 0,
+		startDate,
+		workWeeks: [workWeek],
+	  });
+	}
+  }
+  
+  export function getWorkWeekBlockFromDataMap(
+	userAssignmentDataMap: UserAssignmentDataMapType,
+	userId: string,
+	projectName: string,
+	week: number,
+	year: number
+  ): [WorkWeekBlockType | undefined, boolean] {
+	if (!userAssignmentDataMap[userId] || !userAssignmentDataMap[userId][projectName]) {
+	  return [undefined, false];
+	}
+  
+	const workWeekBlocks = userAssignmentDataMap[userId][projectName];
+	const date = getDateFromWeekAndYear(week, year);
+  
+	for (const block of workWeekBlocks) {
+	  if (block.workWeeks.some((workWeek) => getDateFromWeekAndYear(workWeek.cweek, workWeek.year).getTime() === date.getTime())) {
+		return [block, block.startDate.getTime() === date.getTime()];
+	  }
+	}
+  
+	return [undefined, false];
+  }
 
 // Draws a bar with rounded corners for the schedule
 export const drawBar = (xOffset: number, targetCornerRadius: number, barHeight: number, fullBarHeight: number, fullBarWidth: number, hasLeftConnection: boolean = false, hasRightConnection: boolean = false) => {

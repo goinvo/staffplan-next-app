@@ -106,12 +106,18 @@ export const GET_USER_LIST = gql`
 			id
 			name
 			assignments {
+				project {
+					id
+					name
+				}
 				workWeeks {
 					project {
 						name
 					}
 					actualHours
 					estimatedHours
+					cweek
+					year
 				}
 			}
 		}

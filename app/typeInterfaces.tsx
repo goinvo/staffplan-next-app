@@ -66,7 +66,19 @@ export interface WorkWeekType {
 	year: number;
 }
 
-export type WorkWeekRenderData = {
+export interface WorkWeekBlockType {
+	estimatedHours: number;
+	startDate: Date;
+	workWeeks: WorkWeekType[];
+}
+
+export interface UserAssignmentDataMapType {
+	[userId: string]: {
+		[projectId: string]: WorkWeekBlockType[];
+	};
+}
+
+export interface WorkWeekRenderDataType {
 	cweek: number;
 	year: number;
 	estimatedHours: number;

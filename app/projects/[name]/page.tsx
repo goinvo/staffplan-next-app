@@ -3,7 +3,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import withApollo from "@/lib/withApollo";
 import { useQuery, useLazyQuery, useMutation } from "@apollo/client";
-import { UserType, AssignmentType, WorkWeekRenderData, WorkWeekType } from "../../typeInterfaces";
+import { UserType, AssignmentType, WorkWeekRenderDataType, WorkWeekType } from "../../typeInterfaces";
 import { UPSERT_WORKWEEK, GET_USER_ASSIGNMENTS, GET_USER_LIST } from "../../gqlQueries";
 import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
 import { set } from 'date-fns';
@@ -13,7 +13,7 @@ import {
 	parseWorkWeekDate,
 	workWeekArr,
 	workWeekComponentsArr,
-} from "../../people/helperFunctions";
+} from "../../helperFunctions";
 
 const ProjectPage: React.FC = () => {
 	const params = useParams();
@@ -24,7 +24,7 @@ const ProjectPage: React.FC = () => {
 		name: "Select",
 	});
 	const [selectedCell, setselectedCell] = useState<selectedCell>({ week: 0, year: 0, rowId: 0 });
-	const [workWeekDataLookupMap, setWorkWeekDataLookupMap] = useState<Map<number, Map<number, WorkWeekRenderData>>[]>([]);
+	const [workWeekDataLookupMap, setWorkWeekDataLookupMap] = useState<Map<number, Map<number, WorkWeekRenderDataType>>[]>([]);
 	const [currEstHours, setCurrEstHours] = useState<string>("0");
 	const [currActHours, setCurrActHours] = useState<string>("0");
 	const [wasSelectedCellEdited, setWasSelectedCellEdited] = useState<boolean>(false);
@@ -51,7 +51,7 @@ const ProjectPage: React.FC = () => {
 		variables: { selectedUserId: selectedUser.id },
 	});
 
-	const upsertWorkWeekValues = (values: WorkWeekRenderData) => {
+	const upsertWorkWeekValues = (values: WorkWeekRenderDataType) => {
 		upsertWorkweek({
 			variables: {
 				assignmentId: values.assignmentId,
@@ -90,7 +90,7 @@ const ProjectPage: React.FC = () => {
 		return null;
 	};
 
-	const addWorkWeekDataToLookupMap = (workWeekData: WorkWeekRenderData, rowId: number) => {
+	const addWorkWeekDataToLookupMap = (workWeekData: WorkWeekRenderDataType, rowId: number) => {
 		if (rowId != undefined) {
 			if (!workWeekDataLookupMap[rowId]) {
 				workWeekDataLookupMap[rowId] = new Map();
@@ -216,15 +216,15 @@ const ProjectPage: React.FC = () => {
 	// If the user's assignments have been loaded, create a lookup map for the work weeks and map the rows to the assignment IDs
 	useEffect(() => {
 		if (!userAssignmentData) return;
-		const workWeekData: WorkWeekRenderData[][] = userAssignmentData.userAssignments.map(
+		const workWeekData: WorkWeekRenderDataType[][] = userAssignmentData.userAssignments.map(
 			(assignment: AssignmentType) => {
 				return assignment.workWeeks.map((week: WorkWeekType) => {
 					return { cweek: week.cweek, year: week.year, estimatedHours: week.estimatedHours, actualHours: week.actualHours, assignmentId: assignment.id };
 				});
 			}
 		);
-		workWeekData.forEach((assignmentWeeks: WorkWeekRenderData[], index) => {
-			assignmentWeeks.forEach((week: WorkWeekRenderData) => {
+		workWeekData.forEach((assignmentWeeks: WorkWeekRenderDataType[], index) => {
+			assignmentWeeks.forEach((week: WorkWeekRenderDataType) => {
 				addWorkWeekDataToLookupMap(week, index);
 			});
 			rowIdtoAssignmentIdMap.set(index, userAssignmentData.userAssignments[index].id);

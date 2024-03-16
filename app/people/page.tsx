@@ -6,6 +6,7 @@ import {  useQuery } from "@apollo/client";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { UserType } from "../typeInterfaces";
+import { processUserAssignmentDataMap, addWorkWeekToDataMap, getWorkWeekBlockFromDataMap } from "../helperFunctions";
 import { GET_USER_LIST } from "../gqlQueries";
 import WeekDisplay from "../components/weekDisplay";
 import { render } from "@testing-library/react";
@@ -18,10 +19,6 @@ const PeopleView: React.FC = () => {
 	});
 	const router = useRouter();
 	const pathname = usePathname();
-
-	useEffect(() => {
-		setClientSide(true);
-	}, []);
 
 	const {
 		loading: userListLoading,
@@ -36,6 +33,18 @@ const PeopleView: React.FC = () => {
 		skip: !clientSide,
 		errorPolicy: "all",
 	});
+
+	useEffect(() => {
+		setClientSide(true);
+	}, []);
+
+	useEffect(() => {
+		if (userListData) {
+			console.log("userListData", userListData);
+			const userAssignmentDataMap = processUserAssignmentDataMap(userListData);
+			console.log("userAssignmentDataMap", userAssignmentDataMap);
+		}
+	}, [userListData]);
 
 	const handleUserChange = (user: UserType) => {
 		router.push(pathname + "/" + encodeURIComponent(user.name.toString()));
