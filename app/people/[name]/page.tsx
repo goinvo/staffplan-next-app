@@ -72,8 +72,8 @@ const UserPage: React.FC = () => {
 
 	const getUserIdFromName: (name: string) => number | null = (name: string) => {
 		// Iterate through the list of users and find the one with the matching name
-		if (userListData && userListData.users) {
-			for (const user of userListData.users) {
+		if (userListData && userListData.currentCompany && userListData.currentCompany.users) {
+			for (const user of userListData.currentCompany.users) {
 				if (user.name === name) {
 					// Return the user's ID as a number
 					return parseInt(user.id);
@@ -84,8 +84,6 @@ const UserPage: React.FC = () => {
 	};
 
 	const addWorkWeekData = (workWeekData: WorkWeekRenderData, rowId: number) => {
-		// Add new data to storage of consecutive
-
 		// Add data to the lookup map
 		if (rowId != undefined) {
 			if (!workWeekDataLookupMap[rowId]) {

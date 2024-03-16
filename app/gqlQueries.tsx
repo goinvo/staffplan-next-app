@@ -100,12 +100,23 @@ export const GET_USER_ASSIGNMENTS = gql`
 	}
 `;
 export const GET_USER_LIST = gql`
-	{
+{
+	currentCompany{
 		users {
 			id
 			name
+			assignments {
+				workWeeks {
+					project {
+						name
+					}
+					actualHours
+					estimatedHours
+				}
+			}
 		}
 	}
+}
 `;
 
 export const GET_ALL_PROJECTS_DATA = gql`

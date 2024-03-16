@@ -8,6 +8,7 @@ import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { UserType } from "../typeInterfaces";
 import { GET_USER_LIST } from "../gqlQueries";
 import WeekDisplay from "../components/weekDisplay";
+import { render } from "@testing-library/react";
 
 const PeopleView: React.FC = () => {
 	const [clientSide, setClientSide] = useState(false);
@@ -40,16 +41,23 @@ const PeopleView: React.FC = () => {
 		router.push(pathname + "/" + encodeURIComponent(user.name.toString()));
 	};
 
+	const renderCell = (cweek: number, year: number, rowIndex: number, isSelected: boolean) => {
+
+			return (<></>)
+
+	}
+
 	return (
 		<>
 			<WeekDisplay labelContents={
-				userListData?.users?.map((user: UserType) => (
+				userListData?.currentCompany?.users?.map((user: UserType) => (
 					<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={user.id}>
 						<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleUserChange(user)}>Portrait</div>
 						<div className="flex">{user.name}</div>
 					</div>
-				))
-			}/>
+				))}
+				renderCell={renderCell}
+			/>
 			<div className="flex flex-col">
 				<Listbox value={selectedUser} onChange={handleUserChange}>
 					{({ open }) => (
