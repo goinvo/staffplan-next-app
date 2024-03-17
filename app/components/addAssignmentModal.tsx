@@ -10,6 +10,9 @@ import { Field, Formik, FormikValues } from "formik";
 import { GET_ASSIGNMENT_DATA, UPSERT_ASSIGNMENT } from "../gqlQueries";
 const AddAssignment = () => {
 	const [clientSide, setClientSide] = useState(false);
+	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
+		{}
+	);
 	const router = useRouter();
 	useEffect(() => {
 		setClientSide(true);
@@ -53,12 +56,66 @@ const AddAssignment = () => {
 				startsOn: dates.startsOn,
 				endsOn: dates.endsOn,
 			},
-		}).then((res) => {
-			router.push("/projects");
+		}).then(() => {
+			router.back();
 		});
 	};
-	const onCancel = () => router.push("/projects");
-	if (mutationData) console.log(mutationData);
+	const onCancel = () => router.back();
+	const validateForm = (values: FormikValues) => {
+		const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
+		if (!values.userId) {
+			errors.userId = "User is required";
+		}
+		if (values.userId) {
+			const foundUser = data?.users?.find(
+				({ id }: UserType) => id === values.userId
+			);
+			if (!foundUser) {
+				errors.userId = "Must select a valid User";
+			}
+		}
+		if (!values.projectId) {
+			errors.projectId = "Project is required";
+		}
+		if (values.projectId) {
+			const foundProject = data?.clients.find(
+				(client: { projects: ProjectType[] }) => {
+					return client.projects.find(
+						(project: ProjectType) => project.id === values.projectId
+					);
+				}
+			);
+			if (!foundProject) {
+				errors.projectId = "Must select a valid Project";
+			}
+		}
+		if (values.dates) {
+			const startDate = new Date(values.dates.startsOn);
+			const endDate = new Date(values.dates.endsOn);
+			if (startDate > endDate) {
+				errors.dates = { endsOn: "Start must be before end" };
+			}
+			if (
+				startDate.toString() === "Invalid Date" ||
+				endDate.toString() === "Invalid Date"
+			) {
+				errors.dates = { endsOn: "Must select both dates" };
+			}
+		}
+		return errors;
+	};
+
+	const handleProjectSelection = (
+		projectId: React.ChangeEvent<HTMLInputElement>
+	) => {
+		data?.clients?.map((client: { projects: ProjectType[] }) => {
+			const existingProject = client.projects.find(
+				(project: ProjectType) =>
+					project.id.toString() === projectId.target.value
+			);
+			if (existingProject) setSelectedProject(existingProject);
+		});
+	};
 	return (
 		<>
 			{showModal && (
@@ -79,100 +136,116 @@ const AddAssignment = () => {
 											<Formik
 												onSubmit={(e) => onSubmitUpsert(e)}
 												initialValues={initialValues}
+												validate={validateForm}
 											>
 												{({
 													handleChange,
 													values,
 													setErrors,
 													handleSubmit,
+													handleBlur,
+													errors,
+													touched,
+													isValid,
 												}) => (
 													<form
 														className="max-w-lg mx-auto"
 														onSubmit={handleSubmit}
 													>
-														<div className="flex mb-4">
-															<label>
-																User
-																<Field
-																	onChange={handleChange}
-																	as="select"
-																	name="userId"
-																	id="userId"
-																>
-																	<option value={"SELECT"}>SELECT</option>
-																	{data?.users?.map((user: UserType) => {
-																		return (
-																			<option
-																				key={`${user.id} + ${user.name}`}
-																				value={user.id}
-																			>
-																				{" "}
-																				{user.name}
-																			</option>
-																		);
-																	})}
-																</Field>
-															</label>
-															<label>
-																Project
-																<Field
-																	onChange={handleChange}
-																	as="select"
-																	name="projectId"
-																	id="projectId"
-																>
-																	<option value={"SELECT"}>SELECT</option>
-																	{data?.clients?.map(
-																		(client: { projects: ProjectType[] }) => {
-																			return client.projects.map(
-																				(project: ProjectType) => (
-																					<option
-																						key={`${project.id} + ${project.name}`}
-																						value={project.id}
-																					>
-																						{" "}
-																						{project.name}
-																					</option>
-																				)
+														{/* SECTION 1 */}
+														<div className="flex mb-4 pb-2 border-b-4">
+															<div className="w-1/2 mr-4 flex flex-col">
+																<label>
+																	User
+																	<Field
+																		onChange={handleChange}
+																		as="select"
+																		name="userId"
+																		id="userId"
+																		className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+																	>
+																		<option value={""}>SELECT</option>
+																		{data?.users?.map((user: UserType) => {
+																			return (
+																				<option
+																					key={`${user.id} + ${user.name}`}
+																					value={user.id}
+																				>
+																					{" "}
+																					{user.name}
+																				</option>
 																			);
-																		}
-																	)}
-																</Field>
-															</label>
+																		})}
+																	</Field>
+																</label>
+															</div>
+															<div className="w-1/2 mr-4 flex flex-col">
+																<label>
+																	Project
+																	<Field
+																		className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+																		onChange={(
+																			e: React.ChangeEvent<HTMLInputElement>
+																		) => {
+																			handleProjectSelection(e);
+																			handleChange(e);
+																		}}
+																		as="select"
+																		name="projectId"
+																		id="projectId"
+																	>
+																		<option value={""}>SELECT</option>
+																		{data?.clients?.map(
+																			(client: { projects: ProjectType[] }) => {
+																				return client.projects.map(
+																					(project: ProjectType) => (
+																						<option
+																							key={`${project.id} + ${project.name}`}
+																							value={project.id}
+																						>
+																							{" "}
+																							{project.name}
+																						</option>
+																					)
+																				);
+																			}
+																		)}
+																	</Field>
+																</label>
+															</div>
 														</div>
-
-														<div className="flex">
-															<div className="border-b border-gray-900/10 pb-12">
-																<div className="mt-10 grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-10">
-																	<div className="sm:col-span-1">
-																		<label
-																			htmlFor="hoursperweek"
-																			className="block text-sm font-medium leading-6 text-gray-900"
-																		>
-																			Hours/Week
-																		</label>
-																		<div className="mt-2">
-																			<div className="rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-																				<input
-																					type="number"
-																					min="1"
-																					name="hoursperweek"
-																					id="hoursperweek"
-																					autoComplete="hoursperweek"
-																					className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-																					placeholder="40"
-																				/>
-																			</div>
-																		</div>
+														{/* SECTION 2 */}
+														<div className="flex mb-4 pb-2 border-b-4">
+															<div className="w-1/5 mr-4 flex flex-col">
+																<label
+																	htmlFor="hoursperweek"
+																	className="block text-sm font-medium leading-6 text-gray-900"
+																>
+																	Hours/Week
+																</label>
+																<div className="mt-2">
+																	<div className="rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+																		<input
+																			type="number"
+																			min="1"
+																			name="hoursperweek"
+																			id="hoursperweek"
+																			autoComplete="hoursperweek"
+																			className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+																			placeholder="40"
+																		/>
 																	</div>
 																</div>
 															</div>
 															<Field
+																selectedProject={selectedProject}
+																handleBlur={handleBlur}
 																name="dates"
 																component={ProjectDatepicker}
+						
 															/>
 														</div>
-
+														{/* SECTION 3 */}
 														<div className="flex mb-4 justify-between">
 															<div className="mr-2">
 																<label className="inline-block pl-[0.15rem] hover:cursor-pointer">
@@ -197,10 +270,28 @@ const AddAssignment = () => {
 																</button>
 																<button
 																	type="submit"
+																	disabled={!isValid}
 																	className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 																>
 																	Save
 																</button>
+																{errors.dates &&
+																	(touched.dates?.startsOn ||
+																		touched.dates?.endsOn) && (
+																		<div className="text-red-500">
+																			{errors.dates?.endsOn}
+																		</div>
+																	)}
+																{errors.userId && touched.userId && (
+																	<div className="text-red-500">
+																		{errors.userId}
+																	</div>
+																)}
+																{errors.projectId && touched.projectId && (
+																	<div className="text-red-500">
+																		{errors.projectId}
+																	</div>
+																)}
 															</div>
 														</div>
 													</form>

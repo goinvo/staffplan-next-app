@@ -1,20 +1,19 @@
 "use client";
 import { useState, useEffect } from "react";
 import ProjectDatepicker from "./projectDatepicker";
-import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
 import { Field, Formik, FormikValues } from "formik";
-import { ClientType } from "../typeInterfaces";
+import { ClientType, ProjectType } from "../typeInterfaces";
 import { GET_CLIENT_DATA, UPSERT_PROJECT } from "../gqlQueries";
+import { differenceInBusinessDays } from "date-fns";
 
 const AddProject = () => {
 	const [clientSide, setClientSide] = useState(false);
+	const [selectedClient, setSelectedClient] = useState<number | string>("");
 	const router = useRouter();
-	// const [projectNameExists, setProjectNameExists] = useState(false);
-	useEffect(() => {
-		setClientSide(true);
-	}, []);
+	const searchParams = useSearchParams();
 
 	const initialValues = {
 		client: "",
@@ -22,14 +21,16 @@ const AddProject = () => {
 		hours: 0,
 		name: "",
 		numOfFTE: "",
-		numOfWeeks: "",
-		paymentFrequency: "flatRate",
+		payRate: "flatRate",
 		cost: 0,
 		status: false,
+		hourlyRate: 0,
+		flatRate: 0,
 	};
 
-	const searchParams = useSearchParams();
-	const pathName = usePathname();
+	useEffect(() => {
+		setClientSide(true);
+	}, []);
 	const showModal = searchParams.get("projectmodal");
 
 	const { loading, error, data } = useQuery(GET_CLIENT_DATA, {
@@ -48,37 +49,121 @@ const AddProject = () => {
 	if (loading || mutationLoading) return <p> LOADING PROJECT</p>;
 	if (error || mutationError) return <p>ERROR PROJECT</p>;
 
-	// const calculateHours = (values) => {
-	// 	const weeklyFTECost = 38 * parseFloat(values.numOfFTE);
-	// 	const totalHours = parseInt(values.numOfWeeks) * weeklyFTECost;
-	// };
-
-	//checks to see if the project name is already in use by the client, this will likely change this will be replaced by validation
-
-	// const projectNameExists = (data: { clients: [ClientType] }) => {
-	// 	const selectedClientProjects = data.clients.find((client) => {
-	// 		if (client.id === selectedClient.id) return client;
-	// 	});
-	// 	const projectExists = selectedClientProjects?.projects?.find((project) => {
-	// 		if (project.name === values.name) {
-	// 			return project;
-	// 		}
-	// 	});
-	// 	return projectExists;
-	// };
-
 	const onSubmitUpsert = (values: FormikValues) => {
+		const variables = {
+			clientId: values.client,
+			name: values.name,
+			status: values.status ? "active" : "archived",
+			startsOn: values.dates.startsOn,
+			cost: values.cost,
+		};
 		upsertProject({
-			variables: {
-				clientId: values.client,
-				name: values.name,
-				status: values.status ? "active" : "archived",
-				startsOn: values.dates.startsOn,
-				endsOn: values.dates.endsOn,
-			},
-		}).then(() => router.push("/projects"));
+			variables: values.dates.endsOn
+				? { ...variables, endsOn: values.dates.endsOn }
+				: variables,
+		}).then(() => router.back());
 	};
-	const onCancel = () => router.push("/projects");
+	const onCancel = () => router.back();
+	const validateForm = (values: FormikValues) => {
+		const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
+		if (!values.client) {
+			errors.client = "Client is required";
+		}
+		if (values.client) {
+			const foundClient = data?.clients?.find(
+				({ id }: ClientType) => id === values.client
+			);
+			if (!foundClient) {
+				errors.client = "Must select a valid Client";
+			}
+		}
+		if (!values.name) {
+			errors.name = "Project Name is required";
+		}
+		if (values.name) {
+			const currentClient = data.clients.find((client: ClientType) => {
+				if (client.id === selectedClient) return client;
+			});
+			const projectNameExists = currentClient?.projects?.find(
+				(project: ProjectType) => {
+					if (project.name === values.name) {
+						return project;
+					}
+				}
+			);
+			if (projectNameExists) {
+				errors.name = "Project name already in use";
+			}
+		}
+		if (!values.dates.startsOn) {
+			errors.dates = { endsOn: "Start date is required" };
+		}
+		if (values.dates) {
+			const startDate = new Date(values.dates.startsOn);
+			const endDate = new Date(values.dates.endsOn);
+			if (startDate > endDate) {
+				errors.dates = { endsOn: "Start must be before end" };
+			}
+			if (startDate.toString() === "Invalid Date") {
+				errors.dates = { endsOn: "Must select start date" };
+			}
+		}
+		if (values.payRate === "flatRate" && values.cost < 1) {
+			errors.payRate = "Set the total cost";
+		}
+		return errors;
+	};
+	const setTotalCost = (
+		event: React.ChangeEvent<HTMLInputElement>,
+		values: FormikValues,
+		setFieldValue: <ValueType = FormikValues>(
+			field: string,
+			value: ValueType,
+			shouldValidate?: boolean
+		) => void
+	) => {
+		if (values.payRate === "hourlyRate") {
+			setFieldValue("cost", parseInt(event.target.value) * values.hours);
+		}
+	};
+	const calculateHours = (
+		event: React.ChangeEvent<HTMLInputElement>,
+		values: FormikValues,
+		setFieldValue: <ValueType = FormikValues>(
+			field: string,
+			value: ValueType,
+			shouldValidate?: boolean
+		) => void
+	) => {
+		if (values.dates.startsOn && values.dates.endsOn) {
+			const weeklyFTEHours = 38 * parseFloat(event.target.value);
+			const hoursPerDay = weeklyFTEHours / 5;
+			const businessDays = differenceInBusinessDays(
+				values.dates.endsOn,
+				values.dates.startsOn
+			);
+			const totalHours = Math.round(hoursPerDay * businessDays);
+			setFieldValue("hours", totalHours);
+		}
+	};
+	const handleManualHours = (
+		event: React.ChangeEvent<HTMLInputElement>,
+		values: FormikValues,
+		setFieldValue: <ValueType = FormikValues>(
+			field: string,
+			value: ValueType,
+			shouldValidate?: boolean
+		) => void
+	) => {
+		if (
+			values.hourlyRate > 0 &&
+			values.payRate === "hourlyRate" &&
+			!values.dates.endsOn
+		) {
+			const totalCost = parseInt(event.target.value) * values.hourlyRate;
+			setFieldValue("cost", totalCost);
+		}
+	};
 	return (
 		<>
 			{showModal && (
@@ -100,13 +185,18 @@ const AddProject = () => {
 													onSubmitUpsert(e);
 												}}
 												initialValues={initialValues}
-												validator={() => ({})}
+												validate={validateForm}
 											>
 												{({
 													handleSubmit,
 													handleChange,
 													values,
 													setErrors,
+													handleBlur,
+													errors,
+													touched,
+													isValid,
+													setFieldValue,
 												}) => (
 													<form
 														onSubmit={handleSubmit}
@@ -114,7 +204,7 @@ const AddProject = () => {
 													>
 														{/* section 1 */}
 														<div className="flex mb-4 pb-2 border-b-4">
-															<div className="w-1/3 mr-4 flex flex-col">
+															<div className="w-1/2 mr-4 flex flex-col">
 																<label htmlFor="projectName">
 																	Name(*required)
 																	<input
@@ -122,6 +212,7 @@ const AddProject = () => {
 																		id="projectName"
 																		name="name"
 																		value={values.name}
+																		onBlur={handleBlur}
 																		onChange={handleChange}
 																		className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
 																		placeholder="Enter Name"
@@ -129,14 +220,21 @@ const AddProject = () => {
 																</label>
 															</div>
 															<div className="w-1/3 mr-4 flex flex-col">
+																<label>Client(*required)</label>
 																<Field
-																	onChange={handleChange}
+																	onChange={(
+																		e: React.ChangeEvent<HTMLInputElement>
+																	) => {
+																		handleChange(e);
+																		setSelectedClient(e.target.value);
+																	}}
 																	as="select"
-																	// value={values.client}
+																	value={values.client}
 																	name="client"
 																	id="client"
+																	className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
 																>
-																	<option value={"SELECT"}>SELECT</option>
+																	<option value={""}>SELECT</option>
 																	{data?.clients?.map((client: ClientType) => {
 																		return (
 																			<option
@@ -166,13 +264,14 @@ const AddProject = () => {
 															<div className="w-1/5 mr-4 flex flex-col">
 																<Field
 																	name="dates"
+																	handleBlur={handleBlur}
 																	component={ProjectDatepicker}
 																/>
 															</div>
 														</div>
 														{/* section 3 */}
 														<div className="flex mb-4 pb-2 border-b-4 space-x-10">
-															<div className="w-1/5 mr-4 flex flex-col">
+															<div className="w-1/4 mr-4 flex flex-col">
 																<label className="block font-medium text-gray-900">
 																	FTE
 																	<input
@@ -185,54 +284,37 @@ const AddProject = () => {
 																		autoComplete="numOfFTE"
 																		className="block w-full mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
 																		placeholder="1.0"
-																		onChange={handleChange}
+																		onBlur={handleBlur}
+																		onChange={(e) => {
+																			handleChange(e);
+																			calculateHours(e, values, setFieldValue);
+																		}}
 																		value={values.numOfFTE}
 																	/>
 																</label>
 															</div>
-															<div className="w-1/5 mr-4 flex flex-col">
-																<label
-																	htmlFor="numOfWeeks"
-																	className="block font-medium text-gray-900"
-																>
-																	# of Weeks
-																</label>
-																<input
-																	type="number"
-																	min="1"
-																	max="999"
-																	name="numOfWeeks"
-																	id="numOfWeeks"
-																	autoComplete="numOfWeeks"
-																	className="block w-full mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-																	placeholder="1"
-																	onChange={handleChange}
-																	value={values.numOfWeeks}
-																/>
-															</div>
-															<div className="w-1/5 flex flex-col">
+															<div className="w-1/4 flex flex-col">
 																<label
 																	htmlFor="hours"
 																	className="block font-medium text-gray-900"
 																>
-																	Total Hours
+																	Hours
 																</label>
 																<input
 																	type="number"
 																	name="hours"
 																	id="hours"
+																	min={1}
 																	autoComplete="hours"
 																	className="block w-full mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
 																	placeholder=""
 																	value={values.hours}
-																	readOnly
+																	onChange={(e) => {
+																		handleChange(e);
+																		handleManualHours(e, values, setFieldValue);
+																	}}
+																	readOnly={values.dates.endsOn ? true : false}
 																/>
-																<span
-																//this will be replaced by validation
-																// onClick={(values) => calculateHours(values)}
-																>
-																	Recalculate Hours
-																</span>
 															</div>
 														</div>
 														{/* Section 4 */}
@@ -242,9 +324,16 @@ const AddProject = () => {
 																	<label>
 																		<Field
 																			type="radio"
-																			name="paymentFrequency"
+																			name="payRate"
 																			value="flatRate"
 																			id="flatRate"
+																			onChange={(
+																				e: React.ChangeEvent<HTMLInputElement>
+																			) => {
+																				handleChange(e);
+																				setFieldValue("hourlyRate", 0);
+																				setFieldValue("cost", 0);
+																			}}
 																		/>
 																		Flat Rate
 																	</label>
@@ -253,22 +342,47 @@ const AddProject = () => {
 																	<label>
 																		<Field
 																			type="radio"
-																			name="paymentFrequency"
+																			name="payRate"
 																			value="hourlyRate"
 																			id="hourlyRate"
+																			onChange={(
+																				e: React.ChangeEvent<HTMLInputElement>
+																			) => {
+																				handleChange(e);
+																				setFieldValue("cost", 0);
+																			}}
 																		/>
 																		Hourly Rate
 																	</label>
 																</div>
 															</div>
-															<div className="w-1/3 mr-4 flex">
+															<div className="w-1/2 mr-4 flex">
 																<label>
 																	<span className="relative">
 																		<span className="absolute inset-y-0 left-0 pl-3 pb-5 flex items-center pointer-events-none">
 																			$
 																		</span>
 																		<input
-																			className="w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+																			disabled={
+																				values.payRate === "flatRate" ||
+																				values.hours === 0
+																			}
+																			type="number"
+																			min="0"
+																			value={values.hourlyRate}
+																			name="hourlyRate"
+																			id="hourlyRate"
+																			autoComplete="hourlyRate"
+																			onBlur={handleBlur}
+																			onChange={(e) => {
+																				handleChange(e);
+																				setTotalCost(e, values, setFieldValue);
+																			}}
+																			className={
+																				values.payRate === "flatRate"
+																					? "bg-slate-500 w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+																					: "w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+																			}
 																			placeholder="0"
 																		/>
 																	</span>
@@ -280,6 +394,18 @@ const AddProject = () => {
 																			$
 																		</span>
 																		<input
+																			disabled={values.payRate === "hourlyRate"}
+																			type="number"
+																			min="0"
+																			name="cost"
+																			value={values.cost}
+																			id="cost"
+																			autoComplete="cost"
+																			onBlur={handleBlur}
+																			onChange={(e) => {
+																				handleChange(e);
+																				setTotalCost(e, values, setFieldValue);
+																			}}
 																			className="w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
 																			placeholder="0"
 																		/>
@@ -303,10 +429,46 @@ const AddProject = () => {
 																</button>
 																<button
 																	type="submit"
-																	className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+																	disabled={!isValid}
+																	className={`rounded-md bg-${
+																		isValid ? "indigo-600" : "slate-500"
+																	} px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
 																>
 																	Save
 																</button>
+
+																{errors.dates &&
+																	(touched.dates?.startsOn ||
+																		touched.dates?.endsOn) && (
+																		<div className="text-red-500">
+																			{errors.dates?.endsOn}
+																		</div>
+																	)}
+																{errors.name && touched.name && (
+																	<div className="text-red-500">
+																		{errors.name}
+																	</div>
+																)}
+																{errors.client && touched.client && (
+																	<div className="text-red-500">
+																		{errors.client}
+																	</div>
+																)}
+																{errors.cost && (
+																	<div className="text-red-500">
+																		{errors.cost}
+																	</div>
+																)}
+																{errors.payRate && touched.payRate && (
+																	<div className="text-red-500">
+																		{errors.payRate}
+																	</div>
+																)}
+																{errors.numOfFTE && touched.numOfFTE && (
+																	<div className="text-red-500">
+																		{errors.numOfFTE}
+																	</div>
+																)}
 															</div>
 														</div>
 													</form>

@@ -173,6 +173,28 @@ export const UPSERT_ASSIGNMENT = gql`
 		}
 	}
 `;
+
+export const UPSERT_CLIENT = gql`
+	mutation UpsertClient(
+		$clientId: ID
+		$name: String
+		$description: String
+		$status: String
+	) {
+		upsertClient(
+			id: $clientId
+			name: $name
+			description: $description
+			status: $status
+		) {
+			id
+			name
+			description
+			status
+		}
+	}
+`;
+
 export const UPSERT_PROJECT = gql`
 	mutation UpsertProjectUpdate(
 		$clientId: ID
@@ -180,6 +202,7 @@ export const UPSERT_PROJECT = gql`
 		$status: String
 		$startsOn: ISO8601Date
 		$endsOn: ISO8601Date
+		$cost: Float
 	) {
 		upsertProject(
 			clientId: $clientId
@@ -187,6 +210,7 @@ export const UPSERT_PROJECT = gql`
 			status: $status
 			startsOn: $startsOn
 			endsOn: $endsOn
+			cost: $cost
 		) {
 			id
 			client {
@@ -226,4 +250,3 @@ export const UPSERT_WORKWEEK = gql`
 		}
 	}
 `;
-

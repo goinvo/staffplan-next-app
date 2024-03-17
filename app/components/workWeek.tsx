@@ -21,7 +21,6 @@ export const WorkWeek = ({ workWeek }: WorkWeekProps) => {
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_WORKWEEK, {
 		onCompleted(mutationData) {
-			console.log(mutationData, "DATADATA");
 		},
 	});
 
