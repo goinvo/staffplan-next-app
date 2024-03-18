@@ -6,14 +6,6 @@ import { useQuery, useLazyQuery, useMutation } from "@apollo/client";
 import { UserType, AssignmentType, WorkWeekRenderDataType, WorkWeekType } from "../../typeInterfaces";
 import { UPSERT_WORKWEEK, GET_USER_ASSIGNMENTS, GET_USER_LIST } from "../../gqlQueries";
 import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
-import { set } from 'date-fns';
-import {
-	calWeekDatesArr,
-	parseProjectDates,
-	parseWorkWeekDate,
-	workWeekArr,
-	workWeekComponentsArr,
-} from "../../helperFunctions";
 
 const ProjectPage: React.FC = () => {
 	const params = useParams();
@@ -35,7 +27,6 @@ const ProjectPage: React.FC = () => {
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_WORKWEEK, {
 		onCompleted(mutationData) {
-			console.log(mutationData, "DATADATA");
 		},
 	});
 

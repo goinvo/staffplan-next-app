@@ -3,11 +3,15 @@ import { useState, useEffect } from "react";
 import ProjectDatepicker from "./projectDatepicker";
 import { UserType } from "../typeInterfaces";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery, useMutation, gql } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
 import { ProjectType } from "../typeInterfaces";
 import { Field, Formik, FormikValues } from "formik";
-import { GET_ASSIGNMENT_DATA, UPSERT_ASSIGNMENT } from "../gqlQueries";
+import {
+	GET_ASSIGNMENT_DATA,
+	UPSERT_ASSIGNMENT,
+	GET_USER_ASSIGNMENTS,
+} from "../gqlQueries";
 const AddAssignment = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
@@ -39,7 +43,25 @@ const AddAssignment = () => {
 	const [
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
-	] = useMutation(UPSERT_ASSIGNMENT);
+	] = useMutation(UPSERT_ASSIGNMENT, {
+		update(cache, { data }) {
+				const existingAssignments = cache.readQuery({
+					query: GET_USER_ASSIGNMENTS,
+					variables: {
+						selectedUserId: data.upsertAssignment.assignedUser.id,
+					},
+				});
+				console.log(existingAssignments, "EXISITING ASSIGNMENTS");
+				const newUserAssignment = data.upsertAssignment;
+				cache.writeQuery({
+					query: GET_USER_ASSIGNMENTS,
+					data: {
+						userAssignments: [...existingAssignments, newUserAssignment],
+					},
+				});
+		},
+	});
+	if (mutationData) console.log(mutationData, "MUTATION DATA");
 	if (loading || mutationLoading) return <p> LOADING ASSIGNMENTS</p>;
 	if (error || mutationError) return <p>ERROR ASSIGNMENTS</p>;
 	const onSubmitUpsert = ({
@@ -242,7 +264,6 @@ const AddAssignment = () => {
 																handleBlur={handleBlur}
 																name="dates"
 																component={ProjectDatepicker}
-						
 															/>
 														</div>
 														{/* SECTION 3 */}

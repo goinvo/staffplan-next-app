@@ -5,8 +5,7 @@ import withApollo from "@/lib/withApollo";
 import { useQuery, useLazyQuery, useMutation } from "@apollo/client";
 import { UserType, AssignmentType, WorkWeekRenderDataType, WorkWeekType } from "../../typeInterfaces";
 import { UPSERT_WORKWEEK, GET_USER_ASSIGNMENTS, GET_USER_LIST } from "../../gqlQueries";
-import WeekDisplay, { selectedCell, weekWidth } from "../../components/weekDisplay";
-import { eachWeekOfInterval, endOfYear, startOfYear, getISOWeeksInYear } from "date-fns";
+import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
 
 const UserPage: React.FC = () => {
 	const params = useParams();
@@ -125,8 +124,6 @@ const UserPage: React.FC = () => {
 		}
 		setWasSelectedCellEdited(true);
 	}
-
-
 
 	const renderCell = (cweek: number, year: number, rowIndex: number, isSelected: boolean) => {
 		const workWeekData = lookupWorkWeekData(rowIndex, year, cweek);

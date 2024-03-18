@@ -100,48 +100,56 @@ export const GET_USER_ASSIGNMENTS = gql`
 	}
 `;
 export const GET_USER_LIST = gql`
-{
-	currentCompany{
-		users {
-			id
-			name
-			assignments {
-				project {
-					id
-					name
-				}
-				workWeeks {
+	{
+		currentCompany {
+			users {
+				id
+				name
+				assignments {
 					project {
+						id
 						name
 					}
-					actualHours
-					estimatedHours
-					cweek
-					year
+					workWeeks {
+						project {
+							name
+						}
+						actualHours
+						estimatedHours
+						cweek
+						year
+					}
 				}
 			}
 		}
 	}
-}
 `;
 
 export const GET_ALL_PROJECTS_DATA = gql`
 	{
-	currentCompany{
-		projects {
-		id
-		name
-		client {
-			name
+		currentCompany {
+			projects {
+				id
+				name
+				client {
+					name
+				}
+				workWeeks {
+					actualHours
+					estimatedHours
+				}
+			}
 		}
-		workWeeks {
-			actualHours
-			estimatedHours
-		}
-		}
-	}
 	}
 `;
+export const GET_VIEWER = gql`
+	{
+		viewer {
+			name
+		}
+	}
+`;
+
 
 //mutations
 export const UPSERT_ASSIGNMENT = gql`
@@ -250,3 +258,4 @@ export const UPSERT_WORKWEEK = gql`
 		}
 	}
 `;
+

@@ -3,10 +3,9 @@ import React from "react";
 import withApollo from "@/lib/withApollo";
 import { useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import { AssignmentType, ClientType, ProjectType } from "../typeInterfaces";
+import { ProjectType } from "../typeInterfaces";
 import { GET_ALL_PROJECTS_DATA } from "../gqlQueries";
 import WeekDisplay from "../components/weekDisplay";
-import { Project } from "next/dist/build/swc";
 
 const Projects: React.FC = () => {
 	const [clientSide, setClientSide] = useState(false);

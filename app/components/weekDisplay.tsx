@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useRef, useEffect, ReactNode } from "react";
+import React, { useState, useEffect, ReactNode } from "react";
 import useInfiniteScroll, {
     InfiniteScrollRef,
     ScrollDirection,

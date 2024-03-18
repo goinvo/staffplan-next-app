@@ -1,9 +1,12 @@
 import {
-	ApolloClient,
-	from,
-	HttpLink,
-	InMemoryCache,
-} from "@apollo/client";
+	GET_ALL_PROJECTS_DATA,
+	GET_ASSIGNMENT_DATA,
+	GET_CLIENT_DATA,
+	GET_PROJECT_DATA,
+	GET_USER_ASSIGNMENTS,
+	GET_USER_LIST,
+} from "@/app/gqlQueries";
+import { ApolloClient, from, HttpLink, InMemoryCache } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 import { ServerError } from "@apollo/client/link/utils";
 
@@ -30,17 +33,17 @@ function createApolloClient(context = {}) {
 		defaultOptions: {
 			query: {
 				errorPolicy: "all",
-				fetchPolicy:"cache-first"
+				fetchPolicy: "cache-first",
 			},
 			mutate: {
 				errorPolicy: "all",
 			},
+			watchQuery: {},
 		},
-		connectToDevTools: true,
 		cache: new InMemoryCache({
-			addTypename:true
+			addTypename: true,
 		}),
+		connectToDevTools: true,
 	});
 }
-
 export default createApolloClient;
