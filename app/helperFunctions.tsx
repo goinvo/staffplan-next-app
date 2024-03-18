@@ -147,11 +147,11 @@ export function getWorkWeeksForUserByWeekAndYear(
   }
 
 // Draws a bar with rounded corners for the schedule
-export const drawBar = (xOffset: number, targetCornerRadius: number, barHeight: number, fullBarHeight: number, fullBarWidth: number, hasLeftConnection: boolean = false, hasRightConnection: boolean = false) => {
+export const drawBar = (xOffset: number, targetCornerRadius: number, barHeight: number, fullBarHeight: number, fullBarWidth: number, hasLeftConnection: boolean = false, hasRightConnection: boolean = false, key?: number) => {
 	const cornerRadius = Math.min(targetCornerRadius, barHeight);
 	if (!hasLeftConnection && !hasRightConnection) {
 		return (
-			<path d={"M " + xOffset + ", " + (cornerRadius + (fullBarHeight - barHeight))
+			<path key={key} d={"M " + xOffset + ", " + (cornerRadius + (fullBarHeight - barHeight))
 				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 1 " + cornerRadius + "," + (cornerRadius * -1)
 				+ " h " + (fullBarWidth - 2 * cornerRadius) +
 				" a " + cornerRadius + "," + cornerRadius + " 0 0 1 " + cornerRadius + "," + cornerRadius
@@ -160,7 +160,7 @@ export const drawBar = (xOffset: number, targetCornerRadius: number, barHeight: 
 		)
 	} else if (hasLeftConnection && !hasRightConnection) {
 		return (
-			<path d={"M " + xOffset + ", " + (fullBarHeight - barHeight - cornerRadius)
+			<path key={key} d={"M " + xOffset + ", " + (fullBarHeight - barHeight - cornerRadius)
 				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 0 " + cornerRadius + "," + cornerRadius
 				+ " h " + (fullBarWidth - cornerRadius * 2)
 				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 1 " + cornerRadius + "," + cornerRadius
@@ -169,7 +169,7 @@ export const drawBar = (xOffset: number, targetCornerRadius: number, barHeight: 
 		)
 	} else if (!hasLeftConnection && hasRightConnection) {
 		return (
-			<path d={"M " + xOffset + ", " + (cornerRadius + (fullBarHeight - barHeight))
+			<path key={key} d={"M " + xOffset + ", " + (cornerRadius + (fullBarHeight - barHeight))
 				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 1 " + cornerRadius + "," + (cornerRadius * -1)
 				+ " h " + (fullBarWidth - 2 * cornerRadius) +
 				" a " + cornerRadius + "," + cornerRadius + " 0 0 0 " + cornerRadius + "," + (cornerRadius * -1)
@@ -178,7 +178,7 @@ export const drawBar = (xOffset: number, targetCornerRadius: number, barHeight: 
 		)
 	} else {
 		return (
-			<path d={"M " + xOffset + ", " + (fullBarHeight - barHeight - cornerRadius)
+			<path key={key} d={"M " + xOffset + ", " + (fullBarHeight - barHeight - cornerRadius)
 				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 0 " + cornerRadius + "," + cornerRadius
 				+ " h " + (fullBarWidth - 2 * cornerRadius) +
 				" a " + cornerRadius + "," + cornerRadius + " 0 0 0 " + cornerRadius + "," + (cornerRadius * -1)

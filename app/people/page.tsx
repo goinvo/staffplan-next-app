@@ -2,11 +2,11 @@
 import React, { useEffect, useState, Fragment } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import withApollo from "@/lib/withApollo";
-import {  useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { UserType, AssignmentType, UserAssignmentDataMapType, WorkWeekType } from "../typeInterfaces";
-import { processUserAssignmentDataMap, addWorkWeekToDataMap, getWorkWeeksForUserByWeekAndYear } from "../helperFunctions";
+import { processUserAssignmentDataMap, addWorkWeekToDataMap, getWorkWeeksForUserByWeekAndYear, drawBar } from "../helperFunctions";
 import { GET_USER_LIST } from "../gqlQueries";
 import WeekDisplay from "../components/weekDisplay";
 import { render } from "@testing-library/react";
@@ -45,10 +45,10 @@ const PeopleView: React.FC = () => {
 		if (userListData) {
 			// Setup the map of users to their assignments' work weeks
 			setUserAssignmentDataMap(processUserAssignmentDataMap(userListData, rowIdtoUserIdMap));
-			
+
 			// Setup the map of row ids to user ids
 			userListData?.currentCompany?.users?.map((user: UserType, index: number) => {
-				if (user.id && !rowIdtoUserIdMap.has(index)){
+				if (user.id && !rowIdtoUserIdMap.has(index)) {
 					rowIdtoUserIdMap.set(index, user.id);
 				}
 			});
@@ -60,6 +60,26 @@ const PeopleView: React.FC = () => {
 		router.push(pathname + "/" + encodeURIComponent(user.name.toString()));
 	};
 
+	const drawBars = (workWeeks: WorkWeekType[]) => {
+		return (
+			<div>
+
+				{workWeeks.map((workWeek: WorkWeekType, index: number) => {
+					return (
+						<>
+							<svg width="200" height="20" xmlns="http://www.w3.org/2000/svg">
+								{drawBar(index * 20, 5, 20, 20, 20, index === 0, index === workWeeks.length - 1, index)}
+							</svg>
+						</>
+
+					)
+				})}
+
+			</div>
+
+		);
+	}
+
 	const renderCell = (cweek: number, year: number, rowIndex: number, isSelected: boolean) => {
 
 		const userId = rowIdtoUserIdMap.get(rowIndex);
@@ -67,15 +87,13 @@ const PeopleView: React.FC = () => {
 			const workWeeksForUser = getWorkWeeksForUserByWeekAndYear(userAssignmentDataMap, userId, cweek, year);
 			if (workWeeksForUser.length > 0) {
 				return (<>
-				<div>{workWeeksForUser.length}</div>
-				{workWeeksForUser.map((workWeek: WorkWeekType) => {
-					return (<div>{workWeek.project ? workWeek.project.name : "no name"}</div>)
-				})}
+					<div>{workWeeksForUser.length}</div>
+					{drawBars(workWeeksForUser)}
 				</>)
 			}
 		}
-		
-		
+
+
 		return (<></>)
 
 	}
