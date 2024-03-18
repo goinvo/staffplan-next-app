@@ -89,101 +89,61 @@ export function getDateFromWeekAndYear(cweek: number, year: number): Date {
 	return new Date(firstMondayOfYear.getFullYear(), firstMondayOfYear.getMonth(), firstMondayOfYear.getDate() + (cweek - 1) * 7);
 }
 
-export function processUserAssignmentDataMap(userAssignmentDataMap: any): UserAssignmentDataMapType {
+export function processUserAssignmentDataMap(userAssignmentDataMap: any, rowIdtoUserIdMap: Map<number, number>): UserAssignmentDataMapType {
 	const processedDataMap: UserAssignmentDataMapType = {};
-  
+
 	userAssignmentDataMap.currentCompany.users.forEach((user: any) => {
-	  const userId = user.id;
-	  processedDataMap[userId] = {};
-  
-	  user.assignments.forEach((assignment: any) => {
-		assignment.workWeeks.forEach((workWeek: WorkWeekType) => {
-		  const projectName = assignment.project.name;
-		  const estimatedHours = workWeek.estimatedHours || 0;
-		  const startDate = getDateFromWeekAndYear(workWeek.cweek, workWeek.year);
-  
-		  if (!processedDataMap[userId][projectName]) {
-			processedDataMap[userId][projectName] = [];
-		  }
-  
-		  const workWeekBlocks = processedDataMap[userId][projectName];
-		  const lastBlock = workWeekBlocks[workWeekBlocks.length - 1];
-  
-		  if (
-			lastBlock &&
-			lastBlock.estimatedHours === estimatedHours &&
-			differenceInWeeks(startDate, lastBlock.startDate) === 1
-		  ) {
-			lastBlock.workWeeks.push(workWeek);
-		  } else {
-			workWeekBlocks.push({
-			  estimatedHours,
-			  startDate,
-			  workWeeks: [workWeek],
-			});
-		  }
+		const userId = user.id;
+		processedDataMap[userId] = {};
+
+		user.assignments.forEach((assignment: any) => {
+			if (assignment.project.id && assignment.workWeeks.length > 0) {
+				processedDataMap[userId][assignment.project.id] = {};
+
+				assignment.workWeeks.forEach((workWeek: any) => {
+					if (!processedDataMap[userId][assignment.project.id][workWeek.year]) {
+						processedDataMap[userId][assignment.project.id][workWeek.year] = {};
+					}
+
+					processedDataMap[userId][assignment.project.id][workWeek.year][workWeek.cweek] = workWeek;
+				});
+			}
 		});
-	  });
 	});
-  
+
 	return processedDataMap;
-  }
-  
-  export function addWorkWeekToDataMap(
+}
+
+export function addWorkWeekToDataMap(
 	userAssignmentDataMap: UserAssignmentDataMapType,
 	userId: string,
-	projectName: string,
+	projectId: string,
 	workWeek: WorkWeekType
-  ): void {
-	if (!userAssignmentDataMap[userId]) {
-	  userAssignmentDataMap[userId] = {};
-	}
-  
-	if (!userAssignmentDataMap[userId][projectName]) {
-	  userAssignmentDataMap[userId][projectName] = [];
-	}
-  
-	const workWeekBlocks = userAssignmentDataMap[userId][projectName];
-	const lastBlock = workWeekBlocks[workWeekBlocks.length - 1];
-	const startDate = getDateFromWeekAndYear(workWeek.cweek, workWeek.year);
-  
-	if (
-	  lastBlock &&
-	  lastBlock.estimatedHours === workWeek.estimatedHours &&
-	  differenceInWeeks(startDate, lastBlock.startDate) === 1
-	) {
-	  lastBlock.workWeeks.push(workWeek);
-	  lastBlock.workWeeks.sort((a, b) => getDateFromWeekAndYear(a.cweek, a.year).getTime() - getDateFromWeekAndYear(b.cweek, b.year).getTime());
-	} else {
-	  workWeekBlocks.push({
-		estimatedHours: workWeek.estimatedHours || 0,
-		startDate,
-		workWeeks: [workWeek],
-	  });
-	}
-  }
-  
-  export function getWorkWeekBlockFromDataMap(
+): void {
+
+}
+
+export function getWorkWeeksForUserByWeekAndYear(
 	userAssignmentDataMap: UserAssignmentDataMapType,
-	userId: string,
-	projectName: string,
-	week: number,
+	userId: number,
+	cweek: number,
 	year: number
-  ): [WorkWeekBlockType | undefined, boolean] {
-	if (!userAssignmentDataMap[userId] || !userAssignmentDataMap[userId][projectName]) {
-	  return [undefined, false];
-	}
+  ): WorkWeekType[] {
+	const workWeeksByProject: WorkWeekType[] = [];
   
-	const workWeekBlocks = userAssignmentDataMap[userId][projectName];
-	const date = getDateFromWeekAndYear(week, year);
-  
-	for (const block of workWeekBlocks) {
-	  if (block.workWeeks.some((workWeek) => getDateFromWeekAndYear(workWeek.cweek, workWeek.year).getTime() === date.getTime())) {
-		return [block, block.startDate.getTime() === date.getTime()];
+	if (userAssignmentDataMap[userId]) {
+	  for (const projectId in userAssignmentDataMap[userId]) {
+		if (
+		  userAssignmentDataMap[userId][projectId] &&
+		  userAssignmentDataMap[userId][projectId][year] &&
+		  userAssignmentDataMap[userId][projectId][year][cweek]
+		) {
+		  workWeeksByProject.push(userAssignmentDataMap[userId][projectId][year][cweek]);
+		}
 	  }
 	}
   
-	return [undefined, false];
+	return workWeeksByProject;
   }
 
 // Draws a bar with rounded corners for the schedule

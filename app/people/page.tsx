@@ -5,11 +5,12 @@ import withApollo from "@/lib/withApollo";
 import {  useQuery } from "@apollo/client";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
-import { UserType } from "../typeInterfaces";
-import { processUserAssignmentDataMap, addWorkWeekToDataMap, getWorkWeekBlockFromDataMap } from "../helperFunctions";
+import { UserType, AssignmentType, UserAssignmentDataMapType, WorkWeekType } from "../typeInterfaces";
+import { processUserAssignmentDataMap, addWorkWeekToDataMap, getWorkWeeksForUserByWeekAndYear } from "../helperFunctions";
 import { GET_USER_LIST } from "../gqlQueries";
 import WeekDisplay from "../components/weekDisplay";
 import { render } from "@testing-library/react";
+import { getWeek } from "date-fns";
 
 const PeopleView: React.FC = () => {
 	const [clientSide, setClientSide] = useState(false);
@@ -17,6 +18,8 @@ const PeopleView: React.FC = () => {
 		id: NaN,
 		name: "Select",
 	});
+	const [userAssignmentDataMap, setUserAssignmentDataMap] = useState<UserAssignmentDataMapType>({});
+	const [rowIdtoUserIdMap, setRowIdtoUserIdMap] = useState<Map<number, number>>(new Map());
 	const router = useRouter();
 	const pathname = usePathname();
 
@@ -40,9 +43,16 @@ const PeopleView: React.FC = () => {
 
 	useEffect(() => {
 		if (userListData) {
-			console.log("userListData", userListData);
-			const userAssignmentDataMap = processUserAssignmentDataMap(userListData);
-			console.log("userAssignmentDataMap", userAssignmentDataMap);
+			// Setup the map of users to their assignments' work weeks
+			setUserAssignmentDataMap(processUserAssignmentDataMap(userListData, rowIdtoUserIdMap));
+			
+			// Setup the map of row ids to user ids
+			userListData?.currentCompany?.users?.map((user: UserType, index: number) => {
+				if (user.id && !rowIdtoUserIdMap.has(index)){
+					rowIdtoUserIdMap.set(index, user.id);
+				}
+			});
+			console.log("userListData: ", userListData, ", userAssignmentDataMap: ", userAssignmentDataMap, ", rowIdtoUserIdMap: ", rowIdtoUserIdMap);
 		}
 	}, [userListData]);
 
@@ -52,7 +62,21 @@ const PeopleView: React.FC = () => {
 
 	const renderCell = (cweek: number, year: number, rowIndex: number, isSelected: boolean) => {
 
-			return (<></>)
+		const userId = rowIdtoUserIdMap.get(rowIndex);
+		if (userId) {
+			const workWeeksForUser = getWorkWeeksForUserByWeekAndYear(userAssignmentDataMap, userId, cweek, year);
+			if (workWeeksForUser.length > 0) {
+				return (<>
+				<div>{workWeeksForUser.length}</div>
+				{workWeeksForUser.map((workWeek: WorkWeekType) => {
+					return (<div>{workWeek.project ? workWeek.project.name : "no name"}</div>)
+				})}
+				</>)
+			}
+		}
+		
+		
+		return (<></>)
 
 	}
 
