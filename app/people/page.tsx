@@ -60,12 +60,12 @@ const PeopleView: React.FC = () => {
 		router.push(pathname + "/" + encodeURIComponent(user.name.toString()));
 	};
 
-	const drawBars = (workWeeks: WorkWeekType[], width?: number, height?: number) => {
+	const drawBars = (workWeeks: WorkWeekType[], prevWeekHasSameProject: boolean[], width?: number, height?: number, gap: number = 4, cornerRadius = 6) => {
 		if (!width || !height) { return; }
-		
+
 		const barHeightSum = height * workWeeks.reduce((acc, workWeek) => acc + (workWeek.estimatedHours ? workWeek.estimatedHours : 0), 0) / 40;
 		return (
-			<div className="absolute z-40">
+			<div className="absolute z-30">
 
 				{workWeeks.map((workWeek: WorkWeekType, index: number) => {
 					if (workWeek.estimatedHours && width && height) {
@@ -73,7 +73,7 @@ const PeopleView: React.FC = () => {
 						return (
 							<div key={index}>
 								<svg width={width + 1} height={weekHeight} xmlns="http://www.w3.org/2000/svg">
-									{drawBar(height - barHeightSum, 6, weekHeight, weekHeight, width + 1)}
+									{drawBar(prevWeekHasSameProject[index] ? 0 : gap, (index * gap), cornerRadius, weekHeight, weekHeight, width + 1)}
 								</svg>
 							</div>
 
@@ -82,29 +82,41 @@ const PeopleView: React.FC = () => {
 
 				})}
 
-				<div>{height}</div>
+				<div>{(prevWeekHasSameProject && prevWeekHasSameProject.length > 0) ? "True" : "False"}</div>
 			</div>
-			
 
 		);
 	}
 
-	const drawFTELabels = (workWeeks: WorkWeekType[], width?: number, height?: number) => {
+	const drawFTELabels = (workWeeks: WorkWeekType[], prevWeekHasSameProject: boolean[], width?: number, height?: number, gap: number = 4) => {
 		if (!width || !height) { return; }
-		const labelPadding = 8;
+		const labelPadding = 4;
 		const barHeightSum = height * workWeeks.reduce((acc, workWeek) => acc + (workWeek.estimatedHours ? workWeek.estimatedHours : 0), 0) / 40;
+
 		return (
 			<div className="absolute z-40">
 				{workWeeks.map((workWeek: WorkWeekType, index: number) => {
 					if (workWeek.estimatedHours && width && height) {
 						const weekHeight = (height * workWeek.estimatedHours / 40);
 						return (
-							<div key={index}>
-								<svg width={width + 1} height={weekHeight} xmlns="http://www.w3.org/2000/svg">
-									<text x={width / 2} y={weekHeight - labelPadding} textAnchor="middle" fontSize="12" fill="black">{workWeek.estimatedHours}</text>
-								</svg>
+							<div key={index}
+								className="relative z-40"
+								style={{
+									width: `${width}px`,
+									height: `${weekHeight}px`,
+									lineHeight: `${weekHeight}px`,
+								}}>
+								<div
+									className="absolute text-bottom text-black text-xs"
+									style={{
+										left: `${labelPadding + gap}px`,
+										bottom: `${labelPadding}px`,
+									}}
+								>
+									{prevWeekHasSameProject[index] ? "" : (workWeek.project && workWeek.project.name ? workWeek.project.name : "")}
+								</div>
 							</div>
-						)
+						);
 					}
 				})}
 			</div>
@@ -114,13 +126,24 @@ const PeopleView: React.FC = () => {
 	const renderCell = (cweek: number, year: number, rowIndex: number, isSelected: boolean, width?: number, height?: number) => {
 
 		const userId = rowIdtoUserIdMap.get(rowIndex);
+
 		if (userId) {
-			const workWeeksForUser = getWorkWeeksForUserByWeekAndYear(userAssignmentDataMap, userId, cweek, year);
+			const prevWorkWeeksForUser = getWorkWeeksForUserByWeekAndYear(userAssignmentDataMap, userId, cweek - 1, year) ?? [];
+			const workWeeksForUser = getWorkWeeksForUserByWeekAndYear(userAssignmentDataMap, userId, cweek, year) ?? [];
+
+			const prevWeekHasSameProject: boolean[] = [];
+
+			if (prevWorkWeeksForUser.length > 0) {
+				workWeeksForUser.forEach((workWeek: WorkWeekType, weekIndex: number) => {
+					const hasSameProject = prevWorkWeeksForUser[weekIndex]?.project?.name === workWeek.project?.name;
+					prevWeekHasSameProject.push(hasSameProject);
+				});
+			}
+
 			if (workWeeksForUser.length > 0) {
 				return (<>
-					<div>{workWeeksForUser.length}</div>
-					{drawBars(workWeeksForUser, width, height)}
-					{drawFTELabels(workWeeksForUser, width, height)}
+					{drawBars(workWeeksForUser, prevWeekHasSameProject, width, height)}
+					{drawFTELabels(workWeeksForUser, prevWeekHasSameProject, width, height)}
 				</>)
 			}
 		}

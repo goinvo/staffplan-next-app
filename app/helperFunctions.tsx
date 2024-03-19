@@ -147,82 +147,44 @@ export function getWorkWeeksForUserByWeekAndYear(
 }
 
 // Draws a bar with rounded corners for the schedule
-export const drawBar = (
-	xOffset: number,
-	targetCornerRadius: number,
-	barHeight: number,
-	fullBarHeight: number,
-	fullBarWidth: number,
-	hasLeftConnection: boolean = true,
-	hasRightConnection: boolean = true,
-	isBottomLeftCornerRounded: boolean = false,
-	isBottomRightCornerRounded: boolean = false
-) => {
+export const drawBar = (xOffset: number, yOffset: number, targetCornerRadius: number, barHeight: number, fullBarHeight: number, fullBarWidth: number, hasLeftConnection: boolean = false, hasRightConnection: boolean = false, key?: number) => {
 	const cornerRadius = Math.min(targetCornerRadius, barHeight);
-
 	if (!hasLeftConnection && !hasRightConnection) {
 		return (
-			<path
-				d={`
-			M ${xOffset}, ${cornerRadius + (fullBarHeight - barHeight)}
-			a ${cornerRadius},${cornerRadius} 0 0 1 ${cornerRadius},${cornerRadius * -1}
-			h ${fullBarWidth - 2 * cornerRadius}
-			a ${cornerRadius},${cornerRadius} 0 0 1 ${cornerRadius},${cornerRadius}
-			v ${barHeight - cornerRadius - (isBottomRightCornerRounded ? cornerRadius : 0)}
-			${isBottomRightCornerRounded ? `a ${cornerRadius},${cornerRadius} 0 0 1 ${-cornerRadius},${cornerRadius}` : ''}
-			h ${(fullBarWidth - (isBottomRightCornerRounded ? cornerRadius : 0) - (isBottomLeftCornerRounded ? cornerRadius : 0)) * -1}
-			${isBottomLeftCornerRounded ? `a ${cornerRadius},${cornerRadius} 0 0 1 ${-cornerRadius},${-cornerRadius}` : ''}
-			z
-		  `}
-				fill="blue"
-			/>
-		);
+			<path key={key} d={"M " + xOffset + ", " + (yOffset + cornerRadius + (fullBarHeight - barHeight))
+				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 1 " + cornerRadius + "," + (cornerRadius * -1)
+				+ " h " + (fullBarWidth - 2 * cornerRadius) +
+				" a " + cornerRadius + "," + cornerRadius + " 0 0 1 " + cornerRadius + "," + cornerRadius
+				+ " v " + (barHeight - cornerRadius) + " h " + (fullBarWidth * -1) + " z"}
+				fill="blue" />
+		)
 	} else if (hasLeftConnection && !hasRightConnection) {
 		return (
-			<path
-				d={`
-			M ${xOffset}, ${fullBarHeight - barHeight - cornerRadius}
-			a ${cornerRadius},${cornerRadius} 0 0 0 ${cornerRadius},${cornerRadius}
-			h ${fullBarWidth - cornerRadius * 2}
-			a ${cornerRadius},${cornerRadius} 0 0 1 ${cornerRadius},${cornerRadius}
-			v ${barHeight - cornerRadius - (isBottomRightCornerRounded ? cornerRadius : 0)}
-			${isBottomRightCornerRounded ? `a ${cornerRadius},${cornerRadius} 0 0 1 ${-cornerRadius},${cornerRadius}` : ''}
-			h ${fullBarWidth * -1}
-			z
-		  `}
-				fill="blue"
-			/>
-		);
+			<path key={key} d={"M " + xOffset + ", " + (yOffset + fullBarHeight - barHeight - cornerRadius)
+				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 0 " + cornerRadius + "," + cornerRadius
+				+ " h " + (fullBarWidth - cornerRadius * 2)
+				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 1 " + cornerRadius + "," + cornerRadius
+				+ " v " + (barHeight - cornerRadius) + " h " + (fullBarWidth * -1) + " z"}
+				fill="blue" />
+		)
 	} else if (!hasLeftConnection && hasRightConnection) {
 		return (
-			<path
-				d={`
-			M ${xOffset}, ${cornerRadius + (fullBarHeight - barHeight)}
-			a ${cornerRadius},${cornerRadius} 0 0 1 ${cornerRadius},${cornerRadius * -1}
-			h ${fullBarWidth - 2 * cornerRadius}
-			a ${cornerRadius},${cornerRadius} 0 0 0 ${cornerRadius},${cornerRadius * -1}
-			v ${barHeight + cornerRadius - (isBottomLeftCornerRounded ? cornerRadius : 0)}
-			${isBottomLeftCornerRounded ? `a ${cornerRadius},${cornerRadius} 0 0 0 ${-cornerRadius},${-cornerRadius}` : ''}
-			h ${fullBarWidth * -1}
-			z
-		  `}
-				fill="blue"
-			/>
-		);
+			<path key={key} d={"M " + xOffset + ", " + (yOffset + cornerRadius + (fullBarHeight - barHeight))
+				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 1 " + cornerRadius + "," + (cornerRadius * -1)
+				+ " h " + (fullBarWidth - 2 * cornerRadius) +
+				" a " + cornerRadius + "," + cornerRadius + " 0 0 0 " + cornerRadius + "," + (cornerRadius * -1)
+				+ " v " + (barHeight + cornerRadius) + " h " + (fullBarWidth * -1) + " z"}
+				fill="blue" />
+		)
 	} else {
 		return (
-			<path
-				d={`
-			M ${xOffset}, ${fullBarHeight - barHeight - cornerRadius}
-			a ${cornerRadius},${cornerRadius} 0 0 0 ${cornerRadius},${cornerRadius}
-			h ${fullBarWidth - 2 * cornerRadius}
-			a ${cornerRadius},${cornerRadius} 0 0 0 ${cornerRadius},${cornerRadius * -1}
-			v ${barHeight + cornerRadius}
-			h ${fullBarWidth * -1}
-			z
-		  `}
-				fill="blue"
-			/>
-		);
+			<path key={key} d={"M " + xOffset + ", " + (yOffset + fullBarHeight - barHeight - cornerRadius)
+				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 0 " + cornerRadius + "," + cornerRadius
+				+ " h " + (fullBarWidth - 2 * cornerRadius) +
+				" a " + cornerRadius + "," + cornerRadius + " 0 0 0 " + cornerRadius + "," + (cornerRadius * -1)
+				+ " v " + (barHeight + cornerRadius) + " h " + (fullBarWidth * -1) + " z"}
+				fill="blue" />
+		)
 	}
-};
+
+}
