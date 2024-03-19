@@ -68,17 +68,18 @@ export interface WorkWeekType {
 	year: number;
 }
 
-export interface WorkWeekBlockType {
-	estimatedHours: number;
-	startDate: Date;
-	workWeeks: WorkWeekType[];
+export interface WorkWeekBlockMemberType {
+	workWeek: WorkWeekType;
+	maxTotalEstHours: number;
+	itemEstHoursOffset: number;
+	consecutivePrevWeeks: number;
 }
 
 export interface UserAssignmentDataMapType {
 	[userId: number]: {
 		[projectId: string]: {
 			[year: number]: {
-				[cweek: number]: WorkWeekType;
+				[cweek: number]: WorkWeekBlockMemberType;
 			};
 		};
 	};

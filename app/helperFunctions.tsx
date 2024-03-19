@@ -6,7 +6,7 @@ import {
 	UserAssignmentDataType,
 	WorkWeekType,
 	UserAssignmentDataMapType,
-	WorkWeekBlockType,
+	WorkWeekBlockMemberType,
 } from "./typeInterfaces";
 // convert a human readable date to calendar week and year
 export const parseProjectDates = (date: string) => {
@@ -89,23 +89,49 @@ export function getDateFromWeekAndYear(cweek: number, year: number): Date {
 	return new Date(firstMondayOfYear.getFullYear(), firstMondayOfYear.getMonth(), firstMondayOfYear.getDate() + (cweek - 1) * 7);
 }
 
-export function processUserAssignmentDataMap(userAssignmentDataMap: any, rowIdtoUserIdMap: Map<number, number>): UserAssignmentDataMapType {
+export function processUserAssignmentDataMap(userAssignmentDataMap: any): UserAssignmentDataMapType {
 	const processedDataMap: UserAssignmentDataMapType = {};
 
 	userAssignmentDataMap.currentCompany.users.forEach((user: any) => {
 		const userId = user.id;
 		processedDataMap[userId] = {};
+		let maxTotalEstHours = 40;
 
+		// Calculate the max total number of estimated hours in the assignment
+		user.assignments.forEach((assignment: any) => {
+			if (assignment.project.id && assignment.workWeeks.length > 0) {
+				let totalEstHoursInAssignment = 0;
+
+				assignment.workWeeks.forEach((workWeek: any) => {
+					totalEstHoursInAssignment += workWeek.estimatedHours;
+				});
+
+				if (totalEstHoursInAssignment > maxTotalEstHours) {
+					maxTotalEstHours = totalEstHoursInAssignment;
+				}
+			}
+		});
+
+		// Add the data to the map
 		user.assignments.forEach((assignment: any) => {
 			if (assignment.project.id && assignment.workWeeks.length > 0) {
 				processedDataMap[userId][assignment.project.id] = {};
+				let itemEstHoursOffset = 0;
 
 				assignment.workWeeks.forEach((workWeek: any) => {
 					if (!processedDataMap[userId][assignment.project.id][workWeek.year]) {
 						processedDataMap[userId][assignment.project.id][workWeek.year] = {};
 					}
+					
+					let consecutivePrevWeeks = 0;
 
-					processedDataMap[userId][assignment.project.id][workWeek.year][workWeek.cweek] = workWeek;
+					processedDataMap[userId][assignment.project.id][workWeek.year][workWeek.cweek] = {
+						workWeek: workWeek,
+						maxTotalEstHours: maxTotalEstHours,
+						itemEstHoursOffset: itemEstHoursOffset,
+						consecutivePrevWeeks: consecutivePrevWeeks
+					};
+					itemEstHoursOffset += workWeek.estimatedHours;
 				});
 			}
 		});
@@ -128,8 +154,8 @@ export function getWorkWeeksForUserByWeekAndYear(
 	userId: number,
 	cweek: number,
 	year: number
-): WorkWeekType[] {
-	const workWeeksByProject: WorkWeekType[] = [];
+): WorkWeekBlockMemberType[] {
+	const workWeeksBlocksByProject: WorkWeekBlockMemberType[] = [];
 
 	if (userAssignmentDataMap[userId]) {
 		for (const projectId in userAssignmentDataMap[userId]) {
@@ -138,53 +164,34 @@ export function getWorkWeeksForUserByWeekAndYear(
 				userAssignmentDataMap[userId][projectId][year] &&
 				userAssignmentDataMap[userId][projectId][year][cweek]
 			) {
-				workWeeksByProject.push(userAssignmentDataMap[userId][projectId][year][cweek]);
+				workWeeksBlocksByProject.push(userAssignmentDataMap[userId][projectId][year][cweek]);
 			}
 		}
 	}
 
-	return workWeeksByProject;
+	return workWeeksBlocksByProject;
 }
 
 // Draws a bar with rounded corners for the schedule
-export const drawBar = (xOffset: number, yOffset: number, targetCornerRadius: number, barHeight: number, fullBarHeight: number, fullBarWidth: number, hasLeftConnection: boolean = false, hasRightConnection: boolean = false, key?: number) => {
+export const drawBar = (xOffset: number, yOffset: number, 
+	targetCornerRadius: number, 
+	barHeight: number, fullBarHeight: number, fullBarWidth: number, 
+	hasTopLeftConnection: boolean = false, hasTopRightConnection: boolean = true, 
+	key?: number) => {
 	const cornerRadius = Math.min(targetCornerRadius, barHeight);
-	if (!hasLeftConnection && !hasRightConnection) {
-		return (
-			<path key={key} d={"M " + xOffset + ", " + (yOffset + cornerRadius + (fullBarHeight - barHeight))
-				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 1 " + cornerRadius + "," + (cornerRadius * -1)
-				+ " h " + (fullBarWidth - 2 * cornerRadius) +
-				" a " + cornerRadius + "," + cornerRadius + " 0 0 1 " + cornerRadius + "," + cornerRadius
-				+ " v " + (barHeight - cornerRadius) + " h " + (fullBarWidth * -1) + " z"}
-				fill="blue" />
-		)
-	} else if (hasLeftConnection && !hasRightConnection) {
-		return (
-			<path key={key} d={"M " + xOffset + ", " + (yOffset + fullBarHeight - barHeight - cornerRadius)
-				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 0 " + cornerRadius + "," + cornerRadius
-				+ " h " + (fullBarWidth - cornerRadius * 2)
-				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 1 " + cornerRadius + "," + cornerRadius
-				+ " v " + (barHeight - cornerRadius) + " h " + (fullBarWidth * -1) + " z"}
-				fill="blue" />
-		)
-	} else if (!hasLeftConnection && hasRightConnection) {
-		return (
-			<path key={key} d={"M " + xOffset + ", " + (yOffset + cornerRadius + (fullBarHeight - barHeight))
-				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 1 " + cornerRadius + "," + (cornerRadius * -1)
-				+ " h " + (fullBarWidth - 2 * cornerRadius) +
-				" a " + cornerRadius + "," + cornerRadius + " 0 0 0 " + cornerRadius + "," + (cornerRadius * -1)
-				+ " v " + (barHeight + cornerRadius) + " h " + (fullBarWidth * -1) + " z"}
-				fill="blue" />
-		)
-	} else {
-		return (
-			<path key={key} d={"M " + xOffset + ", " + (yOffset + fullBarHeight - barHeight - cornerRadius)
-				+ " a " + cornerRadius + "," + cornerRadius + " 0 0 0 " + cornerRadius + "," + cornerRadius
-				+ " h " + (fullBarWidth - 2 * cornerRadius) +
-				" a " + cornerRadius + "," + cornerRadius + " 0 0 0 " + cornerRadius + "," + (cornerRadius * -1)
-				+ " v " + (barHeight + cornerRadius) + " h " + (fullBarWidth * -1) + " z"}
-				fill="blue" />
-		)
-	}
+	const vLength = hasTopRightConnection ? barHeight + cornerRadius : barHeight - cornerRadius;
+	const hLength = fullBarWidth - 2 * cornerRadius;
+
+	const topSection = ("M " + xOffset + ", " + (hasTopLeftConnection ? (yOffset + fullBarHeight - barHeight - cornerRadius) : (yOffset + cornerRadius + (fullBarHeight - barHeight)))
+	+ " a " + cornerRadius + "," + (hasTopLeftConnection ? (cornerRadius + " 0 0 0 " + cornerRadius + "," + cornerRadius) : (cornerRadius + " 0 0 1 " + cornerRadius + "," + (cornerRadius * -1)))
+	+ " h " + hLength
+	+ " a " + cornerRadius + "," + (hasTopRightConnection ? (cornerRadius + " 0 0 0 " + cornerRadius + "," + (cornerRadius * -1)) : (cornerRadius + " 0 0 1 " + cornerRadius + "," + cornerRadius))
+	);
+
+	return (
+		<path key={key} d={topSection
+			+ " v " + vLength + " h " + (fullBarWidth * -1) + " z"}
+			fill="blue" />
+	)
 
 }

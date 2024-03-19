@@ -5,7 +5,7 @@ import withApollo from "@/lib/withApollo";
 import { useQuery } from "@apollo/client";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
-import { UserType, AssignmentType, UserAssignmentDataMapType, WorkWeekType } from "../typeInterfaces";
+import { UserType, AssignmentType, UserAssignmentDataMapType, WorkWeekType, WorkWeekBlockMemberType } from "../typeInterfaces";
 import { processUserAssignmentDataMap, addWorkWeekToDataMap, getWorkWeeksForUserByWeekAndYear, drawBar } from "../helperFunctions";
 import { GET_USER_LIST } from "../gqlQueries";
 import WeekDisplay from "../components/weekDisplay";
@@ -44,7 +44,7 @@ const PeopleView: React.FC = () => {
 	useEffect(() => {
 		if (userListData) {
 			// Setup the map of users to their assignments' work weeks
-			setUserAssignmentDataMap(processUserAssignmentDataMap(userListData, rowIdtoUserIdMap));
+			setUserAssignmentDataMap(processUserAssignmentDataMap(userListData));
 
 			// Setup the map of row ids to user ids
 			userListData?.currentCompany?.users?.map((user: UserType, index: number) => {
@@ -60,16 +60,15 @@ const PeopleView: React.FC = () => {
 		router.push(pathname + "/" + encodeURIComponent(user.name.toString()));
 	};
 
-	const drawBars = (workWeeks: WorkWeekType[], prevWeekHasSameProject: boolean[], width?: number, height?: number, gap: number = 4, cornerRadius = 6) => {
+	const drawBars = (workWeekBlocks: WorkWeekBlockMemberType[], prevWeekHasSameProject: boolean[], width?: number, height?: number, gap: number = 4, cornerRadius = 6) => {
 		if (!width || !height) { return; }
 
-		const barHeightSum = height * workWeeks.reduce((acc, workWeek) => acc + (workWeek.estimatedHours ? workWeek.estimatedHours : 0), 0) / 40;
 		return (
 			<div className="absolute z-30">
 
-				{workWeeks.map((workWeek: WorkWeekType, index: number) => {
-					if (workWeek.estimatedHours && width && height) {
-						const weekHeight = (height * workWeek.estimatedHours / 40);
+				{workWeekBlocks.map((workWeekBlock: WorkWeekBlockMemberType, index: number) => {
+					if (workWeekBlock.workWeek.estimatedHours && width && height) {
+						const weekHeight = (height * workWeekBlock.workWeek.estimatedHours / 40);
 						return (
 							<div key={index}>
 								<svg width={width + 1} height={weekHeight} xmlns="http://www.w3.org/2000/svg">
@@ -88,16 +87,16 @@ const PeopleView: React.FC = () => {
 		);
 	}
 
-	const drawFTELabels = (workWeeks: WorkWeekType[], prevWeekHasSameProject: boolean[], width?: number, height?: number, gap: number = 4) => {
+	const drawFTELabels = (workWeekBlocks: WorkWeekBlockMemberType[], prevWeekHasSameProject: boolean[], width?: number, height?: number, gap: number = 4) => {
 		if (!width || !height) { return; }
 		const labelPadding = 4;
-		const barHeightSum = height * workWeeks.reduce((acc, workWeek) => acc + (workWeek.estimatedHours ? workWeek.estimatedHours : 0), 0) / 40;
+		const barHeightSum = height * workWeekBlocks.reduce((acc, workWeekBlock) => acc + (workWeekBlock.workWeek.estimatedHours ? workWeekBlock.workWeek.estimatedHours : 0), 0) / 40;
 
 		return (
 			<div className="absolute z-40">
-				{workWeeks.map((workWeek: WorkWeekType, index: number) => {
-					if (workWeek.estimatedHours && width && height) {
-						const weekHeight = (height * workWeek.estimatedHours / 40);
+				{workWeekBlocks.map((workWeekBlock: WorkWeekBlockMemberType, index: number) => {
+					if (workWeekBlock.workWeek.estimatedHours && width && height) {
+						const weekHeight = (height * workWeekBlock.workWeek.estimatedHours / 40);
 						return (
 							<div key={index}
 								className="relative z-40"
@@ -113,7 +112,7 @@ const PeopleView: React.FC = () => {
 										bottom: `${labelPadding}px`,
 									}}
 								>
-									{prevWeekHasSameProject[index] ? "" : (workWeek.project && workWeek.project.name ? workWeek.project.name : "")}
+									{prevWeekHasSameProject[index] ? "" : (workWeekBlock.workWeek.project && workWeekBlock.workWeek.project.name ? workWeekBlock.workWeek.project.name : "")}
 								</div>
 							</div>
 						);
@@ -134,8 +133,8 @@ const PeopleView: React.FC = () => {
 			const prevWeekHasSameProject: boolean[] = [];
 
 			if (prevWorkWeeksForUser.length > 0) {
-				workWeeksForUser.forEach((workWeek: WorkWeekType, weekIndex: number) => {
-					const hasSameProject = prevWorkWeeksForUser[weekIndex]?.project?.name === workWeek.project?.name;
+				workWeeksForUser.forEach((workWeekBlock: WorkWeekBlockMemberType, weekIndex: number) => {
+					const hasSameProject = prevWorkWeeksForUser[weekIndex]?.workWeek.project?.name === workWeekBlock.workWeek.project?.name;
 					prevWeekHasSameProject.push(hasSameProject);
 				});
 			}
