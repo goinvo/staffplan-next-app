@@ -6,7 +6,7 @@ import { useQuery } from "@apollo/client";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { UserType, AssignmentType, UserAssignmentDataMapType, WorkWeekType, WorkWeekBlockMemberType } from "../typeInterfaces";
-import { processUserAssignmentDataMap, addWorkWeekToDataMap, getWorkWeeksForUserByWeekAndYear, drawBar } from "../helperFunctions";
+import { processUserAssignmentDataMap, getWorkWeeksForUserByWeekAndYear, drawBar } from "../helperFunctions";
 import { GET_USER_LIST } from "../gqlQueries";
 import WeekDisplay from "../components/weekDisplay";
 import { render } from "@testing-library/react";
@@ -60,19 +60,19 @@ const PeopleView: React.FC = () => {
 		router.push(pathname + "/" + encodeURIComponent(user.name.toString()));
 	};
 
-	const drawBars = (workWeekBlocks: WorkWeekBlockMemberType[], prevWeekHasSameProject: boolean[], width?: number, height?: number, gap: number = 4, cornerRadius = 6) => {
+	const drawBars = (workWeekBlocks: WorkWeekBlockMemberType[], width?: number, height?: number, gap: number = 4, cornerRadius = 6) => {
 		if (!width || !height) { return; }
+		const labelPadding = 4;
 
 		return (
-			<div className="absolute z-30">
-
+			<div className="absolute bottom-0 z-30">
 				{workWeekBlocks.map((workWeekBlock: WorkWeekBlockMemberType, index: number) => {
 					if (workWeekBlock.workWeek.estimatedHours && width && height) {
 						const weekHeight = (height * workWeekBlock.workWeek.estimatedHours / 40);
 						return (
 							<div key={index}>
 								<svg width={width + 1} height={weekHeight} xmlns="http://www.w3.org/2000/svg">
-									{drawBar(prevWeekHasSameProject[index] ? 0 : gap, (index * gap), cornerRadius, weekHeight, weekHeight, width + 1)}
+									{drawBar(workWeekBlock.consecutivePrevWeeks != 0 ? 0 : gap, (index * gap), cornerRadius, weekHeight, weekHeight, width + 1, workWeekBlock.consecutivePrevWeeks != 0, !workWeekBlock.isLastConsecutiveWeek)}
 								</svg>
 							</div>
 
@@ -80,8 +80,6 @@ const PeopleView: React.FC = () => {
 					}
 
 				})}
-
-				<div>{(prevWeekHasSameProject && prevWeekHasSameProject.length > 0) ? "True" : "False"}</div>
 			</div>
 
 		);
@@ -90,10 +88,9 @@ const PeopleView: React.FC = () => {
 	const drawFTELabels = (workWeekBlocks: WorkWeekBlockMemberType[], prevWeekHasSameProject: boolean[], width?: number, height?: number, gap: number = 4) => {
 		if (!width || !height) { return; }
 		const labelPadding = 4;
-		const barHeightSum = height * workWeekBlocks.reduce((acc, workWeekBlock) => acc + (workWeekBlock.workWeek.estimatedHours ? workWeekBlock.workWeek.estimatedHours : 0), 0) / 40;
 
 		return (
-			<div className="absolute z-40">
+			<div className="absolute bottom-0 z-40">
 				{workWeekBlocks.map((workWeekBlock: WorkWeekBlockMemberType, index: number) => {
 					if (workWeekBlock.workWeek.estimatedHours && width && height) {
 						const weekHeight = (height * workWeekBlock.workWeek.estimatedHours / 40);
@@ -140,10 +137,12 @@ const PeopleView: React.FC = () => {
 			}
 
 			if (workWeeksForUser.length > 0) {
-				return (<>
-					{drawBars(workWeeksForUser, prevWeekHasSameProject, width, height)}
-					{drawFTELabels(workWeeksForUser, prevWeekHasSameProject, width, height)}
-				</>)
+				return (
+					<div className="relative absolute" style={{ height: height }}>
+						{drawBars(workWeeksForUser, width, height)}
+						{drawFTELabels(workWeeksForUser, prevWeekHasSameProject, width, height)}
+					</div>
+				)
 			}
 		}
 

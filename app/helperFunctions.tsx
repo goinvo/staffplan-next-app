@@ -125,28 +125,29 @@ export function processUserAssignmentDataMap(userAssignmentDataMap: any): UserAs
 					
 					let consecutivePrevWeeks = 0;
 
+					// Check if the previous week is consecutive and update the consecutivePrevWeeks count
+					if (processedDataMap[userId][assignment.project.id][workWeek.year][workWeek.cweek - 1]){
+						const prevWeek = processedDataMap[userId][assignment.project.id][workWeek.year][workWeek.cweek - 1];
+						consecutivePrevWeeks = prevWeek.consecutivePrevWeeks + 1;
+						prevWeek.isLastConsecutiveWeek = false;
+					}
+
+					// Add the work week to the map
 					processedDataMap[userId][assignment.project.id][workWeek.year][workWeek.cweek] = {
 						workWeek: workWeek,
 						maxTotalEstHours: maxTotalEstHours,
 						itemEstHoursOffset: itemEstHoursOffset,
-						consecutivePrevWeeks: consecutivePrevWeeks
+						consecutivePrevWeeks: consecutivePrevWeeks,
+						isLastConsecutiveWeek: true,
 					};
 					itemEstHoursOffset += workWeek.estimatedHours;
 				});
+
 			}
 		});
 	});
 
 	return processedDataMap;
-}
-
-export function addWorkWeekToDataMap(
-	userAssignmentDataMap: UserAssignmentDataMapType,
-	userId: string,
-	projectId: string,
-	workWeek: WorkWeekType
-): void {
-
 }
 
 export function getWorkWeeksForUserByWeekAndYear(

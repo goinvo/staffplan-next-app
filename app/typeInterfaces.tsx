@@ -73,6 +73,7 @@ export interface WorkWeekBlockMemberType {
 	maxTotalEstHours: number;
 	itemEstHoursOffset: number;
 	consecutivePrevWeeks: number;
+	isLastConsecutiveWeek: boolean;
 }
 
 export interface UserAssignmentDataMapType {
