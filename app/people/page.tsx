@@ -60,58 +60,27 @@ const PeopleView: React.FC = () => {
 		router.push(pathname + "/" + encodeURIComponent(user.name.toString()));
 	};
 
-	const drawBars = (workWeeks: WorkWeekType[], width?: number, height?: number) => {
-		if (!width || !height) { return; }
-		
-		const barHeightSum = height * workWeeks.reduce((acc, workWeek) => acc + (workWeek.estimatedHours ? workWeek.estimatedHours : 0), 0) / 40;
+	const drawBars = (workWeeks: WorkWeekType[]) => {
 		return (
-			<div className="absolute z-40">
+			<div>
 
 				{workWeeks.map((workWeek: WorkWeekType, index: number) => {
-					if (workWeek.estimatedHours && width && height) {
-						const weekHeight = (height * workWeek.estimatedHours / 40);
-						return (
-							<div key={index}>
-								<svg width={width + 1} height={weekHeight} xmlns="http://www.w3.org/2000/svg">
-									{drawBar(height - barHeightSum, 6, weekHeight, weekHeight, width + 1)}
-								</svg>
-							</div>
+					return (
+						<>
+							<svg width="200" height="20" xmlns="http://www.w3.org/2000/svg">
+								{drawBar(index * 20, 5, 20, 20, 20, index === 0, index === workWeeks.length - 1, index)}
+							</svg>
+						</>
 
-						)
-					}
-
+					)
 				})}
 
-				<div>{height}</div>
 			</div>
-			
 
 		);
 	}
 
-	const drawFTELabels = (workWeeks: WorkWeekType[], width?: number, height?: number) => {
-		if (!width || !height) { return; }
-		const labelPadding = 8;
-		const barHeightSum = height * workWeeks.reduce((acc, workWeek) => acc + (workWeek.estimatedHours ? workWeek.estimatedHours : 0), 0) / 40;
-		return (
-			<div className="absolute z-40">
-				{workWeeks.map((workWeek: WorkWeekType, index: number) => {
-					if (workWeek.estimatedHours && width && height) {
-						const weekHeight = (height * workWeek.estimatedHours / 40);
-						return (
-							<div key={index}>
-								<svg width={width + 1} height={weekHeight} xmlns="http://www.w3.org/2000/svg">
-									<text x={width / 2} y={weekHeight - labelPadding} textAnchor="middle" fontSize="12" fill="black">{workWeek.estimatedHours}</text>
-								</svg>
-							</div>
-						)
-					}
-				})}
-			</div>
-		);
-	}
-
-	const renderCell = (cweek: number, year: number, rowIndex: number, isSelected: boolean, width?: number, height?: number) => {
+	const renderCell = (cweek: number, year: number, rowIndex: number, isSelected: boolean) => {
 
 		const userId = rowIdtoUserIdMap.get(rowIndex);
 		if (userId) {
@@ -119,8 +88,7 @@ const PeopleView: React.FC = () => {
 			if (workWeeksForUser.length > 0) {
 				return (<>
 					<div>{workWeeksForUser.length}</div>
-					{drawBars(workWeeksForUser, width, height)}
-					{drawFTELabels(workWeeksForUser, width, height)}
+					{drawBars(workWeeksForUser)}
 				</>)
 			}
 		}

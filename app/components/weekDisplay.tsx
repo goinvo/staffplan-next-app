@@ -21,7 +21,7 @@ export type WeekDisplayProps = {
     labelContents: React.ReactNode[];
     onMouseOverWeek?: (week: number, year: number, cellId: number) => void;
     onMouseClickWeek?: (week: number, year: number, cellId: number) => void;
-    renderCell?: (week: number, year: number, cellId: number, isSelected: boolean, width?: number, height?: number) => ReactNode;
+    renderCell?: (week: number, year: number, cellId: number, isSelected: boolean) => ReactNode;
     selectedCell?: selectedCell;
 };
 
@@ -248,7 +248,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
                                                 onMouseDown={onMouseClickWeek ? () => onMouseClickWeek(week.week, week.year, rowIndex) : () => { }}>
                                                 {
                                                     <div className="flex flex-col">
-                                                        {renderCell ? renderCell(week.week, week.year, rowIndex, (selectedCell && selectedCell.week === week.week && selectedCell.year === week.year && selectedCell.rowId == rowIndex) || false, weekWidth, height + sideListGutterHeight * 2) : <div></div>}
+                                                        {renderCell ? renderCell(week.week, week.year, rowIndex, (selectedCell && selectedCell.week === week.week && selectedCell.year === week.year && selectedCell.rowId == rowIndex) || false) : <div></div>}
                                                     </div>
                                                 }
                                             </div>
