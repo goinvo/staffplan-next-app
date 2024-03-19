@@ -21,6 +21,7 @@ function createApolloClient(context = {}) {
 		},
 	});
 
+	// automatically save the CSRF token from responses to localStorage
 	const saveCsrfTokenMiddleware = new ApolloLink((operation, forward) => {
 		return forward(operation).map((response) => {
 			const context = operation.getContext();
@@ -37,8 +38,8 @@ function createApolloClient(context = {}) {
 		});
 	});
 
+	// automatically add the CSRF token to headers
 	const csrfMiddleware = new ApolloLink((operation, forward) => {
-		// add the CSRF token to headers
 		operation.setContext(({ headers = {} }) => ({
 			headers: {
 				"X-Csrf-Token": localStorage.getItem("csrf-token"),
