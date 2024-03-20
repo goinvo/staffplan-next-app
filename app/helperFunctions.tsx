@@ -89,6 +89,30 @@ export function getDateFromWeekAndYear(cweek: number, year: number): Date {
 	return new Date(firstMondayOfYear.getFullYear(), firstMondayOfYear.getMonth(), firstMondayOfYear.getDate() + (cweek - 1) * 7);
 }
 
+export function matchWorkWeeks(prevWeeks: WorkWeekBlockMemberType[], currWeeks: WorkWeekBlockMemberType[]): WorkWeekBlockMemberType[] {
+	const matchedWeeks: WorkWeekBlockMemberType[] = [];
+	const usedIndices: boolean[] = new Array(currWeeks.length).fill(false);
+
+	// Match items in the same index
+	for (let i = 0; i < prevWeeks.length; i++) {
+		const prevWeek = prevWeeks[i];
+		const currIndex = currWeeks.findIndex((week, index) => week.workWeek.project && prevWeek.workWeek.project && week.workWeek.project.name === prevWeek.workWeek.project.name && !usedIndices[index]);
+		if (currIndex !== -1) {
+			matchedWeeks.push(currWeeks[currIndex]);
+			usedIndices[currIndex] = true;
+		}
+	}
+
+	// Add remaining unmatched items
+	for (let i = 0; i < currWeeks.length; i++) {
+		if (!usedIndices[i]) {
+			matchedWeeks.push(currWeeks[i]);
+		}
+	}
+
+	return matchedWeeks;
+}
+
 export function processUserAssignmentDataMap(userAssignmentDataMap: any): UserAssignmentDataMapType {
 	const processedDataMap: UserAssignmentDataMapType = {};
 
@@ -97,53 +121,78 @@ export function processUserAssignmentDataMap(userAssignmentDataMap: any): UserAs
 		processedDataMap[userId] = {};
 		let maxTotalEstHours = 40;
 
-		// Calculate the max total number of estimated hours in the assignment
 		user.assignments.forEach((assignment: any) => {
 			if (assignment.project.id && assignment.workWeeks.length > 0) {
-				let totalEstHoursInAssignment = 0;
-
 				assignment.workWeeks.forEach((workWeek: any) => {
-					totalEstHoursInAssignment += workWeek.estimatedHours;
-				});
-
-				if (totalEstHoursInAssignment > maxTotalEstHours) {
-					maxTotalEstHours = totalEstHoursInAssignment;
-				}
-			}
-		});
-
-		// Add the data to the map
-		user.assignments.forEach((assignment: any) => {
-			if (assignment.project.id && assignment.workWeeks.length > 0) {
-				processedDataMap[userId][assignment.project.id] = {};
-				let itemEstHoursOffset = 0;
-
-				assignment.workWeeks.forEach((workWeek: any) => {
-					if (!processedDataMap[userId][assignment.project.id][workWeek.year]) {
-						processedDataMap[userId][assignment.project.id][workWeek.year] = {};
+					if (!processedDataMap[userId][workWeek.year]) {
+						processedDataMap[userId][workWeek.year] = {};
 					}
-					
+					if (!processedDataMap[userId][workWeek.year][workWeek.cweek]) {
+						processedDataMap[userId][workWeek.year][workWeek.cweek] = {};
+					}
+
 					let consecutivePrevWeeks = 0;
 
 					// Check if the previous week is consecutive and update the consecutivePrevWeeks count
-					if (processedDataMap[userId][assignment.project.id][workWeek.year][workWeek.cweek - 1]){
-						const prevWeek = processedDataMap[userId][assignment.project.id][workWeek.year][workWeek.cweek - 1];
+					if (
+						processedDataMap[userId][workWeek.year][workWeek.cweek - 1] &&
+						processedDataMap[userId][workWeek.year][workWeek.cweek - 1][assignment.project.id]
+					) {
+						const prevWeek = processedDataMap[userId][workWeek.year][workWeek.cweek - 1][assignment.project.id];
 						consecutivePrevWeeks = prevWeek.consecutivePrevWeeks + 1;
 						prevWeek.isLastConsecutiveWeek = false;
 					}
 
 					// Add the work week to the map
-					processedDataMap[userId][assignment.project.id][workWeek.year][workWeek.cweek] = {
+					processedDataMap[userId][workWeek.year][workWeek.cweek][assignment.project.id] = {
 						workWeek: workWeek,
-						maxTotalEstHours: maxTotalEstHours,
-						itemEstHoursOffset: itemEstHoursOffset,
 						consecutivePrevWeeks: consecutivePrevWeeks,
 						isLastConsecutiveWeek: true,
+						itemEstHoursOffset: 0,
+						maxTotalEstHours: 40,
 					};
-					itemEstHoursOffset += workWeek.estimatedHours;
 				});
-
 			}
+
+			// Iterate through each given week and year to get projects for a given time, then calculate total est hours
+			Object.keys(processedDataMap[userId]).forEach((year: string) => {
+				const yearAsNumber = parseInt(year);
+				
+				Object.keys(processedDataMap[userId][yearAsNumber]).forEach((cweek) => {
+					const cweekAsNumber = parseInt(cweek);
+					const workWeeksByProject = processedDataMap[userId][yearAsNumber][cweekAsNumber];
+					const projectIds = Object.keys(workWeeksByProject);
+					let totalEstHours = 0;
+
+					// Calculate the total estimated hours for the week
+					projectIds.forEach((projectId) => {
+						const workWeekBlock = workWeeksByProject[projectId];
+						totalEstHours += workWeekBlock.workWeek.estimatedHours || 0;
+					});
+
+					// If the total estimated hours for the week is greater than 40, update the maxTotalEstHours
+					if (totalEstHours > 40) {
+						maxTotalEstHours = totalEstHours;
+					}
+				});
+			});
+		});
+
+		// Update the maxTotalEstHours for each project under the user
+		Object.keys(processedDataMap[userId]).forEach((year: string) => {
+			const yearAsNumber = parseInt(year);
+			
+			Object.keys(processedDataMap[userId][yearAsNumber]).forEach((cweek) => {
+				const cweekAsNumber = parseInt(cweek);
+				const workWeeksByProject = processedDataMap[userId][yearAsNumber][cweekAsNumber];
+				const projectIds = Object.keys(workWeeksByProject);
+
+				// Update the maxTotalEstHours for each project
+				projectIds.forEach((projectId) => {
+					const workWeekBlock = workWeeksByProject[projectId];
+					workWeekBlock.maxTotalEstHours = maxTotalEstHours;
+				});
+			});
 		});
 	});
 
@@ -158,15 +207,13 @@ export function getWorkWeeksForUserByWeekAndYear(
 ): WorkWeekBlockMemberType[] {
 	const workWeeksBlocksByProject: WorkWeekBlockMemberType[] = [];
 
-	if (userAssignmentDataMap[userId]) {
-		for (const projectId in userAssignmentDataMap[userId]) {
-			if (
-				userAssignmentDataMap[userId][projectId] &&
-				userAssignmentDataMap[userId][projectId][year] &&
-				userAssignmentDataMap[userId][projectId][year][cweek]
-			) {
-				workWeeksBlocksByProject.push(userAssignmentDataMap[userId][projectId][year][cweek]);
-			}
+	if (
+		userAssignmentDataMap[userId] &&
+		userAssignmentDataMap[userId][year] &&
+		userAssignmentDataMap[userId][year][cweek]
+	) {
+		for (const projectId in userAssignmentDataMap[userId][year][cweek]) {
+			workWeeksBlocksByProject.push(userAssignmentDataMap[userId][year][cweek][projectId]);
 		}
 	}
 
@@ -174,19 +221,19 @@ export function getWorkWeeksForUserByWeekAndYear(
 }
 
 // Draws a bar with rounded corners for the schedule
-export const drawBar = (xOffset: number, yOffset: number, 
-	targetCornerRadius: number, 
-	barHeight: number, fullBarHeight: number, fullBarWidth: number, 
-	hasTopLeftConnection: boolean = false, hasTopRightConnection: boolean = true, 
+export const drawBar = (xOffset: number, yOffset: number,
+	targetCornerRadius: number,
+	barHeight: number, fullBarHeight: number, fullBarWidth: number,
+	hasTopLeftConnection: boolean = false, hasTopRightConnection: boolean = true,
 	key?: number) => {
 	const cornerRadius = Math.min(targetCornerRadius, barHeight);
 	const vLength = hasTopRightConnection ? barHeight + cornerRadius : barHeight - cornerRadius;
 	const hLength = fullBarWidth - 2 * cornerRadius;
 
 	const topSection = ("M " + xOffset + ", " + (hasTopLeftConnection ? (yOffset + fullBarHeight - barHeight - cornerRadius) : (yOffset + cornerRadius + (fullBarHeight - barHeight)))
-	+ " a " + cornerRadius + "," + (hasTopLeftConnection ? (cornerRadius + " 0 0 0 " + cornerRadius + "," + cornerRadius) : (cornerRadius + " 0 0 1 " + cornerRadius + "," + (cornerRadius * -1)))
-	+ " h " + hLength
-	+ " a " + cornerRadius + "," + (hasTopRightConnection ? (cornerRadius + " 0 0 0 " + cornerRadius + "," + (cornerRadius * -1)) : (cornerRadius + " 0 0 1 " + cornerRadius + "," + cornerRadius))
+		+ " a " + cornerRadius + "," + (hasTopLeftConnection ? (cornerRadius + " 0 0 0 " + cornerRadius + "," + cornerRadius) : (cornerRadius + " 0 0 1 " + cornerRadius + "," + (cornerRadius * -1)))
+		+ " h " + hLength
+		+ " a " + cornerRadius + "," + (hasTopRightConnection ? (cornerRadius + " 0 0 0 " + cornerRadius + "," + (cornerRadius * -1)) : (cornerRadius + " 0 0 1 " + cornerRadius + "," + cornerRadius))
 	);
 
 	return (

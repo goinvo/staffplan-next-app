@@ -6,7 +6,7 @@ import { useQuery } from "@apollo/client";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { UserType, AssignmentType, UserAssignmentDataMapType, WorkWeekType, WorkWeekBlockMemberType } from "../typeInterfaces";
-import { processUserAssignmentDataMap, getWorkWeeksForUserByWeekAndYear, drawBar } from "../helperFunctions";
+import { processUserAssignmentDataMap, getWorkWeeksForUserByWeekAndYear, drawBar, matchWorkWeeks } from "../helperFunctions";
 import { GET_USER_LIST } from "../gqlQueries";
 import WeekDisplay from "../components/weekDisplay";
 import { render } from "@testing-library/react";
@@ -65,10 +65,10 @@ const PeopleView: React.FC = () => {
 		const labelPadding = 4;
 
 		return (
-			<div className="absolute bottom-0 z-30">
+			<div className="absolute bottom-0 z-10">
 				{workWeekBlocks.map((workWeekBlock: WorkWeekBlockMemberType, index: number) => {
 					if (workWeekBlock.workWeek.estimatedHours && width && height) {
-						const weekHeight = (height * workWeekBlock.workWeek.estimatedHours / 40);
+						const weekHeight = (height * workWeekBlock.workWeek.estimatedHours / workWeekBlock.maxTotalEstHours);
 						return (
 							<div key={index}>
 								<svg width={width + 1} height={weekHeight} xmlns="http://www.w3.org/2000/svg">
@@ -90,13 +90,13 @@ const PeopleView: React.FC = () => {
 		const labelPadding = 4;
 
 		return (
-			<div className="absolute bottom-0 z-40">
+			<div className="absolute bottom-0 z-30">
 				{workWeekBlocks.map((workWeekBlock: WorkWeekBlockMemberType, index: number) => {
 					if (workWeekBlock.workWeek.estimatedHours && width && height) {
-						const weekHeight = (height * workWeekBlock.workWeek.estimatedHours / 40);
+						const weekHeight = (height * workWeekBlock.workWeek.estimatedHours / workWeekBlock.maxTotalEstHours);
 						return (
 							<div key={index}
-								className="relative z-40"
+								className="relative z-30"
 								style={{
 									width: `${width}px`,
 									height: `${weekHeight}px`,
@@ -118,6 +118,9 @@ const PeopleView: React.FC = () => {
 			</div>
 		);
 	}
+
+
+
 
 	const renderCell = (cweek: number, year: number, rowIndex: number, isSelected: boolean, width?: number, height?: number) => {
 

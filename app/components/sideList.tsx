@@ -15,7 +15,7 @@ const UsersList: React.FC<SideLabelComponents> = ({ labelContents, setDivHeights
   }, [labelContents]); 
 
   return (
-    <div className="absolute left-0 z-30" style={{top: offset + "px"}}>
+    <div className="absolute left-0 z-40" style={{top: offset + "px"}}>
       <div className="flex flex-col" style={{rowGap: sideListGutterHeight * 3 + "px"}}>
         {labelContents && labelContents.map((label, index) => (
           <div
