@@ -69,8 +69,8 @@ export const GET_PROJECT_DATA = gql`
 `;
 
 export const GET_USER_ASSIGNMENTS = gql`
-	query getUserAssignments($selectedUserId: ID!) {
-		userAssignments(userId: $selectedUserId) {
+	query getUserAssignments($userId: ID!) {
+		userAssignments(userId: $userId) {
 			id
 			startsOn
 			endsOn
@@ -150,7 +150,6 @@ export const GET_VIEWER = gql`
 	}
 `;
 
-
 //mutations
 export const UPSERT_ASSIGNMENT = gql`
 	mutation UpsertAssignment(
@@ -169,14 +168,30 @@ export const UPSERT_ASSIGNMENT = gql`
 			startsOn: $startsOn
 			endsOn: $endsOn
 		) {
-			project {
-				id
-			}
+			id
 			startsOn
 			endsOn
 			status
 			assignedUser {
 				id
+				name
+			}
+			workWeeks {
+				id
+				actualHours
+				assignmentId
+				cweek
+				estimatedHours
+				year
+			}
+			project {
+				name
+				id
+				client {
+					name
+				}
+				startsOn
+				endsOn
 			}
 		}
 	}
@@ -258,4 +273,3 @@ export const UPSERT_WORKWEEK = gql`
 		}
 	}
 `;
-

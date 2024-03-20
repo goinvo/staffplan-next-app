@@ -1,12 +1,10 @@
 import {
-	GET_ALL_PROJECTS_DATA,
-	GET_ASSIGNMENT_DATA,
-	GET_CLIENT_DATA,
-	GET_PROJECT_DATA,
-	GET_USER_ASSIGNMENTS,
-	GET_USER_LIST,
-} from "@/app/gqlQueries";
-import { ApolloClient, from, HttpLink, InMemoryCache } from "@apollo/client";
+	ApolloClient,
+	from,
+	ApolloLink,
+	HttpLink,
+	InMemoryCache,
+} from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 import { ServerError } from "@apollo/client/link/utils";
 
@@ -22,25 +20,76 @@ function createApolloClient(context = {}) {
 			...context,
 		},
 	});
+	// automatically save the CSRF token from responses to localStorage
+	const saveCsrfTokenMiddleware = new ApolloLink((operation, forward) => {
+		return forward(operation).map((response) => {
+			const context = operation.getContext();
+			const {
+				response: { headers },
+			} = context;
 
+			if (headers) {
+				const csrfTokenValue = headers.get("x-csrf-token");
+				if (csrfTokenValue) {
+					localStorage.setItem("csrf-token", csrfTokenValue);
+				}
+			}
+
+			return response;
+		});
+	});
+
+	// automatically add the CSRF token to headers
+	const csrfMiddleware = new ApolloLink((operation, forward) => {
+		const csrfTokenValue = localStorage.getItem("csrf-token");
+
+		if (csrfTokenValue) {
+			operation.setContext(({ headers = {} }) => ({
+				headers: {
+					"X-Csrf-Token": csrfTokenValue,
+				},
+			}));
+		}
+
+		return forward(operation);
+	});
 	const errorLink = onError(({ networkError, graphQLErrors }) => {
 		if ((networkError as ServerError).statusCode === 403) {
 			return window.location.replace(signinURL);
 		}
 	});
 	return new ApolloClient({
-		link: from([errorLink, httpLink]),
+		link: from([
+			csrfMiddleware,
+			errorLink,
+			saveCsrfTokenMiddleware.concat(httpLink),
+		]),
 		defaultOptions: {
 			query: {
 				errorPolicy: "all",
-				fetchPolicy: "cache-first",
+				fetchPolicy: "no-cache",
 			},
 			mutate: {
 				errorPolicy: "all",
+				awaitRefetchQueries: true,
 			},
 			watchQuery: {},
 		},
 		cache: new InMemoryCache({
+			typePolicies: {
+				Query: {
+					fields: {
+						assignment: {
+							read(_, { args, toReference }) {
+								return toReference({
+									__typename: "assignment",
+									id: args?.id,
+								});
+							},
+						},
+					},
+				},
+			},
 			addTypename: true,
 		}),
 		connectToDevTools: true,

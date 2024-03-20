@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import ProjectDatepicker from "./projectDatepicker";
 import { UserType } from "../typeInterfaces";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useQuery, useMutation, gql } from "@apollo/client";
+import { useQuery, useMutation, gql, useApolloClient } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
 import { ProjectType } from "../typeInterfaces";
 import { Field, Formik, FormikValues } from "formik";
@@ -11,7 +11,9 @@ import {
 	GET_ASSIGNMENT_DATA,
 	UPSERT_ASSIGNMENT,
 	GET_USER_ASSIGNMENTS,
+	GET_ALL_PROJECTS_DATA,
 } from "../gqlQueries";
+import useFreshData from "../useFreshData";
 const AddAssignment = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
@@ -31,7 +33,7 @@ const AddAssignment = () => {
 		dates: { endsOn: "", startsOn: "" },
 	};
 
-	const { loading, error, data } = useQuery(GET_ASSIGNMENT_DATA, {
+	const { loading, error, data, refetch } = useQuery(GET_ASSIGNMENT_DATA, {
 		context: {
 			headers: {
 				cookie: clientSide ? document.cookie : null,
@@ -40,28 +42,13 @@ const AddAssignment = () => {
 		skip: !clientSide,
 		errorPolicy: "all",
 	});
+	const { getUserAssignments } = useFreshData();
 	const [
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_ASSIGNMENT, {
-		update(cache, { data }) {
-				const existingAssignments = cache.readQuery({
-					query: GET_USER_ASSIGNMENTS,
-					variables: {
-						selectedUserId: data.upsertAssignment.assignedUser.id,
-					},
-				});
-				console.log(existingAssignments, "EXISITING ASSIGNMENTS");
-				const newUserAssignment = data.upsertAssignment;
-				cache.writeQuery({
-					query: GET_USER_ASSIGNMENTS,
-					data: {
-						userAssignments: [...existingAssignments, newUserAssignment],
-					},
-				});
-		},
+		refetchQueries:[{query:GET_USER_ASSIGNMENTS, variables:{userId:8}}]
 	});
-	if (mutationData) console.log(mutationData, "MUTATION DATA");
 	if (loading || mutationLoading) return <p> LOADING ASSIGNMENTS</p>;
 	if (error || mutationError) return <p>ERROR ASSIGNMENTS</p>;
 	const onSubmitUpsert = ({

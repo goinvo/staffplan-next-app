@@ -9,7 +9,6 @@ import { UserType } from "../typeInterfaces";
 import { processUserAssignmentDataMap } from "../helperFunctions";
 import { GET_USER_LIST } from "../gqlQueries";
 import WeekDisplay from "../components/weekDisplay";
-import { render } from "@testing-library/react";
 
 const PeopleView: React.FC = () => {
 	const [clientSide, setClientSide] = useState(false);
