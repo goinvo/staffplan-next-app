@@ -13,7 +13,6 @@ import {
 	GET_USER_ASSIGNMENTS,
 	GET_ALL_PROJECTS_DATA,
 } from "../gqlQueries";
-import useFreshData from "../useFreshData";
 const AddAssignment = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
@@ -42,12 +41,28 @@ const AddAssignment = () => {
 		skip: !clientSide,
 		errorPolicy: "all",
 	});
-	const { getUserAssignments } = useFreshData();
 	const [
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_ASSIGNMENT, {
-		refetchQueries:[{query:GET_USER_ASSIGNMENTS, variables:{userId:8}}]
+		// refetchQueries: [{ query: GET_USER_ASSIGNMENTS, variables: { userId: 8 } }],
+		update: (cache, { data }) => {
+			console.log("UPDATE HIT")
+			cache.modify({
+				id: cache.identify(data.upsertAssignment),
+				fields: {
+					Assignment(exisitingAssignments = []) {
+						console.log("HIT inside modify")
+						const newAssignment = data.upsertAssignment;
+						cache.writeQuery({
+							query: GET_USER_ASSIGNMENTS,
+							variables: {userId:data.upsertAssignment.assignedUser.id},
+							data: { ...exisitingAssignments,newAssignment },
+						});
+					},
+				},
+			});
+		},
 	});
 	if (loading || mutationLoading) return <p> LOADING ASSIGNMENTS</p>;
 	if (error || mutationError) return <p>ERROR ASSIGNMENTS</p>;
