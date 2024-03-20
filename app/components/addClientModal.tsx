@@ -6,6 +6,7 @@ import withApollo from "@/lib/withApollo";
 import { Field, Formik, FormikValues } from "formik";
 import { GET_CLIENT_DATA, UPSERT_CLIENT } from "../gqlQueries";
 import { ClientType } from "../typeInterfaces";
+import { LoadingSpinner } from "./loadingSpinner";
 const AddClient = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const router = useRouter();
@@ -36,7 +37,7 @@ const AddClient = () => {
 		upsertClient,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_CLIENT);
-	if (mutationLoading) return <p> LOADING PERSON</p>;
+	if (mutationLoading || loading) return <LoadingSpinner/>;
 	if (mutationError) return <p>ERROR ON PERSON</p>;
 	const onSubmitUpsert = ({
 		name,

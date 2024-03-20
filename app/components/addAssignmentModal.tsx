@@ -8,6 +8,7 @@ import withApollo from "@/lib/withApollo";
 import { ProjectType } from "../typeInterfaces";
 import { Field, Formik, FormikValues } from "formik";
 import { GET_ASSIGNMENT_DATA, UPSERT_ASSIGNMENT } from "../gqlQueries";
+import { LoadingSpinner } from "./loadingSpinner";
 const AddAssignment = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
@@ -40,7 +41,7 @@ const AddAssignment = () => {
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_ASSIGNMENT);
-	if (loading || mutationLoading) return <p> LOADING ASSIGNMENTS</p>;
+	if (loading || mutationLoading) return <LoadingSpinner/>;
 	if (error || mutationError) return <p>ERROR ASSIGNMENTS</p>;
 	const onSubmitUpsert = ({
 		projectId,
