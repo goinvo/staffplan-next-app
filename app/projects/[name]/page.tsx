@@ -15,6 +15,7 @@ import {
 	GET_USER_LIST,
 } from "../../gqlQueries";
 import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
+import { useUserDataContext } from "../../userDataContext";
 
 const ProjectPage: React.FC = () => {
 	const params = useParams();
@@ -38,20 +39,10 @@ const ProjectPage: React.FC = () => {
 	const [rowIdtoAssignmentIdMap, setRowIdtoAssignmentIdMap] = useState<
 		Map<number, number>
 	>(new Map());
+	const [userAssignmentData, setUserAssignmentData] = useState<any>(null);
+	const { userList } = useUserDataContext();
 
 	const [upsertWorkweek] = useMutation(UPSERT_WORKWEEK);
-
-	const [
-		getUserAssignments,
-		{
-			data: userAssignmentData,
-			loading: userAssignmentLoading,
-			error: userAssignmentError,
-			called,
-		},
-	] = useLazyQuery(GET_USER_ASSIGNMENTS, {
-		variables: { selectedUserId: selectedUser.id },
-	});
 
 	const upsertWorkWeekValues = (values: WorkWeekRenderDataType) => {
 		upsertWorkweek({
@@ -81,8 +72,8 @@ const ProjectPage: React.FC = () => {
 
 	const getUserIdFromName: (name: string) => number | null = (name: string) => {
 		// Iterate through the list of users and find the one with the matching name
-		if (userListData && userListData.users) {
-			for (const user of userListData.users) {
+		if (userListData) {
+			for (const user of userListData) {
 				if (user.name === name) {
 					// Return the user's ID as a number
 					return parseInt(user.id);
@@ -279,7 +270,7 @@ const ProjectPage: React.FC = () => {
 			const userId = getUserIdFromName(name);
 			if (userId) {
 				setSelectedUser({ id: userId, name });
-				getUserAssignments({ variables: { userId: userId } });
+				setUserAssignmentData(userList);
 			}
 		}
 	}, [clientSide, userListData, params.name]);
@@ -310,22 +301,8 @@ const ProjectPage: React.FC = () => {
 		});
 	}, [userAssignmentData]);
 
-	if (called && userAssignmentLoading)
-		return (
-			<p>
-				Loading User Assignments for{" "}
-				{decodeURIComponent(params.name.toString())}
-			</p>
-		);
 	if (userListLoading) return <p>Finding user...</p>;
 	if (userListError) return <p>Error Loading Users List</p>;
-	if (userAssignmentError)
-		return (
-			<p>
-				Error Loading User Assignments for{" "}
-				{decodeURIComponent(params.name.toString())}
-			</p>
-		);
 
 	return (
 		<div>

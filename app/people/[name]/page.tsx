@@ -12,9 +12,9 @@ import {
 import {
 	UPSERT_WORKWEEK,
 	GET_USER_ASSIGNMENTS,
-	GET_USER_LIST,
 } from "../../gqlQueries";
 import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
+import { useUserDataContext } from "../../userDataContext";
 
 const UserPage: React.FC = () => {
 	const params = useParams();
@@ -38,6 +38,7 @@ const UserPage: React.FC = () => {
 	const [rowIdtoAssignmentIdMap, setRowIdtoAssignmentIdMap] = useState<
 		Map<number, number>
 	>(new Map());
+	const { userList } = useUserDataContext();
 
 	const [upsertWorkweek] = useMutation(UPSERT_WORKWEEK);
 
@@ -65,28 +66,13 @@ const UserPage: React.FC = () => {
 		});
 	};
 
-	const {
-		loading: userListLoading,
-		error: userListError,
-		data: userListData,
-	} = useQuery(GET_USER_LIST, {
-		context: {
-			headers: {
-				cookie: clientSide ? document.cookie : null,
-			},
-		},
-		skip: !clientSide,
-		errorPolicy: "all",
-	});
-
 	const getUserIdFromName: (name: string) => number | null = (name: string) => {
 		// Iterate through the list of users and find the one with the matching name
 		if (
-			userListData &&
-			userListData.currentCompany &&
-			userListData.currentCompany.users
+			userList
 		) {
-			for (const user of userListData.currentCompany.users) {
+			console.log(userList, "USERLISTDATA");
+			for (const user of userList) {
 				if (user.name === name) {
 					// Return the user's ID as a number
 					return parseInt(user.id);
@@ -273,49 +259,56 @@ const UserPage: React.FC = () => {
 		}
 	};
 
+	const setSelectedUserData = (newSelectedId: number) => {
+		if (!userList) return;
+
+		const selectedUserData = userList.find((user: UserType) => user.id?.toString() === newSelectedId.toString());
+		console.log(selectedUserData, "SELECTEDUSERDATA", newSelectedId, "NEWSELECTEDID", "USERLIST", userList, "USERLIST", "USERID");
+		if (!selectedUserData) return;
+
+		setSelectedUser(selectedUserData);
+		console.log(selectedUserData, " NEW SELECTEDUSER");
+
+		const workWeekData: WorkWeekRenderDataType[][] = selectedUserData.assignments.map((assignment: AssignmentType) => {
+			return assignment.workWeeks.map((week: WorkWeekType) => {
+				return {
+					cweek: week.cweek,
+					year: week.year,
+					estimatedHours: week.estimatedHours,
+					actualHours: week.actualHours,
+					assignmentId: assignment.id,
+				};
+			});
+		});
+
+		console.log(workWeekData, "WORKWEEKDATA");
+
+		workWeekData.forEach((assignmentWeeks: WorkWeekRenderDataType[], index) => {
+			assignmentWeeks.forEach((week: WorkWeekRenderDataType) => {
+				addWorkWeekData(week, index);
+			});
+			rowIdtoAssignmentIdMap.set(index, selectedUserData.assignments[index].id);
+		});
+
+		console.log(workWeekDataLookupMap, "LOOKUPMAP");
+	}
+
 	useEffect(() => {
 		setClientSide(true);
 	}, []);
 
 	// If the user list has been loaded and the user's name is in the URL, get the user's ID and load their assignments
 	useEffect(() => {
-		if (clientSide && userListData) {
+		if (clientSide && userList) {
 			const name = decodeURIComponent(params.name.toString());
 			const userId = getUserIdFromName(name);
+
 			if (userId) {
-				setSelectedUser({ id: userId, name });
-				getUserAssignments({ variables: { userId: userId } });
+				console.log(userId, "USERID");
+				setSelectedUserData(userId);
 			}
 		}
-	}, [clientSide, userListData, params.name]);
-
-	// If the user's assignments have been loaded, create a lookup map for the work weeks and map the rows to the assignment IDs
-	useEffect(() => {
-		if (!userAssignmentData) return;
-		const workWeekData: WorkWeekRenderDataType[][] =
-			userAssignmentData.userAssignments.map((assignment: AssignmentType) => {
-				return assignment.workWeeks.map((week: WorkWeekType) => {
-					return {
-						cweek: week.cweek,
-						year: week.year,
-						estimatedHours: week.estimatedHours,
-						actualHours: week.actualHours,
-						assignmentId: assignment.id,
-					};
-				});
-			});
-		workWeekData.forEach((assignmentWeeks: WorkWeekRenderDataType[], index) => {
-			assignmentWeeks.forEach((week: WorkWeekRenderDataType) => {
-				addWorkWeekData(week, index);
-			});
-			rowIdtoAssignmentIdMap.set(
-				index,
-				userAssignmentData.userAssignments[index].id
-			);
-		});
-
-		console.log(workWeekDataLookupMap, "LOOKUPMAP");
-	}, [userAssignmentData]);
+	}, [clientSide, userList, params.name]);
 
 	if (called && userAssignmentLoading)
 		return (
@@ -324,8 +317,7 @@ const UserPage: React.FC = () => {
 				{decodeURIComponent(params.name.toString())}
 			</p>
 		);
-	if (userListLoading) return <p>Finding user...</p>;
-	if (userListError) return <p>Error Loading Users List</p>;
+
 	if (userAssignmentError)
 		return (
 			<p>
@@ -333,20 +325,20 @@ const UserPage: React.FC = () => {
 				{decodeURIComponent(params.name.toString())}
 			</p>
 		);
+	
+	console.log(selectedUser, "SELECTEDUSER");
 
 	return (
 		<div>
 			<h1>Assignments for {decodeURIComponent(params.name.toString())}</h1>
-			{userAssignmentData && userAssignmentData.userAssignments && (
+			{userList && selectedUser && selectedUser.assignments && (
 				<WeekDisplay
-					labelContents={userAssignmentData.userAssignments.map(
-						(assignment: AssignmentType) => (
-							<div key={assignment.id}>
-								<div>{assignment.project.client.name}</div>
-								<div>{assignment.project.name}</div>
-							</div>
-						)
-					)}
+					labelContents={selectedUser.assignments.map((assignment: AssignmentType) => (
+						<div key={assignment.id}>
+							<div>{assignment.project.client.name}</div>
+							<div>{assignment.project.name}</div>
+						</div>
+					))}
 					onMouseOverWeek={(week, year, rowId) => {
 						handleOnMouseOverWeek(week, year, rowId);
 					}}

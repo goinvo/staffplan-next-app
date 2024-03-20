@@ -51,6 +51,7 @@ export interface UserAssignmentDataType {
 export interface UserType {
 	id?: number;
 	name: string;
+	assignments?: [AssignmentType];
 }
 
 export interface WorkWeekProps {
