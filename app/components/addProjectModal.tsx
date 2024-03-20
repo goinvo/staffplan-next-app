@@ -8,6 +8,7 @@ import { Field, Formik, FormikValues } from "formik";
 import { ClientType, ProjectType } from "../typeInterfaces";
 import { GET_CLIENT_DATA, UPSERT_PROJECT } from "../gqlQueries";
 import { differenceInBusinessDays } from "date-fns";
+import { LoadingSpinner } from "./loadingSpinner";
 
 const AddProject = () => {
 	const [clientSide, setClientSide] = useState(false);
@@ -46,7 +47,7 @@ const AddProject = () => {
 		upsertProject,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_PROJECT, { errorPolicy: "all" });
-	if (loading || mutationLoading) return <p> LOADING PROJECT</p>;
+	if (loading || mutationLoading) return <LoadingSpinner/>;
 	if (error || mutationError) return <p>ERROR PROJECT</p>;
 
 	const onSubmitUpsert = (values: FormikValues) => {
