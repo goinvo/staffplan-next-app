@@ -99,7 +99,7 @@ const PeopleView: React.FC = () => {
 									leaveTo="opacity-0"
 								>
 									<Listbox.Options className="absolute z-10 mt-1 max-h-56 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-										{userListData?.users?.map((user: UserType) => (
+										{userListData?.currentCompany?.users?.map((user: UserType) => (
 											<Listbox.Option
 												key={user.id}
 												className={({ active }) =>
