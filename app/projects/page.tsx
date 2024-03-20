@@ -3,11 +3,10 @@ import React from "react";
 import withApollo from "@/lib/withApollo";
 import { useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import { AssignmentType, ClientType, ProjectType } from "../typeInterfaces";
+import { ProjectType } from "../typeInterfaces";
 import { GET_ALL_PROJECTS_DATA } from "../gqlQueries";
 import WeekDisplay from "../components/weekDisplay";
-import { Project } from "next/dist/build/swc";
-
+import { LoadingSpinner } from "../components/loadingSpinner";
 const Projects: React.FC = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const [projectsList, setProjectsList] = useState<ProjectType[]>([]);
@@ -15,7 +14,11 @@ const Projects: React.FC = () => {
 	useEffect(() => {
 		setClientSide(true);
 	}, []);
-	const { loading, error, data: projectData } = useQuery(GET_ALL_PROJECTS_DATA, {
+	const {
+		loading: projectDataLoading,
+		error,
+		data: projectData,
+	} = useQuery(GET_ALL_PROJECTS_DATA, {
 		context: {
 			headers: {
 				cookie: clientSide ? document.cookie : null,
@@ -27,32 +30,37 @@ const Projects: React.FC = () => {
 
 	const handleProjectChange = (project: ProjectType) => {
 		console.log("Viewing project: ", project);
-	}
+	};
 
 	useEffect(() => {
 		if (projectData && projectData.currentCompany?.projects) {
-
 			let allProjects: ProjectType[] = [];
 
 			console.log("Projects: ", projectData.currentCompany?.projects);
-			
+
 			setProjectsList(projectData.currentCompany?.projects);
 		}
-		
 	}, [projectData]);
-
-	if (loading) return <p> LOADING PROJECTS</p>;
+	if (projectDataLoading) return <LoadingSpinner/>;
 	if (error) return <p>ERROR PROJECTS</p>;
 	return (
 		<div>
-			<WeekDisplay labelContents={
-				projectsList.map((project) => (
-					<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={project.id}>
-						<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleProjectChange(project)}>Portrait</div>
+			<WeekDisplay
+				labelContents={projectsList.map((project) => (
+					<div
+						className="flex gap-x-4 gap-y-4 items-center justify-center"
+						key={project.id}
+					>
+						<div
+							className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden"
+							onClick={() => handleProjectChange(project)}
+						>
+							Portrait
+						</div>
 						<div className="flex">{project.name}</div>
 					</div>
-				))
-			} />
+				))}
+			/>
 		</div>
 	);
 };
