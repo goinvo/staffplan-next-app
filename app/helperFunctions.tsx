@@ -113,6 +113,33 @@ export function matchWorkWeeks(prevWeeks: WorkWeekBlockMemberType[], currWeeks: 
 	return matchedWeeks;
 }
 
+export function matchWorkWeekBlocks(prevBlocks: WorkWeekBlockMemberType[], currentBlocks: WorkWeekBlockMemberType[]): WorkWeekBlockMemberType[] {
+	const matchedBlocks: WorkWeekBlockMemberType[] = [];
+	const usedIndices: boolean[] = new Array(currentBlocks.length).fill(false);
+
+	// Match blocks based on the project name
+	for (let i = 0; i < prevBlocks.length; i++) {
+		const prevBlock = prevBlocks[i];
+		const currentIndex = currentBlocks.findIndex(
+			(block, index) => block.workWeek.project?.name === prevBlock.workWeek.project?.name && !usedIndices[index]
+		);
+		if (currentIndex !== -1) {
+			matchedBlocks.push(currentBlocks[currentIndex]);
+			usedIndices[currentIndex] = true;
+		}
+	}
+
+	// Add remaining unmatched blocks
+	for (let i = 0; i < currentBlocks.length; i++) {
+		if (!usedIndices[i]) {
+			matchedBlocks.push(currentBlocks[i]);
+		}
+	}
+
+	return matchedBlocks;
+}
+
+
 export function processUserAssignmentDataMap(userAssignmentDataMap: any): UserAssignmentDataMapType {
 	const processedDataMap: UserAssignmentDataMapType = {};
 
@@ -128,74 +155,80 @@ export function processUserAssignmentDataMap(userAssignmentDataMap: any): UserAs
 						processedDataMap[userId][workWeek.year] = {};
 					}
 					if (!processedDataMap[userId][workWeek.year][workWeek.cweek]) {
-						processedDataMap[userId][workWeek.year][workWeek.cweek] = {};
+						processedDataMap[userId][workWeek.year][workWeek.cweek] = [];
 					}
 
 					let consecutivePrevWeeks = 0;
-
 					// Check if the previous week is consecutive and update the consecutivePrevWeeks count
-					if (
-						processedDataMap[userId][workWeek.year][workWeek.cweek - 1] &&
-						processedDataMap[userId][workWeek.year][workWeek.cweek - 1][assignment.project.id]
-					) {
-						const prevWeek = processedDataMap[userId][workWeek.year][workWeek.cweek - 1][assignment.project.id];
+					const prevWeek = processedDataMap[userId][workWeek.year][workWeek.cweek - 1]?.find(
+						(block) => block.workWeek.project && block.workWeek.project.name === assignment.project.name
+					);
+					if (prevWeek) {
 						consecutivePrevWeeks = prevWeek.consecutivePrevWeeks + 1;
 						prevWeek.isLastConsecutiveWeek = false;
 					}
 
-					// Add the work week to the map
-					processedDataMap[userId][workWeek.year][workWeek.cweek][assignment.project.id] = {
+					// Get the previous week's work week blocks in reverse order
+					const prevWeekBlocks = [...(processedDataMap[userId][workWeek.year][workWeek.cweek - 1] || [])].reverse();
+
+					// Get the current week's work week blocks
+					const currentWeekBlocks = [...processedDataMap[userId][workWeek.year][workWeek.cweek]];
+
+					const currentWorkWeekBlock = {
 						workWeek: workWeek,
 						consecutivePrevWeeks: consecutivePrevWeeks,
 						isLastConsecutiveWeek: true,
 						itemEstHoursOffset: 0,
 						maxTotalEstHours: 40,
 					};
+
+					currentWeekBlocks.push(currentWorkWeekBlock);
+
+					// Find the best matching order for the current week's blocks
+					const bestMatchingOrder = matchWorkWeekBlocks(prevWeekBlocks, currentWeekBlocks);
+
+					// Update the current week's blocks with the best matching order
+					processedDataMap[userId][workWeek.year][workWeek.cweek] = bestMatchingOrder;
 				});
 			}
+		});
 
-			// Iterate through each given week and year to get projects for a given time, then calculate total est hours
-			Object.keys(processedDataMap[userId]).forEach((year: string) => {
-				const yearAsNumber = parseInt(year);
-				
-				Object.keys(processedDataMap[userId][yearAsNumber]).forEach((cweek) => {
-					const cweekAsNumber = parseInt(cweek);
-					const workWeeksByProject = processedDataMap[userId][yearAsNumber][cweekAsNumber];
-					const projectIds = Object.keys(workWeeksByProject);
-					let totalEstHours = 0;
+		// Iterate through each given week and year to get projects for a given time, then calculate total est hours
+		Object.keys(processedDataMap[userId]).forEach((year: string) => {
+			const yearAsNumber = parseInt(year);
+			Object.keys(processedDataMap[userId][yearAsNumber]).forEach((cweek) => {
+				const cweekAsNumber = parseInt(cweek);
+				const workWeekBlocks = processedDataMap[userId][yearAsNumber][cweekAsNumber];
+				let totalEstHours = 0;
 
-					// Calculate the total estimated hours for the week
-					projectIds.forEach((projectId) => {
-						const workWeekBlock = workWeeksByProject[projectId];
-						totalEstHours += workWeekBlock.workWeek.estimatedHours || 0;
-					});
-
-					// If the total estimated hours for the week is greater than 40, update the maxTotalEstHours
-					if (totalEstHours > 40) {
-						maxTotalEstHours = totalEstHours;
-					}
+				// Calculate the total estimated hours for the week
+				workWeekBlocks.forEach((workWeekBlock) => {
+					totalEstHours += workWeekBlock.workWeek.estimatedHours || 0;
 				});
+
+				// If the total estimated hours for the week is greater than 40, update the maxTotalEstHours
+				if (totalEstHours > 40) {
+					maxTotalEstHours = totalEstHours;
+				}
 			});
 		});
 
 		// Update the maxTotalEstHours for each project under the user
 		Object.keys(processedDataMap[userId]).forEach((year: string) => {
 			const yearAsNumber = parseInt(year);
-			
 			Object.keys(processedDataMap[userId][yearAsNumber]).forEach((cweek) => {
 				const cweekAsNumber = parseInt(cweek);
-				const workWeeksByProject = processedDataMap[userId][yearAsNumber][cweekAsNumber];
-				const projectIds = Object.keys(workWeeksByProject);
+				const workWeekBlocks = processedDataMap[userId][yearAsNumber][cweekAsNumber];
 
 				// Update the maxTotalEstHours for each project
-				projectIds.forEach((projectId) => {
-					const workWeekBlock = workWeeksByProject[projectId];
+				workWeekBlocks.forEach((workWeekBlock) => {
 					workWeekBlock.maxTotalEstHours = maxTotalEstHours;
 				});
 			});
 		});
 	});
 
+	console.log(processedDataMap);
 	return processedDataMap;
 }
 
@@ -205,19 +238,15 @@ export function getWorkWeeksForUserByWeekAndYear(
 	cweek: number,
 	year: number
 ): WorkWeekBlockMemberType[] {
-	const workWeeksBlocksByProject: WorkWeekBlockMemberType[] = [];
-
 	if (
 		userAssignmentDataMap[userId] &&
 		userAssignmentDataMap[userId][year] &&
 		userAssignmentDataMap[userId][year][cweek]
 	) {
-		for (const projectId in userAssignmentDataMap[userId][year][cweek]) {
-			workWeeksBlocksByProject.push(userAssignmentDataMap[userId][year][cweek][projectId]);
-		}
+		return userAssignmentDataMap[userId][year][cweek];
 	}
 
-	return workWeeksBlocksByProject;
+	return [];
 }
 
 // Draws a bar with rounded corners for the schedule

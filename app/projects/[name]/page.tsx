@@ -255,7 +255,7 @@ const ProjectPage: React.FC = () => {
 				userAssignmentData.userAssignments &&
 				<WeekDisplay labelContents={userAssignmentData.userAssignments.map((assignment: AssignmentType) => (
 					<div key={assignment.id}>
-						<div>{assignment.project.client.name}</div>
+						<div>{assignment.project.client ? assignment.project.client.name : ""}</div>
 						<div>{assignment.project.name}</div>
 					</div>
 				))}

@@ -85,39 +85,48 @@ const PeopleView: React.FC = () => {
 		);
 	}
 
-	const drawFTELabels = (workWeekBlocks: WorkWeekBlockMemberType[], prevWeekHasSameProject: boolean[], width?: number, height?: number, gap: number = 4) => {
-		if (!width || !height) { return; }
+	const drawFTELabels = (workWeekBlocks: WorkWeekBlockMemberType[], width?: number, height?: number, gap: number = 4) => {
+		if (!width || !height) {
+		  return;
+		}
+	  
 		const labelPadding = 4;
-
+	  
 		return (
-			<div className="absolute bottom-0 z-30">
-				{workWeekBlocks.map((workWeekBlock: WorkWeekBlockMemberType, index: number) => {
-					if (workWeekBlock.workWeek.estimatedHours && width && height) {
-						const weekHeight = (height * workWeekBlock.workWeek.estimatedHours / workWeekBlock.maxTotalEstHours);
-						return (
-							<div key={index}
-								className="relative z-30"
-								style={{
-									width: `${width}px`,
-									height: `${weekHeight}px`,
-									lineHeight: `${weekHeight}px`,
-								}}>
-								<div
-									className="absolute text-bottom text-black text-xs"
-									style={{
-										left: `${labelPadding + gap}px`,
-										bottom: `${labelPadding}px`,
-									}}
-								>
-									{prevWeekHasSameProject[index] ? "" : (workWeekBlock.workWeek.project && workWeekBlock.workWeek.project.name ? workWeekBlock.workWeek.project.name : "")}
-								</div>
-							</div>
-						);
-					}
-				})}
-			</div>
+		  <div className="absolute bottom-0 z-30">
+			{workWeekBlocks.map((workWeekBlock: WorkWeekBlockMemberType, index: number) => {
+			  if (workWeekBlock.workWeek.estimatedHours && width && height) {
+				const weekHeight = (height * workWeekBlock.workWeek.estimatedHours / workWeekBlock.maxTotalEstHours);
+	  
+				// Check if the previous week has the same project
+				const hasSameProject = workWeekBlock.consecutivePrevWeeks != 0
+	  
+				return (
+				  <div
+					key={index}
+					className="relative z-30"
+					style={{
+					  width: `${width}px`,
+					  height: `${weekHeight}px`,
+					  lineHeight: `${weekHeight}px`,
+					}}
+				  >
+					<div
+					  className="absolute text-bottom text-black text-xs"
+					  style={{
+						left: `${labelPadding + gap}px`,
+						bottom: `${labelPadding}px`,
+					  }}
+					>
+					  {hasSameProject ? "" : (workWeekBlock.workWeek.project && workWeekBlock.workWeek.project.name ? workWeekBlock.workWeek.project.name : "")}
+					</div>
+				  </div>
+				);
+			  }
+			})}
+		  </div>
 		);
-	}
+	  };
 
 
 
@@ -127,23 +136,13 @@ const PeopleView: React.FC = () => {
 		const userId = rowIdtoUserIdMap.get(rowIndex);
 
 		if (userId) {
-			const prevWorkWeeksForUser = getWorkWeeksForUserByWeekAndYear(userAssignmentDataMap, userId, cweek - 1, year) ?? [];
 			const workWeeksForUser = getWorkWeeksForUserByWeekAndYear(userAssignmentDataMap, userId, cweek, year) ?? [];
-
-			const prevWeekHasSameProject: boolean[] = [];
-
-			if (prevWorkWeeksForUser.length > 0) {
-				workWeeksForUser.forEach((workWeekBlock: WorkWeekBlockMemberType, weekIndex: number) => {
-					const hasSameProject = prevWorkWeeksForUser[weekIndex]?.workWeek.project?.name === workWeekBlock.workWeek.project?.name;
-					prevWeekHasSameProject.push(hasSameProject);
-				});
-			}
 
 			if (workWeeksForUser.length > 0) {
 				return (
 					<div className="relative absolute" style={{ height: height }}>
 						{drawBars(workWeeksForUser, width, height)}
-						{drawFTELabels(workWeeksForUser, prevWeekHasSameProject, width, height)}
+						{drawFTELabels(workWeeksForUser, width, height)}
 					</div>
 				)
 			}
