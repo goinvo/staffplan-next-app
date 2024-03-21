@@ -49,34 +49,33 @@ export default function AddDropdown() {
 							)}
 						</Menu.Item>
 						<Menu.Item>
-						{({ active }) => (
-								<>
-									<Link
-										href={"?projectmodal=true"}
-										className={dropdownSelectedItemClass(active)}
-									>
-										Project
-									</Link>
-								</>
+							{({ active }) => (
+								<Link
+									href={"?projectmodal=true"}
+									className={dropdownSelectedItemClass(active)}
+								>
+									Project
+								</Link>
 							)}
 						</Menu.Item>
 					</div>
 					<div className="py-1">
 						<Menu.Item>
 							{({ active }) => (
-								<>
-									<Link
-										href={"?assignmentmodal=true"}
-										className={dropdownSelectedItemClass(active)}
-									>
-										Assignment
-									</Link>
-								</>
+								<Link
+									href={"?assignmentmodal=true"}
+									className={dropdownSelectedItemClass(active)}
+								>
+									Assignment
+								</Link>
 							)}
 						</Menu.Item>
 						<Menu.Item>
 							{({ active }) => (
-								<a href="?addclientmodal=true" className={dropdownSelectedItemClass(active)}>
+								<a
+									href="?addclientmodal=true"
+									className={dropdownSelectedItemClass(active)}
+								>
 									Client
 								</a>
 							)}

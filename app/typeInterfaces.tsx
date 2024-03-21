@@ -16,6 +16,9 @@ export interface ClientType {
 	projects?: [ProjectType];
 }
 
+export interface EllipsisProjectMenuProps {
+	project:Partial<ProjectType>
+}
 export interface ProjectType {
 	endsOn: string | null;
 	id: number;
@@ -26,6 +29,7 @@ export interface ProjectType {
 	status: string;
 	users: [];
 	assignments?: [AssignmentType];
+	__typename?:string;
 }
 
 export interface ProjectValuesType {
@@ -37,6 +41,10 @@ export interface ProjectValuesType {
 	startsOn: string;
 	paymentFrequency: string;
 	cost: number;
+}
+
+export interface SVGAlphabetProps {
+	name: string;
 }
 export interface UpsertValues {
 	actualHours: number | string;

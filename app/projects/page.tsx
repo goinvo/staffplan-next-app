@@ -8,6 +8,7 @@ import { GET_ALL_PROJECTS_DATA } from "../gqlQueries";
 import WeekDisplay from "../components/weekDisplay";
 import { LoadingSpinner } from "../components/loadingSpinner";
 import { SVGAlphabet } from "../svgAlphabet";
+import EllipsisProjectMenu from "../components/ellipsisProjectMenu";
 const Projects: React.FC = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const [projectsList, setProjectsList] = useState<ProjectType[]>([]);
@@ -59,6 +60,9 @@ const Projects: React.FC = () => {
 							<SVGAlphabet name={project.name} />
 						</div>
 						<div className="flex">{project.name}</div>
+						<div>
+							<EllipsisProjectMenu project={project} />
+						</div>
 					</div>
 				))}
 			/>

@@ -100,46 +100,51 @@ export const GET_USER_ASSIGNMENTS = gql`
 	}
 `;
 export const GET_USER_LIST = gql`
-{
-	currentCompany{
-		users {
-			id
-			name
-			assignments {
-				project {
-					id
-					name
-				}
-				workWeeks {
+	{
+		currentCompany {
+			users {
+				id
+				name
+				assignments {
 					project {
+						id
 						name
 					}
-					actualHours
-					estimatedHours
-					cweek
-					year
+					workWeeks {
+						project {
+							name
+						}
+						actualHours
+						estimatedHours
+						cweek
+						year
+					}
 				}
 			}
 		}
 	}
-}
 `;
 
 export const GET_ALL_PROJECTS_DATA = gql`
 	{
-	currentCompany{
-		projects {
-		id
-		name
-		client {
-			name
+		currentCompany {
+			projects {
+				id
+				name
+				startsOn
+				endsOn
+				status
+				cost
+				client {
+					name
+					id
+				}
+				workWeeks {
+					actualHours
+					estimatedHours
+				}
+			}
 		}
-		workWeeks {
-			actualHours
-			estimatedHours
-		}
-		}
-	}
 	}
 `;
 
@@ -197,6 +202,7 @@ export const UPSERT_CLIENT = gql`
 
 export const UPSERT_PROJECT = gql`
 	mutation UpsertProjectUpdate(
+		$id:ID
 		$clientId: ID
 		$name: String
 		$status: String
@@ -205,6 +211,7 @@ export const UPSERT_PROJECT = gql`
 		$cost: Float
 	) {
 		upsertProject(
+			id:$id
 			clientId: $clientId
 			name: $name
 			status: $status

@@ -7,7 +7,14 @@ const config: Config = {
 		"./app/**/*.{js,ts,jsx,tsx,mdx}",
 		"./src/**/*.{js,jsx,ts,tsx}",
 	],
-	theme: {},
+	theme: {
+		extend: {
+			colors: {
+				accentlightgreen: "#72DDC3",
+				accentgreen: "#02AAA4",
+			},
+		},
+	},
 	plugins: [require("@tailwindcss/forms")],
 };
 export default config;

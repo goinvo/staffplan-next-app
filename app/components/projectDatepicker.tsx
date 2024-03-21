@@ -29,10 +29,10 @@ export default function ProjctDatepicker(props: DatePickerProps) {
 	};
 	const handleEndDateProjectModal = () => {
 		if (projectModal) {
-			setFieldValue("hourlyRate", 0)
-			setFieldValue("cost", 0)
-			setFieldValue("hours", 0)
-			setFieldValue("numOfFTE", 0)
+			setFieldValue("hourlyRate", 0);
+			setFieldValue("cost", 0);
+			setFieldValue("hours", 0);
+			setFieldValue("numOfFTE", 0);
 		}
 	};
 	return (
@@ -41,7 +41,7 @@ export default function ProjctDatepicker(props: DatePickerProps) {
 				<label className="block mb-2">
 					Start
 					<input
-						className="w-full px-4 py-2 border rounded-md"
+						className="w-full px-4 py-2 border rounded-md block border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 						type="date"
 						id="startDate"
 						name={`${name}.startsOn`}
@@ -67,14 +67,14 @@ export default function ProjctDatepicker(props: DatePickerProps) {
 				<label className="block mb-2">
 					End
 					<input
-						className="w-full px-4 py-2 border rounded-md"
+						className="w-full px-4 py-2 border rounded-md block border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 						type="date"
 						id="endDate"
 						name={`${name}.endsOn`}
 						value={value.endsOn}
 						onChange={(e) => {
 							onChange(e);
-							handleEndDateProjectModal()
+							handleEndDateProjectModal();
 						}}
 						onBlur={handleBlur}
 					/>
