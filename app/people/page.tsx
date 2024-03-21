@@ -2,6 +2,7 @@
 import React, { useEffect, useState, Fragment } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import withApollo from "@/lib/withApollo";
+<<<<<<< HEAD
 import { useQuery } from "@apollo/client";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
@@ -11,9 +12,15 @@ import { GET_USER_LIST } from "../gqlQueries";
 import WeekDisplay from "../components/weekDisplay";
 import { render } from "@testing-library/react";
 import { getWeek } from "date-fns";
+=======
+import { Listbox, Transition } from "@headlessui/react";
+import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
+import { UserType } from "../typeInterfaces";
+import { useUserDataContext } from "../userDataContext";
+import WeekDisplay from "../components/weekDisplay";
+>>>>>>> corbinFixStaleData
 
 const PeopleView: React.FC = () => {
-	const [clientSide, setClientSide] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<UserType>({
 		id: NaN,
 		name: "Select",
@@ -23,20 +30,9 @@ const PeopleView: React.FC = () => {
 	const router = useRouter();
 	const pathname = usePathname();
 
-	const {
-		loading: userListLoading,
-		error: userListError,
-		data: userListData,
-	} = useQuery(GET_USER_LIST, {
-		context: {
-			headers: {
-				cookie: clientSide ? document.cookie : null,
-			},
-		},
-		skip: !clientSide,
-		errorPolicy: "all",
-	});
+	const { userList } = useUserDataContext();
 
+<<<<<<< HEAD
 	useEffect(() => {
 		setClientSide(true);
 	}, []);
@@ -55,6 +51,9 @@ const PeopleView: React.FC = () => {
 			console.log("userListData: ", userListData, ", userAssignmentDataMap: ", userAssignmentDataMap, ", rowIdtoUserIdMap: ", rowIdtoUserIdMap);
 		}
 	}, [userListData]);
+=======
+	console.log(userList);
+>>>>>>> corbinFixStaleData
 
 	const handleUserChange = (user: UserType) => {
 		router.push(pathname + "/" + encodeURIComponent(user.name.toString()));
@@ -156,7 +155,7 @@ const PeopleView: React.FC = () => {
 	return (
 		<>
 			<WeekDisplay labelContents={
-				userListData?.currentCompany?.users?.map((user: UserType) => (
+				userList?.map((user: UserType) => (
 					<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={user.id}>
 						<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleUserChange(user)}>Portrait</div>
 						<div className="flex">{user.name}</div>
@@ -196,7 +195,7 @@ const PeopleView: React.FC = () => {
 									leaveTo="opacity-0"
 								>
 									<Listbox.Options className="absolute z-10 mt-1 max-h-56 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-										{userListData?.users?.map((user: UserType) => (
+										{userList?.map((user: UserType) => (
 											<Listbox.Option
 												key={user.id}
 												className={({ active }) =>

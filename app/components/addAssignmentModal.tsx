@@ -1,13 +1,19 @@
 "use client";
 import { useState, useEffect } from "react";
 import ProjectDatepicker from "./projectDatepicker";
-import { UserType } from "../typeInterfaces";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery, useMutation, gql, useApolloClient } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
-import { ProjectType } from "../typeInterfaces";
+import { ProjectType, AssignmentType, UserType } from "../typeInterfaces";
 import { Field, Formik, FormikValues } from "formik";
-import { GET_ASSIGNMENT_DATA, UPSERT_ASSIGNMENT } from "../gqlQueries";
+import { useUserDataContext } from "../userDataContext";
+
+import {
+	GET_ASSIGNMENT_DATA,
+	UPSERT_ASSIGNMENT,
+	GET_USER_ASSIGNMENTS,
+	GET_ALL_PROJECTS_DATA,
+} from "../gqlQueries";
 const AddAssignment = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
@@ -19,6 +25,7 @@ const AddAssignment = () => {
 	}, []);
 	const searchParams = useSearchParams();
 	const showModal = searchParams.get("assignmentmodal");
+	const { userList, setUserList, projectList } = useUserDataContext();
 
 	const initialValues = {
 		status: false,
@@ -27,7 +34,7 @@ const AddAssignment = () => {
 		dates: { endsOn: "", startsOn: "" },
 	};
 
-	const { loading, error, data } = useQuery(GET_ASSIGNMENT_DATA, {
+	const { loading, error, data, refetch } = useQuery(GET_ASSIGNMENT_DATA, {
 		context: {
 			headers: {
 				cookie: clientSide ? document.cookie : null,
@@ -39,7 +46,25 @@ const AddAssignment = () => {
 	const [
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
-	] = useMutation(UPSERT_ASSIGNMENT);
+	] = useMutation(UPSERT_ASSIGNMENT, {
+		// refetchQueries: [{ query: GET_USER_ASSIGNMENTS, variables: { userId: 8 } }],
+		update: (cache, { data }) => {
+			cache.modify({
+				id: cache.identify(data.upsertAssignment),
+				fields: {
+					Assignment(exisitingAssignments = []) {
+						console.log("HIT inside modify")
+						const newAssignment = data.upsertAssignment;
+						cache.writeQuery({
+							query: GET_USER_ASSIGNMENTS,
+							variables: { userId: data.upsertAssignment.assignedUser.id },
+							data: { ...exisitingAssignments, newAssignment },
+						});
+					},
+				},
+			});
+		},
+	});
 	if (loading || mutationLoading) return <p> LOADING ASSIGNMENTS</p>;
 	if (error || mutationError) return <p>ERROR ASSIGNMENTS</p>;
 	const onSubmitUpsert = ({
@@ -56,7 +81,38 @@ const AddAssignment = () => {
 				startsOn: dates.startsOn,
 				endsOn: dates.endsOn,
 			},
-		}).then(() => {
+		}).then((response) => {
+			if (response.data.upsertAssignment) {
+				// Print the values passed into the mutation
+				console.log("Submitted values:", {
+					projectId,
+					userId,
+					status,
+					dates,
+				});
+				console.log("Response Data:", response.data);
+				console.log("User List:", userList, "Project List:", projectList);
+
+				const newAssignment = response.data.upsertAssignment
+
+				// Find the user whose ID matches the one in the response
+				const user = userList.find((user: UserType) => user.id === newAssignment.assignedUser.id);
+				const updatedUser = { ...user, assignments: [...user.assignments, newAssignment] };
+
+				// Update the user list with the new assignment
+				setUserList((prevUserData: any) => {
+					const updatedUsers = prevUserData.map((user: UserType) => {
+						if (user.id === newAssignment.assignedUser.id && user.assignments) {
+							return {
+								...user,
+								assignments: [...user.assignments, newAssignment],
+							};
+						}
+						return user;
+					});
+					return updatedUsers;
+				});
+			}
 			router.back();
 		});
 	};
@@ -242,7 +298,6 @@ const AddAssignment = () => {
 																handleBlur={handleBlur}
 																name="dates"
 																component={ProjectDatepicker}
-						
 															/>
 														</div>
 														{/* SECTION 3 */}
