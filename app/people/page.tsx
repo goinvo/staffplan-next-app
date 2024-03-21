@@ -10,6 +10,7 @@ import { processUserAssignmentDataMap } from "../helperFunctions";
 import { GET_USER_LIST } from "../gqlQueries";
 import WeekDisplay from "../components/weekDisplay";
 import { LoadingSpinner } from "../components/loadingSpinner";
+import { SVGAlphabet } from "../svgAlphabet";
 const PeopleView: React.FC = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<UserType>({
@@ -71,7 +72,7 @@ const PeopleView: React.FC = () => {
 								className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden"
 								onClick={() => handleUserChange(user)}
 							>
-								Portrait
+								<SVGAlphabet name={user.name}/>
 							</div>
 							<div className="flex">{user.name}</div>
 						</div>
