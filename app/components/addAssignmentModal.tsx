@@ -9,6 +9,7 @@ import { ProjectType } from "../typeInterfaces";
 import { Field, Formik, FormikValues } from "formik";
 import { GET_ASSIGNMENT_DATA, UPSERT_ASSIGNMENT } from "../gqlQueries";
 import { LoadingSpinner } from "./loadingSpinner";
+import { Dialog } from '@headlessui/react'
 const AddAssignment = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
@@ -19,8 +20,8 @@ const AddAssignment = () => {
 		setClientSide(true);
 	}, []);
 	const searchParams = useSearchParams();
-	const showModal = searchParams.get("assignmentmodal");
-
+	const modalParam = searchParams.get("assignmentmodal");
+	const showModal = modalParam ? true : false
 	const initialValues = {
 		status: false,
 		userId: "",
@@ -120,10 +121,11 @@ const AddAssignment = () => {
 	return (
 		<>
 			{showModal && (
-				<div
+				<Dialog
+					open={showModal}
+					onClose={onCancel}
 					className="relative z-50"
 					aria-labelledby="assignment-modal"
-					role="dialog"
 					aria-modal="true"
 				>
 					<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
@@ -304,7 +306,7 @@ const AddAssignment = () => {
 							</div>
 						</div>
 					</div>
-				</div>
+				</Dialog>
 			)}
 		</>
 	);

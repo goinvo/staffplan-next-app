@@ -9,7 +9,7 @@ import { ClientType, ProjectType } from "../typeInterfaces";
 import { GET_CLIENT_DATA, UPSERT_PROJECT } from "../gqlQueries";
 import { differenceInBusinessDays } from "date-fns";
 import { LoadingSpinner } from "./loadingSpinner";
-
+import { Dialog } from "@headlessui/react";
 const AddProject = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedClient, setSelectedClient] = useState<number | string>("");
@@ -32,8 +32,9 @@ const AddProject = () => {
 	useEffect(() => {
 		setClientSide(true);
 	}, []);
-	const showModal = searchParams.get("projectmodal");
 
+	const modalParam = searchParams.get("projectmodal");
+	const showModal = modalParam ? true : false;
 	const { loading, error, data } = useQuery(GET_CLIENT_DATA, {
 		context: {
 			headers: {
@@ -168,12 +169,13 @@ const AddProject = () => {
 	return (
 		<>
 			{showModal && (
-				<div
-					className="relative z-50"
-					aria-labelledby="project-modal"
-					role="dialog"
-					aria-modal="true"
-				>
+				<Dialog
+				open={showModal}
+				onClose={onCancel}
+				className="relative z-50"
+				aria-labelledby="project-modal"
+				aria-modal="true"
+			>
 					<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
 					<div className="fixed inset-0 z-10 w-screen overflow-y-auto">
 						<div className="flex min-h-full p-4 text-center justify-center sm:items-center sm:p-0">
@@ -481,7 +483,7 @@ const AddProject = () => {
 							</div>
 						</div>
 					</div>
-				</div>
+				</Dialog>
 			)}
 		</>
 	);
