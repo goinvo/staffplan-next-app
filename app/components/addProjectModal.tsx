@@ -39,7 +39,6 @@ const AddProject = () => {
 		flatRate: 0,
 	};
 	const newProjectInitialValues = {
-		id: "",
 		client: "",
 		dates: { endsOn: "", startsOn: "" },
 		hours: 0,
@@ -78,7 +77,9 @@ const AddProject = () => {
 	if (error || mutationError) return <p>ERROR PROJECT</p>;
 
 	const onSubmitUpsert = (values: FormikValues) => {
+		console.log(values, "VALUES UPSERT");
 		const variables = {
+			id: values.id,
 			clientId: values.client,
 			name: values.name,
 			status: values.status ? "active" : "archived",
