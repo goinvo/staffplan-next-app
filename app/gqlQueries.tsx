@@ -122,6 +122,7 @@ export const GET_USER_LIST = gql`
 						cweek
 						year
 					}
+					id
 				}
 			}
 		}

@@ -111,6 +111,7 @@ const ProjectPage: React.FC = () => {
 			selectedCell.year,
 			selectedCell.week
 		);
+		
 		if (newWorkWeekData) {
 			newWorkWeekData.estimatedHours = newEstimatedHours;
 			addWorkWeekDataToLookupMap(newWorkWeekData, selectedCell.rowId);
@@ -320,7 +321,7 @@ const ProjectPage: React.FC = () => {
 					renderCell={renderCell}
 					selectedCell={selectedCell}
 				/>
-			)}
+			}
 		</div>
 	);
 };

@@ -130,6 +130,7 @@ const UserPage: React.FC = () => {
 	const handleCurrActHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setCurrActHours(e.target.value);
 		const newActualHours = parseInt(e.target.value);
+		const newAssignmentId = rowIdtoAssignmentIdMap.get(selectedCell.rowId);
 		const newWorkWeekData = lookupWorkWeekData(
 			selectedCell.rowId,
 			selectedCell.year,
@@ -239,6 +240,7 @@ const UserPage: React.FC = () => {
 				selectedCell.week
 			);
 			if (oldWorkWeekData) {
+				console.log("upserting", oldWorkWeekData);
 				upsertWorkWeekValues(oldWorkWeekData);
 				setWasSelectedCellEdited(false);
 				console.log("upserted");
@@ -287,8 +289,10 @@ const UserPage: React.FC = () => {
 			assignmentWeeks.forEach((week: WorkWeekRenderDataType) => {
 				addWorkWeekData(week, index);
 			});
+			console.log(selectedUserData, "SELECTEDUSERDATA");
 			rowIdtoAssignmentIdMap.set(index, selectedUserData.assignments[index].id);
 		});
+		console.log(rowIdtoAssignmentIdMap, "ROWIDTOASSIGNMENTIDMAP")
 
 		console.log(workWeekDataLookupMap, "LOOKUPMAP");
 	}
@@ -325,8 +329,6 @@ const UserPage: React.FC = () => {
 				{decodeURIComponent(params.name.toString())}
 			</p>
 		);
-	
-	console.log(selectedUser, "SELECTEDUSER");
 
 	return (
 		<div>
