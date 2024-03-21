@@ -21,6 +21,20 @@ const PeopleView: React.FC = () => {
 
 	const { userList } = useUserDataContext();
 
+	useEffect(() => {
+		if (userList) {
+			// Setup the map of users to their assignments' work weeks
+			setUserAssignmentDataMap(processUserAssignmentDataMap(userList));
+
+			// Setup the map of row ids to user ids
+			userList?.map((user: UserType, index: number) => {
+				if (user.id && !rowIdtoUserIdMap.has(index)) {
+					rowIdtoUserIdMap.set(index, user.id);
+				}
+			});
+		}
+	}, [userList]);
+
 	const handleUserChange = (user: UserType) => {
 		router.push(pathname + "/" + encodeURIComponent(user.name.toString()));
 	};

@@ -79,12 +79,11 @@ export interface WorkWeekBlockMemberType {
 export interface UserAssignmentDataMapType {
 	[userId: number]: {
 		[year: number]: {
-			[cweek: number]: {
-				[projectId: string]: WorkWeekBlockMemberType;
-			};
+			[cweek: number]: WorkWeekBlockMemberType[];
 		};
 	};
 }
+
 
 export interface WorkWeekRenderDataType {
 	cweek: number;

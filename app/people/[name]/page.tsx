@@ -71,7 +71,6 @@ const UserPage: React.FC = () => {
 		if (
 			userList
 		) {
-			console.log(userList, "USERLISTDATA");
 			for (const user of userList) {
 				if (user.name === name) {
 					// Return the user's ID as a number
@@ -240,10 +239,8 @@ const UserPage: React.FC = () => {
 				selectedCell.week
 			);
 			if (oldWorkWeekData) {
-				console.log("upserting", oldWorkWeekData);
 				upsertWorkWeekValues(oldWorkWeekData);
 				setWasSelectedCellEdited(false);
-				console.log("upserted");
 			}
 		}
 		setselectedCell({ week, year, rowId });

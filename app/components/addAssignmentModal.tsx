@@ -84,15 +84,6 @@ const AddAssignment = () => {
 		}).then((response) => {
 			if (response.data.upsertAssignment) {
 				// Print the values passed into the mutation
-				console.log("Submitted values:", {
-					projectId,
-					userId,
-					status,
-					dates,
-				});
-				console.log("Response Data:", response.data);
-				console.log("User List:", userList, "Project List:", projectList);
-
 				const newAssignment = response.data.upsertAssignment
 
 				// Find the user whose ID matches the one in the response

@@ -140,10 +140,10 @@ export function matchWorkWeekBlocks(prevBlocks: WorkWeekBlockMemberType[], curre
 	return matchedBlocks;
 }
 
-export function processUserAssignmentDataMap(userAssignmentDataMap: any): UserAssignmentDataMapType {
+export function processUserAssignmentDataMap(userList: any): UserAssignmentDataMapType {
 	const processedDataMap: UserAssignmentDataMapType = {};
 
-	userAssignmentDataMap.currentCompany.users.forEach((user: any) => {
+	userList.forEach((user: any) => {
 		const userId = user.id;
 		processedDataMap[userId] = {};
 		let maxTotalEstHours = 40;
@@ -161,7 +161,7 @@ export function processUserAssignmentDataMap(userAssignmentDataMap: any): UserAs
 					let consecutivePrevWeeks = 0;
 					// Check if the previous week is consecutive and update the consecutivePrevWeeks count
 					const prevWeek = processedDataMap[userId][workWeek.year][workWeek.cweek - 1]?.find(
-						(block) => block.workWeek.project && block.workWeek.project.name === assignment.project.name
+						(block: WorkWeekBlockMemberType) => block.workWeek.project && block.workWeek.project.name === assignment.project.name
 					);
 					if (prevWeek) {
 						consecutivePrevWeeks = prevWeek.consecutivePrevWeeks + 1;
@@ -228,7 +228,6 @@ export function processUserAssignmentDataMap(userAssignmentDataMap: any): UserAs
 		});
 	});
 
-	console.log(processedDataMap);
 	return processedDataMap;
 }
 

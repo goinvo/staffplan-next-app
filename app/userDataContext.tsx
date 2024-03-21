@@ -1,6 +1,5 @@
 'use client'
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { processUserAssignmentDataMap } from "./helperFunctions";
 import { useQuery } from "@apollo/client";
 import {
 	UserType,
@@ -73,7 +72,6 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
 
     useEffect(() => {
         if (userListData) {
-            console.log("userListData", userListData.currentCompany.users);
             setUserList(userListData.currentCompany.users);
         }
     }, [userListData]);
@@ -81,7 +79,6 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
     useEffect(() => {
 		if (projectData && projectData.currentCompany?.projects) {
 			setProjectList(projectData.currentCompany?.projects);
-            console.log("projectData", projectData);
 		}
 		
 	}, [projectData]);
