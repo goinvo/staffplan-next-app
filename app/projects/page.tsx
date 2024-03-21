@@ -7,6 +7,7 @@ import { ProjectType } from "../typeInterfaces";
 import { GET_ALL_PROJECTS_DATA } from "../gqlQueries";
 import WeekDisplay from "../components/weekDisplay";
 import { LoadingSpinner } from "../components/loadingSpinner";
+import { SVGAlphabet } from "../svgAlphabet";
 const Projects: React.FC = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const [projectsList, setProjectsList] = useState<ProjectType[]>([]);
@@ -41,7 +42,7 @@ const Projects: React.FC = () => {
 			setProjectsList(projectData.currentCompany?.projects);
 		}
 	}, [projectData]);
-	if (projectDataLoading) return <LoadingSpinner/>;
+	if (projectDataLoading) return <LoadingSpinner />;
 	if (error) return <p>ERROR PROJECTS</p>;
 	return (
 		<div>
@@ -55,7 +56,7 @@ const Projects: React.FC = () => {
 							className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden"
 							onClick={() => handleProjectChange(project)}
 						>
-							Portrait
+							<SVGAlphabet name={project.name} />
 						</div>
 						<div className="flex">{project.name}</div>
 					</div>
