@@ -113,12 +113,13 @@ export function matchWorkWeeks(prevWeeks: WorkWeekBlockMemberType[], currWeeks: 
 	return matchedWeeks;
 }
 
+
 export function matchWorkWeekBlocks(prevBlocks: WorkWeekBlockMemberType[], currentBlocks: WorkWeekBlockMemberType[]): WorkWeekBlockMemberType[] {
 	const matchedBlocks: WorkWeekBlockMemberType[] = [];
 	const usedIndices: boolean[] = new Array(currentBlocks.length).fill(false);
 
-	// Match blocks based on the project name
-	for (let i = 0; i < prevBlocks.length; i++) {
+	// Match blocks based on the project name in reverse order
+	for (let i = prevBlocks.length - 1; i >= 0; i--) {
 		const prevBlock = prevBlocks[i];
 		const currentIndex = currentBlocks.findIndex(
 			(block, index) => block.workWeek.project?.name === prevBlock.workWeek.project?.name && !usedIndices[index]
@@ -129,7 +130,7 @@ export function matchWorkWeekBlocks(prevBlocks: WorkWeekBlockMemberType[], curre
 		}
 	}
 
-	// Add remaining unmatched blocks
+	// Add remaining unmatched blocks from currentBlocks
 	for (let i = 0; i < currentBlocks.length; i++) {
 		if (!usedIndices[i]) {
 			matchedBlocks.push(currentBlocks[i]);
@@ -138,7 +139,6 @@ export function matchWorkWeekBlocks(prevBlocks: WorkWeekBlockMemberType[], curre
 
 	return matchedBlocks;
 }
-
 
 export function processUserAssignmentDataMap(userAssignmentDataMap: any): UserAssignmentDataMapType {
 	const processedDataMap: UserAssignmentDataMapType = {};

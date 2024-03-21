@@ -242,7 +242,7 @@ test('matchWorkWeekBlocks should handle empty previous blocks', () => {
 });
 
 // Test case 3: Handle empty current blocks
-test('matchWorkWeekBlocks should handle empty current blocks', () => {
+test('matchWorkWeekBlocks should handle empty current blocks and not add blocks from previous entry', () => {
     const emptyCurrentBlocks: WorkWeekBlockMemberType[] = [];
     const result = matchWorkWeekBlocks(prevBlocks, emptyCurrentBlocks);
     expect(result).toEqual([]);
