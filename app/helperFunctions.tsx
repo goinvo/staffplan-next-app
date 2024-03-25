@@ -228,8 +228,6 @@ export function processUserAssignmentDataMap(userList: any): UserAssignmentDataM
 		});
 	});
 
-	console.log("Processed data map: ", processedDataMap);
-
 	return processedDataMap;
 }
 
@@ -244,8 +242,6 @@ export function getWorkWeeksForUserByWeekAndYear(
 		userAssignmentDataMap[userId][year] &&
 		userAssignmentDataMap[userId][year][cweek]
 	) {
-		console.log("WORK WEEKS FOUND for user, year, and week", userId, year, cweek)
-		console.log(userAssignmentDataMap[userId][year][cweek])
 		return userAssignmentDataMap[userId][year][cweek];
 	} 
 

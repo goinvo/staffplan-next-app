@@ -242,7 +242,6 @@ const ProjectPage: React.FC = () => {
 			if (oldWorkWeekData) {
 				upsertWorkWeekValues(oldWorkWeekData);
 				setWasSelectedCellEdited(false);
-				console.log("upserted");
 			}
 		}
 		setselectedCell({ week, year, rowId });
@@ -289,7 +288,6 @@ const ProjectPage: React.FC = () => {
 
 	// If the user's assignments have been loaded, create a lookup map for the work weeks and map the rows to the assignment IDs
 	useEffect(() => {
-		console.log("Formatting user assignment data")
 		if (!userAssignmentData) return;
 		const workWeekData: WorkWeekRenderDataType[][] =
 			userAssignmentData.userAssignments.map((assignment: AssignmentType) => {
@@ -329,7 +327,6 @@ const ProjectPage: React.FC = () => {
 					</div>
 				))}
 					onMouseOverWeek={(week, year, rowId) => { handleOnMouseOverWeek(week, year, rowId) }}
-					onMouseClickWeek={(week, year, rowId) => { console.log(week, year, rowId) }}
 					renderCell={renderCell}
 					selectedCell={selectedCell}
 				/>

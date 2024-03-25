@@ -38,7 +38,7 @@ const UserPage: React.FC = () => {
 	const [rowIdtoAssignmentIdMap, setRowIdtoAssignmentIdMap] = useState<
 		Map<number, number>
 	>(new Map());
-	const { userList } = useUserDataContext();
+	const { userList, setUserList } = useUserDataContext();
 
 	const [upsertWorkweek] = useMutation(UPSERT_WORKWEEK);
 
@@ -85,8 +85,11 @@ const UserPage: React.FC = () => {
 		workWeekData: WorkWeekRenderDataType,
 		rowId: number
 	) => {
-		// Add data to the lookup map
+		console.log("ADDING: ", workWeekData, "WORKWEEKDATA", rowId, "ROWID")
+
 		if (rowId != undefined) {
+
+			// Add data to the lookup map
 			if (!workWeekDataLookupMap[rowId]) {
 				workWeekDataLookupMap[rowId] = new Map();
 			}
@@ -101,6 +104,65 @@ const UserPage: React.FC = () => {
 		}
 	};
 
+	const updateUserListData = (workWeekData: WorkWeekRenderDataType) => {
+		const newUserData = [...userList]; // Create a new array to avoid mutating the original userList
+		const userIndex = newUserData.findIndex((user: UserType) => user.id === selectedUser.id);
+	  
+		if (userIndex !== -1) {
+		  const user = newUserData[userIndex];
+		  const assignmentIndex = user.assignments.findIndex(
+			(assignment: AssignmentType) => assignment.id === workWeekData.assignmentId
+		  );
+	  
+		  if (assignmentIndex !== -1) {
+			const assignment = user.assignments[assignmentIndex];
+			const newWorkWeeks = [...assignment.workWeeks]; // Create a new array for workWeeks
+			const workWeekIndex = newWorkWeeks.findIndex(
+			  (week: WorkWeekType) => week.cweek === workWeekData.cweek && week.year === workWeekData.year
+			);
+	  
+			if (workWeekIndex !== -1) {
+			  // Update the existing work week
+			  newWorkWeeks[workWeekIndex] = {
+				...newWorkWeeks[workWeekIndex],
+				estimatedHours: workWeekData.estimatedHours,
+				actualHours: workWeekData.actualHours,
+			  };
+			} else {
+			  // Add a new work week
+			  newWorkWeeks.push({
+				cweek: workWeekData.cweek,
+				year: workWeekData.year,
+				estimatedHours: workWeekData.estimatedHours,
+				actualHours: workWeekData.actualHours,
+			  });
+			}
+	  
+			// Create a new assignment object with the updated workWeeks array
+			const newAssignment: AssignmentType = {
+			  ...assignment,
+			  workWeeks: newWorkWeeks,
+			};
+	  
+			// Update the assignments array with the new assignment object
+			const newAssignments = [
+			  ...user.assignments.slice(0, assignmentIndex),
+			  newAssignment,
+			  ...user.assignments.slice(assignmentIndex + 1),
+			];
+	  
+			// Update the user object with the new assignments array
+			newUserData[userIndex] = {
+			  ...user,
+			  assignments: newAssignments,
+			};
+		  }
+		}
+	  
+		// Update the userList state with the new user data
+		setUserList(newUserData);
+	  };
+
 	const handleCurrEstHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		// If the value is not a number, set the value to 0
 		setCurrEstHours(e.target.value);
@@ -113,6 +175,7 @@ const UserPage: React.FC = () => {
 		if (newWorkWeekData) {
 			newWorkWeekData.estimatedHours = newEstimatedHours;
 			addWorkWeekData(newWorkWeekData, selectedCell.rowId);
+			updateUserListData(newWorkWeekData);
 		} else {
 			const newWorkWeekData = {
 				cweek: selectedCell.week,
@@ -122,6 +185,7 @@ const UserPage: React.FC = () => {
 				assignmentId: rowIdtoAssignmentIdMap.get(selectedCell.rowId),
 			};
 			addWorkWeekData(newWorkWeekData, selectedCell.rowId);
+			updateUserListData(newWorkWeekData);
 		}
 		setWasSelectedCellEdited(true);
 	};

@@ -23,7 +23,6 @@ const PeopleView: React.FC = () => {
 
 	useEffect(() => {
 		if (userList) {
-			console.log("Setting up row ID to user map; User list: ", userList);
 			// Setup the map of users to their assignments' work weeks
 			setUserAssignmentDataMap(processUserAssignmentDataMap(userList));
 
@@ -33,19 +32,16 @@ const PeopleView: React.FC = () => {
 					rowIdtoUserIdMap.set(index, user.id);
 				}
 			});
-			console.log("Row ID to user map: ", rowIdtoUserIdMap);
 		}
 	}, [userList]);
 
 	const handleUserChange = (user: UserType) => {
 		router.push(pathname + "/" + encodeURIComponent(user.name.toString()));
-		console.log("User changed to: ", user);
 	};
 
 	const drawBars = (workWeekBlocks: WorkWeekBlockMemberType[], width?: number, height?: number, gap: number = 4, cornerRadius = 6) => {
 		if (!width || !height) { return; }
 
-		console.log("Drawing bars for work week blocks: ", workWeekBlocks);
 		return (
 			<div className="absolute bottom-0 z-10">
 				{workWeekBlocks.map((workWeekBlock: WorkWeekBlockMemberType, index: number) => {

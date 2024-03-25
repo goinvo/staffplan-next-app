@@ -11,14 +11,12 @@ const Projects: React.FC = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const { projectList } = useUserDataContext();
 
-	console.log("Projects list: ", projectList);
 
 	useEffect(() => {
 		setClientSide(true);
 	}, []);
 
 	const handleProjectChange = (project: ProjectType) => {
-		console.log("Viewing project: ", project);
 	}
 
 	if (!projectList) {
