@@ -8,6 +8,7 @@
   --background-end-rgb: 255, 255, 255;
 
   --accent-green: #72DDC3;
+  --accent-light-green:rgb(123, 238, 209)
   --accent-blue: #3758F9;
   
   --navbar-bg: #121F35;
@@ -89,6 +90,10 @@
 .actionbar-search {
   background-color: var(--actionbar-search);
 }
+
+.ellipsismenu:after {
+  content: '\2807';
+  }
 
 .timeline-bar-bg {
   background-color: var(--timeline-bar-bg);
