@@ -10,15 +10,13 @@ export const metadata: Metadata = {
 	description: "Staff Plan App",
 };
 
-export default function RootLayout({
-	children,
-}: Readonly<{
-	children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
 	return (
 		<html lang="en">
 			<body className={open_sans.className}>
-				<RootLayoutContents children={children} />
+				<RootLayoutContents>
+					{children}
+				</RootLayoutContents>
 			</body>
 		</html>
 	);
