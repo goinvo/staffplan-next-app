@@ -15,6 +15,8 @@ import {
 } from "../../gqlQueries";
 import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
 import { useUserDataContext } from "../../userDataContext";
+import { LoadingSpinner } from "@/app/components/loadingSpinner";
+
 
 const UserPage: React.FC = () => {
 	const params = useParams();
@@ -38,6 +40,7 @@ const UserPage: React.FC = () => {
 	const [rowIdtoAssignmentIdMap, setRowIdtoAssignmentIdMap] = useState<
 		Map<number, number>
 	>(new Map());
+
 	const { userList, setUserList } = useUserDataContext();
 
 	const [upsertWorkweek] = useMutation(UPSERT_WORKWEEK);
@@ -85,8 +88,7 @@ const UserPage: React.FC = () => {
 		workWeekData: WorkWeekRenderDataType,
 		rowId: number
 	) => {
-		console.log("ADDING: ", workWeekData, "WORKWEEKDATA", rowId, "ROWID")
-
+		// Add data to the lookup map
 		if (rowId != undefined) {
 
 			// Add data to the lookup map
@@ -165,6 +167,7 @@ const UserPage: React.FC = () => {
 		setUserList(newUserData);
 	  };
 
+
 	const handleCurrEstHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		// If the value is not a number, set the value to 0
 		setCurrEstHours(e.target.value);
@@ -195,7 +198,9 @@ const UserPage: React.FC = () => {
 	const handleCurrActHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setCurrActHours(e.target.value);
 		const newActualHours = parseInt(e.target.value);
+
 		const newAssignmentId = rowIdtoAssignmentIdMap.get(selectedCell.rowId);
+
 		const newWorkWeekData = lookupWorkWeekData(
 			selectedCell.rowId,
 			selectedCell.year,
@@ -360,6 +365,7 @@ const UserPage: React.FC = () => {
 		console.log(workWeekDataLookupMap, "LOOKUPMAP");
 	}
 
+
 	useEffect(() => {
 		setClientSide(true);
 	}, []);
@@ -379,10 +385,7 @@ const UserPage: React.FC = () => {
 
 	if (called && userAssignmentLoading)
 		return (
-			<p>
-				Loading User Assignments for{" "}
-				{decodeURIComponent(params.name.toString())}
-			</p>
+			 <LoadingSpinner />;
 		);
 
 	if (userAssignmentError)

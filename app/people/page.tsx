@@ -2,12 +2,15 @@
 import React, { useEffect, useState, Fragment } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import withApollo from "@/lib/withApollo";
+
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useUserDataContext } from "../userDataContext";
 import { UserType, AssignmentType, UserAssignmentDataMapType, WorkWeekType, WorkWeekBlockMemberType } from "../typeInterfaces";
 import { processUserAssignmentDataMap, getWorkWeeksForUserByWeekAndYear, drawBar, matchWorkWeeks } from "../helperFunctions";
 import WeekDisplay from "../components/weekDisplay";
+import { LoadingSpinner } from "../components/loadingSpinner";
+import { SVGAlphabet } from "../svgAlphabet";
 
 const PeopleView: React.FC = () => {
 	const [selectedUser, setSelectedUser] = useState<UserType>({
@@ -38,6 +41,7 @@ const PeopleView: React.FC = () => {
 	const handleUserChange = (user: UserType) => {
 		router.push(pathname + "/" + encodeURIComponent(user.name.toString()));
 	};
+
 
 	const drawBars = (workWeekBlocks: WorkWeekBlockMemberType[], width?: number, height?: number, gap: number = 4, cornerRadius = 6) => {
 		if (!width || !height) { return; }

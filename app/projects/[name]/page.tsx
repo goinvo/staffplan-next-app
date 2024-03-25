@@ -1,5 +1,5 @@
 "use client";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import withApollo from "@/lib/withApollo";
 import { useQuery, useLazyQuery, useMutation } from "@apollo/client";
@@ -16,7 +16,7 @@ import {
 } from "../../gqlQueries";
 import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
 import { useUserDataContext } from "../../userDataContext";
-
+import { LoadingSpinner } from "@/app/components/loadingSpinner";
 const ProjectPage: React.FC = () => {
 	const params = useParams();
 	const [clientSide, setClientSide] = useState(false);
@@ -39,6 +39,7 @@ const ProjectPage: React.FC = () => {
 	const [rowIdtoAssignmentIdMap, setRowIdtoAssignmentIdMap] = useState<
 		Map<number, number>
 	>(new Map());
+
 	const [userAssignmentData, setUserAssignmentData] = useState<any>(null);
 	const { userList } = useUserDataContext();
 
@@ -111,7 +112,7 @@ const ProjectPage: React.FC = () => {
 			selectedCell.year,
 			selectedCell.week
 		);
-		
+
 		if (newWorkWeekData) {
 			newWorkWeekData.estimatedHours = newEstimatedHours;
 			addWorkWeekDataToLookupMap(newWorkWeekData, selectedCell.rowId);
@@ -259,6 +260,7 @@ const ProjectPage: React.FC = () => {
 		}
 	};
 
+
 	const loadUserAssignments = () => {
 		if (clientSide && userListData) {
 			const name = decodeURIComponent(params.name.toString());
@@ -269,6 +271,7 @@ const ProjectPage: React.FC = () => {
 			}
 		}
 	};
+
 
 	useEffect(() => {
 		setClientSide(true);
@@ -312,12 +315,15 @@ const ProjectPage: React.FC = () => {
 		});
 	}, [userAssignmentData]);
 
-	if (userListLoading) return <p>Finding user...</p>;
+
+	if (userListLoading) return <LoadingSpinner />;
+
 	if (userListError) return <p>Error Loading Users List</p>;
 
 	return (
 		<div>
 			<h1>Assignments for {decodeURIComponent(params.name.toString())}</h1>
+
 			{userAssignmentData &&
 				userAssignmentData.userAssignments &&
 				<WeekDisplay labelContents={userAssignmentData.userAssignments.map((assignment: AssignmentType) => (
@@ -331,6 +337,7 @@ const ProjectPage: React.FC = () => {
 					selectedCell={selectedCell}
 				/>
 			}
+
 		</div>
 	);
 };

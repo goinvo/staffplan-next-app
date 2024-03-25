@@ -7,13 +7,15 @@ import withApollo from "@/lib/withApollo";
 import { ProjectType, AssignmentType, UserType } from "../typeInterfaces";
 import { Field, Formik, FormikValues } from "formik";
 import { useUserDataContext } from "../userDataContext";
-
 import {
 	GET_ASSIGNMENT_DATA,
 	UPSERT_ASSIGNMENT,
 	GET_USER_ASSIGNMENTS,
 	GET_ALL_PROJECTS_DATA,
 } from "../gqlQueries";
+import { LoadingSpinner } from "./loadingSpinner";
+import { Dialog } from '@headlessui/react'
+
 const AddAssignment = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
@@ -24,9 +26,9 @@ const AddAssignment = () => {
 		setClientSide(true);
 	}, []);
 	const searchParams = useSearchParams();
-	const showModal = searchParams.get("assignmentmodal");
 	const { userList, setUserList, projectList } = useUserDataContext();
-
+	const modalParam = searchParams.get("assignmentmodal");
+	const showModal = modalParam ? true : false
 	const initialValues = {
 		status: false,
 		userId: "",
@@ -46,26 +48,9 @@ const AddAssignment = () => {
 	const [
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
-	] = useMutation(UPSERT_ASSIGNMENT, {
-		// refetchQueries: [{ query: GET_USER_ASSIGNMENTS, variables: { userId: 8 } }],
-		update: (cache, { data }) => {
-			cache.modify({
-				id: cache.identify(data.upsertAssignment),
-				fields: {
-					Assignment(exisitingAssignments = []) {
-						console.log("HIT inside modify")
-						const newAssignment = data.upsertAssignment;
-						cache.writeQuery({
-							query: GET_USER_ASSIGNMENTS,
-							variables: { userId: data.upsertAssignment.assignedUser.id },
-							data: { ...exisitingAssignments, newAssignment },
-						});
-					},
-				},
-			});
-		},
-	});
-	if (loading || mutationLoading) return <p> LOADING ASSIGNMENTS</p>;
+
+	] = useMutation(UPSERT_ASSIGNMENT)
+	if (loading || mutationLoading) return return <LoadingSpinner/>;
 	if (error || mutationError) return <p>ERROR ASSIGNMENTS</p>;
 	const onSubmitUpsert = ({
 		projectId,
@@ -166,10 +151,11 @@ const AddAssignment = () => {
 	return (
 		<>
 			{showModal && (
-				<div
+				<Dialog
+					open={showModal}
+					onClose={onCancel}
 					className="relative z-50"
 					aria-labelledby="assignment-modal"
-					role="dialog"
 					aria-modal="true"
 				>
 					<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
@@ -349,7 +335,7 @@ const AddAssignment = () => {
 							</div>
 						</div>
 					</div>
-				</div>
+				</Dialog>
 			)}
 		</>
 	);

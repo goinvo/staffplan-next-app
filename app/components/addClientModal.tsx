@@ -6,6 +6,8 @@ import withApollo from "@/lib/withApollo";
 import { Field, Formik, FormikValues } from "formik";
 import { GET_CLIENT_DATA, UPSERT_CLIENT } from "../gqlQueries";
 import { ClientType } from "../typeInterfaces";
+import { LoadingSpinner } from "./loadingSpinner";
+import { Dialog } from "@headlessui/react";
 const AddClient = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const router = useRouter();
@@ -13,8 +15,9 @@ const AddClient = () => {
 		setClientSide(true);
 	}, []);
 	const searchParams = useSearchParams();
-	const showModal = searchParams.get("addclientmodal");
-
+	const modalParam = searchParams.get("addclientmodal");
+	const showModal = modalParam ? true : false
+	
 	const initialValues = {
 		name: "",
 		status: "",
@@ -36,7 +39,7 @@ const AddClient = () => {
 		upsertClient,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_CLIENT);
-	if (mutationLoading) return <p> LOADING PERSON</p>;
+	if (mutationLoading || loading) return <LoadingSpinner/>;
 	if (mutationError) return <p>ERROR ON PERSON</p>;
 	const onSubmitUpsert = ({
 		name,
@@ -77,12 +80,13 @@ const AddClient = () => {
 	return (
 		<>
 			{showModal && (
-				<div
-					className="relative z-50"
-					aria-labelledby="person-modal"
-					role="dialog"
-					aria-modal="true"
-				>
+				<Dialog
+				open={showModal}
+				onClose={onCancel}
+				className="relative z-50"
+				aria-labelledby="client-modal"
+				aria-modal="true"
+			>
 					<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
 
 					<div className="fixed inset-0 z-10 w-screen overflow-y-auto">
@@ -210,7 +214,7 @@ const AddClient = () => {
 							</div>
 						</div>
 					</div>
-				</div>
+				</Dialog>
 			)}
 		</>
 	);
