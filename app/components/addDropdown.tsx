@@ -13,7 +13,7 @@ export default function AddDropdown() {
 	return (
 		<Menu
 			as="div"
-			className="relative inline-block text-left z-40"
+			className="relative inline-block text-left z-50"
 			id="add-dropdown"
 			data-testid="add-dropdown"
 		>

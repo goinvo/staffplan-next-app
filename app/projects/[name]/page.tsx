@@ -15,6 +15,7 @@ import {
 	GET_USER_LIST,
 } from "../../gqlQueries";
 import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
+import { useUserDataContext } from "../../userDataContext";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
 const ProjectPage: React.FC = () => {
 	const params = useParams();
@@ -39,26 +40,10 @@ const ProjectPage: React.FC = () => {
 		Map<number, number>
 	>(new Map());
 
-	const [
-		upsertWorkweek,
-		{ data: mutationData, loading: mutationLoading, error: mutationError },
-	] = useMutation(UPSERT_WORKWEEK, {
-		onCompleted(mutationData) {
-			console.log(mutationData, "DATADATA");
-		},
-	});
+	const [userAssignmentData, setUserAssignmentData] = useState<any>(null);
+	const { userList } = useUserDataContext();
 
-	const [
-		getUserAssignments,
-		{
-			data: userAssignmentData,
-			loading: userAssignmentLoading,
-			error: userAssignmentError,
-			called,
-		},
-	] = useLazyQuery(GET_USER_ASSIGNMENTS, {
-		variables: { selectedUserId: selectedUser.id },
-	});
+	const [upsertWorkweek] = useMutation(UPSERT_WORKWEEK);
 
 	const upsertWorkWeekValues = (values: WorkWeekRenderDataType) => {
 		upsertWorkweek({
@@ -88,8 +73,8 @@ const ProjectPage: React.FC = () => {
 
 	const getUserIdFromName: (name: string) => number | null = (name: string) => {
 		// Iterate through the list of users and find the one with the matching name
-		if (userListData && userListData.users) {
-			for (const user of userListData.users) {
+		if (userListData) {
+			for (const user of userListData) {
 				if (user.name === name) {
 					// Return the user's ID as a number
 					return parseInt(user.id);
@@ -127,6 +112,7 @@ const ProjectPage: React.FC = () => {
 			selectedCell.year,
 			selectedCell.week
 		);
+
 		if (newWorkWeekData) {
 			newWorkWeekData.estimatedHours = newEstimatedHours;
 			addWorkWeekDataToLookupMap(newWorkWeekData, selectedCell.rowId);
@@ -257,7 +243,6 @@ const ProjectPage: React.FC = () => {
 			if (oldWorkWeekData) {
 				upsertWorkWeekValues(oldWorkWeekData);
 				setWasSelectedCellEdited(false);
-				console.log("upserted");
 			}
 		}
 		setselectedCell({ week, year, rowId });
@@ -275,6 +260,19 @@ const ProjectPage: React.FC = () => {
 		}
 	};
 
+
+	const loadUserAssignments = () => {
+		if (clientSide && userListData) {
+			const name = decodeURIComponent(params.name.toString());
+			const userId = getUserIdFromName(name);
+			if (userId) {
+				setSelectedUser({ id: userId, name });
+				setUserAssignmentData(userList);
+			}
+		}
+	};
+
+
 	useEffect(() => {
 		setClientSide(true);
 	}, []);
@@ -286,7 +284,7 @@ const ProjectPage: React.FC = () => {
 			const userId = getUserIdFromName(name);
 			if (userId) {
 				setSelectedUser({ id: userId, name });
-				getUserAssignments({ variables: { selectedUserId: userId } });
+				setUserAssignmentData(userList);
 			}
 		}
 	}, [clientSide, userListData, params.name]);
@@ -317,46 +315,29 @@ const ProjectPage: React.FC = () => {
 		});
 	}, [userAssignmentData]);
 
-	if (called && userAssignmentLoading)
-		return (
-			<p>
-				Loading User Assignments for{" "}
-				{decodeURIComponent(params.name.toString())}
-			</p>
-		);
-	if (userListLoading || userAssignmentLoading) return <LoadingSpinner/>;
+
+	if (userListLoading) return <LoadingSpinner />;
+
 	if (userListError) return <p>Error Loading Users List</p>;
-	if (userAssignmentError)
-		return (
-			<p>
-				Error Loading User Assignments for{" "}
-				{decodeURIComponent(params.name.toString())}
-			</p>
-		);
 
 	return (
 		<div>
 			<h1>Assignments for {decodeURIComponent(params.name.toString())}</h1>
-			{userAssignmentData && userAssignmentData.userAssignments && (
-				<WeekDisplay
-					labelContents={userAssignmentData.userAssignments.map(
-						(assignment: AssignmentType) => (
-							<div key={assignment.id}>
-								<div>{assignment.project.client.name}</div>
-								<div>{assignment.project.name}</div>
-							</div>
-						)
-					)}
-					onMouseOverWeek={(week, year, rowId) => {
-						handleOnMouseOverWeek(week, year, rowId);
-					}}
-					onMouseClickWeek={(week, year, rowId) => {
-						console.log(week, year, rowId);
-					}}
+
+			{userAssignmentData &&
+				userAssignmentData.userAssignments &&
+				<WeekDisplay labelContents={userAssignmentData.userAssignments.map((assignment: AssignmentType) => (
+					<div key={assignment.id}>
+						<div>{assignment.project.client ? assignment.project.client.name : ""}</div>
+						<div>{assignment.project.name}</div>
+					</div>
+				))}
+					onMouseOverWeek={(week, year, rowId) => { handleOnMouseOverWeek(week, year, rowId) }}
 					renderCell={renderCell}
 					selectedCell={selectedCell}
 				/>
-			)}
+			}
+
 		</div>
 	);
 };

@@ -69,8 +69,8 @@ export const GET_PROJECT_DATA = gql`
 `;
 
 export const GET_USER_ASSIGNMENTS = gql`
-	query getUserAssignments($selectedUserId: ID!) {
-		userAssignments(userId: $selectedUserId) {
+	query getUserAssignments($userId: ID!) {
+		userAssignments(userId: $userId) {
 			id
 			startsOn
 			endsOn
@@ -100,50 +100,52 @@ export const GET_USER_ASSIGNMENTS = gql`
 	}
 `;
 export const GET_USER_LIST = gql`
-	{
-		currentCompany {
-			users {
-				id
-				name
-				assignments {
+{
+	currentCompany{
+		users {
+			id
+			name
+			assignments {
+				project {
+					id
+					name
+				}
+				workWeeks {
 					project {
-						id
 						name
 					}
-					workWeeks {
-						project {
-							name
-						}
-						actualHours
-						estimatedHours
-						cweek
-						year
-					}
+					actualHours
+					estimatedHours
+					cweek
+					year
 				}
 			}
 		}
 	}
+}
 `;
 
 export const GET_ALL_PROJECTS_DATA = gql`
 	{
-		currentCompany {
-			projects {
-				id
-				name
-				startsOn
-				endsOn
-				status
-				cost
-				client {
-					name
-					id
-				}
-				workWeeks {
-					actualHours
-					estimatedHours
-				}
-			}
+	currentCompany{
+		projects {
+		id
+		name
+		client {
+			name
+		}
+		workWeeks {
+			actualHours
+			estimatedHours
+		}
+		}
+	}
+	}
+`;
+export const GET_VIEWER = gql`
+	{
+		viewer {
+			name
 		}
 	}
 `;
@@ -166,14 +168,30 @@ export const UPSERT_ASSIGNMENT = gql`
 			startsOn: $startsOn
 			endsOn: $endsOn
 		) {
-			project {
-				id
-			}
+			id
 			startsOn
 			endsOn
 			status
 			assignedUser {
 				id
+				name
+			}
+			workWeeks {
+				id
+				actualHours
+				assignmentId
+				cweek
+				estimatedHours
+				year
+			}
+			project {
+				name
+				id
+				client {
+					name
+				}
+				startsOn
+				endsOn
 			}
 		}
 	}

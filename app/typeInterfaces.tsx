@@ -59,6 +59,7 @@ export interface UserAssignmentDataType {
 export interface UserType {
 	id?: number;
 	name: string;
+	assignments?: AssignmentType[];
 }
 
 export interface WorkWeekProps {
@@ -69,20 +70,25 @@ export interface WorkWeekType {
 	id?: number;
 	actualHours?: number;
 	estimatedHours?: number;
+	project?: ProjectType;
 	assignmentId: number;
 	cweek: number;
 	year: number;
 }
 
-export interface WorkWeekBlockType {
-	estimatedHours: number;
-	startDate: Date;
-	workWeeks: WorkWeekType[];
+export interface WorkWeekBlockMemberType {
+	workWeek: WorkWeekType;
+	maxTotalEstHours: number;
+	itemEstHoursOffset: number;
+	consecutivePrevWeeks: number;
+	isLastConsecutiveWeek: boolean;
 }
 
 export interface UserAssignmentDataMapType {
-	[userId: string]: {
-		[projectId: string]: WorkWeekBlockType[];
+	[userId: number]: {
+		[year: number]: {
+			[cweek: number]: WorkWeekBlockMemberType[];
+		};
 	};
 }
 
