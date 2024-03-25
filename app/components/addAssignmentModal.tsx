@@ -50,7 +50,7 @@ const AddAssignment = () => {
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 
 	] = useMutation(UPSERT_ASSIGNMENT)
-	if (loading || mutationLoading) return return <LoadingSpinner/>;
+	if (loading || mutationLoading) return <LoadingSpinner/>;
 	if (error || mutationError) return <p>ERROR ASSIGNMENTS</p>;
 	const onSubmitUpsert = ({
 		projectId,

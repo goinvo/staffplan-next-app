@@ -385,7 +385,7 @@ const UserPage: React.FC = () => {
 
 	if (called && userAssignmentLoading)
 		return (
-			 <LoadingSpinner />;
+			 <LoadingSpinner />
 		);
 
 	if (userAssignmentError)

@@ -1,6 +1,5 @@
 import {
 	ApolloClient,
-	ApolloLink,
 	from,
 	ApolloLink,
 	HttpLink,
