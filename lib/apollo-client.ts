@@ -1,7 +1,7 @@
 import {
 	ApolloClient,
-	ApolloLink,
 	from,
+	ApolloLink,
 	HttpLink,
 	InMemoryCache,
 } from "@apollo/client";
@@ -40,40 +40,62 @@ function createApolloClient(context = {}) {
 
 	// automatically add the CSRF token to headers
 	const csrfMiddleware = new ApolloLink((operation, forward) => {
-		const csrfTokenValue = localStorage.getItem("csrf-token")
 
-		if(csrfTokenValue){
+		const csrfTokenValue = localStorage.getItem("csrf-token");
+
+		if (csrfTokenValue) {
 			operation.setContext(({ headers = {} }) => ({
 				headers: {
 					"X-Csrf-Token": csrfTokenValue,
-				}
+				},
+
 			}));
 		}
 
 		return forward(operation);
-	})
 
+	});
 	const errorLink = onError(({ networkError, graphQLErrors }) => {
 		if ((networkError as ServerError).statusCode === 403) {
 			return window.location.replace(signinURL);
 		}
 	});
 	return new ApolloClient({
-		link: from([csrfMiddleware, errorLink, saveCsrfTokenMiddleware.concat(httpLink)]),
+		link: from([
+			csrfMiddleware,
+			errorLink,
+			saveCsrfTokenMiddleware.concat(httpLink),
+		]),
+
 		defaultOptions: {
 			query: {
 				errorPolicy: "all",
-				fetchPolicy:"cache-first"
+				fetchPolicy: "no-cache",
 			},
 			mutate: {
 				errorPolicy: "all",
+				awaitRefetchQueries: true,
 			},
+			watchQuery: {},
 		},
-		connectToDevTools: true,
 		cache: new InMemoryCache({
-			addTypename:true
+			typePolicies: {
+				Query: {
+					fields: {
+						assignment: {
+							read(_, { args, toReference }) {
+								return toReference({
+									__typename: "assignment",
+									id: args?.id,
+								});
+							},
+						},
+					},
+				},
+			},
+			addTypename: true,
 		}),
+		connectToDevTools: true,
 	});
 }
-
 export default createApolloClient;

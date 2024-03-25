@@ -12,20 +12,22 @@ const UsersList: React.FC<SideLabelComponents> = ({ labelContents, setDivHeights
     // Calculate the heights of all divs and call setDivHeights with the result
     const heights = divRefs.current.map(div => div?.offsetHeight ?? 0);
     setDivHeights(heights);
-  }, [labelContents]); 
+  }, [labelContents]);
 
   return (
-    <div className="absolute left-0 z-30" style={{top: offset + "px"}}>
-      <div className="flex flex-col" style={{rowGap: sideListGutterHeight * 3 + "px"}}>
-        {labelContents && labelContents.map((label, index) => (
-          <div
-            key={index}
-            ref={el => divRefs.current[index] = el} // Assign the div element to the refs array
-            className="flex flex-row bg-white rounded-r p-4"
-          >
-            {label}
-          </div>
-        ))}
+    <div className="relative z-40">
+      <div className="absolute left-0 z-40" style={{ top: offset + "px" }}>
+        <div className="flex flex-col" style={{ rowGap: sideListGutterHeight * 3 + "px" }}>
+          {labelContents && labelContents.map((label, index) => (
+            <div
+              key={index}
+              ref={el => divRefs.current[index] = el} // Assign the div element to the refs array
+              className="flex flex-row bg-white rounded-r p-4"
+            >
+              {label}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

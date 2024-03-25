@@ -1,15 +1,21 @@
 "use client";
 import { useState, useEffect } from "react";
 import ProjectDatepicker from "./projectDatepicker";
-import { UserType } from "../typeInterfaces";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery, useMutation, gql, useApolloClient } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
-import { ProjectType } from "../typeInterfaces";
+import { ProjectType, AssignmentType, UserType } from "../typeInterfaces";
 import { Field, Formik, FormikValues } from "formik";
-import { GET_ASSIGNMENT_DATA, UPSERT_ASSIGNMENT } from "../gqlQueries";
+import { useUserDataContext } from "../userDataContext";
+import {
+	GET_ASSIGNMENT_DATA,
+	UPSERT_ASSIGNMENT,
+	GET_USER_ASSIGNMENTS,
+	GET_ALL_PROJECTS_DATA,
+} from "../gqlQueries";
 import { LoadingSpinner } from "./loadingSpinner";
 import { Dialog } from '@headlessui/react'
+
 const AddAssignment = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
@@ -20,6 +26,7 @@ const AddAssignment = () => {
 		setClientSide(true);
 	}, []);
 	const searchParams = useSearchParams();
+	const { userList, setUserList, projectList } = useUserDataContext();
 	const modalParam = searchParams.get("assignmentmodal");
 	const showModal = modalParam ? true : false
 	const initialValues = {
@@ -29,7 +36,7 @@ const AddAssignment = () => {
 		dates: { endsOn: "", startsOn: "" },
 	};
 
-	const { loading, error, data } = useQuery(GET_ASSIGNMENT_DATA, {
+	const { loading, error, data, refetch } = useQuery(GET_ASSIGNMENT_DATA, {
 		context: {
 			headers: {
 				cookie: clientSide ? document.cookie : null,
@@ -41,7 +48,8 @@ const AddAssignment = () => {
 	const [
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
-	] = useMutation(UPSERT_ASSIGNMENT);
+
+	] = useMutation(UPSERT_ASSIGNMENT)
 	if (loading || mutationLoading) return <LoadingSpinner/>;
 	if (error || mutationError) return <p>ERROR ASSIGNMENTS</p>;
 	const onSubmitUpsert = ({
@@ -58,7 +66,29 @@ const AddAssignment = () => {
 				startsOn: dates.startsOn,
 				endsOn: dates.endsOn,
 			},
-		}).then(() => {
+		}).then((response) => {
+			if (response.data.upsertAssignment) {
+				// Print the values passed into the mutation
+				const newAssignment = response.data.upsertAssignment
+
+				// Find the user whose ID matches the one in the response
+				const user = userList.find((user: UserType) => user.id === newAssignment.assignedUser.id);
+				const updatedUser = { ...user, assignments: [...user.assignments, newAssignment] };
+
+				// Update the user list with the new assignment
+				setUserList((prevUserData: any) => {
+					const updatedUsers = prevUserData.map((user: UserType) => {
+						if (user.id === newAssignment.assignedUser.id && user.assignments) {
+							return {
+								...user,
+								assignments: [...user.assignments, newAssignment],
+							};
+						}
+						return user;
+					});
+					return updatedUsers;
+				});
+			}
 			router.back();
 		});
 	};
@@ -130,7 +160,7 @@ const AddAssignment = () => {
 				>
 					<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
 
-					<div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+					<div className="fixed inset-0 z-50 w-screen overflow-y-auto">
 						<div className="flex min-h-full p-4 text-center justify-center sm:items-center sm:p-0">
 							<div className="relative transform overflow-hidden w-1/2 rounded-xl bg-white text-left shadow-xl transition-all">
 								<div className="bg-white p-10">
@@ -245,7 +275,6 @@ const AddAssignment = () => {
 																handleBlur={handleBlur}
 																name="dates"
 																component={ProjectDatepicker}
-						
 															/>
 														</div>
 														{/* SECTION 3 */}
