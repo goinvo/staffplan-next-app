@@ -72,14 +72,12 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
 
     useEffect(() => {
         if (userListData) {
-            console.log("User list data: ", userListData);
             setUserList(userListData.currentCompany.users);
         }
     }, [userListData]);
 
     useEffect(() => {
 		if (projectData && projectData.currentCompany?.projects) {
-            console.log("Project data: ", projectData);
 			setProjectList(projectData.currentCompany?.projects);
 		}
 		

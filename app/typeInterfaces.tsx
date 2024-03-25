@@ -84,7 +84,6 @@ export interface UserAssignmentDataMapType {
 	};
 }
 
-
 export interface WorkWeekRenderDataType {
 	cweek: number;
 	year: number;

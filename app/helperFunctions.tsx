@@ -142,6 +142,7 @@ export function matchWorkWeekBlocks(prevBlocks: WorkWeekBlockMemberType[], curre
 
 export function processUserAssignmentDataMap(userList: any): UserAssignmentDataMapType {
 	const processedDataMap: UserAssignmentDataMapType = {};
+	console.log("Setting up processed data map");
 
 	userList.forEach((user: any) => {
 		const userId = user.id;
@@ -167,6 +168,8 @@ export function processUserAssignmentDataMap(userList: any): UserAssignmentDataM
 						consecutivePrevWeeks = prevWeek.consecutivePrevWeeks + 1;
 						prevWeek.isLastConsecutiveWeek = false;
 					}
+
+					console.log("Consecutive prev weeks: ", consecutivePrevWeeks, "prevWeek: ", prevWeek, "workWeek: ", workWeek, "userId: ", userId, "year: ", workWeek.year, "cweek: ", workWeek.cweek, "assignment: ", assignment.project.name);
 
 					// Get the previous week's work week blocks in reverse order
 					const prevWeekBlocks = [...(processedDataMap[userId][workWeek.year][workWeek.cweek - 1] || [])].reverse();
@@ -227,6 +230,8 @@ export function processUserAssignmentDataMap(userList: any): UserAssignmentDataM
 			});
 		});
 	});
+
+	console.log("Processed data map setup complete; processedDataMap: ", processedDataMap);
 
 	return processedDataMap;
 }

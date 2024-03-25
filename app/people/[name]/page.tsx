@@ -104,7 +104,7 @@ const UserPage: React.FC = () => {
 		}
 	};
 
-	const updateUserListData = (workWeekData: WorkWeekRenderDataType) => {
+	const updateUserListData = (workWeekData: WorkWeekRenderDataType, rowId: number) => {
 		const newUserData = [...userList]; // Create a new array to avoid mutating the original userList
 		const userIndex = newUserData.findIndex((user: UserType) => user.id === selectedUser.id);
 	  
@@ -116,6 +116,7 @@ const UserPage: React.FC = () => {
 	  
 		  if (assignmentIndex !== -1) {
 			const assignment = user.assignments[assignmentIndex];
+			const project = assignment.project;
 			const newWorkWeeks = [...assignment.workWeeks]; // Create a new array for workWeeks
 			const workWeekIndex = newWorkWeeks.findIndex(
 			  (week: WorkWeekType) => week.cweek === workWeekData.cweek && week.year === workWeekData.year
@@ -135,6 +136,7 @@ const UserPage: React.FC = () => {
 				year: workWeekData.year,
 				estimatedHours: workWeekData.estimatedHours,
 				actualHours: workWeekData.actualHours,
+				project: project,
 			  });
 			}
 	  
@@ -175,7 +177,7 @@ const UserPage: React.FC = () => {
 		if (newWorkWeekData) {
 			newWorkWeekData.estimatedHours = newEstimatedHours;
 			addWorkWeekData(newWorkWeekData, selectedCell.rowId);
-			updateUserListData(newWorkWeekData);
+			updateUserListData(newWorkWeekData, selectedCell.rowId);
 		} else {
 			const newWorkWeekData = {
 				cweek: selectedCell.week,
@@ -185,7 +187,7 @@ const UserPage: React.FC = () => {
 				assignmentId: rowIdtoAssignmentIdMap.get(selectedCell.rowId),
 			};
 			addWorkWeekData(newWorkWeekData, selectedCell.rowId);
-			updateUserListData(newWorkWeekData);
+			updateUserListData(newWorkWeekData, selectedCell.rowId);
 		}
 		setWasSelectedCellEdited(true);
 	};
