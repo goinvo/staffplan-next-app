@@ -16,6 +16,7 @@ const AddProject = () => {
 	const [selectedClient, setSelectedClient] = useState<number | string>("");
 	const router = useRouter();
 	const searchParams = useSearchParams();
+	const modalParam = searchParams.get("projectmodal");
 	const projectInParam = searchParams.get("project");
 
 	const decodeQuery = projectInParam
@@ -40,15 +41,15 @@ const AddProject = () => {
 	};
 	const newProjectInitialValues = {
 		client: "",
+		cost: 0,
 		dates: { endsOn: "", startsOn: "" },
+		flatRate: 0,
+		hourlyRate: 0,
 		hours: 0,
 		name: "",
 		numOfFTE: "",
 		payRate: "flatRate",
-		cost: 0,
 		status: false,
-		hourlyRate: 0,
-		flatRate: 0,
 	};
 	const initialValues = parsedProject
 		? editProjectInitialValues
@@ -58,7 +59,6 @@ const AddProject = () => {
 		setClientSide(true);
 	}, []);
 
-	const modalParam = searchParams.get("projectmodal");
 	const showModal = modalParam ? true : false;
 	const { loading, error, data } = useQuery(GET_CLIENT_DATA, {
 		context: {
@@ -77,7 +77,6 @@ const AddProject = () => {
 	if (error || mutationError) return <p>ERROR PROJECT</p>;
 
 	const onSubmitUpsert = (values: FormikValues) => {
-		console.log(values, "VALUES UPSERT");
 		const variables = {
 			id: values.id,
 			clientId: values.client,

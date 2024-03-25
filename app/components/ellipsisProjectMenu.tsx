@@ -1,11 +1,12 @@
 "use client";
-import { Fragment, useState } from "react";
+import { BaseSyntheticEvent, Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import Link from "next/link";
 import React from "react";
+import { UPSERT_PROJECT } from "../gqlQueries";
+import { useMutation } from "@apollo/client";
 
 export default function EllipsisProjectMenu({ project }: any) {
-	const [confirmed, setConfirmed] = useState(false);
 	const {
 		client: { name: clientName, id: clientId },
 		name,
@@ -15,6 +16,9 @@ export default function EllipsisProjectMenu({ project }: any) {
 		status,
 		cost,
 	} = project;
+	const [confirmed, setConfirmed] = useState(
+		status === "active" ? true : false
+	);
 	const dropdownSelectedItemClass = (isActive: boolean) =>
 		isActive
 			? "px-4 py-2 block border-b-2 hover:border-gray-200 hover:text-accentgreen text-sm"
@@ -31,6 +35,30 @@ export default function EllipsisProjectMenu({ project }: any) {
 	};
 	const queryJSONString = JSON.stringify(query);
 	const base64Query = Buffer.from(queryJSONString).toString("base64");
+	const [
+		upsertProject,
+		{ data: mutationData, loading: mutationLoading, error: mutationError },
+	] = useMutation(UPSERT_PROJECT, { errorPolicy: "all" });
+	const onSubmitUpsert = (e: BaseSyntheticEvent) => {
+		const status =
+			e.target.id === "archiveProject"
+				? "archived"
+				: e.target.checked
+				? "active"
+				: "archived";
+		//last options need to be changed to confirmed and unconfirmed when backend reflects those options
+		const variables = {
+			id: id,
+			clientId: clientId,
+			name: name,
+			status: status,
+			startsOn: startsOn,
+			cost: cost,
+		};
+		upsertProject({
+			variables: endsOn ? { ...variables, endsOn: endsOn } : variables,
+		});
+	};
 	return (
 		<Menu
 			as="div"
@@ -58,7 +86,7 @@ export default function EllipsisProjectMenu({ project }: any) {
 								</p>
 							)}
 						</Menu.Item>
-						<label className="ml-3 inline-block pl-[0.15rem] hover:cursor-pointer">
+						<label className="ml-3 inline-block pl-[0.15rem] hover:cursor-pointer text-gray-900 px-4 py-2 text-sm">
 							<input
 								className="mr-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-neutral-300 
 																		hover:checked:bg-accentgreen
@@ -66,13 +94,19 @@ export default function EllipsisProjectMenu({ project }: any) {
 								type="checkbox"
 								name="status"
 								checked={confirmed}
-								onChange={() => setConfirmed(!confirmed)}
+								onChange={(e) => {
+									setConfirmed(!confirmed);
+									onSubmitUpsert(e);
+								}}
 							/>
 							{confirmed ? "Confirmed" : "Unconfirmed"}
 						</label>
 						<Menu.Item>
 							{({ active }) => (
-								<a href="#" className={dropdownSelectedItemClass(active)}>
+								<a
+									href={`?assignmentmodal=true&project=${base64Query}`}
+									className={dropdownSelectedItemClass(active)}
+								>
 									Add Staff
 								</a>
 							)}
@@ -88,13 +122,15 @@ export default function EllipsisProjectMenu({ project }: any) {
 							)}
 						</Menu.Item>
 					</div>
-					<Menu.Item>
-						{({ active }) => (
-							<Link href={"#"} className={dropdownSelectedItemClass(active)}>
-								Archive Project
-							</Link>
-						)}
-					</Menu.Item>
+					<div
+						id="archiveProject"
+						onClick={onSubmitUpsert}
+						className={
+							"text-orange-500 block px-4 py-2 text-sm hover:text-accentgreen hover:border-b-2 hover:border-gray-200"
+						}
+					>
+						Archive Project
+					</div>
 				</Menu.Items>
 			</Transition>
 		</Menu>
