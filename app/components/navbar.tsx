@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React from "react";
 import Link from "next/link";
 import {
@@ -6,10 +6,14 @@ import {
 	BellIcon,
 } from "@heroicons/react/24/outline";
 import { usePathname } from "next/navigation";
+import { useUserDataContext } from "../userDataContext";
+import { LoadingSpinner } from "./loadingSpinner";
 
 const Navbar: React.FC = () => {
+	const { viewer } = useUserDataContext();
 	const pathname = usePathname().split("/")[1];
-		const activeTab = "navbar-border-accent border-b-2"
+	const activeTab = "navbar-border-accent border-b-2";
+	if (!viewer) return <LoadingSpinner />;
 	return (
 		<nav className="navbar bg-gray-100 px-4 h-14 flex justify-between items-center">
 			<div className="flex items-center space-x-4 h-full">
@@ -17,20 +21,16 @@ const Navbar: React.FC = () => {
 				<Link
 					href="/projects"
 					className={`flex h-full justify-between items-center ${
-						pathname === "projects"
-						? activeTab
-						: "hover:underline"
-					  }`}
+						pathname === "projects" ? activeTab : "hover:underline"
+					}`}
 				>
 					Projects
 				</Link>
 				<Link
 					href="/people"
 					className={`flex h-full justify-between items-center ${
-						pathname === "people"
-						? activeTab
-						: "hover:underline"
-					  }`}
+						pathname === "people" ? activeTab : "hover:underline"
+					}`}
 				>
 					<b>People</b>
 				</Link>
@@ -46,7 +46,7 @@ const Navbar: React.FC = () => {
 					<BellIcon />
 				</div>
 
-				<div>Hi, Jennifer!</div>
+				<div>{viewer.name}</div>
 			</div>
 		</nav>
 	);

@@ -92,6 +92,10 @@ export interface UserAssignmentDataMapType {
 	};
 }
 
+export interface ViewerType { 
+	name:string;
+}
+
 export interface WorkWeekRenderDataType {
 	cweek: number;
 	year: number;

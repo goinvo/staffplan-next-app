@@ -1,13 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
 import { Field, Formik, FormikValues } from "formik";
-import { GET_CLIENT_DATA, UPSERT_CLIENT } from "../gqlQueries";
+import { UPSERT_CLIENT } from "../gqlQueries";
 import { ClientType } from "../typeInterfaces";
 import { LoadingSpinner } from "./loadingSpinner";
 import { Dialog } from "@headlessui/react";
+import { useUserDataContext } from "../userDataContext";
 const AddClient = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const router = useRouter();
@@ -16,8 +17,8 @@ const AddClient = () => {
 	}, []);
 	const searchParams = useSearchParams();
 	const modalParam = searchParams.get("addclientmodal");
-	const showModal = modalParam ? true : false
-	
+	const showModal = modalParam ? true : false;
+
 	const initialValues = {
 		name: "",
 		status: "",
@@ -25,21 +26,18 @@ const AddClient = () => {
 		clientId: "",
 	};
 
-	const { loading, error, data } = useQuery(GET_CLIENT_DATA, {
-		context: {
-			headers: {
-				cookie: clientSide ? document.cookie : null,
-			},
-		},
-		skip: !clientSide,
-		errorPolicy: "all",
-	});
+	const { clientList, setClientList } = useUserDataContext();
 
 	const [
 		upsertClient,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
-	] = useMutation(UPSERT_CLIENT);
-	if (mutationLoading || loading) return <LoadingSpinner/>;
+	] = useMutation(UPSERT_CLIENT, {
+		onCompleted({ upsertClient }) {
+			setClientList([...clientList, upsertClient]);
+			console.log(clientList, "CLIENT LIST")
+		},
+	});
+	if (mutationLoading || !clientList) return <LoadingSpinner />;
 	if (mutationError) return <p>ERROR ON PERSON</p>;
 	const onSubmitUpsert = ({
 		name,
@@ -51,7 +49,6 @@ const AddClient = () => {
 			variables: {
 				name: name,
 				description: description,
-				status: status,
 				clientId: clientId ? clientId : "",
 			},
 		}).then((res) => {
@@ -65,7 +62,7 @@ const AddClient = () => {
 			errors.status = "Status is required";
 		}
 		if (values.name) {
-			const foundClient = data?.clients.find(
+			const foundClient = clientList?.find(
 				(client: ClientType) => client.name === values.name
 			);
 			if (foundClient) {
@@ -81,12 +78,12 @@ const AddClient = () => {
 		<>
 			{showModal && (
 				<Dialog
-				open={showModal}
-				onClose={onCancel}
-				className="relative z-50"
-				aria-labelledby="client-modal"
-				aria-modal="true"
-			>
+					open={showModal}
+					onClose={onCancel}
+					className="relative z-50"
+					aria-labelledby="client-modal"
+					aria-modal="true"
+				>
 					<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
 
 					<div className="fixed inset-0 z-10 w-screen overflow-y-auto">
@@ -156,7 +153,8 @@ const AddClient = () => {
 																						as="select"
 																						name="status"
 																						id="status"
-			onBlur={handleBlur}																	>
+																						onBlur={handleBlur}
+																					>
 																						<option value={""}>SELECT</option>
 																						<option value={"active"}>
 																							Active

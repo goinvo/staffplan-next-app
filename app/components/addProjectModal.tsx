@@ -1,24 +1,25 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ProjectDatepicker from "./projectDatepicker";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
 import { Field, Formik, FormikValues } from "formik";
 import { ClientType, ProjectType } from "../typeInterfaces";
-import { GET_CLIENT_DATA, UPSERT_PROJECT } from "../gqlQueries";
+import { UPSERT_PROJECT } from "../gqlQueries";
 import { differenceInBusinessDays } from "date-fns";
-import { LoadingSpinner } from "./loadingSpinner";
 import { Dialog } from "@headlessui/react";
 import { ReactNode } from "react";
+import { useUserDataContext } from "../userDataContext";
+import { LoadingSpinner } from "./loadingSpinner";
+
 const AddProject = () => {
-	const [clientSide, setClientSide] = useState(false);
 	const [selectedClient, setSelectedClient] = useState<number | string>("");
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const modalParam = searchParams.get("projectmodal");
 	const projectInParam = searchParams.get("project");
-
+	const { projectList, setProjectList, clientList } = useUserDataContext();
 	const decodeQuery = projectInParam
 		? Buffer.from(projectInParam, "base64").toString()
 		: "";
@@ -55,26 +56,24 @@ const AddProject = () => {
 		? editProjectInitialValues
 		: newProjectInitialValues;
 
-	useEffect(() => {
-		setClientSide(true);
-	}, []);
-
 	const showModal = modalParam ? true : false;
-	const { loading, error, data } = useQuery(GET_CLIENT_DATA, {
-		context: {
-			headers: {
-				cookie: clientSide ? document.cookie : null,
-			},
-		},
-		skip: !clientSide,
+	const [upsertProject] = useMutation(UPSERT_PROJECT, {
 		errorPolicy: "all",
+		onCompleted({ upsertProject }) {
+			const projectToUpdate = projectList.find(
+				(project) => project.id === upsertProject.id
+			);
+			if (projectToUpdate) {
+				const updatedProjectList = projectList.map((project) => {
+					if (project.id === upsertProject.id) return upsertProject;
+					return project;
+				});
+				return setProjectList(updatedProjectList);
+			}
+
+			setProjectList([...projectList, upsertProject]);
+		},
 	});
-	const [
-		upsertProject,
-		{ data: mutationData, loading: mutationLoading, error: mutationError },
-	] = useMutation(UPSERT_PROJECT, { errorPolicy: "all" });
-	if (loading || mutationLoading) return <LoadingSpinner />;
-	if (error || mutationError) return <p>ERROR PROJECT</p>;
 
 	const onSubmitUpsert = (values: FormikValues) => {
 		const variables = {
@@ -98,7 +97,7 @@ const AddProject = () => {
 			errors.client = "Client is required";
 		}
 		if (values.client) {
-			const foundClient = data?.clients?.find(
+			const foundClient = clientList?.find(
 				({ id }: ClientType) => id === values.client
 			);
 			if (!foundClient) {
@@ -109,16 +108,17 @@ const AddProject = () => {
 			errors.name = "Project Name is required";
 		}
 		if (values.name && !parsedProject) {
-			const currentClient = data.clients.find((client: ClientType) => {
+			const currentClient = clientList.find((client: ClientType) => {
 				if (client.id === selectedClient) return client;
 			});
-			const projectNameExists = currentClient?.projects?.find(
-				(project: ProjectType) => {
-					if (project.name === values.name) {
-						return project;
-					}
+			const projectNameExists = projectList?.find((project: ProjectType) => {
+				if (
+					project.name === values.name &&
+					currentClient?.id === project.client.id
+				) {
+					return project;
 				}
-			);
+			});
 			if (projectNameExists) {
 				errors.name = "Project name already in use";
 			}
@@ -192,6 +192,7 @@ const AddProject = () => {
 			setFieldValue("cost", totalCost);
 		}
 	};
+	if (!clientList || !projectList) return <LoadingSpinner />;
 	return (
 		<>
 			{showModal && (
@@ -275,7 +276,7 @@ const AddProject = () => {
 																			? parsedProject.clientName
 																			: "SELECT"}
 																	</option>
-																	{data?.clients?.map((client: ClientType) => {
+																	{clientList?.map((client: ClientType) => {
 																		return (
 																			<option
 																				key={`${client.id} + ${client.name}`}

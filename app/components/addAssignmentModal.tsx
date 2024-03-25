@@ -1,29 +1,20 @@
 "use client";
-import { useState, useEffect,ReactNode } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import ProjectDatepicker from "./projectDatepicker";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useQuery, useMutation, gql, useApolloClient } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import withApollo from "@/lib/withApollo";
-import { ProjectType, AssignmentType, UserType } from "../typeInterfaces";
+import { ProjectType, UserType } from "../typeInterfaces";
 import { Field, Formik, FormikValues } from "formik";
 import { useUserDataContext } from "../userDataContext";
-import {
-	GET_ASSIGNMENT_DATA,
-	UPSERT_ASSIGNMENT,
-	GET_USER_ASSIGNMENTS,
-	GET_ALL_PROJECTS_DATA,
-} from "../gqlQueries";
+import { UPSERT_ASSIGNMENT } from "../gqlQueries";
 import { LoadingSpinner } from "./loadingSpinner";
 import { Dialog } from "@headlessui/react";
 const AddAssignment = () => {
-	const [clientSide, setClientSide] = useState(false);
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
 		{}
 	);
 	const router = useRouter();
-	useEffect(() => {
-		setClientSide(true);
-	}, []);
 	const searchParams = useSearchParams();
 	const { userList, setUserList, projectList } = useUserDataContext();
 	const modalParam = searchParams.get("assignmentmodal");
@@ -39,11 +30,11 @@ const AddAssignment = () => {
 			endsOn: parsedProject.endsOn ? parsedProject.endsOn : "",
 			startsOn: parsedProject.startsOn,
 		},
-		hours:"",
-		projectId:parsedProject.id,
-		status:false,
-		userId:"",
-	}
+		hours: "",
+		projectId: parsedProject.id,
+		status: false,
+		userId: "",
+	};
 	const newAssignmentInitialValues = {
 		dates: { endsOn: "", startsOn: "" },
 		hours: "",
@@ -51,22 +42,14 @@ const AddAssignment = () => {
 		status: false,
 		userId: "",
 	};
-	const initialValues = parsedProject ? autoFillAssignmentValues : newAssignmentInitialValues;
-	const { loading, error, data } = useQuery(GET_ASSIGNMENT_DATA, {
-		context: {
-			headers: {
-				cookie: clientSide ? document.cookie : null,
-			},
-		},
-		skip: !clientSide,
-		errorPolicy: "all",
-	});
+	const initialValues = parsedProject
+		? autoFillAssignmentValues
+		: newAssignmentInitialValues;
 	const [
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_ASSIGNMENT);
-	if (loading || mutationLoading) return <LoadingSpinner />;
-	if (error || mutationError) return <p>ERROR ASSIGNMENTS</p>;
+	if (!userList || !projectList || mutationLoading) return <LoadingSpinner />;
 	const onSubmitUpsert = ({
 		projectId,
 		userId,
@@ -84,11 +67,16 @@ const AddAssignment = () => {
 		}).then((response) => {
 			if (response.data.upsertAssignment) {
 				// Print the values passed into the mutation
-				const newAssignment = response.data.upsertAssignment
+				const newAssignment = response.data.upsertAssignment;
 
 				// Find the user whose ID matches the one in the response
-				const user = userList.find((user: UserType) => user.id === newAssignment.assignedUser.id);
-				const updatedUser = { ...user, assignments: [...user.assignments, newAssignment] };
+				const user = userList.find(
+					(user: UserType) => user.id === newAssignment.assignedUser.id
+				);
+				const updatedUser = {
+					...user,
+					assignments: [...user.assignments, newAssignment],
+				};
 
 				// Update the user list with the new assignment
 				setUserList((prevUserData: any) => {
@@ -114,7 +102,7 @@ const AddAssignment = () => {
 			errors.userId = "User is required";
 		}
 		if (values.userId) {
-			const foundUser = data?.users?.find(
+			const foundUser = userList?.find(
 				({ id }: UserType) => id === values.userId
 			);
 			if (!foundUser) {
@@ -125,12 +113,8 @@ const AddAssignment = () => {
 			errors.projectId = "Project is required";
 		}
 		if (values.projectId) {
-			const foundProject = data?.clients.find(
-				(client: { projects: ProjectType[] }) => {
-					return client.projects.find(
-						(project: ProjectType) => project.id === values.projectId
-					);
-				}
+			const foundProject = projectList?.find(
+				(project: ProjectType) => project.id === values.projectId
 			);
 			if (!foundProject) {
 				errors.projectId = "Must select a valid Project";
@@ -155,13 +139,11 @@ const AddAssignment = () => {
 	const handleProjectSelection = (
 		projectId: React.ChangeEvent<HTMLInputElement>
 	) => {
-		data?.clients?.map((client: { projects: ProjectType[] }) => {
-			const existingProject = client.projects.find(
+			const existingProject = projectList?.find(
 				(project: ProjectType) =>
 					project.id.toString() === projectId.target.value
 			);
 			if (existingProject) setSelectedProject(existingProject);
-		});
 	};
 	return (
 		<>
@@ -213,7 +195,7 @@ const AddAssignment = () => {
 																		className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 																	>
 																		<option value={""}>SELECT</option>
-																		{data?.users?.map((user: UserType) => {
+																		{userList?.map((user: UserType) => {
 																			return (
 																				<option
 																					key={`${user.id} + ${user.name}`}
@@ -243,20 +225,16 @@ const AddAssignment = () => {
 																		id="projectId"
 																	>
 																		<option value={""}>SELECT</option>
-																		{data?.clients?.map(
-																			(client: { projects: ProjectType[] }) => {
-																				return client.projects.map(
-																					(project: ProjectType) => (
-																						<option
-																							key={`${project.id} + ${project.name}`}
-																							value={project.id}
-																						>
-																							{" "}
-																							{project.name}
-																						</option>
-																					)
-																				);
-																			}
+																		{projectList?.map(
+																			(project: ProjectType) => (
+																				<option
+																					key={`${project.id} + ${project.name}`}
+																					value={project.id}
+																				>
+																					{" "}
+																					{project.name}
+																				</option>
+																			)
 																		)}
 																	</Field>
 																</label>
