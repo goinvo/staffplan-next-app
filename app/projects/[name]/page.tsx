@@ -260,6 +260,17 @@ const ProjectPage: React.FC = () => {
 		}
 	};
 
+	const loadUserAssignments = () => {
+		if (clientSide && userListData) {
+			const name = decodeURIComponent(params.name.toString());
+			const userId = getUserIdFromName(name);
+			if (userId) {
+				setSelectedUser({ id: userId, name });
+				setUserAssignmentData(userList);
+			}
+		}
+	};
+
 	useEffect(() => {
 		setClientSide(true);
 	}, []);
@@ -278,6 +289,7 @@ const ProjectPage: React.FC = () => {
 
 	// If the user's assignments have been loaded, create a lookup map for the work weeks and map the rows to the assignment IDs
 	useEffect(() => {
+		console.log("Formatting user assignment data")
 		if (!userAssignmentData) return;
 		const workWeekData: WorkWeekRenderDataType[][] =
 			userAssignmentData.userAssignments.map((assignment: AssignmentType) => {

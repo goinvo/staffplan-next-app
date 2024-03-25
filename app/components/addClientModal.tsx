@@ -78,7 +78,7 @@ const AddClient = () => {
 		<>
 			{showModal && (
 				<div
-					className="relative z-10"
+					className="relative z-50"
 					aria-labelledby="person-modal"
 					role="dialog"
 					aria-modal="true"

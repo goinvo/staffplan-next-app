@@ -174,7 +174,7 @@ const AddAssignment = () => {
 				>
 					<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
 
-					<div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+					<div className="fixed inset-0 z-50 w-screen overflow-y-auto">
 						<div className="flex min-h-full p-4 text-center justify-center sm:items-center sm:p-0">
 							<div className="relative transform overflow-hidden w-1/2 rounded-xl bg-white text-left shadow-xl transition-all">
 								<div className="bg-white p-10">

@@ -10,16 +10,18 @@ import { withApollo } from "@/lib/withApollo";
 
 const RootLayoutContents: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <UserListProvider>
-      <Navbar />
-      <ActionBar />
-      <Suspense>
-        <AddAssignment />
-        <AddProject />
-        <AddClient />
-      </Suspense>
-      {children}
-    </UserListProvider>
+    <div className="relative z-0">
+      <UserListProvider>
+        <Navbar />
+        <ActionBar />
+        <Suspense>
+          <AddAssignment />
+          <AddProject />
+          <AddClient />
+        </Suspense>
+        {children}
+      </UserListProvider>
+    </div>
   );
 };
 

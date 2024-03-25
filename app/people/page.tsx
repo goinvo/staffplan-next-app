@@ -23,6 +23,7 @@ const PeopleView: React.FC = () => {
 
 	useEffect(() => {
 		if (userList) {
+			console.log("Setting up row ID to user map; User list: ", userList);
 			// Setup the map of users to their assignments' work weeks
 			setUserAssignmentDataMap(processUserAssignmentDataMap(userList));
 
@@ -32,17 +33,19 @@ const PeopleView: React.FC = () => {
 					rowIdtoUserIdMap.set(index, user.id);
 				}
 			});
+			console.log("Row ID to user map: ", rowIdtoUserIdMap);
 		}
 	}, [userList]);
 
 	const handleUserChange = (user: UserType) => {
 		router.push(pathname + "/" + encodeURIComponent(user.name.toString()));
+		console.log("User changed to: ", user);
 	};
 
 	const drawBars = (workWeekBlocks: WorkWeekBlockMemberType[], width?: number, height?: number, gap: number = 4, cornerRadius = 6) => {
 		if (!width || !height) { return; }
-		const labelPadding = 4;
 
+		console.log("Drawing bars for work week blocks: ", workWeekBlocks);
 		return (
 			<div className="absolute bottom-0 z-10">
 				{workWeekBlocks.map((workWeekBlock: WorkWeekBlockMemberType, index: number) => {
@@ -111,12 +114,11 @@ const PeopleView: React.FC = () => {
 
 
 	const renderCell = (cweek: number, year: number, rowIndex: number, isSelected: boolean, width?: number, height?: number) => {
-
 		const userId = rowIdtoUserIdMap.get(rowIndex);
 
 		if (userId) {
 			const workWeeksForUser = getWorkWeeksForUserByWeekAndYear(userAssignmentDataMap, userId, cweek, year) ?? [];
-
+			
 			if (workWeeksForUser.length > 0) {
 				return (
 					<div className="relative absolute" style={{ height: height }}>
