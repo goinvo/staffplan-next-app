@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect,ReactNode } from "react";
 import ProjectDatepicker from "./projectDatepicker";
 import { UserType } from "../typeInterfaces";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -21,15 +21,31 @@ const AddAssignment = () => {
 	}, []);
 	const searchParams = useSearchParams();
 	const modalParam = searchParams.get("assignmentmodal");
+	const projectInParam = searchParams.get("project");
+
+	const decodeQuery = projectInParam
+		? Buffer.from(projectInParam, "base64").toString()
+		: "";
+	const parsedProject = decodeQuery ? JSON.parse(decodeQuery) : "";
 	const showModal = modalParam ? true : false;
-	const initialValues = {
-		status: false,
-		userId: "",
-		projectId: "",
+	const autoFillAssignmentValues = {
+		dates: {
+			endsOn: parsedProject.endsOn ? parsedProject.endsOn : "",
+			startsOn: parsedProject.startsOn,
+		},
+		hours:"",
+		projectId:parsedProject.id,
+		status:false,
+		userId:"",
+	}
+	const newAssignmentInitialValues = {
 		dates: { endsOn: "", startsOn: "" },
 		hours: "",
+		projectId: "",
+		status: false,
+		userId: "",
 	};
-
+	const initialValues = parsedProject ? autoFillAssignmentValues : newAssignmentInitialValues;
 	const { loading, error, data } = useQuery(GET_ASSIGNMENT_DATA, {
 		context: {
 			headers: {
@@ -286,7 +302,7 @@ const AddAssignment = () => {
 																	(touched.dates?.startsOn ||
 																		touched.dates?.endsOn) && (
 																		<div className="text-red-500">
-																			{errors.dates?.endsOn}
+																			{errors.dates?.endsOn as ReactNode}
 																		</div>
 																	)}
 																{errors.userId && touched.userId && (
@@ -296,7 +312,7 @@ const AddAssignment = () => {
 																)}
 																{errors.projectId && touched.projectId && (
 																	<div className="text-red-500">
-																		{errors.projectId}
+																		{errors.projectId as ReactNode}
 																	</div>
 																)}
 															</div>
