@@ -70,6 +70,7 @@ const ProjectPage: React.FC = () => {
 		setCurrEstHours(e.target.value);
 		const newEstimatedHours = parseInt(e.target.value);
 		const newWorkWeekData = lookupWorkWeekData(selectedCell.rowId, selectedCell.year, selectedCell.week);
+		console.log("usersWithProjectAssignment", usersWithProjectAssignment);
 
 		if (newWorkWeekData) {
 			newWorkWeekData.estimatedHours = newEstimatedHours;
@@ -91,6 +92,8 @@ const ProjectPage: React.FC = () => {
 		setCurrActHours(e.target.value);
 		const newActualHours = parseInt(e.target.value);
 		const newWorkWeekData = lookupWorkWeekData(selectedCell.rowId, selectedCell.year, selectedCell.week);
+		console.log("usersWithProjectAssignment", usersWithProjectAssignment);
+
 		if (newWorkWeekData) {
 			newWorkWeekData.actualHours = newActualHours;
 			addWorkWeekDataToLookupMap(newWorkWeekData, selectedCell.rowId);
@@ -232,29 +235,32 @@ const ProjectPage: React.FC = () => {
 	useEffect(() => {
 		console.log("selectedProject", selectedProject);
 		if (!selectedProject || !selectedProject.workWeeks) return;
-
+	  
 		const workWeekData: WorkWeekRenderDataType[][] = selectedProject.workWeeks.map((week: WorkWeekType) => {
-			return [
-				{
-					cweek: week.cweek,
-					year: week.year,
-					estimatedHours: week.estimatedHours ?? 0,
-					actualHours: week.actualHours ?? 0,
-					assignmentId: week.assignmentId,
-				},
-			];
+		  return [
+			{
+			  cweek: week.cweek,
+			  year: week.year,
+			  estimatedHours: week.estimatedHours ?? 0,
+			  actualHours: week.actualHours ?? 0,
+			  assignmentId: week.assignmentId,
+			},
+		  ];
 		});
-
+	  
 		workWeekData.forEach((workWeeks: WorkWeekRenderDataType[], index) => {
-			workWeeks.forEach((week: WorkWeekRenderDataType) => {
-				addWorkWeekDataToLookupMap(week, index);
-			});
-
-			if (selectedProject.workWeeks && selectedProject.workWeeks[index]?.user) {
-				rowIdToUserIdMap.set(index, selectedProject.workWeeks[index].user.id ?? 0);
+		  workWeeks.forEach((week: WorkWeekRenderDataType) => {
+			addWorkWeekDataToLookupMap(week, index);
+		  });
+	  
+		  if (selectedProject.workWeeks && selectedProject.workWeeks[index]?.user) {
+			const userId = selectedProject.workWeeks[index].user?.id;
+			if (userId !== undefined) {
+			  rowIdToUserIdMap.set(index, userId);
 			}
+		  }
 		});
-	}, [selectedProject]);
+	  }, [selectedProject]);
 
 	const handleUserChange = (user: UserType) => {
 		router.push(pathname + "/" + encodeURIComponent(user.name.toString()));
