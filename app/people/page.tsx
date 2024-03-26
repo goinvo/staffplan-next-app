@@ -42,7 +42,7 @@ const PeopleView: React.FC = () => {
 
 		if (userId) {
 			const workWeeksForUser = getWorkWeeksForUserByWeekAndYearForUsers(userAssignmentDataMap, userId, cweek, year) ?? [];
-			
+
 			if (workWeeksForUser.length > 0) {
 				return (
 					<div className="relative absolute" style={{ height: height }}>
@@ -59,15 +59,18 @@ const PeopleView: React.FC = () => {
 
 	return (
 		<>
-			<WeekDisplay labelContents={
-				userList ? userList?.map((user: UserType) => (
-					<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={user.id}>
-						<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleUserChange(user)}><SVGAlphabet name={user.name}/></div>
-						<div className="flex">{user.name}</div>
-					</div>
-				)) : <LoadingSpinner />}
-				renderCell={renderCell}
-			/>
+			{
+				userList ?
+				<WeekDisplay labelContents={
+					userList?.map((user: UserType) => (
+						<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={user.id}>
+							<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleUserChange(user)}><SVGAlphabet name={user.name} /></div>
+							<div className="flex">{user.name}</div>
+						</div>
+					))}
+					renderCell={renderCell}
+				/> : <LoadingSpinner />
+			}
 		</>
 	);
 };

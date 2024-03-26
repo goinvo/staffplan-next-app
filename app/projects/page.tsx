@@ -62,20 +62,22 @@ const ProjectsView: React.FC = () => {
 	}
 
 	return (
-		<div>
-			<WeekDisplay labelContents={
-				projectList && projectList.map((project) => (
-					<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={project.id}>
-						<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleProjectChange(project)}><SVGAlphabet name={project.name}/></div>
-						<div className="flex">{project.name}</div>
-						<div>
-							<EllipsisProjectMenu project={project} />
+		<>
+			{
+				projectList ? <WeekDisplay labelContents={
+					projectList.map((project) => (
+						<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={project.id}>
+							<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleProjectChange(project)}><SVGAlphabet name={project.name} /></div>
+							<div className="flex">{project.name}</div>
+							<div>
+								<EllipsisProjectMenu project={project} />
+							</div>
 						</div>
-					</div>
-				))}
-				renderCell={renderCell}
-			/>
-		</div>
+					))}
+					renderCell={renderCell}
+				/> : <LoadingSpinner />
+			}
+		</>
 	);
 };
 
