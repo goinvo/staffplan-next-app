@@ -30,6 +30,7 @@ export interface ProjectType {
 	users: [];
 	assignments?: [AssignmentType];
 	__typename?:string;
+	workWeeks?: WorkWeekType[];
 }
 
 export interface ProjectValuesType {
