@@ -127,19 +127,24 @@ export const GET_USER_LIST = gql`
 
 export const GET_ALL_PROJECTS_DATA = gql`
 	{
-	currentCompany{
-		projects {
-		id
-		name
-		client {
+		currentCompany{
+			projects {
+			id
 			name
+			client {
+				name
+			}
+			workWeeks {
+				actualHours
+				estimatedHours
+				cweek
+				year
+				user {
+					name
+				}
+			}
+			}
 		}
-		workWeeks {
-			actualHours
-			estimatedHours
-		}
-		}
-	}
 	}
 `;
 export const GET_VIEWER = gql`

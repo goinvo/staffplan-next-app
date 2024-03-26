@@ -71,6 +71,7 @@ export interface WorkWeekType {
 	actualHours?: number;
 	estimatedHours?: number;
 	project?: ProjectType;
+	user?: UserType;
 	assignmentId: number;
 	cweek: number;
 	year: number;
@@ -86,6 +87,14 @@ export interface WorkWeekBlockMemberType {
 
 export interface UserAssignmentDataMapType {
 	[userId: number]: {
+		[year: number]: {
+			[cweek: number]: WorkWeekBlockMemberType[];
+		};
+	};
+}
+
+export interface ProjectDataMapType {
+	[projectId: number]: {
 		[year: number]: {
 			[cweek: number]: WorkWeekBlockMemberType[];
 		};

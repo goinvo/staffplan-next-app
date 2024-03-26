@@ -7,7 +7,7 @@ import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useUserDataContext } from "../userDataContext";
 import { UserType, AssignmentType, UserAssignmentDataMapType, WorkWeekType, WorkWeekBlockMemberType } from "../typeInterfaces";
-import { processUserAssignmentDataMap, getWorkWeeksForUserByWeekAndYear, drawBar, matchWorkWeeks } from "../helperFunctions";
+import { processUserAssignmentDataMap, getWorkWeeksForUserByWeekAndYearForUsers, drawBars, drawFTELabels } from "../helperFunctions";
 import WeekDisplay from "../components/weekDisplay";
 import { LoadingSpinner } from "../components/loadingSpinner";
 import { SVGAlphabet } from "../svgAlphabet";
@@ -28,6 +28,8 @@ const PeopleView: React.FC = () => {
 		if (userList) {
 			// Setup the map of users to their assignments' work weeks
 			setUserAssignmentDataMap(processUserAssignmentDataMap(userList));
+			console.log("userList", userList);
+			console.log("userAssignmentDataMap", userAssignmentDataMap);
 
 			// Setup the map of row ids to user ids
 			userList?.map((user: UserType, index: number) => {
@@ -42,82 +44,11 @@ const PeopleView: React.FC = () => {
 		router.push(pathname + "/" + encodeURIComponent(user.name.toString()));
 	};
 
-
-	const drawBars = (workWeekBlocks: WorkWeekBlockMemberType[], width?: number, height?: number, gap: number = 4, cornerRadius = 6) => {
-		if (!width || !height) { return; }
-
-		return (
-			<div className="absolute bottom-0 z-10">
-				{workWeekBlocks.map((workWeekBlock: WorkWeekBlockMemberType, index: number) => {
-					if (workWeekBlock.workWeek.estimatedHours && width && height) {
-						const weekHeight = (height * workWeekBlock.workWeek.estimatedHours / workWeekBlock.maxTotalEstHours);
-						return (
-							<div key={index}>
-								<svg width={width + 1} height={weekHeight} xmlns="http://www.w3.org/2000/svg">
-									{drawBar(workWeekBlock.consecutivePrevWeeks != 0 ? 0 : gap, (index * gap), cornerRadius, weekHeight, weekHeight, width + 1, workWeekBlock.consecutivePrevWeeks != 0, !workWeekBlock.isLastConsecutiveWeek)}
-								</svg>
-							</div>
-
-						)
-					}
-
-				})}
-			</div>
-
-		);
-	}
-
-	const drawFTELabels = (workWeekBlocks: WorkWeekBlockMemberType[], width?: number, height?: number, gap: number = 4) => {
-		if (!width || !height) {
-		  return;
-		}
-	  
-		const labelPadding = 4;
-	  
-		return (
-		  <div className="absolute bottom-0 z-30">
-			{workWeekBlocks.map((workWeekBlock: WorkWeekBlockMemberType, index: number) => {
-			  if (workWeekBlock.workWeek.estimatedHours && width && height) {
-				const weekHeight = (height * workWeekBlock.workWeek.estimatedHours / workWeekBlock.maxTotalEstHours);
-	  
-				// Check if the previous week has the same project
-				const hasSameProject = workWeekBlock.consecutivePrevWeeks != 0
-	  
-				return (
-				  <div
-					key={index}
-					className="relative z-30"
-					style={{
-					  width: `${width}px`,
-					  height: `${weekHeight}px`,
-					  lineHeight: `${weekHeight}px`,
-					}}
-				  >
-					<div
-					  className="absolute text-bottom text-black text-xs"
-					  style={{
-						left: `${labelPadding + gap}px`,
-						bottom: `${labelPadding}px`,
-					  }}
-					>
-					  {hasSameProject ? "" : (workWeekBlock.workWeek.project && workWeekBlock.workWeek.project.name ? workWeekBlock.workWeek.project.name : "")}
-					</div>
-				  </div>
-				);
-			  }
-			})}
-		  </div>
-		);
-	  };
-
-
-
-
 	const renderCell = (cweek: number, year: number, rowIndex: number, isSelected: boolean, width?: number, height?: number) => {
 		const userId = rowIdtoUserIdMap.get(rowIndex);
 
 		if (userId) {
-			const workWeeksForUser = getWorkWeeksForUserByWeekAndYear(userAssignmentDataMap, userId, cweek, year) ?? [];
+			const workWeeksForUser = getWorkWeeksForUserByWeekAndYearForUsers(userAssignmentDataMap, userId, cweek, year) ?? [];
 			
 			if (workWeeksForUser.length > 0) {
 				return (
@@ -128,7 +59,6 @@ const PeopleView: React.FC = () => {
 				)
 			}
 		}
-
 
 		return (<></>)
 
