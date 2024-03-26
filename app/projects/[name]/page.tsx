@@ -163,13 +163,22 @@ const ProjectPage: React.FC = () => {
 		}
 	};
 
-	const lookupWorkWeekData = (rowIndex: number, year: number, cweek: number) => {
-		if (
-			workWeekDataLookupMap[rowIndex] &&
-			workWeekDataLookupMap[rowIndex]?.has(year) &&
-			workWeekDataLookupMap[rowIndex]?.get(year)?.has(cweek)
-		) {
-			return workWeekDataLookupMap[rowIndex]?.get(year)?.get(cweek);
+	const lookupWorkWeekData = (rowIndex: number, year: number, cweek: number): WorkWeekRenderDataType | null => {
+		if (usersWithProjectAssignment) {
+			const foundUser: UserType = usersWithProjectAssignment[rowIndex];
+			if (foundUser.assignments && foundUser.assignments.length > 0) {
+				const foundAssignment = foundUser.assignments.find(
+					(assignment: AssignmentType) => assignment.project.name === selectedProject?.name
+				);
+				if (foundAssignment && foundAssignment.workWeeks.length > 0) {
+					const foundWorkWeekData: WorkWeekRenderDataType | undefined = foundAssignment.workWeeks.find(
+						(workWeek: WorkWeekType) => workWeek.year === year && workWeek.cweek === cweek
+					);
+					if (foundWorkWeekData) {
+						return foundWorkWeekData;
+					}
+				}
+			}
 		}
 		return null;
 	};
@@ -228,7 +237,7 @@ const ProjectPage: React.FC = () => {
 
 			setUsersWithProjectAssignment(newUsersWithProjectAssignment);
 
-			console.log("usersWithProjectAssignment", usersWithProjectAssignment);
+			console.log("usersWithProjectAssignment", newUsersWithProjectAssignment);
 		}
 	}, [projectList, userList]);
 
@@ -247,6 +256,8 @@ const ProjectPage: React.FC = () => {
 			},
 		  ];
 		});
+
+		console.log("workWeekData", workWeekData);
 	  
 		workWeekData.forEach((workWeeks: WorkWeekRenderDataType[], index) => {
 		  workWeeks.forEach((week: WorkWeekRenderDataType) => {
@@ -260,6 +271,8 @@ const ProjectPage: React.FC = () => {
 			}
 		  }
 		});
+
+		console.log("workWeekDataLookupMap", workWeekDataLookupMap);
 	  }, [selectedProject]);
 
 	const handleUserChange = (user: UserType) => {
