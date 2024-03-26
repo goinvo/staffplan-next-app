@@ -34,10 +34,6 @@ export const GET_CLIENT_DATA = gql`
 			description
 			id
 			name
-			projects {
-				id
-				name
-			}
 			status
 		}
 	}
@@ -100,46 +96,64 @@ export const GET_USER_ASSIGNMENTS = gql`
 	}
 `;
 export const GET_USER_LIST = gql`
-{
-	currentCompany{
-		users {
+	{
+		currentCompany {
 			id
-			name
-			assignments {
-				project {
-					id
-					name
-				}
-				workWeeks {
+			users {
+				id
+				name
+				assignments {
 					project {
+						id
 						name
+						client{
+							id
+							name
+						}
 					}
-					actualHours
-					estimatedHours
-					cweek
-					year
+					
+					workWeeks {
+						project {
+							name
+						}
+						actualHours
+						estimatedHours
+						cweek
+						year
+					}
 				}
 			}
 		}
 	}
-}
 `;
 
 export const GET_ALL_PROJECTS_DATA = gql`
 	{
-	currentCompany{
-		projects {
-		id
-		name
-		client {
-			name
-		}
-		workWeeks {
-			actualHours
-			estimatedHours
-		}
-		}
-	}
+			currentCompany {
+			id
+				projects {
+					id
+					name
+				status
+				paymentFrequency
+				startsOn
+				endsOn
+				cost
+					client {
+					id
+						name
+					}
+					workWeeks {
+						actualHours
+						estimatedHours
+						cweek
+				year
+				user {
+					name
+				}
+			}
+				}
+			}
 	}
 `;
 export const GET_VIEWER = gql`
@@ -220,7 +234,7 @@ export const UPSERT_CLIENT = gql`
 
 export const UPSERT_PROJECT = gql`
 	mutation UpsertProjectUpdate(
-		$id:ID
+		$id: ID
 		$clientId: ID
 		$name: String
 		$status: String
@@ -229,7 +243,7 @@ export const UPSERT_PROJECT = gql`
 		$cost: Float
 	) {
 		upsertProject(
-			id:$id
+			id: $id
 			clientId: $clientId
 			name: $name
 			status: $status
@@ -248,6 +262,10 @@ export const UPSERT_PROJECT = gql`
 			paymentFrequency
 			startsOn
 			endsOn
+			workWeeks {
+				actualHours
+				estimatedHours
+			}
 		}
 	}
 `;

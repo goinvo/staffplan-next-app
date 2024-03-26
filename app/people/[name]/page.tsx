@@ -1,22 +1,18 @@
 "use client";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import withApollo from "@/lib/withApollo";
-import { useQuery, useLazyQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import {
 	UserType,
 	AssignmentType,
 	WorkWeekRenderDataType,
 	WorkWeekType,
 } from "../../typeInterfaces";
-import {
-	UPSERT_WORKWEEK,
-	GET_USER_ASSIGNMENTS,
-} from "../../gqlQueries";
+import { UPSERT_WORKWEEK } from "../../gqlQueries";
 import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
 import { useUserDataContext } from "../../userDataContext";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
-
 
 const UserPage: React.FC = () => {
 	const params = useParams();
@@ -45,18 +41,6 @@ const UserPage: React.FC = () => {
 
 	const [upsertWorkweek] = useMutation(UPSERT_WORKWEEK);
 
-	const [
-		getUserAssignments,
-		{
-			data: userAssignmentData,
-			loading: userAssignmentLoading,
-			error: userAssignmentError,
-			called,
-		},
-	] = useLazyQuery(GET_USER_ASSIGNMENTS, {
-		variables: { userId: selectedUser.id },
-	});
-
 	const upsertWorkWeekValues = (values: WorkWeekRenderDataType) => {
 		upsertWorkweek({
 			variables: {
@@ -71,9 +55,7 @@ const UserPage: React.FC = () => {
 
 	const getUserIdFromName: (name: string) => number | null = (name: string) => {
 		// Iterate through the list of users and find the one with the matching name
-		if (
-			userList
-		) {
+		if (userList) {
 			for (const user of userList) {
 				if (user.name === name) {
 					// Return the user's ID as a number
@@ -90,7 +72,6 @@ const UserPage: React.FC = () => {
 	) => {
 		// Add data to the lookup map
 		if (rowId != undefined) {
-
 			// Add data to the lookup map
 			if (!workWeekDataLookupMap[rowId]) {
 				workWeekDataLookupMap[rowId] = new Map();
@@ -106,67 +87,73 @@ const UserPage: React.FC = () => {
 		}
 	};
 
-	const updateUserListData = (workWeekData: WorkWeekRenderDataType, rowId: number) => {
+	const updateUserListData = (
+		workWeekData: WorkWeekRenderDataType,
+		rowId: number
+	) => {
 		const newUserData = [...userList]; // Create a new array to avoid mutating the original userList
-		const userIndex = newUserData.findIndex((user: UserType) => user.id === selectedUser.id);
-	  
+		const userIndex = newUserData.findIndex(
+			(user: UserType) => user.id === selectedUser.id
+		);
+
 		if (userIndex !== -1) {
-		  const user = newUserData[userIndex];
-		  const assignmentIndex = user.assignments.findIndex(
-			(assignment: AssignmentType) => assignment.id === workWeekData.assignmentId
-		  );
-	  
-		  if (assignmentIndex !== -1) {
-			const assignment = user.assignments[assignmentIndex];
-			const project = assignment.project;
-			const newWorkWeeks = [...assignment.workWeeks]; // Create a new array for workWeeks
-			const workWeekIndex = newWorkWeeks.findIndex(
-			  (week: WorkWeekType) => week.cweek === workWeekData.cweek && week.year === workWeekData.year
+			const user = newUserData[userIndex];
+			const assignmentIndex = user.assignments.findIndex(
+				(assignment: AssignmentType) =>
+					assignment.id === workWeekData.assignmentId
 			);
-	  
-			if (workWeekIndex !== -1) {
-			  // Update the existing work week
-			  newWorkWeeks[workWeekIndex] = {
-				...newWorkWeeks[workWeekIndex],
-				estimatedHours: workWeekData.estimatedHours,
-				actualHours: workWeekData.actualHours,
-			  };
-			} else {
-			  // Add a new work week
-			  newWorkWeeks.push({
-				cweek: workWeekData.cweek,
-				year: workWeekData.year,
-				estimatedHours: workWeekData.estimatedHours,
-				actualHours: workWeekData.actualHours,
-				project: project,
-			  });
+
+			if (assignmentIndex !== -1) {
+				const assignment = user.assignments[assignmentIndex];
+				const project = assignment.project;
+				const newWorkWeeks = [...assignment.workWeeks]; // Create a new array for workWeeks
+				const workWeekIndex = newWorkWeeks.findIndex(
+					(week: WorkWeekType) =>
+						week.cweek === workWeekData.cweek && week.year === workWeekData.year
+				);
+
+				if (workWeekIndex !== -1) {
+					// Update the existing work week
+					newWorkWeeks[workWeekIndex] = {
+						...newWorkWeeks[workWeekIndex],
+						estimatedHours: workWeekData.estimatedHours,
+						actualHours: workWeekData.actualHours,
+					};
+				} else {
+					// Add a new work week
+					newWorkWeeks.push({
+						cweek: workWeekData.cweek,
+						year: workWeekData.year,
+						estimatedHours: workWeekData.estimatedHours,
+						actualHours: workWeekData.actualHours,
+						project: project,
+					});
+				}
+
+				// Create a new assignment object with the updated workWeeks array
+				const newAssignment: AssignmentType = {
+					...assignment,
+					workWeeks: newWorkWeeks,
+				};
+
+				// Update the assignments array with the new assignment object
+				const newAssignments = [
+					...user.assignments.slice(0, assignmentIndex),
+					newAssignment,
+					...user.assignments.slice(assignmentIndex + 1),
+				];
+
+				// Update the user object with the new assignments array
+				newUserData[userIndex] = {
+					...user,
+					assignments: newAssignments,
+				};
 			}
-	  
-			// Create a new assignment object with the updated workWeeks array
-			const newAssignment: AssignmentType = {
-			  ...assignment,
-			  workWeeks: newWorkWeeks,
-			};
-	  
-			// Update the assignments array with the new assignment object
-			const newAssignments = [
-			  ...user.assignments.slice(0, assignmentIndex),
-			  newAssignment,
-			  ...user.assignments.slice(assignmentIndex + 1),
-			];
-	  
-			// Update the user object with the new assignments array
-			newUserData[userIndex] = {
-			  ...user,
-			  assignments: newAssignments,
-			};
-		  }
 		}
-	  
+
 		// Update the userList state with the new user data
 		setUserList(newUserData);
-	  };
-
+	};
 
 	const handleCurrEstHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		// If the value is not a number, set the value to 0
@@ -332,39 +319,33 @@ const UserPage: React.FC = () => {
 	const setSelectedUserData = (newSelectedId: number) => {
 		if (!userList) return;
 
-		const selectedUserData = userList.find((user: UserType) => user.id?.toString() === newSelectedId.toString());
-		console.log(selectedUserData, "SELECTEDUSERDATA", newSelectedId, "NEWSELECTEDID", "USERLIST", userList, "USERLIST", "USERID");
+		const selectedUserData = userList.find(
+			(user: UserType) => user.id?.toString() === newSelectedId.toString()
+		);
 		if (!selectedUserData) return;
 
 		setSelectedUser(selectedUserData);
-		console.log(selectedUserData, " NEW SELECTEDUSER");
 
-		const workWeekData: WorkWeekRenderDataType[][] = selectedUserData.assignments.map((assignment: AssignmentType) => {
-			return assignment.workWeeks.map((week: WorkWeekType) => {
-				return {
-					cweek: week.cweek,
-					year: week.year,
-					estimatedHours: week.estimatedHours,
-					actualHours: week.actualHours,
-					assignmentId: assignment.id,
-				};
+		const workWeekData: WorkWeekRenderDataType[][] =
+			selectedUserData.assignments.map((assignment: AssignmentType) => {
+				return assignment.workWeeks.map((week: WorkWeekType) => {
+					return {
+						cweek: week.cweek,
+						year: week.year,
+						estimatedHours: week.estimatedHours,
+						actualHours: week.actualHours,
+						assignmentId: assignment.id,
+					};
+				});
 			});
-		});
-
-		console.log(workWeekData, "WORKWEEKDATA");
 
 		workWeekData.forEach((assignmentWeeks: WorkWeekRenderDataType[], index) => {
 			assignmentWeeks.forEach((week: WorkWeekRenderDataType) => {
 				addWorkWeekData(week, index);
 			});
-			console.log(selectedUserData, "SELECTEDUSERDATA");
 			rowIdtoAssignmentIdMap.set(index, selectedUserData.assignments[index].id);
 		});
-		console.log(rowIdtoAssignmentIdMap, "ROWIDTOASSIGNMENTIDMAP")
-
-		console.log(workWeekDataLookupMap, "LOOKUPMAP");
-	}
-
+	};
 
 	useEffect(() => {
 		setClientSide(true);
@@ -377,36 +358,25 @@ const UserPage: React.FC = () => {
 			const userId = getUserIdFromName(name);
 
 			if (userId) {
-				console.log(userId, "USERID");
 				setSelectedUserData(userId);
 			}
 		}
 	}, [clientSide, userList, params.name]);
 
-	if (called && userAssignmentLoading)
-		return (
-			 <LoadingSpinner />
-		);
-
-	if (userAssignmentError)
-		return (
-			<p>
-				Error Loading User Assignments for{" "}
-				{decodeURIComponent(params.name.toString())}
-			</p>
-		);
-
+	if (!userList) return <LoadingSpinner />;
 	return (
 		<div>
 			<h1>Assignments for {decodeURIComponent(params.name.toString())}</h1>
 			{userList && selectedUser && selectedUser.assignments && (
 				<WeekDisplay
-					labelContents={selectedUser.assignments.map((assignment: AssignmentType) => (
-						<div key={assignment.id}>
-							<div>{assignment.project.client.name}</div>
-							<div>{assignment.project.name}</div>
-						</div>
-					))}
+					labelContents={selectedUser.assignments.map(
+						(assignment: AssignmentType) => (
+							<div key={assignment.id}>
+								<div>{assignment.project.client.name}</div>
+								<div>{assignment.project.name}</div>
+							</div>
+						)
+					)}
 					onMouseOverWeek={(week, year, rowId) => {
 						handleOnMouseOverWeek(week, year, rowId);
 					}}
