@@ -101,6 +101,10 @@ export interface ProjectDataMapType {
 	};
 }
 
+export interface ViewerType { 
+	name:string;
+}
+
 export interface WorkWeekRenderDataType {
 	cweek: number;
 	year: number;

@@ -1,10 +1,8 @@
 "use client";
 import React from "react";
-import withApollo from "@/lib/withApollo";
-import { useQuery } from "@apollo/client";
-import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ProjectType } from "../typeInterfaces";
+import { useRouter, usePathname } from "next/navigation";
 import { useUserDataContext } from "../userDataContext";
 import { UserType, AssignmentType, ProjectDataMapType, WorkWeekType, WorkWeekBlockMemberType } from "../typeInterfaces";
 import { processProjectDataMap, getWorkWeeksForProjectByWeekAndYearForProjects, drawBars, drawFTELabels } from "../helperFunctions";
@@ -68,7 +66,7 @@ const ProjectsView: React.FC = () => {
 			<WeekDisplay labelContents={
 				projectList && projectList.map((project) => (
 					<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={project.id}>
-						<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleProjectChange(project)}>Portrait</div>
+						<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleProjectChange(project)}><SVGAlphabet name={project.name}/></div>
 						<div className="flex">{project.name}</div>
 						<div>
 							<EllipsisProjectMenu project={project} />

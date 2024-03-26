@@ -1,22 +1,15 @@
 "use client";
-import React, { useEffect, useState, Fragment } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import withApollo from "@/lib/withApollo";
-
-import { Listbox, Transition } from "@headlessui/react";
-import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useUserDataContext } from "../userDataContext";
 import { UserType, AssignmentType, UserAssignmentDataMapType, WorkWeekType, WorkWeekBlockMemberType } from "../typeInterfaces";
 import { processUserAssignmentDataMap, getWorkWeeksForUserByWeekAndYearForUsers, drawBars, drawFTELabels } from "../helperFunctions";
 import WeekDisplay from "../components/weekDisplay";
-import { LoadingSpinner } from "../components/loadingSpinner";
 import { SVGAlphabet } from "../svgAlphabet";
+import { LoadingSpinner } from "../components/loadingSpinner";
 
 const PeopleView: React.FC = () => {
-	const [selectedUser, setSelectedUser] = useState<UserType>({
-		id: NaN,
-		name: "Select",
-	});
 	const [userAssignmentDataMap, setUserAssignmentDataMap] = useState<UserAssignmentDataMapType>({});
 	const [rowIdtoUserIdMap, setRowIdtoUserIdMap] = useState<Map<number, number>>(new Map());
 	const router = useRouter();
@@ -67,12 +60,12 @@ const PeopleView: React.FC = () => {
 	return (
 		<>
 			<WeekDisplay labelContents={
-				userList?.map((user: UserType) => (
+				userList ? userList?.map((user: UserType) => (
 					<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={user.id}>
-						<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleUserChange(user)}>Portrait</div>
+						<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleUserChange(user)}><SVGAlphabet name={user.name}/></div>
 						<div className="flex">{user.name}</div>
 					</div>
-				))}
+				)) : <LoadingSpinner />}
 				renderCell={renderCell}
 			/>
 		</>
