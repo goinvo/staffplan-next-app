@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { ProjectType } from "../typeInterfaces";
 import { useRouter, usePathname } from "next/navigation";
 import { useUserDataContext } from "../userDataContext";
@@ -61,22 +61,27 @@ const ProjectsView: React.FC = () => {
 
 	}
 
+	const memoizedLabelContents = useMemo(() => {
+		return projectList.map((project) => (
+			<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={project.id}>
+				<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleProjectChange(project)}>
+					<SVGAlphabet name={project.name} />
+				</div>
+				<div className="flex">{project.name}</div>
+				<div>
+					<EllipsisProjectMenu project={project} />
+				</div>
+			</div>
+		));
+	}, [projectList]);
+
 	return (
 		<>
-			{
-				projectList ? <WeekDisplay labelContents={
-					projectList.map((project) => (
-						<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={project.id}>
-							<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleProjectChange(project)}><SVGAlphabet name={project.name} /></div>
-							<div className="flex">{project.name}</div>
-							<div>
-								<EllipsisProjectMenu project={project} />
-							</div>
-						</div>
-					))}
-					renderCell={renderCell}
-				/> : <LoadingSpinner />
-			}
+			{projectList ? (
+				<WeekDisplay labelContents={memoizedLabelContents} renderCell={renderCell} />
+			) : (
+				<LoadingSpinner />
+			)}
 		</>
 	);
 };

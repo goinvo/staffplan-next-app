@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import withApollo from "@/lib/withApollo";
 import { useUserDataContext } from "../userDataContext";
@@ -57,20 +57,24 @@ const PeopleView: React.FC = () => {
 
 	}
 
+	const memoizedLabelContents = useMemo(() => {
+		return userList?.map((user: UserType) => (
+			<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={user.id}>
+				<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleUserChange(user)}>
+					<SVGAlphabet name={user.name} />
+				</div>
+				<div className="flex">{user.name}</div>
+			</div>
+		));
+	}, [userList]);
+
 	return (
 		<>
-			{
-				userList ?
-				<WeekDisplay labelContents={
-					userList?.map((user: UserType) => (
-						<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={user.id}>
-							<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleUserChange(user)}><SVGAlphabet name={user.name} /></div>
-							<div className="flex">{user.name}</div>
-						</div>
-					))}
-					renderCell={renderCell}
-				/> : <LoadingSpinner />
-			}
+			{userList ? (
+				<WeekDisplay labelContents={memoizedLabelContents} renderCell={renderCell} />
+			) : (
+				<LoadingSpinner />
+			)}
 		</>
 	);
 };

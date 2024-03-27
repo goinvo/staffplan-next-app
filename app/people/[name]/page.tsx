@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import withApollo from "@/lib/withApollo";
 import { useMutation } from "@apollo/client";
 import {
@@ -363,20 +363,24 @@ const UserPage: React.FC = () => {
 		}
 	}, [clientSide, userList, params.name]);
 
+	const memoizedLabelContents = useMemo(() => {
+		return (selectedUser && selectedUser.assignments) ?
+			selectedUser?.assignments.map((assignment: AssignmentType) => (
+				<div key={assignment.id}>
+					<div>{assignment.project.client.name}</div>
+					<div>{assignment.project.name}</div>
+				</div>
+			)) : [];
+	}, [selectedUser]);
+
 	if (!userList) return <LoadingSpinner />;
+
 	return (
 		<div>
 			<h1>Assignments for {decodeURIComponent(params.name.toString())}</h1>
 			{userList && selectedUser && selectedUser.assignments && (
 				<WeekDisplay
-					labelContents={selectedUser.assignments.map(
-						(assignment: AssignmentType) => (
-							<div key={assignment.id}>
-								<div>{assignment.project.client.name}</div>
-								<div>{assignment.project.name}</div>
-							</div>
-						)
-					)}
+					labelContents={memoizedLabelContents}
 					onMouseOverWeek={(week, year, rowId) => {
 						handleOnMouseOverWeek(week, year, rowId);
 					}}
