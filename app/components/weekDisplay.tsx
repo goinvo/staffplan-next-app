@@ -8,6 +8,8 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import SideList, { sideListGutterHeight } from "./sideList";
 import { render } from "@testing-library/react";
 import { getWeek } from "date-fns";
+import { useUserDataContext } from "../userDataContext";
+import { useRouter, usePathname } from "next/navigation";
 
 const { eachWeekOfInterval, addDays } = require('date-fns');
 
@@ -108,6 +110,8 @@ const generateWeeksForYear = (beginYear: number): WeeksAndLabels => {
 
 export const weekWidth = 64;
 
+const sideOffsetItems = 5;
+
 const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWeek, onMouseClickWeek, renderCell, selectedCell }) => {
     const today = new Date();
     const startYear = today.getFullYear();
@@ -120,6 +124,8 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
     const [yearWindow, setYearWindow] = useState<YearWindow>({ start: startYear, end: startYear });
     const [sideLabelDivHeights, setSideLabelDivHeights] = useState<number[]>([]);
     const [numWeeksInYearMap, setNumWeeksInYearMap] = useState<Map<number, number>>(new Map());
+    const { setScrollToTodayFunction } = useUserDataContext();
+    const router = useRouter();
 
     const loadMoreWeeks = async (direction: ScrollDirection) => {
         try {
@@ -167,8 +173,9 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
 
     const scrollToToday = () => {
         const today = new Date();
+
         const weekIndex = data.weeks.findIndex(week => {
-            const weekDate = new Date(today.getFullYear(), week.month, week.date);
+            const weekDate = new Date(week.year, week.month, week.date);
             return today >= weekDate;
         });
         const container = weekContainerRef.current;
@@ -205,6 +212,13 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
             const dx = event.pageX - startX;
             const newScrollPosition = scrollStartX - dx;
             container.scrollLeft = newScrollPosition;
+
+            const currentDateIndex = Math.floor(container.scrollLeft / weekWidth + sideOffsetItems);
+            const currentWeek = data.weeks[currentDateIndex];
+
+            if (currentWeek) {
+                const { year, week } = currentWeek; router.push(`?year=${year}&week=${week}`);
+            }
         }
     };
 
@@ -224,6 +238,10 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
             window.removeEventListener("mouseup", onDragEnd);
         };
     }, [isDragging, onDragMove]);
+
+    useEffect(() => {
+        setScrollToTodayFunction(() => scrollToToday);
+    }, []);
 
     return (
         <div className="relative">
