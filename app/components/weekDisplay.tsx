@@ -90,7 +90,7 @@ const generateWeeksForYear = (beginYear: number): WeeksAndLabels => {
     for (let dateIndex = 0; dateIndex < weeksInYear.length; dateIndex++) {
         weeks.push({
             date: weeksInYear[dateIndex].getDate(),
-            week: getWeek(weeksInYear[dateIndex]),
+            week: getWeek(weeksInYear[dateIndex], { weekStartsOn: 1, firstWeekContainsDate: 1 }),
             month: weeksInYear[dateIndex].getMonth(),
             year: weeksInYear[dateIndex].getFullYear(),
         });
@@ -218,6 +218,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
 
             if (currentWeek) {
                 const { year, week } = currentWeek; router.push(`?year=${year}&week=${week}`);
+                console.log(`Year: ${year}, Week: ${week}, Date: ${currentWeek.date}, Month: ${months[currentWeek.month]}, Index: ${currentDateIndex}`);
             }
         }
     };
