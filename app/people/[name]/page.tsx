@@ -365,29 +365,31 @@ const UserPage: React.FC = () => {
 
 	if (!userList) return <LoadingSpinner />;
 	return (
+		<>
 		<div>
 			<h1>Assignments for {decodeURIComponent(params.name.toString())}</h1>
 			{userList && selectedUser && selectedUser.assignments && (
 				<WeekDisplay
-					labelContents={selectedUser.assignments.map(
-						(assignment: AssignmentType) => (
-							<div key={assignment.id}>
+				labelContents={selectedUser.assignments.map(
+					(assignment: AssignmentType) => (
+						<div key={assignment.id}>
 								<div>{assignment.project.client.name}</div>
 								<div>{assignment.project.name}</div>
 							</div>
 						)
-					)}
-					onMouseOverWeek={(week, year, rowId) => {
-						handleOnMouseOverWeek(week, year, rowId);
-					}}
-					onMouseClickWeek={(week, year, rowId) => {
-						console.log(week, year, rowId);
-					}}
-					renderCell={renderCell}
-					selectedCell={selectedCell}
-				/>
-			)}
+						)}
+						onMouseOverWeek={(week, year, rowId) => {
+							handleOnMouseOverWeek(week, year, rowId);
+						}}
+						onMouseClickWeek={(week, year, rowId) => {
+							console.log(week, year, rowId);
+						}}
+						renderCell={renderCell}
+						selectedCell={selectedCell}
+						/>
+						)}
 		</div>
+						</>
 	);
 };
 

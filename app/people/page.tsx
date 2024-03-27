@@ -21,9 +21,6 @@ const PeopleView: React.FC = () => {
 		if (userList) {
 			// Setup the map of users to their assignments' work weeks
 			setUserAssignmentDataMap(processUserAssignmentDataMap(userList));
-			console.log("userList", userList);
-			console.log("userAssignmentDataMap", userAssignmentDataMap);
-
 			// Setup the map of row ids to user ids
 			userList?.map((user: UserType, index: number) => {
 				if (user.id && !rowIdtoUserIdMap.has(index)) {
@@ -56,7 +53,7 @@ const PeopleView: React.FC = () => {
 		return (<></>)
 
 	}
-
+	console.log(userAssignmentDataMap, "DATA MAP THAT USES FUNCTION")
 	return (
 		<>
 			{

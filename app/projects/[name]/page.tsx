@@ -2,7 +2,7 @@
 import { useParams, useRouter, usePathname } from "next/navigation";
 import React, { useEffect, useState, useMemo } from "react";
 import withApollo from "@/lib/withApollo";
-import { useQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import {
 	ProjectType,
 	UserType,
@@ -10,17 +10,19 @@ import {
 	WorkWeekType,
 	AssignmentType,
 } from "../../typeInterfaces";
-import { UPSERT_WORKWEEK, GET_PROJECT_DATA } from "../../gqlQueries";
+import { UPSERT_WORKWEEK } from "../../gqlQueries";
 import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import { SVGAlphabet } from "@/app/svgAlphabet";
 import { useUserDataContext } from "@/app/userDataContext";
-
+import ProjectDetails from "@/app/components/projectDetails";
 
 const ProjectPage: React.FC = () => {
 	const params = useParams();
 	const [clientSide, setClientSide] = useState(false);
-	const [selectedProject, setSelectedProject] = useState<ProjectType | null>(null);
+	const [selectedProject, setSelectedProject] = useState<ProjectType | null>(
+		null
+	);
 	const [selectedCell, setSelectedCell] = useState<selectedCell>({
 		week: 0,
 		year: 0,
@@ -31,15 +33,19 @@ const ProjectPage: React.FC = () => {
 	>([]);
 	const [currEstHours, setCurrEstHours] = useState<string>("0");
 	const [currActHours, setCurrActHours] = useState<string>("0");
-	const [wasSelectedCellEdited, setWasSelectedCellEdited] = useState<boolean>(false);
-	const [rowIdToUserIdMap, setRowIdToUserIdMap] = useState<Map<number, number>>(new Map());
-	const [usersWithProjectAssignment, setUsersWithProjectAssignment] = useState<UserType[]>([]);
+	const [wasSelectedCellEdited, setWasSelectedCellEdited] =
+		useState<boolean>(false);
+	const [rowIdToUserIdMap, setRowIdToUserIdMap] = useState<Map<number, number>>(
+		new Map()
+	);
+	const [usersWithProjectAssignment, setUsersWithProjectAssignment] = useState<
+		UserType[]
+	>([]);
 
 	const [upsertWorkweek] = useMutation(UPSERT_WORKWEEK);
-	const { userList, projectList } = useUserDataContext();
+	const { userList, projectList, setProjectList } = useUserDataContext();
 	const router = useRouter();
 	const pathname = usePathname();
-
 	const upsertWorkWeekValues = (values: WorkWeekRenderDataType) => {
 		upsertWorkweek({
 			variables: {
@@ -52,7 +58,10 @@ const ProjectPage: React.FC = () => {
 		});
 	};
 
-	const addWorkWeekDataToLookupMap = (workWeekData: WorkWeekRenderDataType, rowId: number) => {
+	const addWorkWeekDataToLookupMap = (
+		workWeekData: WorkWeekRenderDataType,
+		rowId: number
+	) => {
 		if (rowId !== undefined) {
 			if (!workWeekDataLookupMap[rowId]) {
 				workWeekDataLookupMap[rowId] = new Map();
@@ -60,7 +69,9 @@ const ProjectPage: React.FC = () => {
 			if (!workWeekDataLookupMap[rowId]?.has(workWeekData.year)) {
 				workWeekDataLookupMap[rowId]?.set(workWeekData.year, new Map());
 			}
-			workWeekDataLookupMap[rowId].get(workWeekData.year)?.set(workWeekData.cweek, workWeekData);
+			workWeekDataLookupMap[rowId]
+				.get(workWeekData.year)
+				?.set(workWeekData.cweek, workWeekData);
 		} else {
 			console.log("Error: Could not add work week data to lookup map");
 		}
@@ -69,7 +80,11 @@ const ProjectPage: React.FC = () => {
 	const handleCurrEstHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setCurrEstHours(e.target.value);
 		const newEstimatedHours = parseInt(e.target.value);
-		const newWorkWeekData = lookupWorkWeekData(selectedCell.rowId, selectedCell.year, selectedCell.week);
+		const newWorkWeekData = lookupWorkWeekData(
+			selectedCell.rowId,
+			selectedCell.year,
+			selectedCell.week
+		);
 		console.log("usersWithProjectAssignment", usersWithProjectAssignment);
 
 		if (newWorkWeekData) {
@@ -91,7 +106,11 @@ const ProjectPage: React.FC = () => {
 	const handleCurrActHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setCurrActHours(e.target.value);
 		const newActualHours = parseInt(e.target.value);
-		const newWorkWeekData = lookupWorkWeekData(selectedCell.rowId, selectedCell.year, selectedCell.week);
+		const newWorkWeekData = lookupWorkWeekData(
+			selectedCell.rowId,
+			selectedCell.year,
+			selectedCell.week
+		);
 		console.log("usersWithProjectAssignment", usersWithProjectAssignment);
 
 		if (newWorkWeekData) {
@@ -110,9 +129,17 @@ const ProjectPage: React.FC = () => {
 		setWasSelectedCellEdited(true);
 	};
 
-	const renderCell = (cweek: number, year: number, rowIndex: number, isSelected: boolean) => {
+	const renderCell = (
+		cweek: number,
+		year: number,
+		rowIndex: number,
+		isSelected: boolean
+	) => {
 		const workWeekData = lookupWorkWeekData(rowIndex, year, cweek);
-		if (workWeekData && (workWeekData.estimatedHours || workWeekData.actualHours)) {
+		if (
+			workWeekData &&
+			(workWeekData.estimatedHours || workWeekData.actualHours)
+		) {
 			if (isSelected) {
 				return (
 					<>
@@ -134,9 +161,13 @@ const ProjectPage: React.FC = () => {
 				return (
 					<>
 						<div className="flex flex-row">Est:</div>
-						<div className="flex flex-row">{workWeekData.estimatedHours || "0"}</div>
+						<div className="flex flex-row">
+							{workWeekData.estimatedHours || "0"}
+						</div>
 						<div className="flex flex-row">Act:</div>
-						<div className="flex flex-row">{workWeekData.actualHours || "0"}</div>
+						<div className="flex flex-row">
+							{workWeekData.actualHours || "0"}
+						</div>
 					</>
 				);
 			}
@@ -163,17 +194,24 @@ const ProjectPage: React.FC = () => {
 		}
 	};
 
-	const lookupWorkWeekData = (rowIndex: number, year: number, cweek: number): WorkWeekRenderDataType | null => {
+	const lookupWorkWeekData = (
+		rowIndex: number,
+		year: number,
+		cweek: number
+	): WorkWeekRenderDataType | null => {
 		if (usersWithProjectAssignment) {
 			const foundUser: UserType = usersWithProjectAssignment[rowIndex];
 			if (foundUser.assignments && foundUser.assignments.length > 0) {
 				const foundAssignment = foundUser.assignments.find(
-					(assignment: AssignmentType) => assignment.project.name === selectedProject?.name
+					(assignment: AssignmentType) =>
+						assignment.project.name === selectedProject?.name
 				);
 				if (foundAssignment && foundAssignment.workWeeks.length > 0) {
-					const foundWorkWeekData: WorkWeekRenderDataType | undefined = foundAssignment.workWeeks.find(
-						(workWeek: WorkWeekType) => workWeek.year === year && workWeek.cweek === cweek
-					);
+					const foundWorkWeekData: WorkWeekRenderDataType | undefined =
+						foundAssignment.workWeeks.find(
+							(workWeek: WorkWeekType) =>
+								workWeek.year === year && workWeek.cweek === cweek
+						);
 					if (foundWorkWeekData) {
 						return foundWorkWeekData;
 					}
@@ -185,14 +223,22 @@ const ProjectPage: React.FC = () => {
 
 	const handleOnMouseOverWeek = (week: number, year: number, rowId: number) => {
 		if (wasSelectedCellEdited) {
-			const oldWorkWeekData = lookupWorkWeekData(selectedCell.rowId, selectedCell.year, selectedCell.week);
+			const oldWorkWeekData = lookupWorkWeekData(
+				selectedCell.rowId,
+				selectedCell.year,
+				selectedCell.week
+			);
 			if (oldWorkWeekData) {
 				upsertWorkWeekValues(oldWorkWeekData);
 				setWasSelectedCellEdited(false);
 			}
 		}
 		setSelectedCell({ week, year, rowId });
-		const newWorkWeekData = lookupWorkWeekData(selectedCell.rowId, selectedCell.year, selectedCell.week);
+		const newWorkWeekData = lookupWorkWeekData(
+			selectedCell.rowId,
+			selectedCell.year,
+			selectedCell.week
+		);
 		if (newWorkWeekData) {
 			setCurrEstHours(newWorkWeekData.estimatedHours.toString());
 			setCurrActHours(newWorkWeekData.actualHours.toString());
@@ -212,7 +258,8 @@ const ProjectPage: React.FC = () => {
 			console.log("name", decodeURIComponent(params.name.toString()));
 
 			const foundProject = projectList.find(
-				(project: ProjectType) => project.name === decodeURIComponent(params.name.toString())
+				(project: ProjectType) =>
+					project.name === decodeURIComponent(params.name.toString())
 			);
 			if (foundProject) {
 				setSelectedProject(foundProject);
@@ -222,13 +269,19 @@ const ProjectPage: React.FC = () => {
 			if (!userList) return;
 
 			const newUsersWithProjectAssignment = userList.map((user: UserType) => {
-				const filteredAssignments = user.assignments?.reduce((acc: AssignmentType[], assignment: AssignmentType) => {
-					if (assignment.project.name === decodeURIComponent(params.name.toString())) {
-						acc.push(assignment);
-					}
-					return acc;
-				}, []) || [];
-
+				const filteredAssignments =
+					user.assignments?.reduce(
+						(acc: AssignmentType[], assignment: AssignmentType) => {
+							if (
+								assignment.project.name ===
+								decodeURIComponent(params.name.toString())
+							) {
+								acc.push(assignment);
+							}
+							return acc;
+						},
+						[]
+					) || [];
 				return {
 					...user,
 					assignments: filteredAssignments,
@@ -242,38 +295,35 @@ const ProjectPage: React.FC = () => {
 	}, [projectList, userList]);
 
 	useEffect(() => {
-		console.log("selectedProject", selectedProject);
 		if (!selectedProject || !selectedProject.workWeeks) return;
-	  
-		const workWeekData: WorkWeekRenderDataType[][] = selectedProject.workWeeks.map((week: WorkWeekType) => {
-		  return [
-			{
-			  cweek: week.cweek,
-			  year: week.year,
-			  estimatedHours: week.estimatedHours ?? 0,
-			  actualHours: week.actualHours ?? 0,
-			  assignmentId: week.assignmentId,
-			},
-		  ];
-		});
 
-		console.log("workWeekData", workWeekData);
-	  
+		const workWeekData: WorkWeekRenderDataType[][] =
+			selectedProject.workWeeks.map((week: WorkWeekType) => {
+				return [
+					{
+						cweek: week.cweek,
+						year: week.year,
+						estimatedHours: week.estimatedHours ?? 0,
+						actualHours: week.actualHours ?? 0,
+						assignmentId: week.assignmentId,
+					},
+				];
+			});
 		workWeekData.forEach((workWeeks: WorkWeekRenderDataType[], index) => {
-		  workWeeks.forEach((week: WorkWeekRenderDataType) => {
-			addWorkWeekDataToLookupMap(week, index);
-		  });
-	  
-		  if (selectedProject.workWeeks && selectedProject.workWeeks[index]?.user) {
-			const userId = selectedProject.workWeeks[index].user?.id;
-			if (userId !== undefined) {
-			  rowIdToUserIdMap.set(index, userId);
+			workWeeks.forEach((week: WorkWeekRenderDataType) => {
+				addWorkWeekDataToLookupMap(week, index);
+			});
+
+			if (selectedProject.workWeeks && selectedProject.workWeeks[index]?.user) {
+				const userId = selectedProject.workWeeks[index].user?.id;
+				if (userId !== undefined) {
+					rowIdToUserIdMap.set(index, userId);
+				}
 			}
-		  }
 		});
 
 		console.log("workWeekDataLookupMap", workWeekDataLookupMap);
-	  }, [selectedProject]);
+	}, [selectedProject, projectList]);
 
 	const handleUserChange = (user: UserType) => {
 		router.push(pathname + "/" + encodeURIComponent(user.name.toString()));
@@ -288,7 +338,10 @@ const ProjectPage: React.FC = () => {
 			);
 
 			return (
-				<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={user.id}>
+				<div
+					className="flex gap-x-4 gap-y-4 items-center justify-center"
+					key={user.id}
+				>
 					<div onClick={() => handleUserChange(user)}>
 						{memoizedSVGAlphabet}
 					</div>
@@ -313,6 +366,9 @@ const ProjectPage: React.FC = () => {
 			) : (
 				<LoadingSpinner />
 			)}
+			<div>
+				{selectedProject ? <ProjectDetails project={selectedProject} projectList={projectList} setProjectList={setProjectList}/> : <></>}
+			</div>
 		</div>
 	);
 };
