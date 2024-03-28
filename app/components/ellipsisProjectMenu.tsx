@@ -17,7 +17,7 @@ export default function EllipsisProjectMenu({ project }: any) {
 		cost,
 	} = project;
 	const [confirmed, setConfirmed] = useState(
-		status === "active" ? true : false
+		status === "confirmed" ? true : false
 	);
 	const dropdownSelectedItemClass = (isActive: boolean) =>
 		isActive
@@ -44,8 +44,8 @@ export default function EllipsisProjectMenu({ project }: any) {
 			e.target.id === "archiveProject"
 				? "archived"
 				: e.target.checked
-				? "active"
-				: "archived";
+				? "confirmed"
+				: "unconfirmed";
 		//last options need to be changed to confirmed and unconfirmed when backend reflects those options
 		const variables = {
 			id: id,

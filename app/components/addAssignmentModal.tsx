@@ -60,7 +60,7 @@ const AddAssignment = () => {
 			variables: {
 				projectId: projectId,
 				userId: userId,
-				status: status ? "active" : "archived",
+				status: status ? "active" : "proposed",
 				startsOn: dates.startsOn,
 				endsOn: dates.endsOn,
 			},

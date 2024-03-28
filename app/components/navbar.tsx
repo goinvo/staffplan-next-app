@@ -36,7 +36,7 @@ const Navbar: React.FC = () => {
 						pathname === "people" ? activeTab : "hover:underline"
 					}`}
 				>
-					<b>People</b>
+					People
 				</Link>
 			</div>
 			<div className="flex items-center space-x-4 py-4">
