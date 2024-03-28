@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ProjectType } from "../typeInterfaces";
 import { useRouter, usePathname } from "next/navigation";
 import { useUserDataContext } from "../userDataContext";
-import { UserType, AssignmentType, ProjectDataMapType, WorkWeekType, WorkWeekBlockMemberType } from "../typeInterfaces";
+import { UserType, ProjectDataMapType } from "../typeInterfaces";
 import { processProjectDataMap, getWorkWeeksForProjectByWeekAndYearForProjects, drawBars, drawFTELabels } from "../helperFunctions";
 import WeekDisplay from "../components/weekDisplay";
 import { LoadingSpinner } from "../components/loadingSpinner";
@@ -38,7 +38,9 @@ const ProjectsView: React.FC = () => {
 	}, [projectList]);
 
 	const handleProjectChange = (project: ProjectType) => {
-		router.push(pathname + "/" + encodeURIComponent(project.name.toString()));
+		const projectId = JSON.stringify({selectedProjectId:project.id})
+		const encodeProjectId = Buffer.from(projectId).toString("base64");
+		router.push(pathname + "/" + encodeURIComponent(encodeProjectId));
 	};
 
 	const renderCell = (cweek: number, year: number, rowIndex: number, isSelected: boolean, width?: number, height?: number) => {
