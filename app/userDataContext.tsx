@@ -18,6 +18,8 @@ export interface UserDataContextType {
 	setClientList: React.Dispatch<React.SetStateAction<ClientType[]>>;
 	viewer: ViewerType;
 	setViewer: React.Dispatch<React.SetStateAction<ViewerType>>;
+	scrollToTodayFunction: () => void;
+	setScrollToTodayFunction: React.Dispatch<React.SetStateAction<() => void>>;
 }
 
 // Initialize the context
@@ -45,6 +47,7 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 	const [projectList, setProjectList] = useState<any>(null);
 	const [clientList, setClientList] = useState<any>(null);
 	const [viewer, setViewer] = useState<any>(null);
+	const [scrollToTodayFunction, setScrollToTodayFunction] = useState<any>(() => {});
 	const {
 		loading: userListLoading,
 		error: userListError,
@@ -138,6 +141,8 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 				setClientList,
 				viewer,
 				setViewer,
+				scrollToTodayFunction,
+				setScrollToTodayFunction,
 			}}
 		>
 			{children}

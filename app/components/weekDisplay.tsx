@@ -7,9 +7,10 @@ import useInfiniteScroll, {
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import SideList, { sideListGutterHeight } from "./sideList";
 import { render } from "@testing-library/react";
-import { getWeek } from "date-fns";
-
-const { eachWeekOfInterval, addDays } = require('date-fns');
+import { getWeek, setWeek, isAfter, eachWeekOfInterval, addDays, differenceInWeeks } from "date-fns";
+import { useUserDataContext } from "../userDataContext";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { get } from "http";
 
 export interface SideLabelComponents {
     labelContents: React.ReactNode[];
@@ -108,6 +109,8 @@ const generateWeeksForYear = (beginYear: number): WeeksAndLabels => {
 
 export const weekWidth = 64;
 
+const sideOffsetItems = 5;
+
 const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWeek, onMouseClickWeek, renderCell, selectedCell }) => {
     const today = new Date();
     const startYear = today.getFullYear();
@@ -119,7 +122,10 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
     const [isLoading, setIsLoading] = useState(false);
     const [yearWindow, setYearWindow] = useState<YearWindow>({ start: startYear, end: startYear });
     const [sideLabelDivHeights, setSideLabelDivHeights] = useState<number[]>([]);
-    const [numWeeksInYearMap, setNumWeeksInYearMap] = useState<Map<number, number>>(new Map());
+    const { setScrollToTodayFunction } = useUserDataContext();
+
+    const router = useRouter();
+    const searchParams = useSearchParams();
 
     const loadMoreWeeks = async (direction: ScrollDirection) => {
         try {
@@ -167,14 +173,27 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
 
     const scrollToToday = () => {
         const today = new Date();
-        const weekIndex = data.weeks.findIndex(week => {
-            const weekDate = new Date(today.getFullYear(), week.month, week.date);
-            return today >= weekDate;
-        });
+
+        // For some reason the router isn't updating the search params when the URL changes, so pull it directly
+        const currentUrl = new URL(window.location.href);
+
+        // Get the week and year from the search params
+        const year = parseInt(currentUrl.searchParams.get("year") ?? today.getFullYear().toString());
+        const week = parseInt(currentUrl.searchParams.get("week") ?? getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 }).toString());
+        console.log("Scrolling to today; current date: ", year, week);
+
+        const weeksToScroll = differenceInWeeks(today, setWeek(new Date(year, 0, 1), week, { weekStartsOn: 1, firstWeekContainsDate: 1 }))
+        console.log("Weeks between current and today: ", weeksToScroll);
+
+        // Scroll to today and update the URL params
         const container = weekContainerRef.current;
-        if (container && weekIndex >= 0) {
-            const child = container.children[0].children[weekIndex] as HTMLElement;
-            container.scrollLeft = child.offsetLeft - container.offsetLeft;
+        if (container) {
+            container.scrollBy({
+                left: weeksToScroll * weekWidth,
+                behavior: "smooth",
+            });
+
+            window.history.pushState({}, "", `?year=${today.getFullYear()}&week=${getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 })}`);
         }
     };
 
@@ -186,6 +205,13 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
                 left: direction == "left" ? -scrollWidth : scrollWidth,
                 behavior: "smooth",
             });
+
+            const currentDateIndex = Math.floor(container.scrollLeft / weekWidth + sideOffsetItems);
+            const currentWeek = data.weeks[currentDateIndex];
+
+            if (currentWeek) {
+                pushNewUrl(currentWeek.year, currentWeek.week);
+            }
         }
     };
 
@@ -205,8 +231,22 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
             const dx = event.pageX - startX;
             const newScrollPosition = scrollStartX - dx;
             container.scrollLeft = newScrollPosition;
+
+            const currentDateIndex = Math.floor(container.scrollLeft / weekWidth + sideOffsetItems);
+            const currentWeek = data.weeks[currentDateIndex];
+
+            if (currentWeek) {
+                pushNewUrl(currentWeek.year, currentWeek.week);
+            }
         }
     };
+
+    async function pushNewUrl(year: number, week: number) {
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set("year", year.toString());
+        currentUrl.searchParams.set("week", week.toString());
+        window.history.pushState({}, "", currentUrl.toString());
+    }
 
     const onDragEnd = () => {
         setIsDragging(false);
@@ -224,6 +264,10 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
             window.removeEventListener("mouseup", onDragEnd);
         };
     }, [isDragging, onDragMove]);
+
+    useEffect(() => {
+        setScrollToTodayFunction(() => scrollToToday);
+    }, []);
 
     return (
         <div className="relative">
