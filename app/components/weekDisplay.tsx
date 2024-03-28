@@ -49,12 +49,11 @@ type YearWindow = {
     end: number;
 };
 
-const createItems = (year: number): WeeksAndLabels =>
-    generateWeeksForYear(year);
-
+// This function is called whenever scrolling is needed to load more weeks. Weeks are generated asynchronously
 const loadMore = async (year: number): Promise<WeeksAndLabels> =>
-    new Promise((res) => setTimeout(() => res(createItems(year))));
+    new Promise((res) => setTimeout(() => res(generateWeeksForYear(year))));
 
+// This function generates a block of 52 weeks and the corresponding labels for the months they belong to
 const generateWeeksForYear = (beginYear: number): WeeksAndLabels => {
     const weeks: WeekEntry[] = [];
     const monthLabels: string[] = [];
@@ -107,15 +106,19 @@ const generateWeeksForYear = (beginYear: number): WeeksAndLabels => {
     return { weeks, monthLabels };
 };
 
+// This is the width, in pixels, of the rendered row representing each week
 export const weekWidth = 64;
 
+// This dictates how much to offset where from the side of the screen current date is
+// At 5, the current date will be 5 weeks from the left side of the screen
 const sideOffsetItems = 5;
 
+// The main component that renders the week display
 const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWeek, onMouseClickWeek, renderCell, selectedCell }) => {
     const today = new Date();
     const startYear = today.getFullYear();
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const [data, setData] = useState<WeeksAndLabels>(createItems(startYear));
+    const [data, setData] = useState<WeeksAndLabels>(generateWeeksForYear(startYear));
     const [startX, setStartX] = useState(0);
     const [scrollStartX, setScrollStartX] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -127,15 +130,20 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
     const router = useRouter();
     const searchParams = useSearchParams();
 
+    // This is the async function that is called to load more weeks when necessary
     const loadMoreWeeks = async (direction: ScrollDirection) => {
         try {
+            // If we scroll too much to the left, we need to load more weeks from the previous year
             if (direction === ScrollDirection.LEFT) {
+                // Adjust the year window, which dictates which years are currently loaded
                 yearWindow.start -= 1;
                 const newData = await loadMore(yearWindow.start);
 
+                // Offset the scroll position by the width of the newly loaded weeks so dragging isn't wonky
                 setIsLoading(true);
                 setScrollStartX(scrollStartX + weekWidth * newData.weeks.length);
 
+                // Update the data of what needs to be rendered on the screen accordingly
                 setData(
                     (prev) =>
                     ({
@@ -143,6 +151,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
                         monthLabels: [...newData.monthLabels, ...prev.monthLabels],
                     } as WeeksAndLabels)
                 );
+            // If we scroll too much to the right, we need to load more weeks from the next year
             } else {
                 yearWindow.end += 1;
                 const newData = await loadMore(yearWindow.end);
@@ -161,6 +170,8 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
         }
     };
 
+    // This is the reference to the div that contains the weeks
+    // We use the InfiniteScrollRef hook to handle scrolling infinitely in both directions
     const weekContainerRef: InfiniteScrollRef<HTMLDivElement> = useInfiniteScroll(
         {
             next: loadMoreWeeks,
@@ -171,6 +182,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
         }
     );
 
+    // This function scrolls to the current date
     const scrollToToday = () => {
         const today = new Date();
 
@@ -195,6 +207,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
         }
     };
 
+    // This function scrolls the weeks to the left or right when the respective button is clicked
     const scrollWeeks = (direction: "left" | "right") => {
         const container = weekContainerRef.current;
         if (container) {
@@ -207,29 +220,38 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
             const currentDateIndex = Math.floor(container.scrollLeft / weekWidth + sideOffsetItems);
             const currentWeek = data.weeks[currentDateIndex];
 
+            // Update the URL params to reflect the current week
             if (currentWeek) {
                 pushNewUrl(currentWeek.year, currentWeek.week);
             }
         }
     };
 
+    // This function is called when the user starts dragging the weeks
     const onDragStart = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         setIsDragging(true);
+
+        // Save the initial mouse position when dragging starts
         setStartX(event.pageX);
         const container = weekContainerRef.current;
+
+        // Save the current scroll position when dragging starts
         if (container) {
             setScrollStartX(container.scrollLeft);
         }
     };
 
+    // This function is called when the user is dragging the weeks
     const onDragMove = (event: MouseEvent) => {
         if (!isDragging) return;
         const container = weekContainerRef.current;
         if (container) {
+            // Calculate the new scroll position based on the mouse movement
             const dx = event.pageX - startX;
             const newScrollPosition = scrollStartX - dx;
             container.scrollLeft = newScrollPosition;
 
+            // Update the URL params to reflect the current week
             const currentDateIndex = Math.floor(container.scrollLeft / weekWidth + sideOffsetItems);
             const currentWeek = data.weeks[currentDateIndex];
 
@@ -239,6 +261,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
         }
     };
 
+    // This function updates the URL params asynchronously to reflect the current week
     async function pushNewUrl(year: number, week: number) {
         const currentUrl = new URL(window.location.href);
         currentUrl.searchParams.set("year", year.toString());
@@ -246,6 +269,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
         window.history.pushState({}, "", currentUrl.toString());
     }
 
+    // This function is called when the user stops dragging the weeks
     const onDragEnd = () => {
         setIsDragging(false);
     };
@@ -263,6 +287,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
         };
     }, [isDragging, onDragMove]);
 
+    // This function is called when the component is first mounted to link the scrollToToday function to the UserDataContext
     useEffect(() => {
         setScrollToTodayFunction(() => scrollToToday);
     }, []);
