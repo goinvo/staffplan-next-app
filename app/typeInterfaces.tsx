@@ -104,6 +104,7 @@ export interface ProjectDataMapType {
 
 export interface ViewerType { 
 	name:string;
+	id:string;
 }
 
 export interface WorkWeekRenderDataType {

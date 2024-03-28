@@ -41,13 +41,13 @@ export default function AddDropdown() {
 								</p>
 							)}
 						</Menu.Item>
-						<Menu.Item>
+						{/* <Menu.Item>
 							{({ active }) => (
 								<a href="#" className={dropdownSelectedItemClass(active)}>
 									Person
 								</a>
 							)}
-						</Menu.Item>
+						</Menu.Item> */}
 						<Menu.Item>
 							{({ active }) => (
 								<Link

@@ -259,22 +259,16 @@ const AddProject = () => {
 																		setSelectedClient(e.target.value);
 																	}}
 																	as="select"
-																	value={values.client}
 																	name="client"
 																	id="client"
-																	disabled={parsedProject ? true : false}
 																	className="block mt-1 px-2 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 																>
 																	<option
 																		value={
-																			parsedProject
-																				? parsedProject.clientId
-																				: ""
+																			""
 																		}
 																	>
-																		{parsedProject
-																			? parsedProject.clientName
-																			: "SELECT"}
+																	SELECT
 																	</option>
 																	{clientList?.map((client: ClientType) => {
 																		return (

@@ -34,7 +34,6 @@ const AddClient = () => {
 	] = useMutation(UPSERT_CLIENT, {
 		onCompleted({ upsertClient }) {
 			setClientList([...clientList, upsertClient]);
-			console.log(clientList, "CLIENT LIST")
 		},
 	});
 	if (mutationLoading || !clientList) return <LoadingSpinner />;
@@ -84,7 +83,7 @@ const AddClient = () => {
 					aria-labelledby="client-modal"
 					aria-modal="true"
 				>
-					<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+					<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"/>
 
 					<div className="fixed inset-0 z-10 w-screen overflow-y-auto">
 						<div className="flex min-h-full p-4 text-center justify-center sm:items-center sm:p-0">
@@ -111,7 +110,7 @@ const AddClient = () => {
 														className="max-w-lg mx-auto"
 														onSubmit={handleSubmit}
 													>
-														<div className="flex mb-4">
+														<div className="flex mb-4 pb-2 justify-between">
 															<label>
 																Name(*required)
 																<input
@@ -123,28 +122,29 @@ const AddClient = () => {
 																	onChange={(e) => {
 																		handleChange(e);
 																	}}
-																	className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+																	className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 																	placeholder="Enter Client Name"
 																/>
 															</label>
 															<label>
+																Description
 																<Field
 																	onChange={handleChange}
 																	as="textarea"
 																	name="description"
 																	id="description"
 																	value={values.description}
-																	className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-																	placeholder="Description"
+																	className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
+																	placeholder="Describe client here"
 																></Field>
 															</label>
 														</div>
 
 														<div className="flex">
-															<div className="border-b border-gray-900/10 pb-12">
-																<div className="mt-10 grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-10">
+															<div className="border-b border-gray-900/10 pb-3">
+																<div className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-10">
 																	<div className="sm:col-span-1">
-																		<div className="mt-2">
+																		<div className="mt-2 w-full">
 																			<div>
 																				<label>
 																					Status
@@ -154,6 +154,7 @@ const AddClient = () => {
 																						name="status"
 																						id="status"
 																						onBlur={handleBlur}
+																						className="block mt-1 px-2 py-2 pr-8 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 																					>
 																						<option value={""}>SELECT</option>
 																						<option value={"active"}>
@@ -187,7 +188,9 @@ const AddClient = () => {
 																<button
 																	disabled={!isValid}
 																	type="submit"
-																	className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+																	className={`rounded-md bg-${
+																		isValid ? "accentgreen" : "slate-500"
+																	} px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accentgreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accentgreen`}
 																>
 																	Save
 																</button>

@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import withApollo from "@/lib/withApollo";
 import { useMutation } from "@apollo/client";
 import {
@@ -16,6 +16,11 @@ import { LoadingSpinner } from "@/app/components/loadingSpinner";
 
 const UserPage: React.FC = () => {
 	const params = useParams();
+
+const decodedString = decodeURIComponent(params.name.toString());
+const decodedBase64 = Buffer.from(decodedString, 'base64').toString('utf-8');
+const {selectedUserId} = JSON.parse(decodedBase64);
+		
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<UserType>({
 		id: NaN,
@@ -83,7 +88,7 @@ const UserPage: React.FC = () => {
 				.get(workWeekData.year)
 				?.set(workWeekData.cweek, workWeekData);
 		} else {
-			console.log("Error: Could not add work week data to lookup map");
+			console.error("Error: Could not add work week data to lookup map");
 		}
 	};
 
@@ -354,8 +359,7 @@ const UserPage: React.FC = () => {
 	// If the user list has been loaded and the user's name is in the URL, get the user's ID and load their assignments
 	useEffect(() => {
 		if (clientSide && userList) {
-			const name = decodeURIComponent(params.name.toString());
-			const userId = getUserIdFromName(name);
+			const userId = selectedUserId
 
 			if (userId) {
 				setSelectedUserData(userId);
@@ -363,35 +367,32 @@ const UserPage: React.FC = () => {
 		}
 	}, [clientSide, userList, params.name]);
 
-	const memoizedLabelContents = useMemo(() => {
-		return (selectedUser && selectedUser.assignments) ?
-			selectedUser?.assignments.map((assignment: AssignmentType) => (
-				<div key={assignment.id}>
-					<div>{assignment.project.client.name}</div>
-					<div>{assignment.project.name}</div>
-				</div>
-			)) : [];
-	}, [selectedUser]);
-
 	if (!userList) return <LoadingSpinner />;
-
 	return (
+		<>
 		<div>
-			<h1>Assignments for {decodeURIComponent(params.name.toString())}</h1>
+			<h1>Assignments for {selectedUser.name}</h1>
 			{userList && selectedUser && selectedUser.assignments && (
 				<WeekDisplay
-					labelContents={memoizedLabelContents}
-					onMouseOverWeek={(week, year, rowId) => {
-						handleOnMouseOverWeek(week, year, rowId);
-					}}
-					onMouseClickWeek={(week, year, rowId) => {
-						console.log(week, year, rowId);
-					}}
-					renderCell={renderCell}
-					selectedCell={selectedCell}
-				/>
-			)}
+				labelContents={selectedUser.assignments.map(
+					(assignment: AssignmentType) => (
+						<div key={assignment.id}>
+								<div>{assignment.project.client.name}</div>
+								<div>{assignment.project.name}</div>
+							</div>
+						)
+						)}
+						onMouseOverWeek={(week, year, rowId) => {
+							handleOnMouseOverWeek(week, year, rowId);
+						}}
+						onMouseClickWeek={(week, year, rowId) => {
+						}}
+						renderCell={renderCell}
+						selectedCell={selectedCell}
+						/>
+						)}
 		</div>
+						</>
 	);
 };
 
