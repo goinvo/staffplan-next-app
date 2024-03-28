@@ -16,6 +16,11 @@ import { LoadingSpinner } from "@/app/components/loadingSpinner";
 
 const UserPage: React.FC = () => {
 	const params = useParams();
+
+const decodedString = decodeURIComponent(params.name.toString());
+const decodedBase64 = Buffer.from(decodedString, 'base64').toString('utf-8');
+const {selectedUserId} = JSON.parse(decodedBase64);
+		
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<UserType>({
 		id: NaN,
@@ -83,7 +88,7 @@ const UserPage: React.FC = () => {
 				.get(workWeekData.year)
 				?.set(workWeekData.cweek, workWeekData);
 		} else {
-			console.log("Error: Could not add work week data to lookup map");
+			console.error("Error: Could not add work week data to lookup map");
 		}
 	};
 
@@ -354,8 +359,7 @@ const UserPage: React.FC = () => {
 	// If the user list has been loaded and the user's name is in the URL, get the user's ID and load their assignments
 	useEffect(() => {
 		if (clientSide && userList) {
-			const name = decodeURIComponent(params.name.toString());
-			const userId = getUserIdFromName(name);
+			const userId = selectedUserId
 
 			if (userId) {
 				setSelectedUserData(userId);
@@ -367,7 +371,7 @@ const UserPage: React.FC = () => {
 	return (
 		<>
 		<div>
-			<h1>Assignments for {decodeURIComponent(params.name.toString())}</h1>
+			<h1>Assignments for {selectedUser.name}</h1>
 			{userList && selectedUser && selectedUser.assignments && (
 				<WeekDisplay
 				labelContents={selectedUser.assignments.map(
@@ -382,7 +386,6 @@ const UserPage: React.FC = () => {
 							handleOnMouseOverWeek(week, year, rowId);
 						}}
 						onMouseClickWeek={(week, year, rowId) => {
-							console.log(week, year, rowId);
 						}}
 						renderCell={renderCell}
 						selectedCell={selectedCell}

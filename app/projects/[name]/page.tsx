@@ -19,6 +19,9 @@ import ProjectDetails from "@/app/components/projectDetails";
 
 const ProjectPage: React.FC = () => {
 	const params = useParams();
+	const decodedString = decodeURIComponent(params.name.toString());
+	const decodedBase64 = Buffer.from(decodedString, "base64").toString("utf-8");
+	const { selectedProjectId } = JSON.parse(decodedBase64);
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedProject, setSelectedProject] = useState<ProjectType | null>(
 		null
@@ -73,7 +76,7 @@ const ProjectPage: React.FC = () => {
 				.get(workWeekData.year)
 				?.set(workWeekData.cweek, workWeekData);
 		} else {
-			console.log("Error: Could not add work week data to lookup map");
+			console.error("Error: Could not add work week data to lookup map");
 		}
 	};
 
@@ -85,7 +88,6 @@ const ProjectPage: React.FC = () => {
 			selectedCell.year,
 			selectedCell.week
 		);
-		console.log("usersWithProjectAssignment", usersWithProjectAssignment);
 
 		if (newWorkWeekData) {
 			newWorkWeekData.estimatedHours = newEstimatedHours;
@@ -111,7 +113,6 @@ const ProjectPage: React.FC = () => {
 			selectedCell.year,
 			selectedCell.week
 		);
-		console.log("usersWithProjectAssignment", usersWithProjectAssignment);
 
 		if (newWorkWeekData) {
 			newWorkWeekData.actualHours = newActualHours;
@@ -254,18 +255,13 @@ const ProjectPage: React.FC = () => {
 
 	useEffect(() => {
 		if (projectList) {
-			console.log("projectList", projectList);
-			console.log("name", decodeURIComponent(params.name.toString()));
-
 			const foundProject = projectList.find(
-				(project: ProjectType) =>
-					project.name === decodeURIComponent(params.name.toString())
+				(project: ProjectType) => project.id === selectedProjectId
 			);
 			if (foundProject) {
 				setSelectedProject(foundProject);
 			}
 
-			console.log("userList", userList);
 			if (!userList) return;
 
 			const newUsersWithProjectAssignment = userList.map((user: UserType) => {
@@ -289,8 +285,6 @@ const ProjectPage: React.FC = () => {
 			});
 
 			setUsersWithProjectAssignment(newUsersWithProjectAssignment);
-
-			console.log("usersWithProjectAssignment", newUsersWithProjectAssignment);
 		}
 	}, [projectList, userList]);
 
@@ -321,8 +315,6 @@ const ProjectPage: React.FC = () => {
 				}
 			}
 		});
-
-		console.log("workWeekDataLookupMap", workWeekDataLookupMap);
 	}, [selectedProject, projectList]);
 
 	const handleUserChange = (user: UserType) => {
@@ -367,7 +359,15 @@ const ProjectPage: React.FC = () => {
 				<LoadingSpinner />
 			)}
 			<div>
-				{selectedProject ? <ProjectDetails project={selectedProject} projectList={projectList} setProjectList={setProjectList}/> : <></>}
+				{selectedProject ? (
+					<ProjectDetails
+						project={selectedProject}
+						projectList={projectList}
+						setProjectList={setProjectList}
+					/>
+				) : (
+					<></>
+				)}
 			</div>
 		</div>
 	);

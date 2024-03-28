@@ -141,7 +141,6 @@ export function processUserAssignmentDataMap(userList: any): UserAssignmentDataM
 		});
 	});
 
-	console.log("Processed data map setup complete; processedDataMap: ", processedDataMap);
 
 	return processedDataMap;
 }
