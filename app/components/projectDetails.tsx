@@ -10,13 +10,10 @@ import { differenceInBusinessDays } from "date-fns";
 import { ReactNode } from "react";
 import { useUserDataContext } from "../userDataContext";
 import { LoadingSpinner } from "./loadingSpinner";
-import { usePathname, useRouter } from "next/navigation";
 
 const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 	const [selectedClient, setSelectedClient] = useState<number | string>("");
 	const { clientList } = useUserDataContext();
-	const router = useRouter();
-	const pathname = usePathname();
 	const editProjectInitialValues = {
 		id: project.id,
 		client: project.client.id,
@@ -42,7 +39,6 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 				return project;
 			});
 			setProjectList(updatedProjectList);
-			return router.replace(encodeURIComponent(upsertProject.name.toString()));
 		},
 	});
 
