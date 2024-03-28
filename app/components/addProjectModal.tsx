@@ -36,7 +36,7 @@ const AddProject = () => {
 		numOfFTE: "",
 		payRate: "flatRate",
 		cost: parsedProject.cost,
-		status: parsedProject.status === "active" ? true : false,
+		status: parsedProject.status === "confirmed" ? true : false,
 		hourlyRate: 0,
 		flatRate: 0,
 	};

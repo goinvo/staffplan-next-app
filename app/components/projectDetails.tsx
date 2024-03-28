@@ -29,7 +29,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 		numOfFTE: "",
 		payRate: "flatRate",
 		cost: project.cost,
-		status: project.status === "active" ? true : false,
+		status: project.status === "confirmed" ? true : false,
 		hourlyRate: 0,
 		flatRate: 0,
 	};
@@ -51,7 +51,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 			id: values.id,
 			clientId: values.client,
 			name: values.name,
-			status: values.status ? "active" : "archived",
+			status: values.status ? "confirmed" : "unconfirmed",
 			startsOn: values.dates.startsOn,
 			cost: values.cost,
 		};
