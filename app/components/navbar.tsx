@@ -14,6 +14,10 @@ const Navbar: React.FC = () => {
 	const pathname = usePathname().split("/")[1];
 	const activeTab = "navbar-border-accent border-b-2";
 	if (!viewer) return <LoadingSpinner />;
+	const myPlanUrl = () => {
+		const userId = JSON.stringify({ selectedUserId: viewer.id });
+		return Buffer.from(userId).toString("base64");
+	};
 	return (
 		<nav className="navbar bg-gray-100 px-4 h-14 flex justify-between items-center">
 			<div className="flex items-center space-x-4 h-full">
@@ -36,7 +40,10 @@ const Navbar: React.FC = () => {
 				</Link>
 			</div>
 			<div className="flex items-center space-x-4 py-4">
-				<Link href="#" className="navbar-text-accent hover:underline">
+				<Link
+					href={`/people/${myPlanUrl()}`}
+					className="navbar-text-accent hover:underline"
+				>
 					My Plan
 				</Link>
 				<div className="h-4 w-4">

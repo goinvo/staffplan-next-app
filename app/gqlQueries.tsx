@@ -160,6 +160,7 @@ export const GET_VIEWER = gql`
 	{
 		viewer {
 			name
+			id
 		}
 	}
 `;
