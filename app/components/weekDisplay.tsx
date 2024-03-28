@@ -210,7 +210,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
             const currentWeek = data.weeks[currentDateIndex];
 
             if (currentWeek) {
-                const { year, week } = currentWeek; router.push(`?year=${year}&week=${week}`);
+                window.history.pushState({}, "", `?year=${currentWeek.year}&week=${currentWeek.week}`);
             }
         }
     };
@@ -236,7 +236,8 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
             const currentWeek = data.weeks[currentDateIndex];
 
             if (currentWeek) {
-                const { year, week } = currentWeek; router.push(`?year=${year}&week=${week}`);
+                const { year, week } = currentWeek; 
+                window.history.pushState({}, "", `?year=${year}&week=${week}`);
             }
         }
     };
