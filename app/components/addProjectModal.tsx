@@ -80,7 +80,7 @@ const AddProject = () => {
 			id: values.id,
 			clientId: values.client,
 			name: values.name,
-			status: values.status ? "active" : "archived",
+			status: values.status ? "confirmed" : "unconfirmed",
 			startsOn: values.dates.startsOn,
 			cost: values.cost,
 		};
