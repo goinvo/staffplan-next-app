@@ -205,6 +205,13 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
                 left: direction == "left" ? -scrollWidth : scrollWidth,
                 behavior: "smooth",
             });
+
+            const currentDateIndex = Math.floor(container.scrollLeft / weekWidth + sideOffsetItems);
+            const currentWeek = data.weeks[currentDateIndex];
+
+            if (currentWeek) {
+                const { year, week } = currentWeek; router.push(`?year=${year}&week=${week}`);
+            }
         }
     };
 
