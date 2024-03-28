@@ -180,10 +180,8 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
         // Get the week and year from the search params
         const year = parseInt(currentUrl.searchParams.get("year") ?? today.getFullYear().toString());
         const week = parseInt(currentUrl.searchParams.get("week") ?? getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 }).toString());
-        console.log("Scrolling to today; current date: ", year, week);
 
         const weeksToScroll = differenceInWeeks(today, setWeek(new Date(year, 0, 1), week, { weekStartsOn: 1, firstWeekContainsDate: 1 }))
-        console.log("Weeks between current and today: ", weeksToScroll);
 
         // Scroll to today and update the URL params
         const container = weekContainerRef.current;
@@ -283,7 +281,9 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
                         {data.weeks.map((week, index) => (
                             <div className="flex flex-col text-nowrap" style={{ width: weekWidth + "px" }} key={index}>
                                 <div className="flex flex-row grow text-sm">{data.monthLabels[index]}</div>
-                                <div className={"flex flex-row grow-0 text-sm"}>{week.date}</div>
+                                <div className={"flex flex-row grow-0 text-sm"}>{week.date}
+                                {week.week === getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 }) && week.year === today.getFullYear() ? <div className="flex flex-row items-center text-xs text-red-500">Today</div> : <></>}
+                                </div>
                                 <div className={"flex flex-row grow-0 relative"}>
                                     <div className={"top-0 left-0 timeline-grid-gap-bg"} style={{ width: weekWidth + "px" }} key={index}>
                                         {sideLabelDivHeights.map((height, rowIndex) => {
