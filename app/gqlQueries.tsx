@@ -103,6 +103,7 @@ export const GET_USER_LIST = gql`
 				id
 				name
 				assignments {
+					id
 					project {
 						id
 						name
