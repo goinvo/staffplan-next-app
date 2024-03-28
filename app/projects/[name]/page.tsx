@@ -296,7 +296,7 @@ const ProjectPage: React.FC = () => {
 			const newUsersWithProjectAssignment = userList.map((user: UserType) => {
 				// Filter out assignments that don't match the project name
 				const filteredAssignments = user.assignments?.reduce((acc: AssignmentType[], assignment: AssignmentType) => {
-					if (assignment.project.name === decodeURIComponent(params.name.toString())) {
+					if (assignment.project.id === selectedProjectId) {
 						acc.push(assignment);
 					}
 					return acc;
