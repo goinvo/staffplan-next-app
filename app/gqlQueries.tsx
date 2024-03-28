@@ -267,6 +267,8 @@ export const UPSERT_PROJECT = gql`
 			workWeeks {
 				actualHours
 				estimatedHours
+				cweek
+				year
 			}
 		}
 	}

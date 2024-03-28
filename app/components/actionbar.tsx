@@ -43,7 +43,7 @@ const ActionBar: React.FC = () => {
 				</div>
 			</div>
 			<div className="flex items-center space-x-4">
-				<span onClick={scrollToTodayFunction}>Today</span>
+				<span className="hover:underline hover:cursor-pointer" onClick={scrollToTodayFunction}>Today</span>
 				<div className="flex items-center border actionbar-border-accent rounded-full">
 					<div
 						className={

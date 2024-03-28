@@ -62,11 +62,11 @@ export default function EllipsisProjectMenu({ project }: any) {
 	return (
 		<Menu
 			as="div"
-			className="relative inline-block text-left z-40"
+			className="relative inline-block text-left z-100"
 			id="add-dropdown"
 			data-testid="add-dropdown"
 		>
-			<Menu.Button className="relative z-50 actionbar-text-accent w-full h-full rounded-full flex justify-center items-center ellipsismenu text-2xl"></Menu.Button>
+			<Menu.Button className="relative z-1 actionbar-text-accent w-full h-full rounded-full flex justify-center items-center ellipsismenu text-2xl"></Menu.Button>
 
 			<Transition
 				as={Fragment}
