@@ -122,9 +122,6 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
     const [isLoading, setIsLoading] = useState(false);
     const [yearWindow, setYearWindow] = useState<YearWindow>({ start: startYear, end: startYear });
     const [sideLabelDivHeights, setSideLabelDivHeights] = useState<number[]>([]);
-    const [currentWeekAndYear, setCurrentWeekAndYear] = useState<{ week: number, year: number }>({ week: getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 }), year: today.getFullYear() });
-    const [weeksBetweenTodayAndCurrent, setWeeksBetweenTodayAndCurrent] = useState<number>(0);
-    const [scrollToWeekAndYear, setScrollToWeekAndYear] = useState<{ week: number, year: number } | null>(null);
     const { setScrollToTodayFunction } = useUserDataContext();
 
     const router = useRouter();
@@ -175,16 +172,29 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
     );
 
     const scrollToToday = () => {
-        console.log("Scrolling to today");
         const today = new Date();
 
+        // For some reason the router isn't updating the search params when the URL changes, so pull it directly
         const currentUrl = new URL(window.location.href);
-        console.log("Current URL", currentUrl.searchParams.get("year"), currentUrl.searchParams.get("week"));
 
-        // Get the week and year from the router search params
-        const year = parseInt(searchParams.get("year") ?? today.getFullYear().toString());
-        const week = parseInt(searchParams.get("week") ?? getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 }).toString());
+        // Get the week and year from the search params
+        const year = parseInt(currentUrl.searchParams.get("year") ?? today.getFullYear().toString());
+        const week = parseInt(currentUrl.searchParams.get("week") ?? getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 }).toString());
         console.log("Scrolling to today; current date: ", year, week);
+
+        const weeksToScroll = differenceInWeeks(today, setWeek(new Date(year, 0, 1), week, { weekStartsOn: 1, firstWeekContainsDate: 1 }))
+        console.log("Weeks between current and today: ", weeksToScroll);
+
+        // Scroll to today and update the URL params
+        const container = weekContainerRef.current;
+        if (container) {
+            container.scrollBy({
+                left: weeksToScroll * weekWidth,
+                behavior: "smooth",
+            });
+
+            window.history.pushState({}, "", `?year=${today.getFullYear()}&week=${getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 })}`);
+        }
     };
 
     const scrollWeeks = (direction: "left" | "right") => {
@@ -242,7 +252,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
     }, [isDragging, onDragMove]);
 
     useEffect(() => {
-        setScrollToTodayFunction(scrollToToday);
+        setScrollToTodayFunction(() => scrollToToday);
     }, []);
 
     return (
