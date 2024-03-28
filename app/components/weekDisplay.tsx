@@ -210,7 +210,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
             const currentWeek = data.weeks[currentDateIndex];
 
             if (currentWeek) {
-                window.history.pushState({}, "", `?year=${currentWeek.year}&week=${currentWeek.week}`);
+                pushNewUrl(currentWeek.year, currentWeek.week);
             }
         }
     };
@@ -236,11 +236,17 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
             const currentWeek = data.weeks[currentDateIndex];
 
             if (currentWeek) {
-                const { year, week } = currentWeek; 
-                window.history.pushState({}, "", `?year=${year}&week=${week}`);
+                pushNewUrl(currentWeek.year, currentWeek.week);
             }
         }
     };
+
+    async function pushNewUrl(year: number, week: number) {
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set("year", year.toString());
+        currentUrl.searchParams.set("week", week.toString());
+        window.history.pushState({}, "", currentUrl.toString());
+    }
 
     const onDragEnd = () => {
         setIsDragging(false);
