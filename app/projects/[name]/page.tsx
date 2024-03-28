@@ -2,7 +2,7 @@
 import { useParams, useRouter, usePathname } from "next/navigation";
 import React, { useEffect, useState, useMemo } from "react";
 import withApollo from "@/lib/withApollo";
-import { useMutation } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import {
 	ProjectType,
 	UserType,
@@ -10,22 +10,17 @@ import {
 	WorkWeekType,
 	AssignmentType,
 } from "../../typeInterfaces";
-import { UPSERT_WORKWEEK } from "../../gqlQueries";
+import { UPSERT_WORKWEEK, GET_PROJECT_DATA } from "../../gqlQueries";
 import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import { SVGAlphabet } from "@/app/svgAlphabet";
 import { useUserDataContext } from "@/app/userDataContext";
-import ProjectDetails from "@/app/components/projectDetails";
+
 
 const ProjectPage: React.FC = () => {
 	const params = useParams();
-	const decodedString = decodeURIComponent(params.name.toString());
-	const decodedBase64 = Buffer.from(decodedString, "base64").toString("utf-8");
-	const { selectedProjectId } = JSON.parse(decodedBase64);
 	const [clientSide, setClientSide] = useState(false);
-	const [selectedProject, setSelectedProject] = useState<ProjectType | null>(
-		null
-	);
+	const [selectedProject, setSelectedProject] = useState<ProjectType | null>(null);
 	const [selectedCell, setSelectedCell] = useState<selectedCell>({
 		week: 0,
 		year: 0,
@@ -33,19 +28,15 @@ const ProjectPage: React.FC = () => {
 	});
 	const [currEstHours, setCurrEstHours] = useState<string>("0");
 	const [currActHours, setCurrActHours] = useState<string>("0");
-	const [wasSelectedCellEdited, setWasSelectedCellEdited] =
-		useState<boolean>(false);
-	const [rowIdToUserIdMap, setRowIdToUserIdMap] = useState<Map<number, number>>(
-		new Map()
-	);
-	const [usersWithProjectAssignment, setUsersWithProjectAssignment] = useState<
-		UserType[]
-	>([]);
+	const [wasSelectedCellEdited, setWasSelectedCellEdited] = useState<boolean>(false);
+	const [rowIdToUserIdMap, setRowIdToUserIdMap] = useState<Map<number, number>>(new Map());
+	const [usersWithProjectAssignment, setUsersWithProjectAssignment] = useState<UserType[]>([]);
 
 	const [upsertWorkweek] = useMutation(UPSERT_WORKWEEK);
-	const { userList, projectList, setProjectList } = useUserDataContext();
+	const { userList, projectList } = useUserDataContext();
 	const router = useRouter();
 	const pathname = usePathname();
+
 	const upsertWorkWeekValues = (values: WorkWeekRenderDataType) => {
 		upsertWorkweek({
 			variables: {
@@ -155,17 +146,9 @@ const ProjectPage: React.FC = () => {
 		setWasSelectedCellEdited(true);
 	};
 
-	const renderCell = (
-		cweek: number,
-		year: number,
-		rowIndex: number,
-		isSelected: boolean
-	) => {
+	const renderCell = (cweek: number, year: number, rowIndex: number, isSelected: boolean) => {
 		const workWeekData = lookupWorkWeekData(rowIndex, year, cweek);
-		if (
-			workWeekData &&
-			(workWeekData.estimatedHours || workWeekData.actualHours)
-		) {
+		if (workWeekData && (workWeekData.estimatedHours || workWeekData.actualHours)) {
 			if (isSelected) {
 				return (
 					<>
@@ -187,13 +170,9 @@ const ProjectPage: React.FC = () => {
 				return (
 					<>
 						<div className="flex flex-row">Est:</div>
-						<div className="flex flex-row">
-							{workWeekData.estimatedHours || "0"}
-						</div>
+						<div className="flex flex-row">{workWeekData.estimatedHours || "0"}</div>
 						<div className="flex flex-row">Act:</div>
-						<div className="flex flex-row">
-							{workWeekData.actualHours || "0"}
-						</div>
+						<div className="flex flex-row">{workWeekData.actualHours || "0"}</div>
 					</>
 				);
 			}
@@ -220,11 +199,7 @@ const ProjectPage: React.FC = () => {
 		}
 	};
 
-	const lookupWorkWeekData = (
-		rowIndex: number,
-		year: number,
-		cweek: number
-	): WorkWeekRenderDataType | null => {
+	const lookupWorkWeekData = (rowIndex: number, year: number, cweek: number): WorkWeekRenderDataType | null => {
 		if (usersWithProjectAssignment) {
 			const foundUser: UserType = usersWithProjectAssignment[rowIndex];
 			if (foundUser && foundUser.assignments) {
@@ -253,22 +228,14 @@ const ProjectPage: React.FC = () => {
 
 	const handleOnMouseOverWeek = (week: number, year: number, rowId: number) => {
 		if (wasSelectedCellEdited) {
-			const oldWorkWeekData = lookupWorkWeekData(
-				selectedCell.rowId,
-				selectedCell.year,
-				selectedCell.week
-			);
+			const oldWorkWeekData = lookupWorkWeekData(selectedCell.rowId, selectedCell.year, selectedCell.week);
 			if (oldWorkWeekData) {
 				upsertWorkWeekValues(oldWorkWeekData);
 				setWasSelectedCellEdited(false);
 			}
 		}
 		setSelectedCell({ week, year, rowId });
-		const newWorkWeekData = lookupWorkWeekData(
-			selectedCell.rowId,
-			selectedCell.year,
-			selectedCell.week
-		);
+		const newWorkWeekData = lookupWorkWeekData(selectedCell.rowId, selectedCell.year, selectedCell.week);
 		if (newWorkWeekData) {
 			setCurrEstHours(newWorkWeekData.estimatedHours.toString());
 			setCurrActHours(newWorkWeekData.actualHours.toString());
@@ -285,7 +252,7 @@ const ProjectPage: React.FC = () => {
 	useEffect(() => {
 		if (projectList) {
 			const foundProject = projectList.find(
-				(project: ProjectType) => project.id === selectedProjectId
+				(project: ProjectType) => project.name === decodeURIComponent(params.name.toString())
 			);
 			if (foundProject) {
 				setSelectedProject(foundProject);
@@ -354,10 +321,7 @@ const ProjectPage: React.FC = () => {
 			);
 
 			return (
-				<div
-					className="flex gap-x-4 gap-y-4 items-center justify-center"
-					key={user.id}
-				>
+				<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={user.id}>
 					<div onClick={() => handleUserChange(user)}>
 						{memoizedSVGAlphabet}
 					</div>
@@ -382,17 +346,6 @@ const ProjectPage: React.FC = () => {
 			) : (
 				<LoadingSpinner />
 			)}
-			<div>
-				{selectedProject ? (
-					<ProjectDetails
-						project={selectedProject}
-						projectList={projectList}
-						setProjectList={setProjectList}
-					/>
-				) : (
-					<></>
-				)}
-			</div>
 		</div>
 	);
 };
