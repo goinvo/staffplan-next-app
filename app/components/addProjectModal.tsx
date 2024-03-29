@@ -107,7 +107,7 @@ const AddProject = () => {
 		if (!values.name) {
 			errors.name = "Project Name is required";
 		}
-		if (values.name && !parsedProject) {
+		if (values.name && selectedClient) {
 			const currentClient = clientList.find((client: ClientType) => {
 				if (client.id === selectedClient) return client;
 			});
