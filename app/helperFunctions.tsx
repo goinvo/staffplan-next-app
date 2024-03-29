@@ -78,16 +78,16 @@ export function processUserAssignmentDataMap(
 
 		user.assignments.forEach((assignment: any) => {
 			if (assignment.project.id && assignment.workWeeks.length > 0) {
-				processWorkWeeks(processedDataMap, userId, assignment);
+				processWorkWeeksForAssignment(processedDataMap, userId, assignment);
 			}
 		});
-		updateMaxTotalEstHours(processedDataMap, userId);
+		updateMaxTotalEstHoursForAssignment(processedDataMap, userId);
 	});
 
 	return processedDataMap;
 }
 
-function processWorkWeeks(
+function processWorkWeeksForAssignment(
 	processedDataMap: UserAssignmentDataMapType,
 	userId: string,
 	assignment: any
@@ -105,7 +105,7 @@ function processWorkWeeks(
 			[]
 		).reverse();
 
-		const consecutivePrevWeeks = getConsecutivePrevWeeks(
+		const consecutivePrevWeeks = getConsecutivePrevWeeksForAssignment(
 			processedDataMap,
 			userId,
 			workWeek,
@@ -131,7 +131,7 @@ function processWorkWeeks(
 	});
 }
 
-function getConsecutivePrevWeeks(
+function getConsecutivePrevWeeksForAssignment(
 	processedDataMap: UserAssignmentDataMapType,
 	userId: string,
 	workWeek: any,
@@ -155,7 +155,7 @@ function getConsecutivePrevWeeks(
 	return 0;
 }
 
-function updateMaxTotalEstHours(
+function updateMaxTotalEstHoursForAssignment(
 	processedDataMap: UserAssignmentDataMapType,
 	userIdString: string
 ) {
@@ -220,108 +220,89 @@ export function getWorkWeeksForUserByWeekAndYearForUsers(
 
 export function processProjectDataMap(projectsList: any): ProjectDataMapType {
 	const processedDataMap: ProjectDataMapType = {};
-
+  
 	projectsList.forEach((project: any) => {
-		const projectId = project.id;
-		processedDataMap[projectId] = {};
-		let maxTotalEstHours = 40;
-
-		project.workWeeks.forEach((workWeek: any) => {
-			if (!processedDataMap[projectId][workWeek.year]) {
-				processedDataMap[projectId][workWeek.year] = {};
-			}
-			if (!processedDataMap[projectId][workWeek.year][workWeek.cweek]) {
-				processedDataMap[projectId][workWeek.year][workWeek.cweek] = [];
-			}
-
-			let consecutivePrevWeeks = 0;
-			// Check if the previous week is consecutive and update the consecutivePrevWeeks count
-			const prevWeek = processedDataMap[projectId][workWeek.year][
-				workWeek.cweek - 1
-			]?.find(
-				(block: WorkWeekBlockMemberType) =>
-					block.workWeek.user && block.workWeek.user.name === workWeek.user.name
-			);
-			if (prevWeek) {
-				consecutivePrevWeeks = prevWeek.consecutivePrevWeeks + 1;
-				prevWeek.isLastConsecutiveWeek = false;
-			}
-
-			// Get the previous week's work week blocks in reverse order
-			const prevWeekBlocks = [
-				...(processedDataMap[projectId][workWeek.year][workWeek.cweek - 1] ||
-					[]),
-			].reverse();
-
-			// Get the current week's work week blocks
-			const currentWeekBlocks = [
-				...processedDataMap[projectId][workWeek.year][workWeek.cweek],
-			];
-
-			const currentWorkWeekBlock = {
-				workWeek: workWeek,
-				consecutivePrevWeeks: consecutivePrevWeeks,
-				isLastConsecutiveWeek: true,
-				itemEstHoursOffset: 0,
-				maxTotalEstHours: 40,
-			};
-
-			currentWeekBlocks.push(currentWorkWeekBlock);
-
-			// Find the best matching order for the current week's blocks
-			const bestMatchingOrder = matchWorkWeekBlocks(
-				prevWeekBlocks,
-				currentWeekBlocks
-			);
-
-			// Update the current week's blocks with the best matching order
-			processedDataMap[projectId][workWeek.year][workWeek.cweek] =
-				bestMatchingOrder;
-		});
-
-		// Iterate through each given week and year to get users for a given time, then calculate total est hours
-		Object.keys(processedDataMap[projectId]).forEach((year: string) => {
-			const yearAsNumber = parseInt(year);
-			Object.keys(processedDataMap[projectId][yearAsNumber]).forEach(
-				(cweek) => {
-					const cweekAsNumber = parseInt(cweek);
-					const workWeekBlocks =
-						processedDataMap[projectId][yearAsNumber][cweekAsNumber];
-					let totalEstHours = 0;
-
-					// Calculate the total estimated hours for the week
-					workWeekBlocks.forEach((workWeekBlock) => {
-						totalEstHours += workWeekBlock.workWeek.estimatedHours || 0;
-					});
-
-					// If the total estimated hours for the week is greater than 40, update the maxTotalEstHours
-					if (totalEstHours > 40) {
-						maxTotalEstHours = totalEstHours;
-					}
-				}
-			);
-		});
-
-		// Update the maxTotalEstHours for each user under the project
-		Object.keys(processedDataMap[projectId]).forEach((year: string) => {
-			const yearAsNumber = parseInt(year);
-			Object.keys(processedDataMap[projectId][yearAsNumber]).forEach(
-				(cweek) => {
-					const cweekAsNumber = parseInt(cweek);
-					const workWeekBlocks =
-						processedDataMap[projectId][yearAsNumber][cweekAsNumber];
-
-					// Update the maxTotalEstHours for each user
-					workWeekBlocks.forEach((workWeekBlock) => {
-						workWeekBlock.maxTotalEstHours = maxTotalEstHours;
-					});
-				}
-			);
-		});
+	  const projectId = project.id;
+	  processedDataMap[projectId] = {};
+  
+	  project.workWeeks.forEach((workWeek: any) => {
+		processWorkWeeks(processedDataMap, projectId, workWeek);
+	  });
+  
+	  updateMaxTotalEstHoursForProject(processedDataMap, projectId);
 	});
-
+  
 	return processedDataMap;
-}
+  }
+  
+  function processWorkWeeks(
+	processedDataMap: ProjectDataMapType,
+	projectId: string,
+	workWeek: any
+  ) {
+	const { year, cweek } = workWeek;
+  
+	_.set(processedDataMap, [projectId, year, cweek], []);
+  
+	const consecutivePrevWeeks = getConsecutivePrevWeeksForProject(processedDataMap, projectId, workWeek);
+	const prevWeekBlocks = _.get(processedDataMap, [projectId, year, cweek - 1], []).reverse();
+	const currentWeekBlocks = _.get(processedDataMap, [projectId, year, cweek], []);
+  
+	const currentWorkWeekBlock: WorkWeekBlockMemberType = {
+	  workWeek,
+	  consecutivePrevWeeks,
+	  isLastConsecutiveWeek: true,
+	  itemEstHoursOffset: 0,
+	  maxTotalEstHours: 40,
+	};
+  
+	currentWeekBlocks.push(currentWorkWeekBlock);
+  
+	const bestMatchingOrder = matchWorkWeekBlocks(prevWeekBlocks, currentWeekBlocks);
+  
+	_.set(processedDataMap, [projectId, year, cweek], bestMatchingOrder);
+  }
+  
+  function getConsecutivePrevWeeksForProject(
+	processedDataMap: ProjectDataMapType,
+	projectId: string,
+	workWeek: any
+  ): number {
+	const prevWeek = _.get(processedDataMap, [projectId, workWeek.year, workWeek.cweek - 1], []).find(
+	  (block: WorkWeekBlockMemberType) =>
+		block.workWeek.user && block.workWeek.user.name === workWeek.user.name
+	);
+  
+	if (prevWeek) {
+	  prevWeek.isLastConsecutiveWeek = false;
+	  return prevWeek.consecutivePrevWeeks + 1;
+	}
+  
+	return 0;
+  }
+  
+  function updateMaxTotalEstHoursForProject(processedDataMap: ProjectDataMapType, projectIdString: string) {
+	let maxTotalEstHours = 40;
+	const projectId = parseInt(projectIdString);
+	
+	_.forOwn(processedDataMap[projectId], (yearData: { [cweek: number]: WorkWeekBlockMemberType[] }, year: string) => {
+	  _.forOwn(yearData, (workWeekBlocks: WorkWeekBlockMemberType[], cweek: string) => {
+		const totalEstHours = _.sumBy(workWeekBlocks, (block) => block.workWeek.estimatedHours || 0);
+  
+		if (totalEstHours > maxTotalEstHours) {
+		  maxTotalEstHours = totalEstHours;
+		}
+	  });
+	});
+  
+	_.forOwn(processedDataMap[projectId], (yearData: { [cweek: number]: WorkWeekBlockMemberType[] }, year: string) => {
+	  _.forOwn(yearData, (workWeekBlocks: WorkWeekBlockMemberType[], cweek: string) => {
+		workWeekBlocks.forEach((workWeekBlock) => {
+		  workWeekBlock.maxTotalEstHours = maxTotalEstHours;
+		});
+	  });
+	});
+  }
 
 export function getWorkWeeksForProjectByWeekAndYearForProjects(
 	projectDataMap: ProjectDataMapType,
