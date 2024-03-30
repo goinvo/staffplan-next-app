@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect, ReactNode } from "react";
+import React, { useState, useEffect, useMemo, ReactNode } from "react";
 import useInfiniteScroll, {
     InfiniteScrollRef,
     ScrollDirection,
@@ -7,10 +7,11 @@ import useInfiniteScroll, {
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import SideList, { sideListGutterHeight } from "./sideList";
 import { render } from "@testing-library/react";
-import { getWeek, setWeek, isAfter, eachWeekOfInterval, addDays, differenceInWeeks } from "date-fns";
+import { getWeek, setWeek, isAfter, eachWeekOfInterval, addDays, addWeeks, format, differenceInWeeks } from "date-fns";
 import { useUserDataContext } from "../userDataContext";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { get } from "http";
+import { throttle } from 'lodash';
 
 export interface SideLabelComponents {
     labelContents: React.ReactNode[];
@@ -151,7 +152,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
                         monthLabels: [...newData.monthLabels, ...prev.monthLabels],
                     } as WeeksAndLabels)
                 );
-            // If we scroll too much to the right, we need to load more weeks from the next year
+                // If we scroll too much to the right, we need to load more weeks from the next year
             } else {
                 yearWindow.end += 1;
                 const newData = await loadMore(yearWindow.end);
@@ -207,23 +208,38 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
         }
     };
 
+    // Create a throttled version of the pushNewUrl function
+    const throttledPushNewUrl = useMemo( // Needs to be memoized so it doesn't generate a new function each time
+        () =>
+            throttle((year: number, week: number) => {
+                pushNewUrl(year, week);
+            }, 1000), // Limit to every second
+        []
+    );
+
     // This function scrolls the weeks to the left or right when the respective button is clicked
     const scrollWeeks = (direction: "left" | "right") => {
         const container = weekContainerRef.current;
         if (container) {
             const scrollWidth = container.offsetWidth;
+            const weeksToScroll = Math.floor(scrollWidth / weekWidth);
+            const currentUrl = new URL(window.location.href);
+            const currentYear = parseInt(currentUrl.searchParams.get("year") ?? today.getFullYear().toString());
+            const currentWeek = parseInt(currentUrl.searchParams.get("week") ?? getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 }).toString());
+
+            if (currentWeek) {
+                const currentDate = new Date(currentYear, 0, 1 + (currentWeek - 1) * 7);
+                const newDate = addWeeks(currentDate, direction === "left" ? -weeksToScroll : weeksToScroll);
+                const newYear = parseInt(format(newDate, 'yyyy'));
+                const newWeek = Math.floor((newDate.getTime() - new Date(newYear, 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000)) + 1;
+
+                throttledPushNewUrl(newYear, newWeek);
+            }
+
             container.scrollBy({
-                left: direction == "left" ? -scrollWidth : scrollWidth,
+                left: direction === "left" ? -scrollWidth : scrollWidth,
                 behavior: "smooth",
             });
-
-            const currentDateIndex = Math.floor(container.scrollLeft / weekWidth + sideOffsetItems);
-            const currentWeek = data.weeks[currentDateIndex];
-
-            // Update the URL params to reflect the current week
-            if (currentWeek) {
-                pushNewUrl(currentWeek.year, currentWeek.week);
-            }
         }
     };
 
@@ -244,6 +260,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
     // This function is called when the user is dragging the weeks
     const onDragMove = (event: MouseEvent) => {
         if (!isDragging) return;
+
         const container = weekContainerRef.current;
         if (container) {
             // Calculate the new scroll position based on the mouse movement
@@ -254,19 +271,15 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
             // Update the URL params to reflect the current week
             const currentDateIndex = Math.floor(container.scrollLeft / weekWidth + sideOffsetItems);
             const currentWeek = data.weeks[currentDateIndex];
-
             if (currentWeek) {
-                pushNewUrl(currentWeek.year, currentWeek.week);
+                throttledPushNewUrl(currentWeek.year, currentWeek.week);
             }
         }
     };
 
-    // This function updates the URL params asynchronously to reflect the current week
-    async function pushNewUrl(year: number, week: number) {
-        const currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.set("year", year.toString());
-        currentUrl.searchParams.set("week", week.toString());
-        window.history.pushState({}, "", currentUrl.toString());
+    // This function updates the URL params to reflect the current week
+    function pushNewUrl(year: number, week: number) {
+        router.push(`?year=${year}&week=${week}`, { scroll: false });
     }
 
     // This function is called when the user stops dragging the weeks
@@ -307,7 +320,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
                             <div className="flex flex-col text-nowrap" style={{ width: weekWidth + "px" }} key={index}>
                                 <div className="flex flex-row grow text-sm">{data.monthLabels[index]}</div>
                                 <div className={"flex flex-row grow-0 text-sm"}>{week.date}
-                                {week.week === getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 }) && week.year === today.getFullYear() ? <div className="flex flex-row items-center text-xs text-red-500">Today</div> : <></>}
+                                    {week.week === getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 }) && week.year === today.getFullYear() ? <div className="flex flex-row items-center text-xs text-red-500">Today</div> : <></>}
                                 </div>
                                 <div className={"flex flex-row grow-0 relative"}>
                                     <div className={"top-0 left-0 timeline-grid-gap-bg"} style={{ width: weekWidth + "px" }} key={index}>
