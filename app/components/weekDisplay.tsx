@@ -5,7 +5,7 @@ import useInfiniteScroll, {
     ScrollDirection,
 } from "react-easy-infinite-scroll-hook";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import SideListRight, { sideListRightGutterHeight } from "./sideListRight";
+import SideListLeft, { sideListLeftGutterHeight } from "./sideListLeft";
 import { render } from "@testing-library/react";
 import { getWeek, setWeek, isAfter, eachWeekOfInterval, addDays, addWeeks, format, differenceInWeeks } from "date-fns";
 import { useUserDataContext } from "../userDataContext";
@@ -319,7 +319,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
 
     return (
         <div className="relative">
-            <SideListRight labelContents={labelContents} setDivHeights={setSideLabelDivHeights} offset={48} />
+            <SideListLeft labelContents={labelContents} setDivHeights={setSideLabelDivHeights} offset={48} />
             <div className="flex items-center my-4">
                 <button onClick={() => scrollWeeks('left')} className="p-2 rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center"><FaChevronLeft className="timeline-text-accent" /></button>
                 <div
@@ -337,12 +337,12 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
                                 <div className={"flex flex-row grow-0 relative"}>
                                     <div className={"top-0 left-0 timeline-grid-gap-bg"} style={{ width: weekWidth + "px" }} key={index}>
                                         {sideLabelDivHeights.map((height, rowIndex) => {
-                                            return <div className="flex border-l timeline-grid-bg timeline-grid-border" style={{ height: height + sideListRightGutterHeight * 2, marginBottom: sideListRightGutterHeight }} key={rowIndex}
+                                            return <div className="flex border-l timeline-grid-bg timeline-grid-border" style={{ height: height + sideListLeftGutterHeight * 2, marginBottom: sideListLeftGutterHeight }} key={rowIndex}
                                                 onMouseOver={onMouseOverWeek ? () => onMouseOverWeek(week.week, week.year, rowIndex) : () => { }}
                                                 onMouseDown={onMouseClickWeek ? () => onMouseClickWeek(week.week, week.year, rowIndex) : () => { }}>
                                                 {
                                                     <div className="flex flex-col">
-                                                        {renderCell ? renderCell(week.week, week.year, rowIndex, (selectedCell && selectedCell.week === week.week && selectedCell.year === week.year && selectedCell.rowId == rowIndex) || false, weekWidth, height + sideListRightGutterHeight * 2) : <div></div>}
+                                                        {renderCell ? renderCell(week.week, week.year, rowIndex, (selectedCell && selectedCell.week === week.week && selectedCell.year === week.year && selectedCell.rowId == rowIndex) || false, weekWidth, height + sideListLeftGutterHeight * 2) : <div></div>}
                                                     </div>
                                                 }
                                             </div>
