@@ -13,12 +13,6 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { get } from "http";
 import { throttle } from 'lodash';
 
-export interface SideLabelComponents {
-    labelContents: React.ReactNode[];
-    setDivHeights: (heights: number[]) => void;
-    offset: number;
-};
-
 export type WeekDisplayProps = {
     labelContents: React.ReactNode[];
     onMouseOverWeek?: (week: number, year: number, cellId: number) => void;

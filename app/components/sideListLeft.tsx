@@ -2,9 +2,9 @@
 import { SideLabelComponentsType } from './../typeInterfaces';
 import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 
-export const sideListRightGutterHeight = 8;
+export const sideListLeftGutterHeight = 8;
 
-const SideListRight: React.FC<SideLabelComponentsType> = ({ labelContents, setDivHeights, offset }) => {
+const SideListLeft: React.FC<SideLabelComponentsType> = ({ labelContents, setDivHeights, offset }) => {
   // Use useRef to keep references to the div elements
   const divRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -32,8 +32,8 @@ const SideListRight: React.FC<SideLabelComponentsType> = ({ labelContents, setDi
 
   return (
     <div className="relative z-40">
-      <div className="absolute left-0 z-40" style={{ top: offset + "px" }}>
-        <div className="flex flex-col" style={{ rowGap: sideListRightGutterHeight * 3 + "px" }}>
+      <div className="absolute right-0 z-40" style={{ top: offset + "px" }}>
+        <div className="flex flex-col" style={{ rowGap: sideListLeftGutterHeight * 3 + "px" }}>
           {memoizedLabelContents}
         </div>
       </div>
@@ -41,4 +41,4 @@ const SideListRight: React.FC<SideLabelComponentsType> = ({ labelContents, setDi
   );
 };
 
-export default SideListRight;
+export default SideListLeft;
