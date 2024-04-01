@@ -32,7 +32,7 @@ const SideListRight: React.FC<SideLabelComponentsType> = ({ labelContents, setDi
 
   return (
     <div className="relative z-40">
-      <div className="absolute left-0 z-40" style={{ top: offset + "px" }}>
+      <div className="absolute right-0 z-40" style={{ top: offset + "px" }}>
         <div className="flex flex-col" style={{ rowGap: sideListRightGutterHeight * 3 + "px" }}>
           {memoizedLabelContents}
         </div>
