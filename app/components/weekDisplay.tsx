@@ -190,9 +190,11 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
         // For some reason the router isn't updating the search params when the URL changes, so pull it directly
         const currentUrl = new URL(window.location.href);
 
-        // Get the week and year from the search params
-        const year = parseInt(currentUrl.searchParams.get("year") ?? today.getFullYear().toString());
-        const week = parseInt(currentUrl.searchParams.get("week") ?? getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 }).toString());
+        // Get the week and year from local storage, or use the current date if not available
+        const storedYear = localStorage.getItem('year');
+        const storedWeek = localStorage.getItem('week');
+        const year = storedYear ? parseInt(storedYear) : today.getFullYear();
+        const week = storedWeek ? parseInt(storedWeek) : getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 });
 
         const weeksToScroll = differenceInWeeks(today, setWeek(new Date(year, 0, 1), week, { weekStartsOn: 1, firstWeekContainsDate: 1 }))
 
@@ -204,8 +206,12 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
                 behavior: "smooth",
             });
 
-            window.history.pushState({}, "", `?year=${today.getFullYear()}&week=${getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 })}`);
+            pushNewUrl(today.getFullYear(), getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 }));
         }
+
+        // Update the local storage with the current week and year
+        localStorage.setItem('year', today.getFullYear().toString());
+        localStorage.setItem('week', getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 }).toString());
     };
 
     // Create a throttled version of the pushNewUrl function
@@ -224,17 +230,26 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
             const scrollWidth = container.offsetWidth;
             const weeksToScroll = Math.floor(scrollWidth / weekWidth);
             const currentUrl = new URL(window.location.href);
-            const currentYear = parseInt(currentUrl.searchParams.get("year") ?? today.getFullYear().toString());
-            const currentWeek = parseInt(currentUrl.searchParams.get("week") ?? getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 }).toString());
+
+            // Get the week and year from local storage, or use the current date if not available
+            const storedYear = localStorage.getItem('year');
+            const storedWeek = localStorage.getItem('week');
+            const currentYear = storedYear ? parseInt(storedYear) : today.getFullYear();
+            const currentWeek = storedWeek ? parseInt(storedWeek) : getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 });
 
             if (currentWeek) {
                 const currentDate = new Date(currentYear, 0, 1 + (currentWeek - 1) * 7);
                 const newDate = addWeeks(currentDate, direction === "left" ? -weeksToScroll : weeksToScroll);
                 const newYear = parseInt(format(newDate, 'yyyy'));
-                const newWeek = Math.floor((newDate.getTime() - new Date(newYear, 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000)) + 1;
+                const newWeek = getWeek(newDate, { weekStartsOn: 1, firstWeekContainsDate: 1 });
 
+                // Push the new week and year to local storage synchronously and to the URL asynchronously
+                localStorage.setItem('year', newYear.toString());
+                localStorage.setItem('week', newWeek.toString());
                 throttledPushNewUrl(newYear, newWeek);
             }
+
+            console.log("scrolling", direction, scrollWidth, " as weeks: ", weeksToScroll);
 
             container.scrollBy({
                 left: direction === "left" ? -scrollWidth : scrollWidth,
@@ -274,6 +289,9 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContents, onMouseOverWee
             if (currentWeek) {
                 throttledPushNewUrl(currentWeek.year, currentWeek.week);
             }
+            // Update the local storage with the current week and year
+            localStorage.setItem('year', currentWeek.year.toString());
+            localStorage.setItem('week', currentWeek.week.toString());
         }
     };
 
