@@ -2,9 +2,9 @@
 import { SideLabelComponents } from './weekDisplay';
 import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 
-export const sideListGutterHeight = 8;
+export const sideListRightGutterHeight = 8;
 
-const SideList: React.FC<SideLabelComponents> = ({ labelContents, setDivHeights, offset }) => {
+const SideListRight: React.FC<SideLabelComponents> = ({ labelContents, setDivHeights, offset }) => {
   // Use useRef to keep references to the div elements
   const divRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -33,7 +33,7 @@ const SideList: React.FC<SideLabelComponents> = ({ labelContents, setDivHeights,
   return (
     <div className="relative z-40">
       <div className="absolute left-0 z-40" style={{ top: offset + "px" }}>
-        <div className="flex flex-col" style={{ rowGap: sideListGutterHeight * 3 + "px" }}>
+        <div className="flex flex-col" style={{ rowGap: sideListRightGutterHeight * 3 + "px" }}>
           {memoizedLabelContents}
         </div>
       </div>
@@ -41,4 +41,4 @@ const SideList: React.FC<SideLabelComponents> = ({ labelContents, setDivHeights,
   );
 };
 
-export default SideList;
+export default SideListRight;
