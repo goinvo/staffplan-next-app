@@ -162,62 +162,26 @@ const ProjectPage: React.FC = () => {
 		isSelected: boolean
 	) => {
 		const workWeekData = lookupWorkWeekData(rowIndex, year, cweek);
-		if (
-			workWeekData &&
-			(workWeekData.estimatedHours || workWeekData.actualHours)
-		) {
-			if (isSelected) {
-				return (
-					<>
-						<div className="flex flex-row">Est:</div>
-						<input
-							className="flex flex-row"
-							value={currEstHours || ""}
-							onChange={(e) => handleCurrEstHoursChange(e)}
-						></input>
-						<div className="flex flex-row">Act:</div>
-						<input
-							className="flex flex-row"
-							value={currActHours || ""}
-							onChange={(e) => handleCurrActHoursChange(e)}
-						></input>
-					</>
-				);
-			} else {
-				return (
-					<>
-						<div className="flex flex-row">Est:</div>
-						<div className="flex flex-row">
-							{workWeekData.estimatedHours || "0"}
-						</div>
-						<div className="flex flex-row">Act:</div>
-						<div className="flex flex-row">
-							{workWeekData.actualHours || "0"}
-						</div>
-					</>
-				);
-			}
-		}
-		if (isSelected) {
-			return (
-				<>
-					<div className="flex flex-row">Est:</div>
-					<input
-						className="flex flex-row"
-						value={currEstHours || ""}
-						onChange={(e) => handleCurrEstHoursChange(e)}
-					></input>
-					<div className="flex flex-row">Act:</div>
-					<input
-						className="flex flex-row"
-						value={currActHours || ""}
-						onChange={(e) => handleCurrActHoursChange(e)}
-					></input>
-				</>
-			);
-		} else {
-			return <></>;
-		}
+
+		const estimatedHours = workWeekData?.estimatedHours || "0";
+		const actualHours = workWeekData?.actualHours || "0";
+
+		return (
+			<>
+				<input
+					className="flex flex-row"
+					value={isSelected ? currEstHours || estimatedHours : estimatedHours}
+					placeholder="Estimated Hours"
+					onChange={(e) => handleCurrEstHoursChange(e)}
+				/>
+				<input
+					className="flex flex-row"
+					value={isSelected ? currActHours || actualHours : actualHours}
+					placeholder="Actual Hours"
+					onChange={(e) => handleCurrActHoursChange(e)}
+				/>
+			</>
+		);
 	};
 
 	const lookupWorkWeekData = (
