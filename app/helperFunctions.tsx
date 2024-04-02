@@ -95,9 +95,8 @@ function processWorkWeeksForAssignment(
 	assignment.workWeeks.forEach((workWeek: any) => {
 		const { year, cweek } = workWeek;
 
-		_.setWith(processedDataMap, [userId, year, cweek], [], Object);
-
-		const currentWeekBlocks = _.get(processedDataMap, [userId, year, cweek]);
+		// Get the current week's work week blocks or initialize an empty array if it doesn't exist
+		const currentWeekBlocks = _.get(processedDataMap, [userId, year, cweek], []);
 
 		const prevWeekBlocks = _.get(
 			processedDataMap,
@@ -120,14 +119,26 @@ function processWorkWeeksForAssignment(
 			maxTotalEstHours: 40,
 		};
 
-		currentWeekBlocks.push(currentWorkWeekBlock);
+		const updatedCurrentWeekBlocks = [...currentWeekBlocks, currentWorkWeekBlock];
 
-		// const bestMatchingOrder = matchWorkWeekBlocks(
-		// 	prevWeekBlocks,
-		// 	currentWeekBlocks
-		// );
+		_.set(processedDataMap, [userId, year, cweek], updatedCurrentWeekBlocks);
 
-		_.set(processedDataMap, [userId, year, cweek], currentWeekBlocks);
+		console.log(
+			{ ...processedDataMap },
+			"processedDataMap",
+			userId,
+			"userId",
+			year,
+			"year",
+			cweek,
+			"cweek",
+			workWeek,
+			"workWeek",
+			assignment,
+			"assignment",
+			updatedCurrentWeekBlocks,
+			"updatedCurrentWeekBlocks"
+		);
 	});
 }
 
@@ -193,11 +204,13 @@ function updateMaxTotalEstHoursForAssignment(
 			_.forOwn(
 				yearData,
 				(workWeekBlocks: WorkWeekBlockMemberType[], cweek: string) => {
+				  if (workWeekBlocks) {
 					workWeekBlocks.forEach((workWeekBlock) => {
-						workWeekBlock.maxTotalEstHours = maxTotalEstHours;
+					  workWeekBlock.maxTotalEstHours = maxTotalEstHours;
 					});
+				  }
 				}
-			);
+			  );
 		}
 	);
 }
@@ -239,29 +252,29 @@ function processWorkWeeks(
 	processedDataMap: ProjectDataMapType,
 	projectId: string,
 	workWeek: any
-  ) {
+) {
 	const { year, cweek } = workWeek;
-  
+
 	// Get the current week's work week blocks or initialize an empty array if it doesn't exist
 	const currentWeekBlocks = _.get(processedDataMap, [projectId, year, cweek], []);
-  
+
 	const consecutivePrevWeeks = getConsecutivePrevWeeksForProject(processedDataMap, projectId, workWeek);
 	const prevWeekBlocks = _.get(processedDataMap, [projectId, year, cweek - 1], []).reverse();
-  
+
 	const currentWorkWeekBlock: WorkWeekBlockMemberType = {
-	  workWeek,
-	  consecutivePrevWeeks,
-	  isLastConsecutiveWeek: true,
-	  itemEstHoursOffset: 0,
-	  maxTotalEstHours: 40,
+		workWeek,
+		consecutivePrevWeeks,
+		isLastConsecutiveWeek: true,
+		itemEstHoursOffset: 0,
+		maxTotalEstHours: 40,
 	};
-  
+
 	// Add the current work week block to the current week's blocks
 	const updatedCurrentWeekBlocks = [...currentWeekBlocks, currentWorkWeekBlock];
-  
+
 	// Update the processed data map with the updated current week's blocks
 	_.set(processedDataMap, [projectId, year, cweek], updatedCurrentWeekBlocks);
-  }
+}
 
 function getConsecutivePrevWeeksForProject(
 	processedDataMap: ProjectDataMapType,
