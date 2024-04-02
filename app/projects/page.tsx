@@ -66,19 +66,51 @@ const ProjectsView: React.FC = () => {
 
 	}
 
+	const leftLabelContents = projectList?.map((project) => (
+		<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={project.id}>
+			<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleProjectChange(project)}><SVGAlphabet name={project.name} /></div>
+			<div className="flex">{project.name}</div>
+			<div>
+				<EllipsisProjectMenu project={project} />
+			</div>
+		</div>
+	));
+
+	const rightLabelContents = projectList?.map((project) => (
+		<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={project.id}>
+			<div className="flex flex-col">
+				<div className="flex flex-row items-center whitespace-nowrap">
+					<div className="flex flex-row items-center flex-initial">
+						<b>1.5</b>&nbsp;FTE
+					</div>
+					<div className="flex flex-row items-center flex-initial ml-2">
+						<b>4</b>&nbsp;wks
+					</div>
+				</div>
+				<div className="flex flex-row flex-grow items-center whitespace-nowrap sidebar-target-div">
+					<div className="flex flex-row items-center flex-initial">
+						Target
+					</div>
+					<div className="flex flex-row items-center justify-end flex-initial ml-2">
+						<b>456</b>&nbsp;hrs
+					</div>
+				</div>
+				<div className="flex flex-row flex-grow items-center whitespace-nowrap sidebar-planned-div">
+					<div className="flex flex-row items-center flex-initial">
+						Planned
+					</div>
+					<div className="flex flex-row items-center justify-end flex-initial ml-2">
+						<b>123</b>&nbsp;hrs
+					</div>
+				</div>
+			</div>
+		</div>
+	));
+
 	return (
 		<>
 			{
-				projectList ? <WeekDisplay labelContentsLeft={
-					projectList.map((project) => (
-						<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={project.id}>
-							<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleProjectChange(project)}><SVGAlphabet name={project.name} /></div>
-							<div className="flex">{project.name}</div>
-							<div>
-								<EllipsisProjectMenu project={project} />
-							</div>
-						</div>
-					))}
+				projectList ? <WeekDisplay labelContentsLeft={leftLabelContents} labelContentsRight={rightLabelContents}
 					renderCell={renderCell}
 				/> : <LoadingSpinner />
 			}
