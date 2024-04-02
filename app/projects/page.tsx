@@ -87,15 +87,11 @@ const ProjectsView: React.FC = () => {
 						<b>4</b>&nbsp;wks
 					</div>
 				</div>
-				<div className="flex flex-row flex-grow items-center whitespace-nowrap sidebar-target-div">
-					<div className="flex flex-row items-center flex-initial">
-						Target
-					</div>
-					<div className="flex flex-row items-center justify-end flex-initial ml-2">
-						<b>456</b>&nbsp;hrs
-					</div>
+				<div className="flex flex-row justify-between items-center whitespace-nowrap sidebar-target-div">
+					<div className="flex flex-row items-center"> Target </div>
+					<div className="flex flex-row items-center ml-2"> <b>456</b>&nbsp;hrs </div>
 				</div>
-				<div className="flex flex-row flex-grow items-center whitespace-nowrap sidebar-planned-div">
+				<div className="flex flex-row justify-between items-center whitespace-nowrap sidebar-planned-div">
 					<div className="flex flex-row items-center flex-initial">
 						Planned
 					</div>
