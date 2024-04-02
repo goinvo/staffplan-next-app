@@ -5,7 +5,7 @@ import { ProjectType } from "../typeInterfaces";
 import { useRouter, usePathname } from "next/navigation";
 import { useUserDataContext } from "../userDataContext";
 import { UserType, ProjectDataMapType } from "../typeInterfaces";
-import { processProjectDataMap, getWorkWeeksForProjectByWeekAndYearForProjects, drawBars, drawFTELabels } from "../helperFunctions";
+import { processProjectDataMap, getWorkWeeksForProjectByWeekAndYear, drawBars, drawFTELabels } from "../helperFunctions";
 import WeekDisplay from "../components/weekDisplay";
 import { LoadingSpinner } from "../components/loadingSpinner";
 import { SVGAlphabet } from "../svgAlphabet";
@@ -26,7 +26,10 @@ const ProjectsView: React.FC = () => {
 	useEffect(() => {
 		if (projectList) {
 			// Setup the map of users to their assignments' work weeks
-			setProjectAssignmentDataMap(processProjectDataMap(projectList));
+			const processedDataMap = processProjectDataMap(projectList);
+			setProjectAssignmentDataMap(processedDataMap);
+
+			console.log("projectList", projectList, "projectAssignmentDataMap", processedDataMap);
 
 			// Setup the map of row ids to project ids
 			projectList?.map((project: UserType, index: number) => {
@@ -44,16 +47,16 @@ const ProjectsView: React.FC = () => {
 	};
 
 	const renderCell = (cweek: number, year: number, rowIndex: number, isSelected: boolean, width?: number, height?: number) => {
-		const userId = rowIdtoProjectIdMap.get(rowIndex);
+		const projectId = rowIdtoProjectIdMap.get(rowIndex);
 
-		if (userId) {
-			const workWeeksForUser = getWorkWeeksForProjectByWeekAndYearForProjects(projectAssignmentDataMap, userId, cweek, year) ?? [];
+		if (projectId) {
+			const workWeeksForProject = getWorkWeeksForProjectByWeekAndYear(projectAssignmentDataMap, projectId, cweek, year) ?? [];
 
-			if (workWeeksForUser.length > 0) {
+			if (workWeeksForProject.length > 0) {
 				return (
 					<div className="relative absolute" style={{ height: height }}>
-						{drawBars(workWeeksForUser, width, height)}
-						{drawFTELabels(workWeeksForUser, width, height)}
+						{drawBars(workWeeksForProject, width, height)}
+						{drawFTELabels(workWeeksForProject, width, height)}
 					</div>
 				)
 			}

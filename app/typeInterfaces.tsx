@@ -115,3 +115,9 @@ export interface WorkWeekRenderDataType {
 	assignmentId?: number;
 	workWeekBarId?: number;
 }
+
+export interface SideLabelComponentsType {
+    labelContents: React.ReactNode[];
+    setDivHeights: (heights: number[]) => void;
+    offset: number;
+};
