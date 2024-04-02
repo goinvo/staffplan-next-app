@@ -122,23 +122,6 @@ function processWorkWeeksForAssignment(
 		const updatedCurrentWeekBlocks = [...currentWeekBlocks, currentWorkWeekBlock];
 
 		_.set(processedDataMap, [userId, year, cweek], updatedCurrentWeekBlocks);
-
-		console.log(
-			{ ...processedDataMap },
-			"processedDataMap",
-			userId,
-			"userId",
-			year,
-			"year",
-			cweek,
-			"cweek",
-			workWeek,
-			"workWeek",
-			assignment,
-			"assignment",
-			updatedCurrentWeekBlocks,
-			"updatedCurrentWeekBlocks"
-		);
 	});
 }
 

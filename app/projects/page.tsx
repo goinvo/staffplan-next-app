@@ -69,7 +69,7 @@ const ProjectsView: React.FC = () => {
 	return (
 		<>
 			{
-				projectList ? <WeekDisplay labelContents={
+				projectList ? <WeekDisplay labelContentsLeft={
 					projectList.map((project) => (
 						<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={project.id}>
 							<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleProjectChange(project)}><SVGAlphabet name={project.name} /></div>

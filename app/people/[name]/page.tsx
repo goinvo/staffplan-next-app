@@ -8,9 +8,10 @@ import {
 	AssignmentType,
 	WorkWeekRenderDataType,
 	WorkWeekType,
+	selectedCell
 } from "../../typeInterfaces";
 import { UPSERT_WORKWEEK } from "../../gqlQueries";
-import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
+import WeekDisplay from "../../components/weekDisplay";
 import { useUserDataContext } from "../../userDataContext";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
 
@@ -338,7 +339,7 @@ const {selectedUserId} = JSON.parse(decodedBase64);
 			<h1>Assignments for {selectedUser.name}</h1>
 			{userList && selectedUser && selectedUser.assignments && (
 				<WeekDisplay
-				labelContents={selectedUser.assignments.map(
+				labelContentsLeft={selectedUser.assignments.map(
 					(assignment: AssignmentType) => (
 						<div key={assignment.id}>
 								<div>{assignment.project.client.name}</div>

@@ -61,7 +61,7 @@ const PeopleView: React.FC = () => {
 		<>
 			{
 				userList ?
-				<WeekDisplay labelContents={
+				<WeekDisplay labelContentsLeft={
 					userList?.map((user: UserType) => (
 						<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={user.id}>
 							<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden" onClick={() => handleUserChange(user)}><SVGAlphabet name={user.name} /></div>
