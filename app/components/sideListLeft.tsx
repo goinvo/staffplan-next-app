@@ -4,14 +4,19 @@ import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 
 export const sideListGutterHeight = 8;
 
-const SideListLeft: React.FC<SideLabelComponentsType> = ({ labelContents, onDivHeightsUpdate, offset }) => {
+const SideListLeft: React.FC<SideLabelComponentsType> = ({ labelContents, divHeights, setDivHeights, offset }) => {
   // Use useRef to keep references to the div elements
   const divRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  const setDivHeightsCallback = useCallback((heights: number[]) => {
+    setDivHeights(heights);
+  }, [setDivHeights]);
+
   useEffect(() => {
-    const heights = divRefs.current.map((div) => div?.offsetHeight ?? 0);
-    onDivHeightsUpdate(heights);
-  }, [labelContents, onDivHeightsUpdate]);
+    // Calculate the heights of all divs and call setDivHeights with the result
+    const heights = divRefs.current.map(div => div?.offsetHeight ?? 0);
+    setDivHeightsCallback(heights);
+  }, [labelContents]);
 
   const memoizedLabelContents = useMemo(() => {
     return labelContents.map((label, index) => (
@@ -19,6 +24,7 @@ const SideListLeft: React.FC<SideLabelComponentsType> = ({ labelContents, onDivH
         key={index}
         ref={el => divRefs.current[index] = el}
         className="flex flex-row bg-white rounded-r p-4"
+        style={{ minHeight: divHeights ? divHeights[index] + "px" : "0px" }}
       >
         {label}
       </div>

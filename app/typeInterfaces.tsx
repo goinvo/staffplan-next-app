@@ -135,6 +135,7 @@ export type selectedCell = {
 
 export interface SideLabelComponentsType {
     labelContents: React.ReactNode[];
-	onDivHeightsUpdate: (heights: number[]) => void;
+	divHeights?: number[];
+	setDivHeights: (heights: number[]) => void;
     offset: number;
 };
