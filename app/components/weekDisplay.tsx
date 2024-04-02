@@ -57,11 +57,9 @@ const generateWeeksForYear = (beginYear: number): WeeksAndLabels => {
         "Dec",
     ];
     let lastMonthLabel = "";
-
-    const firstDate = addDays(currentDate, 1);
     const lastDate = new Date(beginYear, 11, 31);
 
-    const weeksInYear = eachWeekOfInterval({ start: firstDate, end: lastDate });
+    const weeksInYear = eachWeekOfInterval({ start: currentDate, end: lastDate });
 
     // If the first week is in the previous year, skip it
     if (weeksInYear[0].getFullYear() < beginYear) {
