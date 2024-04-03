@@ -371,7 +371,7 @@ const AddProject = () => {
 																				setFieldValue("hourlyRate", 0);
 																				setFieldValue("cost", 0);
 																			}}
-																			className="form-radio text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
+																			className="form-radio text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent mr-1"
 																		/>
 																		Flat Rate
 																	</label>
@@ -389,7 +389,7 @@ const AddProject = () => {
 																				handleChange(e);
 																				setFieldValue("cost", 0);
 																			}}
-																			className="form-radio text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
+																			className="form-radio text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent mr-1"
 																		/>
 																		Hourly Rate
 																	</label>
