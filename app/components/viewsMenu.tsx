@@ -57,7 +57,7 @@ export default function ViewsMenu() {
 								</p>
 							</div>
 							<div>
-								<div className="pb-3 pl-4 w-1/2 border-b-2 border-gray-200 flex">
+								<div className="pb-3 pl-4 w-1/2 border-b-2 border-gray-200 flex hover:cursor-pointer">
 									<div className="flex items-center border actionbar-border-accent rounded-full ">
 										<div
 											className={
@@ -88,7 +88,7 @@ export default function ViewsMenu() {
 								</p>
 							</div>
 							<div>
-								<div className="flex pb-3 border-b-2 border-gray-200 pl-4">
+								<div className="flex pb-3 border-b-2 border-gray-200 pl-4 hover:cursor-pointer">
 									<div className="flex items-center border actionbar-border-accent rounded-full">
 										<div
 											className={
