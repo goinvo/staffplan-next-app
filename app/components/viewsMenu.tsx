@@ -94,7 +94,7 @@ export default function ViewsMenu() {
 											className={
 												rollupSort === "none"
 													? "actionbar-bg-accent actionbar-text-accent px-4 py-1 rounded-l-full actionbar-border-accent "
-													: "px-4 py-1 rounded-r-full border-l actionbar-border-accent"
+													: "px-4 py-1 rounded-r-full actionbar-border-accent"
 											}
 											onClick={() => setRollupSort("none")}
 										>
