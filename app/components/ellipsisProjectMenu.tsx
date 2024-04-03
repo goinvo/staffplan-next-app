@@ -40,18 +40,26 @@ export default function EllipsisProjectMenu({ project }: any) {
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_PROJECT, { errorPolicy: "all" });
 	const onSubmitUpsert = (e: BaseSyntheticEvent) => {
-		const status =
-			e.target.id === "archiveProject"
-				? "archived"
-				: e.target.checked
-				? "confirmed"
-				: "unconfirmed";
+		const statusCheck = () => {
+			if (e.target.checked === true) {
+				return "confirmed";
+			}
+			if (e.target.checked === false) {
+				return "unconfirmed";
+			}
+			if (e.target.id !== "archived") {
+				return "archived";
+			}
+			if (e.target.id === "archived") {
+				return "unconfirmed";
+			}
+		};
 		//last options need to be changed to confirmed and unconfirmed when backend reflects those options
 		const variables = {
 			id: id,
 			clientId: clientId,
 			name: name,
-			status: status,
+			status: statusCheck(),
 			startsOn: startsOn,
 			cost: cost,
 		};
@@ -123,13 +131,15 @@ export default function EllipsisProjectMenu({ project }: any) {
 						</Menu.Item>
 					</div>
 					<div
-						id="archiveProject"
+						id={`${project.status}`}
 						onClick={onSubmitUpsert}
 						className={
 							"text-orange-500 block px-4 py-2 text-sm hover:text-accentgreen hover:border-b-2 hover:border-gray-200"
 						}
 					>
-						Archive Project
+						{project.status === "archived"
+							? "Unarchive Project"
+							: "Archive Project"}
 					</div>
 				</Menu.Items>
 			</Transition>
