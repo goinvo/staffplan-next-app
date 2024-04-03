@@ -1,5 +1,5 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import withApollo from "@/lib/withApollo";
 import { useMutation } from "@apollo/client";
@@ -13,19 +13,17 @@ import { UPSERT_WORKWEEK } from "../../gqlQueries";
 import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
 import { useUserDataContext } from "../../userDataContext";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
+import Image from "next/image";
 
 const UserPage: React.FC = () => {
+	const router = useRouter();
 	const params = useParams();
+	const decodedString = decodeURIComponent(params.name.toString());
+	const decodedBase64 = Buffer.from(decodedString, "base64").toString("utf-8");
+	const { selectedUserId } = JSON.parse(decodedBase64);
 
-const decodedString = decodeURIComponent(params.name.toString());
-const decodedBase64 = Buffer.from(decodedString, 'base64').toString('utf-8');
-const {selectedUserId} = JSON.parse(decodedBase64);
-		
 	const [clientSide, setClientSide] = useState(false);
-	const [selectedUser, setSelectedUser] = useState<UserType>({
-		id: NaN,
-		name: "Select",
-	});
+	const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
 	const [selectedCell, setselectedCell] = useState<selectedCell>({
 		week: 0,
 		year: 0,
@@ -98,7 +96,7 @@ const {selectedUserId} = JSON.parse(decodedBase64);
 	) => {
 		const newUserData = [...userList]; // Create a new array to avoid mutating the original userList
 		const userIndex = newUserData.findIndex(
-			(user: UserType) => user.id === selectedUser.id
+			(user: UserType) => user.id === selectedUser?.id
 		);
 
 		if (userIndex !== -1) {
@@ -219,29 +217,29 @@ const {selectedUserId} = JSON.parse(decodedBase64);
 		year: number,
 		rowIndex: number,
 		isSelected: boolean
-	  ) => {
+	) => {
 		const workWeekData = lookupWorkWeekData(rowIndex, year, cweek);
-	  
+
 		const estimatedHours = workWeekData?.estimatedHours || "0";
 		const actualHours = workWeekData?.actualHours || "0";
-	  
+
 		return (
-		  <>
-			<input
-			  className="flex flex-row"
-			  value={isSelected ? currEstHours || estimatedHours : estimatedHours}
-			  placeholder="Estimated Hours"
-			  onChange={(e) => handleCurrEstHoursChange(e)}
-			/>
-			<input
-			  className="flex flex-row"
-			  value={isSelected ? currActHours || actualHours : actualHours}
-			  placeholder="Actual Hours"
-			  onChange={(e) => handleCurrActHoursChange(e)}
-			/>
-		  </>
+			<>
+				<input
+					className="flex flex-row"
+					value={isSelected ? currEstHours || estimatedHours : estimatedHours}
+					placeholder="Estimated Hours"
+					onChange={(e) => handleCurrEstHoursChange(e)}
+				/>
+				<input
+					className="flex flex-row"
+					value={isSelected ? currActHours || actualHours : actualHours}
+					placeholder="Actual Hours"
+					onChange={(e) => handleCurrActHoursChange(e)}
+				/>
+			</>
 		);
-	  };
+	};
 
 	const lookupWorkWeekData = (
 		rowIndex: number,
@@ -323,7 +321,7 @@ const {selectedUserId} = JSON.parse(decodedBase64);
 	// If the user list has been loaded and the user's name is in the URL, get the user's ID and load their assignments
 	useEffect(() => {
 		if (clientSide && userList) {
-			const userId = selectedUserId
+			const userId = selectedUserId;
 
 			if (userId) {
 				setSelectedUserData(userId);
@@ -332,31 +330,57 @@ const {selectedUserId} = JSON.parse(decodedBase64);
 	}, [clientSide, userList, params.name]);
 
 	if (!userList) return <LoadingSpinner />;
+	const handleProjectChange = (assignment: AssignmentType) => {
+		const projectId = JSON.stringify({ selectedProjectId: assignment.project.id });
+		const encodeProjectId = Buffer.from(projectId).toString("base64");
+		router.push("/projects/" + encodeURIComponent(encodeProjectId));
+	};
 	return (
 		<>
-		<div>
-			<h1>Assignments for {selectedUser.name}</h1>
-			{userList && selectedUser && selectedUser.assignments && (
-				<WeekDisplay
-				labelContents={selectedUser.assignments.map(
-					(assignment: AssignmentType) => (
-						<div key={assignment.id}>
-								<div>{assignment.project.client.name}</div>
-								<div>{assignment.project.name}</div>
-							</div>
-						)
+			<div>
+				{selectedUser ? (
+					<h1>
+						Assignments for {selectedUser.name}{" "}
+						<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
+							<Image
+							src={`${selectedUser.avatarUrl}`}
+							alt="user avatar"
+							width={500}
+							height={500}
+						/>
+						</div>
+					</h1>
+				) : (
+					""
+				)}
+				{userList && selectedUser && selectedUser.assignments && (
+					<WeekDisplay
+						labelContents={selectedUser.assignments.map(
+							(assignment: AssignmentType) => (
+								<div key={assignment.id} onClick={()=> handleProjectChange(assignment)}>
+									<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
+										<Image
+											src={`${assignment.project.client.avatarUrl}`}
+											alt="client avatar"
+											width={500}
+											height={500}
+										/>
+									</div>
+									<div>{assignment.project.client.name}</div>
+									<div>{assignment.project.name}</div>
+								</div>
+							)
 						)}
 						onMouseOverWeek={(week, year, rowId) => {
 							handleOnMouseOverWeek(week, year, rowId);
 						}}
-						onMouseClickWeek={(week, year, rowId) => {
-						}}
+						onMouseClickWeek={(week, year, rowId) => {}}
 						renderCell={renderCell}
 						selectedCell={selectedCell}
-						/>
-						)}
-		</div>
-						</>
+					/>
+				)}
+			</div>
+		</>
 	);
 };
 

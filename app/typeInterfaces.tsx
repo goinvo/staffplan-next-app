@@ -14,6 +14,7 @@ export interface ClientType {
 	id: number;
 	name: string;
 	projects?: [ProjectType];
+	avatarUrl: string;
 }
 
 export interface EllipsisProjectMenuProps {
@@ -44,9 +45,6 @@ export interface ProjectValuesType {
 	cost: number;
 }
 
-export interface SVGAlphabetProps {
-	name: string;
-}
 export interface UpsertValues {
 	actualHours: number | string;
 	estimatedHours: number | string;
@@ -61,6 +59,7 @@ export interface UserType {
 	id?: number;
 	name: string;
 	assignments?: AssignmentType[];
+	avatarUrl:string;
 }
 
 export interface WorkWeekProps {
