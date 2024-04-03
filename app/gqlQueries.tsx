@@ -175,6 +175,7 @@ export const UPSERT_ASSIGNMENT = gql`
 		$status: String!
 		$startsOn: ISO8601Date
 		$endsOn: ISO8601Date
+		$estimatedWeeklyHours: Int
 	) {
 		upsertAssignment(
 			id: $id
@@ -183,11 +184,13 @@ export const UPSERT_ASSIGNMENT = gql`
 			status: $status
 			startsOn: $startsOn
 			endsOn: $endsOn
+			estimatedWeeklyHours: $estimatedWeeklyHours
 		) {
 			id
 			startsOn
 			endsOn
 			status
+			estimatedWeeklyHours
 			assignedUser {
 				id
 				name

@@ -55,6 +55,7 @@ const AddAssignment = () => {
 		userId,
 		status,
 		dates,
+		hours,
 	}: FormikValues) => {
 		upsertAssignment({
 			variables: {
@@ -63,6 +64,7 @@ const AddAssignment = () => {
 				status: status ? "active" : "proposed",
 				startsOn: dates.startsOn,
 				endsOn: dates.endsOn,
+				estimatedWeeklyHours: hours,
 			},
 		}).then((response) => {
 			if (response.data.upsertAssignment) {
