@@ -364,7 +364,7 @@ const ProjectPage: React.FC = () => {
 					key={user.id}
 				>
 					<div onClick={() => handleUserChange(user)}>
-						<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
+						<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden hover:cursor-pointer">
 							<Image
 								src={`${user.avatarUrl}`}
 								alt="user avatar"

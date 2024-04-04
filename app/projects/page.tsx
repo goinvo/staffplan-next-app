@@ -33,13 +33,6 @@ const ProjectsView: React.FC = () => {
 			const processedDataMap = processProjectDataMap(projectList);
 			setProjectAssignmentDataMap(processedDataMap);
 
-			console.log(
-				"projectList",
-				projectList,
-				"projectAssignmentDataMap",
-				processedDataMap
-			);
-
 			// Setup the map of row ids to project ids
 			projectList?.map((project: ProjectType, index: number) => {
 				if (project.id && !rowIdtoProjectIdMap.has(index)) {
@@ -97,7 +90,7 @@ const ProjectsView: React.FC = () => {
 							key={project.id}
 						>
 							<div
-								className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden"
+								className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden hover:cursor-pointer"
 								onClick={() => handleProjectChange(project)}
 							>
 								<Image

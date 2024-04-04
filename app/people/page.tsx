@@ -91,7 +91,7 @@ const PeopleView: React.FC = () => {
 							key={user.id}
 						>
 							<div
-								className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden"
+								className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden hover:cursor-pointer"
 								onClick={() => handleUserChange(user)}
 							>
 								<Image

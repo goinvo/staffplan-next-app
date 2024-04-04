@@ -8,6 +8,7 @@ import {
 	GET_CLIENT_DATA,
 	GET_VIEWER,
 } from "./gqlQueries";
+import { sortProjectList } from "./helperFunctions";
 
 export interface UserDataContextType {
 	userList: any;
@@ -50,7 +51,7 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 	const [clientList, setClientList] = useState<any>(null);
 	const [viewer, setViewer] = useState<any>(null);
 	const [viewsFilter, setViewsFilter] = useState<ViewsFiltersType>({
-		selectedProjectSort: "staffingNeeds",
+		selectedProjectSort: "abc",
 		assignmentSort: "slim",
 		rollupSort: "none",
 		showSummaries: false,
@@ -123,11 +124,13 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 
 	useEffect(() => {
 		if (projectData && projectData.currentCompany?.projects) {
+			const sortedProjectList = sortProjectList(viewsFilter.selectedProjectSort,projectData.currentCompany?.projects);
 			if(viewsFilter.showArchivedProjects){
-			return setProjectList(projectData.currentCompany?.projects);
+			return setProjectList(sortedProjectList);
 			}
-			setProjectList(projectData.currentCompany?.projects.filter((project: ProjectType) => project.status !== "archived"))
+			setProjectList(sortedProjectList?.filter((project: ProjectType) => project.status !== "archived"))
 		}
+		console.log(viewsFilter, "project sort method")
 	}, [projectData,viewsFilter]);
 
 	useEffect(() => {

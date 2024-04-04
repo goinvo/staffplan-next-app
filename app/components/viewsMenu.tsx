@@ -5,6 +5,13 @@ import React from "react";
 import { useUserDataContext } from "../userDataContext";
 export default function ViewsMenu() {
 	const { viewsFilter, setViewsFilter } = useUserDataContext();
+	const [selectedProjectSort, setSelectedProjectSort] =
+		useState<string>("staffingNeeds");
+	const [assignmentSort, setAssignmentSort] = useState<string>("slim");
+	const [rollupSort, setRollupSort] = useState<string>("none");
+	const [showSummaries, setShowSummaries] = useState<boolean>(false);
+	const [showArchivedProjects, setShowArchivedProjects] =
+		useState<boolean>(false);
 	const handleProjectSortChange = (
 		event: React.ChangeEvent<HTMLInputElement>
 	) => {
@@ -45,6 +52,7 @@ export default function ViewsMenu() {
 										<input
 											id="showSummaries"
 											type="checkbox"
+											defaultChecked={viewsFilter.showSummaries}
 											className="w-4 h-4 text-accentgreen bg-gray-100 border-gray-300 rounded focus:accentgreen dark:focus:ring-accentgreen dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-200 dark:border-gray-600 mr-3"
 											onClick={() => setViewsFilter({...viewsFilter,showSummaries:!viewsFilter.showSummaries})}
 										/>
@@ -190,6 +198,7 @@ export default function ViewsMenu() {
 									<input
 										id="showArchivedProjects"
 										type="checkbox"
+										defaultChecked={viewsFilter.showArchivedProjects}
 										className="w-4 h-4 text-accentgreen bg-gray-100 border-gray-300 rounded focus:accentgreen dark:focus:ring-accentgreen dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-200 dark:border-gray-600 mr-3"
 										onClick={() =>
 											setViewsFilter({...viewsFilter,showArchivedProjects:!viewsFilter.showArchivedProjects})

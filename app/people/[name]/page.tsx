@@ -358,7 +358,7 @@ const UserPage: React.FC = () => {
 						labelContents={selectedUser.assignments.map(
 							(assignment: AssignmentType) => (
 								<div key={assignment.id} onClick={()=> handleProjectChange(assignment)}>
-									<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
+									<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden hover:cursor-pointer">
 										<Image
 											src={`${assignment.project.client.avatarUrl}`}
 											alt="client avatar"

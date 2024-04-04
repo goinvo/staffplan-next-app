@@ -5,8 +5,11 @@ import Link from "next/link";
 import React from "react";
 import { UPSERT_PROJECT } from "../gqlQueries";
 import { useMutation } from "@apollo/client";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function EllipsisProjectMenu({ project }: any) {
+	const router = useRouter();
+	const pathname = usePathname();
 	const {
 		client: { name: clientName, id: clientId },
 		name,
@@ -21,7 +24,7 @@ export default function EllipsisProjectMenu({ project }: any) {
 	);
 	const dropdownSelectedItemClass = (isActive: boolean) =>
 		isActive
-			? "px-4 py-2 block border-b-2 hover:border-gray-200 hover:text-accentgreen text-sm"
+			? "px-4 py-2 block border-b-2 hover:border-gray-200 hover:text-accentgreen hover:cursor-pointer text-sm"
 			: "text-gray-900 block px-4 py-2 text-sm";
 	const query = {
 		clientName: clientName,
@@ -39,6 +42,11 @@ export default function EllipsisProjectMenu({ project }: any) {
 		upsertProject,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_PROJECT, { errorPolicy: "all" });
+	const handleProjectChange = () => {
+		const projectId = JSON.stringify({ selectedProjectId: id });
+		const encodeProjectId = Buffer.from(projectId).toString("base64");
+		router.push(pathname + "/" + encodeURIComponent(encodeProjectId));
+	};
 	const onSubmitUpsert = (e: BaseSyntheticEvent) => {
 		const statusCheck = () => {
 			if (e.target.checked === true) {
@@ -89,7 +97,10 @@ export default function EllipsisProjectMenu({ project }: any) {
 					<div className="py-1">
 						<Menu.Item>
 							{({ active }) => (
-								<p className={dropdownSelectedItemClass(active)}>
+								<p
+									className={dropdownSelectedItemClass(active)}
+									onClick={handleProjectChange}
+								>
 									View Project
 								</p>
 							)}
@@ -134,7 +145,7 @@ export default function EllipsisProjectMenu({ project }: any) {
 						id={`${project.status}`}
 						onClick={onSubmitUpsert}
 						className={
-							"text-orange-500 block px-4 py-2 text-sm hover:text-accentgreen hover:border-b-2 hover:border-gray-200"
+							"text-orange-500 block px-4 py-2 text-sm hover:text-accentgreen hover:border-b-2 hover:cursor-pointer hover:border-gray-200"
 						}
 					>
 						{project.status === "archived"
