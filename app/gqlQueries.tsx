@@ -244,6 +244,7 @@ export const UPSERT_CLIENT = gql`
 			name
 			description
 			status
+			avatarUrl
 		}
 	}
 `;
@@ -271,6 +272,7 @@ export const UPSERT_PROJECT = gql`
 			client {
 				id
 				name
+				avatarUrl
 			}
 			name
 			status

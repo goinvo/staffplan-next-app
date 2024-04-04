@@ -2,19 +2,13 @@
 import { Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import React from "react";
-
+import { useUserDataContext } from "../userDataContext";
 export default function ViewsMenu() {
-	const [selectedProjectSort, setSelectedProjectSort] =
-		useState<string>("staffingNeeds");
-	const [assignmentSort, setAssignmentSort] = useState<string>("slim");
-	const [rollupSort, setRollupSort] = useState<string>("none");
-	const [showSummaries, setShowSummaries] = useState<boolean>(false);
-	const [showArchivedProjects, setShowArchivedProjects] =
-		useState<boolean>(false);
+	const { viewsFilter, setViewsFilter } = useUserDataContext();
 	const handleProjectSortChange = (
 		event: React.ChangeEvent<HTMLInputElement>
 	) => {
-		setSelectedProjectSort(event.target.value);
+		setViewsFilter({ ...viewsFilter, selectedProjectSort: event.target.value });
 	};
 	return (
 		<Menu
@@ -25,7 +19,13 @@ export default function ViewsMenu() {
 		>
 			{({ open }) => (
 				<>
-					<div className={open ? "flex items-center border actionbar-bg-accent actionbar-text-accent actionbar-border-accent rounded-full px-5 py-1" : "flex items-center border actionbar-border-accent rounded-full px-5 py-1"}>
+					<div
+						className={
+							open
+								? "flex items-center border actionbar-bg-accent actionbar-text-accent actionbar-border-accent rounded-full px-5 py-1"
+								: "flex items-center border actionbar-border-accent rounded-full px-5 py-1"
+						}
+					>
 						<Menu.Button>Views</Menu.Button>
 					</div>
 
@@ -43,9 +43,10 @@ export default function ViewsMenu() {
 								<div>
 									<label className="block px-4 py-2 text-sm border-b-2 border-gray-200 text-gray-600">
 										<input
+											id="showSummaries"
 											type="checkbox"
 											className="w-4 h-4 text-accentgreen bg-gray-100 border-gray-300 rounded focus:accentgreen dark:focus:ring-accentgreen dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-200 dark:border-gray-600 mr-3"
-											onClick={() => setShowSummaries(!showSummaries)}
+											onClick={() => setViewsFilter({...viewsFilter,showSummaries:!viewsFilter.showSummaries})}
 										/>
 										Show Summaries
 									</label>
@@ -57,25 +58,28 @@ export default function ViewsMenu() {
 								</p>
 							</div>
 							<div>
-								<div className="pb-3 pl-4 w-1/2 border-b-2 border-gray-200 flex hover:cursor-pointer">
+								<div
+									className="pb-3 pl-4 w-1/2 border-b-2 border-gray-200 flex hover:cursor-pointer"
+									id="assignmentSort"
+								>
 									<div className="flex items-center border actionbar-border-accent rounded-full ">
 										<div
 											className={
-												assignmentSort === "slim"
+												viewsFilter.assignmentSort === "slim"
 													? "actionbar-bg-accent actionbar-text-accent px-4 py-1 rounded-l-full actionbar-border-accent "
 													: "px-4 py-1 rounded-l-full actionbar-border-accent "
 											}
-											onClick={() => setAssignmentSort("slim")}
+											onClick={() => setViewsFilter({...viewsFilter,assignmentSort:"slim"})}
 										>
 											Slim
 										</div>
 										<div
 											className={
-												assignmentSort === "wide"
+												viewsFilter.assignmentSort === "wide"
 													? "actionbar-bg-accent actionbar-text-accent px-4 py-1 rounded-r-full border-l actionbar-border-accent"
 													: "px-4 py-1 rounded-r-full border-l actionbar-border-accent"
 											}
-											onClick={() => setAssignmentSort("wide")}
+											onClick={() => setViewsFilter({...viewsFilter,assignmentSort:"wide"})}
 										>
 											Wide
 										</div>
@@ -88,35 +92,38 @@ export default function ViewsMenu() {
 								</p>
 							</div>
 							<div>
-								<div className="flex pb-3 border-b-2 border-gray-200 pl-4 hover:cursor-pointer">
+								<div
+									className="flex pb-3 border-b-2 border-gray-200 pl-4 hover:cursor-pointer"
+									id="rollupSort"
+								>
 									<div className="flex items-center border actionbar-border-accent rounded-full">
 										<div
 											className={
-												rollupSort === "none"
+												viewsFilter.rollupSort === "none"
 													? "actionbar-bg-accent actionbar-text-accent px-4 py-1 rounded-l-full actionbar-border-accent "
 													: "px-4 py-1 rounded-r-full actionbar-border-accent"
 											}
-											onClick={() => setRollupSort("none")}
+											onClick={() => setViewsFilter({...viewsFilter,rollupSort:"none"})}
 										>
 											None
 										</div>
 										<div
 											className={
-												rollupSort === "slim"
+												viewsFilter.rollupSort === "slim"
 													? "actionbar-bg-accent actionbar-text-accent px-4 py-1 actionbar-border-accent "
 													: "px-4 py-1 rounded-r-full border-l actionbar-border-accent"
 											}
-											onClick={() => setRollupSort("slim")}
+											onClick={() => setViewsFilter({...viewsFilter,rollupSort:"slim"})}
 										>
 											Slim
 										</div>
 										<div
 											className={
-												rollupSort === "wide"
+												viewsFilter.rollupSort === "wide"
 													? "actionbar-bg-accent actionbar-text-accent px-4 py-1 rounded-r-full border-l actionbar-border-accent"
 													: "px-4 py-1 rounded-r-full border-l actionbar-border-accent"
 											}
-											onClick={() => setRollupSort("wide")}
+											onClick={() => setViewsFilter({...viewsFilter,rollupSort:"wide"})}
 										>
 											Wide
 										</div>
@@ -133,7 +140,7 @@ export default function ViewsMenu() {
 											<input
 												type="radio"
 												value="staffingNeeds"
-												checked={selectedProjectSort === "staffingNeeds"}
+												checked={viewsFilter.selectedProjectSort === "staffingNeeds"}
 												onChange={handleProjectSortChange}
 												className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
 											/>
@@ -145,7 +152,7 @@ export default function ViewsMenu() {
 											<input
 												type="radio"
 												value="startDate"
-												checked={selectedProjectSort === "startDate"}
+												checked={viewsFilter.selectedProjectSort === "startDate"}
 												onChange={handleProjectSortChange}
 												className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
 											/>
@@ -157,7 +164,7 @@ export default function ViewsMenu() {
 											<input
 												type="radio"
 												value="status"
-												checked={selectedProjectSort === "status"}
+												checked={viewsFilter.selectedProjectSort === "status"}
 												onChange={handleProjectSortChange}
 												className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
 											/>
@@ -169,7 +176,7 @@ export default function ViewsMenu() {
 											<input
 												type="radio"
 												value="abc"
-												checked={selectedProjectSort === "abc"}
+												checked={viewsFilter.selectedProjectSort === "abc"}
 												onChange={handleProjectSortChange}
 												className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
 											/>
@@ -181,10 +188,11 @@ export default function ViewsMenu() {
 							<div>
 								<label className="block px-4 py-2 text-sm text-gray-600">
 									<input
+										id="showArchivedProjects"
 										type="checkbox"
 										className="w-4 h-4 text-accentgreen bg-gray-100 border-gray-300 rounded focus:accentgreen dark:focus:ring-accentgreen dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-200 dark:border-gray-600 mr-3"
 										onClick={() =>
-											setShowArchivedProjects(!showArchivedProjects)
+											setViewsFilter({...viewsFilter,showArchivedProjects:!viewsFilter.showArchivedProjects})
 										}
 									/>
 									Show Archived Projects

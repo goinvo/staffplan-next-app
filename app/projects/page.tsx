@@ -25,7 +25,7 @@ const ProjectsView: React.FC = () => {
 	const router = useRouter();
 	const pathname = usePathname();
 
-	const { projectList } = useUserDataContext();
+	const { projectList,viewsFilter } = useUserDataContext();
 
 	useEffect(() => {
 		if (projectList) {
@@ -47,7 +47,7 @@ const ProjectsView: React.FC = () => {
 				}
 			});
 		}
-	}, [projectList]);
+	}, [projectList,viewsFilter]);
 
 	const handleProjectChange = (project: ProjectType) => {
 		const projectId = JSON.stringify({ selectedProjectId: project.id });

@@ -106,6 +106,14 @@ export interface ViewerType {
 	id:string;
 }
 
+export interface ViewsFiltersType { 
+	selectedProjectSort: string;
+	assignmentSort: string;
+	rollupSort: string;
+	showSummaries: boolean;
+	showArchivedProjects: boolean;
+}
+
 export interface WorkWeekRenderDataType {
 	cweek: number;
 	year: number;
