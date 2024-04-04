@@ -415,7 +415,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContentsLeft, labelConte
                                 <div className={"flex flex-row grow-0 relative"}>
                                     <div className={"top-0 left-0 timeline-grid-gap-bg"} style={{ width: weekWidth + "px" }} key={index}>
                                         {labelContentsLeft.map((contents, rowIndex) => {
-                                            const sideLabelDivHeight = Math.max(sideLabelDivHeightsLeft[rowIndex], sideLabelDivHeightsRight[rowIndex] || 0);
+                                            const sideLabelDivHeight = Math.max(sideLabelDivHeightsLeft[rowIndex] || 0, sideLabelDivHeightsRight[rowIndex] || 0);
                                             return <div className="flex border-l timeline-grid-bg timeline-grid-border" style={{ height: sideLabelDivHeight + sideListGutterHeight * 2, marginBottom: sideListGutterHeight }} key={rowIndex}
                                                 onMouseOver={onMouseOverWeek ? () => onMouseOverWeek(week.week, week.year, rowIndex) : () => { }}
                                                 onMouseDown={onMouseClickWeek ? () => onMouseClickWeek(week.week, week.year, rowIndex) : () => { }}>
