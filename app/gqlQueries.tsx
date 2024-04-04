@@ -111,6 +111,9 @@ export const GET_USER_LIST = gql`
 				avatarUrl
 				assignments {
 					id
+          startsOn
+          endsOn
+          estimatedWeeklyHours
 					project {
 						id
 						name

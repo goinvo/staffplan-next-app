@@ -123,7 +123,7 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 			const sortedUserList = sortUserList(viewsFilter.selectedUserSort,userListData.currentCompany.users);;
 			setUserList(sortedUserList);
 		}
-	}, [userListData]);
+	}, [userListData,viewsFilter]);
 
 	useEffect(() => {
 		if (projectData && projectData.currentCompany?.projects) {

@@ -135,23 +135,6 @@ function processWorkWeeksForAssignment(
 			[userId, year, cweek],
 			updatedCurrentWeekBlocks
 		);
-
-		console.log(
-			{ ...processedDataMap },
-			"processedDataMap",
-			userId,
-			"userId",
-			year,
-			"year",
-			cweek,
-			"cweek",
-			workWeek,
-			"workWeek",
-			assignment,
-			"assignment",
-			updatedCurrentWeekBlocks,
-			"updatedCurrentWeekBlocks"
-		);
 	});
 }
 
@@ -600,6 +583,7 @@ export const sortProjectList = (
 	}
 };
 export const sortUserList = (sortMethod: string, userList: UserType[]) => {
+	console.log(userList, "user list in sort user");
 	const arrayToSort = [...userList];
 	if (sortMethod === "abcUserName") {
 		return arrayToSort.sort((a, b) => {
@@ -609,6 +593,31 @@ export const sortUserList = (sortMethod: string, userList: UserType[]) => {
 				return -1;
 			}
 			if (userA > userB) {
+				return 1;
+			}
+			return 0;
+		});
+	}
+	if (sortMethod === "userAvailability") {
+		return arrayToSort.sort((a, b) => {
+			const userA = a.assignments || [];
+			const userB = b.assignments || [];
+
+			const totalAssignedHoursUserA = userA.reduce(
+				(acc, curr) => acc + (curr.estimatedWeeklyHours || 0),
+				0
+			);
+			const totalAssignedHoursUserB = userB.reduce(
+				(acc, curr) => acc + (curr.estimatedWeeklyHours || 0),
+				0
+			);
+			const hoursA = totalAssignedHoursUserA || 0;
+			const hoursB = totalAssignedHoursUserB || 0;
+
+			if (hoursA < hoursB) {
+				return -1;
+			}
+			if (hoursA > hoursB) {
 				return 1;
 			}
 			return 0;

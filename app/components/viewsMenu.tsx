@@ -24,8 +24,6 @@ export default function ViewsMenu() {
 			});
 		}
 	};
-	console.log(pathname.split("/")[1], "views menu concept of path name ");
-
 	const projectSortOptions = () => {
 		return (
 			<>

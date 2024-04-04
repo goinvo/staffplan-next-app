@@ -9,6 +9,7 @@ export interface AssignmentType {
 	startsOn: string | null;
 	status: string;
 	workWeeks: [];
+	estimatedWeeklyHours: number;
 }
 
 export interface ClientType {
