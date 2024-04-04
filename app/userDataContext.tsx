@@ -8,7 +8,7 @@ import {
 	GET_CLIENT_DATA,
 	GET_VIEWER,
 } from "./gqlQueries";
-import { sortProjectList } from "./helperFunctions";
+import { sortProjectList, sortUserList } from "./helperFunctions";
 
 export interface UserDataContextType {
 	userList: any;
@@ -51,11 +51,13 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 	const [clientList, setClientList] = useState<any>(null);
 	const [viewer, setViewer] = useState<any>(null);
 	const [viewsFilter, setViewsFilter] = useState<ViewsFiltersType>({
-		selectedProjectSort: "abc",
+		selectedProjectSort: "abcProjectName",
+		selectedUserSort: "abcUserName",
 		assignmentSort: "slim",
 		rollupSort: "none",
 		showSummaries: false,
 		showArchivedProjects: false,
+		showInactiveUsers: false,
 	});
 	const [scrollToTodayFunction, setScrollToTodayFunction] = useState<any>(() => {});
 	const {
@@ -118,7 +120,8 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 
 	useEffect(() => {
 		if (userListData) {
-			setUserList(userListData.currentCompany.users);
+			const sortedUserList = sortUserList(viewsFilter.selectedUserSort,userListData.currentCompany.users);;
+			setUserList(sortedUserList);
 		}
 	}, [userListData]);
 

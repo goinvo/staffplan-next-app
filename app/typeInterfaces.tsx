@@ -110,10 +110,12 @@ export interface ViewerType {
 
 export interface ViewsFiltersType { 
 	selectedProjectSort: string;
+	selectedUserSort: string;
 	assignmentSort: string;
 	rollupSort: string;
 	showSummaries: boolean;
 	showArchivedProjects: boolean;
+	showInactiveUsers: boolean;
 }
 
 export interface WorkWeekRenderDataType {

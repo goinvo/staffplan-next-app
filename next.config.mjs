@@ -13,7 +13,7 @@ const nextConfig = {
 		];
 	},
 	images:{
-		domains: ['secure.gravatar.com','www.gravatar.com','staffplan.fermion.dev']
+		domains: ['secure.gravatar.com','www.gravatar.com','staffplan.fermion.dev','localhost']
 	}
 };
 export default nextConfig;

@@ -2,6 +2,7 @@ import {
 	ProjectDataMapType,
 	ProjectType,
 	UserAssignmentDataMapType,
+	UserType,
 	WorkWeekBlockMemberType,
 } from "./typeInterfaces";
 import _ from "lodash";
@@ -129,7 +130,11 @@ function processWorkWeeksForAssignment(
 			currentWorkWeekBlock,
 		];
 
-		_.setWith(processedDataMap, [userId, year, cweek], updatedCurrentWeekBlocks);
+		_.setWith(
+			processedDataMap,
+			[userId, year, cweek],
+			updatedCurrentWeekBlocks
+		);
 
 		console.log(
 			{ ...processedDataMap },
@@ -293,7 +298,11 @@ function processWorkWeeks(
 	const updatedCurrentWeekBlocks = [...currentWeekBlocks, currentWorkWeekBlock];
 
 	// Update the processed data map with the updated current week's blocks
-	_.setWith(processedDataMap, [projectId, year, cweek], updatedCurrentWeekBlocks);
+	_.setWith(
+		processedDataMap,
+		[projectId, year, cweek],
+		updatedCurrentWeekBlocks
+	);
 }
 
 function getConsecutivePrevWeeksForProject(
@@ -544,7 +553,7 @@ export const sortProjectList = (
 	projectList: ProjectType[]
 ) => {
 	const arrayToSort = [...projectList];
-	if (sortMethod === "abc") {
+	if (sortMethod === "abcProjectName") {
 		return arrayToSort.sort((a, b) => {
 			const projectA = a.name.toLowerCase();
 			const projectB = b.name.toLowerCase();
@@ -589,4 +598,21 @@ export const sortProjectList = (
 	if (sortMethod === "staffingNeeds") {
 		return arrayToSort;
 	}
+};
+export const sortUserList = (sortMethod: string, userList: UserType[]) => {
+	const arrayToSort = [...userList];
+	if (sortMethod === "abcUserName") {
+		return arrayToSort.sort((a, b) => {
+			const userA = a.name.toLowerCase();
+			const userB = b.name.toLowerCase();
+			if (userA < userB) {
+				return -1;
+			}
+			if (userA > userB) {
+				return 1;
+			}
+			return 0;
+		});
+	}
+	return userList;
 };
