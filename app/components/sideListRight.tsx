@@ -7,14 +7,10 @@ const SideListRight: React.FC<SideLabelComponentsType> = ({ labelContents, divHe
   // Use useRef to keep references to the div elements
   const divRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const setDivHeightsCallback = useCallback((heights: number[]) => {
-    setDivHeights(heights);
-  }, [setDivHeights]);
-
   useEffect(() => {
     // Calculate the heights of all divs and call setDivHeights with the result
     const heights = divRefs.current.map(div => div?.offsetHeight ?? 0);
-    setDivHeightsCallback(heights);
+    setDivHeights(heights);
   }, [labelContents]);
 
   const memoizedLabelContents = useMemo(() => {

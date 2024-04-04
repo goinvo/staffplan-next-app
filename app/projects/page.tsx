@@ -40,7 +40,7 @@ const ProjectsView: React.FC = () => {
 				}
 			});
 		}
-	}, [projectList,viewsFilter]);
+	}, [projectList, viewsFilter]);
 
 	const handleProjectChange = (project: ProjectType) => {
 		const projectId = JSON.stringify({ selectedProjectId: project.id });
