@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+
 export interface AssignmentType {
 	assignedUser: UserType;
 	endsOn: string | null;
@@ -123,8 +125,24 @@ export interface WorkWeekRenderDataType {
 	workWeekBarId?: number;
 }
 
+export type WeekDisplayProps = {
+    labelContentsLeft: React.ReactNode[];
+	labelContentsRight?: React.ReactNode[];
+    onMouseOverWeek?: (week: number, year: number, cellId: number) => void;
+    onMouseClickWeek?: (week: number, year: number, cellId: number) => void;
+    renderCell?: (week: number, year: number, cellId: number, isSelected: boolean, width?: number, height?: number) => ReactNode;
+    selectedCell?: selectedCell;
+};
+
+export type selectedCell = {
+    week: number;
+    year: number;
+    rowId: number;
+};
+
 export interface SideLabelComponentsType {
     labelContents: React.ReactNode[];
-    setDivHeights: (heights: number[]) => void;
+	divHeights?: number[];
+	setDivHeights: (heights: number[]) => void;
     offset: number;
 };

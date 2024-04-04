@@ -5,7 +5,8 @@ import useInfiniteScroll, {
 	ScrollDirection,
 } from "react-easy-infinite-scroll-hook";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import SideListLeft, { sideListLeftGutterHeight } from "./sideListLeft";
+import SideListLeft, { sideListGutterHeight } from "./sideListLeft";
+import SideListRight from "./sideListRight";
 import { render } from "@testing-library/react";
 import {
 	getWeek,
@@ -18,30 +19,10 @@ import {
 	differenceInWeeks,
 } from "date-fns";
 import { useUserDataContext } from "../userDataContext";
+import { WeekDisplayProps, selectedCell } from "../typeInterfaces";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { get } from "http";
-import { throttle } from "lodash";
-
-export type WeekDisplayProps = {
-	labelContents: React.ReactNode[];
-	onMouseOverWeek?: (week: number, year: number, cellId: number) => void;
-	onMouseClickWeek?: (week: number, year: number, cellId: number) => void;
-	renderCell?: (
-		week: number,
-		year: number,
-		cellId: number,
-		isSelected: boolean,
-		width?: number,
-		height?: number
-	) => ReactNode;
-	selectedCell?: selectedCell;
-};
-
-export type selectedCell = {
-	week: number;
-	year: number;
-	rowId: number;
-};
+import { throttle } from 'lodash';
 
 type WeekEntry = {
 	date: number;
@@ -69,27 +50,25 @@ const generateWeeksForYear = (beginYear: number): WeeksAndLabels => {
 	const weeks: WeekEntry[] = [];
 	const monthLabels: string[] = [];
 
-	let currentDate = new Date(beginYear, 0, 1);
-	const months = [
-		"Jan",
-		"Feb",
-		"Mar",
-		"Apr",
-		"May",
-		"Jun",
-		"Jul",
-		"Aug",
-		"Sep",
-		"Oct",
-		"Nov",
-		"Dec",
-	];
-	let lastMonthLabel = "";
+    let currentDate = new Date(beginYear, 0, 1);
+    const months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+    ];
+    let lastMonthLabel = "";
+    const lastDate = new Date(beginYear, 11, 31);
 
-	const firstDate = addDays(currentDate, 1);
-	const lastDate = new Date(beginYear, 11, 31);
-
-	const weeksInYear = eachWeekOfInterval({ start: firstDate, end: lastDate });
+    const weeksInYear = eachWeekOfInterval({ start: currentDate, end: lastDate });
 
 	// If the first week is in the previous year, skip it
 	if (weeksInYear[0].getFullYear() < beginYear) {
@@ -129,42 +108,19 @@ export const weekWidth = 64;
 const sideOffsetItems = 5;
 
 // The main component that renders the week display
-const WeekDisplay: React.FC<WeekDisplayProps> = ({
-	labelContents,
-	onMouseOverWeek,
-	onMouseClickWeek,
-	renderCell,
-	selectedCell,
-}) => {
-	const today = new Date();
-	const startYear = today.getFullYear();
-	const months = [
-		"Jan",
-		"Feb",
-		"Mar",
-		"Apr",
-		"May",
-		"Jun",
-		"Jul",
-		"Aug",
-		"Sep",
-		"Oct",
-		"Nov",
-		"Dec",
-	];
-	const [data, setData] = useState<WeeksAndLabels>(
-		generateWeeksForYear(startYear)
-	);
-	const [startX, setStartX] = useState(0);
-	const [scrollStartX, setScrollStartX] = useState(0);
-	const [isDragging, setIsDragging] = useState(false);
-	const [isLoading, setIsLoading] = useState(false);
-	const [yearWindow, setYearWindow] = useState<YearWindow>({
-		start: startYear,
-		end: startYear,
-	});
-	const [sideLabelDivHeights, setSideLabelDivHeights] = useState<number[]>([]);
-	const { setScrollToTodayFunction } = useUserDataContext();
+const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContentsLeft, labelContentsRight, onMouseOverWeek, onMouseClickWeek, renderCell, selectedCell }) => {
+    const today = new Date();
+    const startYear = today.getFullYear();
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const [data, setData] = useState<WeeksAndLabels>(generateWeeksForYear(startYear));
+    const [startX, setStartX] = useState(0);
+    const [scrollStartX, setScrollStartX] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [yearWindow, setYearWindow] = useState<YearWindow>({ start: startYear, end: startYear });
+    const [sideLabelDivHeightsLeft, setSideLabelDivHeightsLeft] = useState<number[]>([]);
+    const [sideLabelDivHeightsRight, setSideLabelDivHeightsRight] = useState<number[]>([]);
+    const { setScrollToTodayFunction } = useUserDataContext();
 
 	const router = useRouter();
 	const searchParams = useSearchParams();
@@ -389,135 +345,97 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 		};
 	}, [isDragging, onDragMove]);
 
-	// This function is called when the component is first mounted to link the scrollToToday function to the UserDataContext
-	useEffect(() => {
-		setScrollToTodayFunction(() => scrollToToday);
-	}, []);
+    // This function is called when the component is first mounted to link the scrollToToday function to the UserDataContext
+    useEffect(() => {
+        setScrollToTodayFunction(() => scrollToToday);
+    }, []);
 
-	return (
-		<div className="relative">
-			<SideListLeft
-				labelContents={labelContents}
-				setDivHeights={setSideLabelDivHeights}
-				offset={48}
-			/>
-			<div className="flex items-center my-4">
-				<button
-					onClick={() => scrollWeeks("left")}
-					className="p-2 rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center"
-				>
-					<FaChevronLeft className="timeline-text-accent" />
-				</button>
-				<div
-					ref={weekContainerRef}
-					className="flex flex-row overflow-x-auto scrollbar-hide cursor-grab"
-					onMouseDown={onDragStart}
-				>
-                    	<button
-					onClick={() => scrollWeeks("left")}
-					className="p-2 rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center"
-				>
-					<FaChevronLeft className="timeline-text-accent" />
-				</button>
-					<div className="flex min-w-max select-none">
-						{data.weeks.map((week, index) => (
-							<div
-								className="flex flex-col text-nowrap"
-								style={{ width: weekWidth + "px" }}
-								key={index}
-							>
-								<div className="flex flex-row grow text-sm">
-									{data.monthLabels[index]}
-								</div>
-								<div className={"flex flex-row grow-0 text-sm"}>
-									{week.date}
-									{week.week ===
-										getWeek(today, {
-											weekStartsOn: 1,
-											firstWeekContainsDate: 1,
-										}) && week.year === today.getFullYear() ? (
-										<div className="flex flex-row items-center text-xs text-red-500">
-											Today
-										</div>
-									) : (
-										<></>
-									)}
-								</div>
-								<div className={"flex flex-row grow-0 relative"}>
-									<div
-										className={"top-0 left-0 timeline-grid-gap-bg"}
-										style={{ width: weekWidth + "px" }}
-										key={index}
-									>
-										{sideLabelDivHeights.map((height, rowIndex) => {
-											return (
-												<div
-													className="flex border-l timeline-grid-bg timeline-grid-border"
-													style={{
-														height: height + sideListLeftGutterHeight * 2,
-														marginBottom: sideListLeftGutterHeight,
-													}}
-													key={rowIndex}
-													onMouseOver={
-														onMouseOverWeek
-															? () =>
-																	onMouseOverWeek(
-																		week.week,
-																		week.year,
-																		rowIndex
-																	)
-															: () => {}
-													}
-													onMouseDown={
-														onMouseClickWeek
-															? () =>
-																	onMouseClickWeek(
-																		week.week,
-																		week.year,
-																		rowIndex
-																	)
-															: () => {}
-													}
-												>
-													{
-														<div className="flex flex-col">
-															{renderCell ? (
-																renderCell(
-																	week.week,
-																	week.year,
-																	rowIndex,
-																	(selectedCell &&
-																		selectedCell.week === week.week &&
-																		selectedCell.year === week.year &&
-																		selectedCell.rowId == rowIndex) ||
-																		false,
-																	weekWidth,
-																	height + sideListLeftGutterHeight * 2
-																)
-															) : (
-																<div></div>
-															)}
-														</div>
-													}
-												</div>
-											);
-										})}
-									</div>
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
-				<button
-					onClick={() => scrollWeeks("right")}
-					className="p-2 rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center"
-				>
-					<FaChevronRight className="timeline-text-accent" />
-				</button>
-				{isLoading && <div>Loading...</div>}
-			</div>
-		</div>
-	);
+    const handleSetSideLabelDivHeightsLeft = (heights: number[]) => {
+        const updatedTotalHeights = [...heights];
+        let wasRightSideUpdated = false;
+
+        // For each height on the right side, if it's less than the new height from the left side, mark that we need to update the right side
+        sideLabelDivHeightsRight.forEach((height, index) => {
+            if (height < sideLabelDivHeightsRight[index]) {
+                wasRightSideUpdated = true;
+            }
+
+            // Update the total height to be the maximum of the two
+            updatedTotalHeights[index] = Math.max(updatedTotalHeights[index] || 0, height);
+        });
+        setSideLabelDivHeightsLeft(updatedTotalHeights);
+
+        // If the right side was updated, update the right side
+        if (wasRightSideUpdated) {
+            setSideLabelDivHeightsRight(updatedTotalHeights);
+        }
+    };
+
+    const handleSetSideLabelDivHeightsRight = (heights: number[]) => {
+        const updatedTotalHeights = [...heights];
+        let wasLeftSideUpdated = false;
+
+        // For each height on the left side, if it's less than the new height from the right side, mark that we need to update the left side
+        sideLabelDivHeightsLeft.forEach((height, index) => {
+            if (height < sideLabelDivHeightsRight[index]) {
+                wasLeftSideUpdated = true;
+            }
+
+            // Update the total height to be the maximum of the two
+            updatedTotalHeights[index] = Math.max(updatedTotalHeights[index] || 0, height);
+        });
+        setSideLabelDivHeightsRight(updatedTotalHeights);
+
+        // If the left side was updated, update the left side
+        if (wasLeftSideUpdated) {
+            setSideLabelDivHeightsLeft(updatedTotalHeights);
+        }
+    };
+
+
+    return (
+        <div className="relative">
+            <SideListLeft labelContents={labelContentsLeft} divHeights={sideLabelDivHeightsLeft} setDivHeights={handleSetSideLabelDivHeightsLeft} offset={48} />
+            {labelContentsRight && <SideListRight labelContents={labelContentsRight} divHeights={sideLabelDivHeightsRight} setDivHeights={handleSetSideLabelDivHeightsRight} offset={48} />}
+            <div className="flex items-center my-4">
+                <button onClick={() => scrollWeeks('left')} className="p-2 rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center"><FaChevronLeft className="timeline-text-accent" /></button>
+                <div
+                    ref={weekContainerRef}
+                    className="flex flex-row overflow-x-auto scrollbar-hide cursor-grab"
+                    onMouseDown={onDragStart}
+                >
+                    <div className="flex min-w-max select-none">
+                        {data.weeks.map((week, index) => (
+                            <div className="flex flex-col text-nowrap" style={{ width: weekWidth + "px" }} key={index}>
+                                <div className="flex flex-row grow text-sm">{data.monthLabels[index]}</div>
+                                <div className={"flex flex-row grow-0 text-sm"}>{week.date}
+                                    {week.week === getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 }) && week.year === today.getFullYear() ? <div className="flex flex-row items-center text-xs text-red-500">Today</div> : <></>}
+                                </div>
+                                <div className={"flex flex-row grow-0 relative"}>
+                                    <div className={"top-0 left-0 timeline-grid-gap-bg"} style={{ width: weekWidth + "px" }} key={index}>
+                                        {sideLabelDivHeightsLeft.map((height, rowIndex) => {
+                                            const sideLabelDivHeight = Math.max(height, sideLabelDivHeightsRight[rowIndex] || 0);
+                                            return <div className="flex border-l timeline-grid-bg timeline-grid-border" style={{ height: sideLabelDivHeight + sideListGutterHeight * 2, marginBottom: sideListGutterHeight }} key={rowIndex}
+                                                onMouseOver={onMouseOverWeek ? () => onMouseOverWeek(week.week, week.year, rowIndex) : () => { }}
+                                                onMouseDown={onMouseClickWeek ? () => onMouseClickWeek(week.week, week.year, rowIndex) : () => { }}>
+                                                {
+                                                    <div className="flex flex-col">
+                                                        {renderCell ? renderCell(week.week, week.year, rowIndex, (selectedCell && selectedCell.week === week.week && selectedCell.year === week.year && selectedCell.rowId == rowIndex) || false, weekWidth, sideLabelDivHeight + sideListGutterHeight * 2) : <div></div>}
+                                                    </div>
+                                                }
+                                            </div>
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                <button onClick={() => scrollWeeks('right')} className="p-2 rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center"><FaChevronRight className="timeline-text-accent" /></button>
+                {isLoading && <div>Loading...</div>}
+            </div>
+        </div>
+    );
 };
 
 export default WeekDisplay;

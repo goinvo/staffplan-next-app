@@ -8,9 +8,10 @@ import {
 	AssignmentType,
 	WorkWeekRenderDataType,
 	WorkWeekType,
+	selectedCell
 } from "../../typeInterfaces";
 import { UPSERT_WORKWEEK } from "../../gqlQueries";
-import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
+import WeekDisplay from "../../components/weekDisplay";
 import { useUserDataContext } from "../../userDataContext";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import Image from "next/image";
@@ -355,7 +356,7 @@ const UserPage: React.FC = () => {
 				)}
 				{userList && selectedUser && selectedUser.assignments && (
 					<WeekDisplay
-						labelContents={selectedUser.assignments.map(
+						labelContentsLeft={selectedUser.assignments.map(
 							(assignment: AssignmentType) => (
 								<div key={assignment.id} onClick={()=> handleProjectChange(assignment)}>
 									<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden hover:cursor-pointer">

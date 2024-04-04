@@ -85,7 +85,7 @@ const PeopleView: React.FC = () => {
 		<>
 			{userList ? (
 				<WeekDisplay
-					labelContents={userList?.map((user: UserType) => (
+					labelContentsLeft={userList?.map((user: UserType) => (
 						<div
 							className="flex gap-x-4 gap-y-4 items-center justify-center"
 							key={user.id}

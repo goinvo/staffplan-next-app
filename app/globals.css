@@ -27,6 +27,11 @@
   --timeline-bar-fill: #02AAA4;
   --timeline-actual: #7084A3;
   --timeline-stroke-below: #D1D5DB;
+
+  --sidebar-target-bg: #F5F5F5;
+  --sidebar-target-border: #7C8491;
+  --sidebar-planned-bg: #ECF7F8;
+  --sidebar-planned-border: #30B7B3;
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -113,4 +118,14 @@
 
 .timeline-text-accent {
   color: var(--timeline-accent);
+}
+
+.sidebar-target-div {
+  background-color: var(--sidebar-target-bg);
+  border-bottom: 1px solid var(--sidebar-target-border);
+}
+
+.sidebar-planned-div {
+  background-color: var(--sidebar-planned-bg);
+  border-bottom: 1px solid var(--sidebar-planned-border);
 }

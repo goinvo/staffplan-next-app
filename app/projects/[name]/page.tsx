@@ -9,9 +9,10 @@ import {
 	WorkWeekRenderDataType,
 	WorkWeekType,
 	AssignmentType,
+	selectedCell
 } from "../../typeInterfaces";
 import { UPSERT_WORKWEEK } from "../../gqlQueries";
-import WeekDisplay, { selectedCell } from "../../components/weekDisplay";
+import WeekDisplay from "../../components/weekDisplay";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import { useUserDataContext } from "@/app/userDataContext";
 import ProjectDetails from "@/app/components/projectDetails";
@@ -355,8 +356,7 @@ const ProjectPage: React.FC = () => {
 		router.push("/people" + "/" + encodeURIComponent(encodeUserId));
 	};
 
-
-	const memoizedLabelContents = useMemo(() => {
+	const memoizedLabelContentsLeft = useMemo(() => {
 		return usersWithProjectAssignment.map((user: UserType) => {
 			return (
 				<div
@@ -393,7 +393,7 @@ const ProjectPage: React.FC = () => {
 				</h1>) : ""}
 			{usersWithProjectAssignment ? (
 				<WeekDisplay
-					labelContents={memoizedLabelContents}
+					labelContentsLeft={memoizedLabelContentsLeft}
 					onMouseOverWeek={(week, year, rowId) => {
 						handleOnMouseOverWeek(week, year, rowId);
 					}}

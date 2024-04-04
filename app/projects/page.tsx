@@ -25,7 +25,7 @@ const ProjectsView: React.FC = () => {
 	const router = useRouter();
 	const pathname = usePathname();
 
-	const { projectList,viewsFilter } = useUserDataContext();
+	const { projectList, viewsFilter } = useUserDataContext();
 
 	useEffect(() => {
 		if (projectList) {
@@ -84,7 +84,7 @@ const ProjectsView: React.FC = () => {
 		<>
 			{projectList ? (
 				<WeekDisplay
-					labelContents={projectList.map((project) => (
+					labelContentsLeft={projectList.map((project) => (
 						<div
 							className="flex gap-x-4 gap-y-4 items-center justify-center"
 							key={project.id}
