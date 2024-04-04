@@ -24,6 +24,7 @@ export const GET_ASSIGNMENT_DATA = gql`
 		users {
 			id
 			name
+			avatarUrl
 		}
 	}
 `;
@@ -35,6 +36,7 @@ export const GET_CLIENT_DATA = gql`
 			id
 			name
 			status
+			avatarUrl
 		}
 	}
 `;
@@ -43,6 +45,7 @@ export const GET_PROJECT_DATA = gql`
 		clients {
 			id
 			name
+			avatarUrl
 			projects {
 				id
 				name
@@ -54,6 +57,7 @@ export const GET_PROJECT_DATA = gql`
 					assignedUser {
 						name
 						id
+						avatarUrl
 					}
 					endsOn
 					startsOn
@@ -74,6 +78,7 @@ export const GET_USER_ASSIGNMENTS = gql`
 			assignedUser {
 				name
 				id
+				avatarUrl
 			}
 			workWeeks {
 				id
@@ -88,6 +93,7 @@ export const GET_USER_ASSIGNMENTS = gql`
 				id
 				client {
 					name
+					avatarUrl
 				}
 				startsOn
 				endsOn
@@ -102,17 +108,19 @@ export const GET_USER_LIST = gql`
 			users {
 				id
 				name
+				avatarUrl
 				assignments {
 					id
 					project {
 						id
 						name
-						client{
+						client {
 							id
 							name
+							avatarUrl
 						}
 					}
-					
+
 					workWeeks {
 						project {
 							name
@@ -130,31 +138,32 @@ export const GET_USER_LIST = gql`
 
 export const GET_ALL_PROJECTS_DATA = gql`
 	{
-			currentCompany {
+		currentCompany {
 			id
-				projects {
-					id
-					name
+			projects {
+				id
+				name
 				status
 				paymentFrequency
 				startsOn
 				endsOn
 				cost
-					client {
+				client {
 					id
+					name
+					avatarUrl
+				}
+				workWeeks {
+					actualHours
+					estimatedHours
+					cweek
+					year
+					user {
 						name
 					}
-					workWeeks {
-						actualHours
-						estimatedHours
-						cweek
-				year
-				user {
-					name
 				}
 			}
-				}
-			}
+		}
 	}
 `;
 export const GET_VIEWER = gql`
@@ -162,6 +171,7 @@ export const GET_VIEWER = gql`
 		viewer {
 			name
 			id
+			avatarUrl
 		}
 	}
 `;
@@ -208,6 +218,7 @@ export const UPSERT_ASSIGNMENT = gql`
 				id
 				client {
 					name
+					avatarUrl
 				}
 				startsOn
 				endsOn
@@ -233,6 +244,7 @@ export const UPSERT_CLIENT = gql`
 			name
 			description
 			status
+			avatarUrl
 		}
 	}
 `;
@@ -260,6 +272,7 @@ export const UPSERT_PROJECT = gql`
 			client {
 				id
 				name
+				avatarUrl
 			}
 			name
 			status

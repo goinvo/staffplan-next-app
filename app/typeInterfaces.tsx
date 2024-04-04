@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+
 export interface AssignmentType {
 	assignedUser: UserType;
 	endsOn: string | null;
@@ -14,6 +16,7 @@ export interface ClientType {
 	id: number;
 	name: string;
 	projects?: [ProjectType];
+	avatarUrl: string;
 }
 
 export interface EllipsisProjectMenuProps {
@@ -44,9 +47,6 @@ export interface ProjectValuesType {
 	cost: number;
 }
 
-export interface SVGAlphabetProps {
-	name: string;
-}
 export interface UpsertValues {
 	actualHours: number | string;
 	estimatedHours: number | string;
@@ -61,6 +61,7 @@ export interface UserType {
 	id?: number;
 	name: string;
 	assignments?: AssignmentType[];
+	avatarUrl:string;
 }
 
 export interface WorkWeekProps {
@@ -107,6 +108,14 @@ export interface ViewerType {
 	id:string;
 }
 
+export interface ViewsFiltersType { 
+	selectedProjectSort: string;
+	assignmentSort: string;
+	rollupSort: string;
+	showSummaries: boolean;
+	showArchivedProjects: boolean;
+}
+
 export interface WorkWeekRenderDataType {
 	cweek: number;
 	year: number;
@@ -116,8 +125,24 @@ export interface WorkWeekRenderDataType {
 	workWeekBarId?: number;
 }
 
+export type WeekDisplayProps = {
+    labelContentsLeft: React.ReactNode[];
+	labelContentsRight?: React.ReactNode[];
+    onMouseOverWeek?: (week: number, year: number, cellId: number) => void;
+    onMouseClickWeek?: (week: number, year: number, cellId: number) => void;
+    renderCell?: (week: number, year: number, cellId: number, isSelected: boolean, width?: number, height?: number) => ReactNode;
+    selectedCell?: selectedCell;
+};
+
+export type selectedCell = {
+    week: number;
+    year: number;
+    rowId: number;
+};
+
 export interface SideLabelComponentsType {
     labelContents: React.ReactNode[];
-    setDivHeights: (heights: number[]) => void;
+	divHeights?: number[];
+	setDivHeights: (heights: number[]) => void;
     offset: number;
 };

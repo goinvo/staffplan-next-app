@@ -1,13 +1,14 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
-import { ProjectType, ClientType, ViewerType } from "./typeInterfaces";
+import { ProjectType, ClientType, ViewerType, ViewsFiltersType } from "./typeInterfaces";
 import {
 	GET_USER_LIST,
 	GET_ALL_PROJECTS_DATA,
 	GET_CLIENT_DATA,
 	GET_VIEWER,
 } from "./gqlQueries";
+import { sortProjectList } from "./helperFunctions";
 
 export interface UserDataContextType {
 	userList: any;
@@ -18,6 +19,8 @@ export interface UserDataContextType {
 	setClientList: React.Dispatch<React.SetStateAction<ClientType[]>>;
 	viewer: ViewerType;
 	setViewer: React.Dispatch<React.SetStateAction<ViewerType>>;
+	viewsFilter: ViewsFiltersType;
+	setViewsFilter: React.Dispatch<React.SetStateAction<ViewsFiltersType>>;
 	scrollToTodayFunction: () => void;
 	setScrollToTodayFunction: React.Dispatch<React.SetStateAction<() => void>>;
 }
@@ -47,6 +50,13 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 	const [projectList, setProjectList] = useState<any>(null);
 	const [clientList, setClientList] = useState<any>(null);
 	const [viewer, setViewer] = useState<any>(null);
+	const [viewsFilter, setViewsFilter] = useState<ViewsFiltersType>({
+		selectedProjectSort: "abc",
+		assignmentSort: "slim",
+		rollupSort: "none",
+		showSummaries: false,
+		showArchivedProjects: false,
+	});
 	const [scrollToTodayFunction, setScrollToTodayFunction] = useState<any>(() => {});
 	const {
 		loading: userListLoading,
@@ -114,9 +124,13 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 
 	useEffect(() => {
 		if (projectData && projectData.currentCompany?.projects) {
-			setProjectList(projectData.currentCompany?.projects);
+			const sortedProjectList = sortProjectList(viewsFilter.selectedProjectSort,projectData.currentCompany?.projects);
+			if(viewsFilter.showArchivedProjects){
+			return setProjectList(sortedProjectList);
+			}
+			setProjectList(sortedProjectList?.filter((project: ProjectType) => project.status !== "archived"))
 		}
-	}, [projectData]);
+	}, [projectData,viewsFilter]);
 
 	useEffect(() => {
 		if (clientData) {
@@ -141,6 +155,8 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 				setClientList,
 				viewer,
 				setViewer,
+				viewsFilter,
+				setViewsFilter,
 				scrollToTodayFunction,
 				setScrollToTodayFunction,
 			}}
