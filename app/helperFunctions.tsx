@@ -121,7 +121,24 @@ function processWorkWeeksForAssignment(
 
 		const updatedCurrentWeekBlocks = [...currentWeekBlocks, currentWorkWeekBlock];
 
-		_.set(processedDataMap, [userId, year, cweek], updatedCurrentWeekBlocks);
+		_.setWith(processedDataMap, [userId, year, cweek], updatedCurrentWeekBlocks);
+
+		console.log(
+			{ ...processedDataMap },
+			"processedDataMap",
+			userId,
+			"userId",
+			year,
+			"year",
+			cweek,
+			"cweek",
+			workWeek,
+			"workWeek",
+			assignment,
+			"assignment",
+			updatedCurrentWeekBlocks,
+			"updatedCurrentWeekBlocks"
+		);
 	});
 }
 
@@ -256,7 +273,7 @@ function processWorkWeeks(
 	const updatedCurrentWeekBlocks = [...currentWeekBlocks, currentWorkWeekBlock];
 
 	// Update the processed data map with the updated current week's blocks
-	_.set(processedDataMap, [projectId, year, cweek], updatedCurrentWeekBlocks);
+	_.setWith(processedDataMap, [projectId, year, cweek], updatedCurrentWeekBlocks);
 }
 
 function getConsecutivePrevWeeksForProject(
