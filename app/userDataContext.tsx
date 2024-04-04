@@ -130,7 +130,6 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 			}
 			setProjectList(sortedProjectList?.filter((project: ProjectType) => project.status !== "archived"))
 		}
-		console.log(viewsFilter, "project sort method")
 	}, [projectData,viewsFilter]);
 
 	useEffect(() => {

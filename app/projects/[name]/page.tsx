@@ -378,7 +378,6 @@ const ProjectPage: React.FC = () => {
 			);
 		});
 	}, [usersWithProjectAssignment]);
-	console.log(selectedProject)
 	return (
 		<div>
 				{selectedProject ? (<h1>
