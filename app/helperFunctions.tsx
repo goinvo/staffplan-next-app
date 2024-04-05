@@ -671,7 +671,6 @@ export const sortUserList = (sortMethod: string, userList: UserType[]) => {
 			}, 0);
 			const hoursA = totalAssignedHoursUserA || 0;
 			const hoursB = totalAssignedHoursUserB || 0;
-			console.log(hoursA, hoursB, a.name, b.name)
 			if (hoursA < hoursB) {
 				return -1;
 			}
@@ -692,7 +691,6 @@ export const sortUserList = (sortMethod: string, userList: UserType[]) => {
 			const unconfirmedPlansB = userB.filter(
 				(assignment) => assignment.status === "proposed"
 			);
-			console.log(unconfirmedPlansA, a.name, unconfirmedPlansB, b.name);
 			if (unconfirmedPlansA.length < unconfirmedPlansB.length) {
 				return 1;
 			}
