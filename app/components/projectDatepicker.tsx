@@ -45,7 +45,7 @@ export default function ProjctDatepicker(props: DatePickerProps) {
 						type="date"
 						id="startDate"
 						name={`${name}.startsOn`}
-						value={value.startsOn}
+						value={value.startsOn ?? ""}
 						onChange={onChange}
 						onBlur={handleBlur}
 					/>
@@ -71,7 +71,7 @@ export default function ProjctDatepicker(props: DatePickerProps) {
 						type="date"
 						id="endDate"
 						name={`${name}.endsOn`}
-						value={value.endsOn}
+						value={value.endsOn ?? ""}
 						onChange={(e) => {
 							onChange(e);
 							handleEndDateProjectModal();
