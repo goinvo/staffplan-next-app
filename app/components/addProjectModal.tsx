@@ -12,6 +12,7 @@ import { Dialog } from "@headlessui/react";
 import { ReactNode } from "react";
 import { useUserDataContext } from "../userDataContext";
 import { LoadingSpinner } from "./loadingSpinner";
+import { parse } from "path";
 
 const AddProject = () => {
 	const [selectedClient, setSelectedClient] = useState<number | string>("");
@@ -31,9 +32,9 @@ const AddProject = () => {
 			endsOn: parsedProject.endsOn ? parsedProject.endsOn : "",
 			startsOn: parsedProject.startsOn,
 		},
-		hours: 0,
+		hours: parsedProject.hours ? parsedProject.hours : 0,
 		name: parsedProject.name,
-		numOfFTE: "",
+		numOfFTE: parsedProject.fte ? parsedProject.fte : "",
 		payRate: "flatRate",
 		cost: parsedProject.cost,
 		status: parsedProject.status === "confirmed" ? true : false,
@@ -83,6 +84,8 @@ const AddProject = () => {
 			status: values.status ? "confirmed" : "unconfirmed",
 			startsOn: values.dates.startsOn,
 			cost: values.cost,
+			fte:values.numOfFTE,
+			hours: values.hours,
 		};
 		upsertProject({
 			variables: values.dates.endsOn
@@ -500,12 +503,12 @@ const AddProject = () => {
 																)}
 																{errors.payRate && touched.payRate && (
 																	<div className="text-red-500">
-																		{errors.payRate}
+																		{errors.payRate as ReactNode}
 																	</div>
 																)}
 																{errors.numOfFTE && touched.numOfFTE && (
 																	<div className="text-red-500">
-																		{errors.numOfFTE}
+																		{errors.numOfFTE as ReactNode}
 																	</div>
 																)}
 															</div>

@@ -21,9 +21,9 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 			endsOn: project.endsOn ? project.endsOn : "",
 			startsOn: project.startsOn,
 		},
-		hours: 0,
+		hours: project.hours,
 		name: project.name,
-		numOfFTE: "",
+		numOfFTE: project.fte,
 		payRate: "flatRate",
 		cost: project.cost,
 		status: project.status === "confirmed" ? true : false,
@@ -50,6 +50,8 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 			status: values.status ? "confirmed" : "unconfirmed",
 			startsOn: values.dates.startsOn,
 			cost: values.cost,
+			fte: values.numOfFTE,
+			hours: values.hours,
 		};
 		upsertProject({
 			variables: values.dates.endsOn
@@ -444,10 +446,10 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 												</div>
 											)}
 											{errors.payRate && touched.payRate && (
-												<div className="text-red-500">{errors.payRate}</div>
+												<div className="text-red-500">{errors.payRate as ReactNode}</div>
 											)}
 											{errors.numOfFTE && touched.numOfFTE && (
-												<div className="text-red-500">{errors.numOfFTE}</div>
+												<div className="text-red-500">{errors.numOfFTE as ReactNode}</div>
 											)}
 										</div>
 									</div>

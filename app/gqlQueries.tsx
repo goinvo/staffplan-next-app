@@ -152,6 +152,8 @@ export const GET_ALL_PROJECTS_DATA = gql`
 				startsOn
 				endsOn
 				cost
+				hours
+				fte
 				client {
 					id
 					name
@@ -262,6 +264,8 @@ export const UPSERT_PROJECT = gql`
 		$startsOn: ISO8601Date
 		$endsOn: ISO8601Date
 		$cost: Float
+		$hours: Int
+		$fte: Float
 	) {
 		upsertProject(
 			id: $id
@@ -271,6 +275,8 @@ export const UPSERT_PROJECT = gql`
 			startsOn: $startsOn
 			endsOn: $endsOn
 			cost: $cost
+			hours: $hours
+			fte: $fte
 		) {
 			id
 			client {
@@ -284,6 +290,8 @@ export const UPSERT_PROJECT = gql`
 			paymentFrequency
 			startsOn
 			endsOn
+			hours
+			fte
 			workWeeks {
 				actualHours
 				estimatedHours
