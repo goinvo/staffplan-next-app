@@ -34,12 +34,19 @@ const PeopleView: React.FC = () => {
 		if (userList) {
 			// Setup the map of users to their assignments' work weeks
 			setUserAssignmentDataMap(processUserAssignmentDataMap(userList));
+
+			// Clear the rowIdtoUserIdMap
+			setRowIdtoUserIdMap(new Map());
+
 			// Setup the map of row ids to user ids
+			const newRowIdtoUserIdMap = new Map<number, number>();
 			userList?.map((user: UserType, index: number) => {
-				if (user.id && !rowIdtoUserIdMap.has(index)) {
-					rowIdtoUserIdMap.set(index, user.id);
-				}
+				if (user.id && !newRowIdtoUserIdMap.has(index)) {
+					newRowIdtoUserIdMap.set(index, user.id);
+				} 
 			});
+
+			setRowIdtoUserIdMap(newRowIdtoUserIdMap);
 		}
 	}, [userList]);
 
