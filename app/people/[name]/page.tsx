@@ -25,16 +25,9 @@ const UserPage: React.FC = () => {
 
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
-	const [selectedCell, setselectedCell] = useState<selectedCell>({
-		week: 0,
-		year: 0,
-		rowId: 0,
-	});
 	const [workWeekDataLookupMap, setWorkWeekDataLookupMap] = useState<
 		Map<number, Map<number, WorkWeekRenderDataType>>[]
 	>([]);
-	const [currEstHours, setCurrEstHours] = useState<string>("0");
-	const [currActHours, setCurrActHours] = useState<string>("0");
 	const [wasSelectedCellEdited, setWasSelectedCellEdited] =
 		useState<boolean>(false);
 	const [rowIdtoAssignmentIdMap, setRowIdtoAssignmentIdMap] = useState<
@@ -160,8 +153,8 @@ const UserPage: React.FC = () => {
 	};
 
 	const handleCurrEstHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		// If the value is not a number, set the value to 0
-		setCurrEstHours(e.target.value);
+		const selectedCell = JSON.parse(localStorage.getItem('selectedCell') || '{}');
+		localStorage.setItem('currEstHours', e.target.value);
 		const newEstimatedHours = parseInt(e.target.value);
 		const newWorkWeekData = lookupWorkWeekData(
 			selectedCell.rowId,
@@ -177,7 +170,7 @@ const UserPage: React.FC = () => {
 				cweek: selectedCell.week,
 				year: selectedCell.year,
 				estimatedHours: newEstimatedHours,
-				actualHours: parseInt(currActHours),
+				actualHours: parseInt(localStorage.getItem('currActHours') || '0'),
 				assignmentId: rowIdtoAssignmentIdMap.get(selectedCell.rowId),
 			};
 			addWorkWeekData(newWorkWeekData, selectedCell.rowId);
@@ -187,7 +180,8 @@ const UserPage: React.FC = () => {
 	};
 
 	const handleCurrActHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setCurrActHours(e.target.value);
+		const selectedCell = JSON.parse(localStorage.getItem('selectedCell') || '{}');
+		localStorage.setItem('currActHours', e.target.value);
 		const newActualHours = parseInt(e.target.value);
 
 		const newAssignmentId = rowIdtoAssignmentIdMap.get(selectedCell.rowId);
@@ -204,7 +198,7 @@ const UserPage: React.FC = () => {
 			const newWorkWeekData = {
 				cweek: selectedCell.week,
 				year: selectedCell.year,
-				estimatedHours: parseInt(currEstHours),
+				estimatedHours: parseInt(localStorage.getItem('currEstHours') || '0'),
 				actualHours: newActualHours,
 				assignmentId: rowIdtoAssignmentIdMap.get(selectedCell.rowId),
 			};
@@ -217,7 +211,11 @@ const UserPage: React.FC = () => {
 		cweek: number,
 		year: number,
 		rowIndex: number,
-		isSelected: boolean
+		isSelected: boolean,
+		width?: number,
+		height?: number,
+		onFocus?: (week: number, year: number, rowId: number) => void,
+		onBlur?: () => void
 	) => {
 		const workWeekData = lookupWorkWeekData(rowIndex, year, cweek);
 
@@ -228,15 +226,19 @@ const UserPage: React.FC = () => {
 			<>
 				<input
 					className="flex flex-row"
-					value={isSelected ? currEstHours || estimatedHours : estimatedHours}
+					value={isSelected ? localStorage.getItem('currEstHours') ?? estimatedHours : estimatedHours}
 					placeholder="Estimated Hours"
 					onChange={(e) => handleCurrEstHoursChange(e)}
+					onFocus={() => onFocus && onFocus(cweek, year, rowIndex)}
+					onBlur={() => onBlur && onBlur()}
 				/>
 				<input
 					className="flex flex-row"
-					value={isSelected ? currActHours || actualHours : actualHours}
+					value={isSelected ? localStorage.getItem('currActHours') ?? actualHours : actualHours}
 					placeholder="Actual Hours"
 					onChange={(e) => handleCurrActHoursChange(e)}
+					onFocus={() => onFocus && onFocus(cweek, year, rowIndex)}
+					onBlur={() => onBlur && onBlur()}
 				/>
 			</>
 		);
@@ -257,8 +259,21 @@ const UserPage: React.FC = () => {
 		return null;
 	};
 
-	const handleOnMouseOverWeek = (week: number, year: number, rowId: number) => {
+	const handleCellFocus = (week: number, year: number, rowId: number) => {
+		localStorage.setItem('selectedCell', JSON.stringify({ week, year, rowId }));
+		const newWorkWeekData = lookupWorkWeekData(rowId, year, week);
+		if (newWorkWeekData) {
+			localStorage.setItem('currEstHours', newWorkWeekData.estimatedHours.toString());
+			localStorage.setItem('currActHours', newWorkWeekData.actualHours.toString());
+		} else {
+			localStorage.setItem('currEstHours', "");
+			localStorage.setItem('currActHours', "");
+		}
+	};
+
+	const handleCellBlur = () => {
 		if (wasSelectedCellEdited) {
+			const selectedCell = JSON.parse(localStorage.getItem('selectedCell') || '{}');
 			const oldWorkWeekData = lookupWorkWeekData(
 				selectedCell.rowId,
 				selectedCell.year,
@@ -269,20 +284,7 @@ const UserPage: React.FC = () => {
 				setWasSelectedCellEdited(false);
 			}
 		}
-		setselectedCell({ week, year, rowId });
-		const newWorkWeekData = lookupWorkWeekData(
-			selectedCell.rowId,
-			selectedCell.year,
-			selectedCell.week
-		);
-		if (newWorkWeekData) {
-			setCurrEstHours(newWorkWeekData.estimatedHours.toString());
-			setCurrActHours(newWorkWeekData.actualHours.toString());
-		} else {
-			setCurrEstHours("0");
-			setCurrActHours("0");
-		}
-	};
+	}
 
 	const setSelectedUserData = (newSelectedId: number) => {
 		if (!userList) return;
@@ -372,12 +374,9 @@ const UserPage: React.FC = () => {
 								</div>
 							)
 						)}
-						onMouseOverWeek={(week, year, rowId) => {
-							handleOnMouseOverWeek(week, year, rowId);
-						}}
-						onMouseClickWeek={(week, year, rowId) => {}}
+						onCellFocus={handleCellFocus}
+						onCellBlur={handleCellBlur}
 						renderCell={renderCell}
-						selectedCell={selectedCell}
 					/>
 				)}
 			</div>

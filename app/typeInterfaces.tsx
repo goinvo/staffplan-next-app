@@ -133,6 +133,8 @@ export type WeekDisplayProps = {
 	labelContentsRight?: React.ReactNode[];
     onMouseOverWeek?: (week: number, year: number, cellId: number) => void;
     onMouseClickWeek?: (week: number, year: number, cellId: number) => void;
+	onCellFocus? : (week: number, year: number, cellId: number) => void;
+	onCellBlur? : (week: number, year: number, cellId: number) => void;
     renderCell?: (week: number, year: number, cellId: number, isSelected: boolean, width?: number, height?: number) => ReactNode;
     selectedCell?: selectedCell;
 };
