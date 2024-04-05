@@ -12,7 +12,7 @@ import {
 } from "../typeInterfaces";
 import {
 	processUserAssignmentDataMap,
-	getWorkWeeksForUserByWeekAndYearForUsers,
+	getWorkWeeksForUserByWeekAndYear,
 	drawBars,
 	drawFTELabels,
 } from "../helperFunctions";
@@ -43,7 +43,7 @@ const PeopleView: React.FC = () => {
 			userList?.map((user: UserType, index: number) => {
 				if (user.id && !newRowIdtoUserIdMap.has(index)) {
 					newRowIdtoUserIdMap.set(index, user.id);
-				} 
+				}
 			});
 
 			setRowIdtoUserIdMap(newRowIdtoUserIdMap);
@@ -68,7 +68,7 @@ const PeopleView: React.FC = () => {
 
 		if (userId) {
 			const workWeeksForUser =
-				getWorkWeeksForUserByWeekAndYearForUsers(
+				getWorkWeeksForUserByWeekAndYear(
 					userAssignmentDataMap,
 					userId,
 					cweek,

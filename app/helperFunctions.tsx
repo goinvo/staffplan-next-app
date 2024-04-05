@@ -210,7 +210,7 @@ function updateMaxTotalEstHoursForAssignment(
 		}
 	);
 }
-export function getWorkWeeksForUserByWeekAndYearForUsers(
+export function getWorkWeeksForUserByWeekAndYear(
 	userAssignmentDataMap: UserAssignmentDataMapType,
 	userId: number,
 	cweek: number,
