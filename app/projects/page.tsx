@@ -33,14 +33,20 @@ const ProjectsView: React.FC = () => {
 			const processedDataMap = processProjectDataMap(projectList);
 			setProjectAssignmentDataMap(processedDataMap);
 
+			// Clear the rowIdtoProjectIdMap
+			setRowIdtoProjectIdMap(new Map());
+
 			// Setup the map of row ids to project ids
+			const newRowIdtoProjectIdMap = new Map<number, number>();
 			projectList?.map((project: ProjectType, index: number) => {
-				if (project.id && !rowIdtoProjectIdMap.has(index)) {
-					rowIdtoProjectIdMap.set(index, project.id);
+				if (project.id && !newRowIdtoProjectIdMap.has(index)) {
+					newRowIdtoProjectIdMap.set(index, project.id);
 				}
 			});
+
+			setRowIdtoProjectIdMap(newRowIdtoProjectIdMap);
 		}
-	}, [projectList, viewsFilter]);
+	}, [projectList]);
 
 	const handleProjectChange = (project: ProjectType) => {
 		const projectId = JSON.stringify({ selectedProjectId: project.id });

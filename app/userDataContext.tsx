@@ -59,7 +59,7 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 		showArchivedProjects: false,
 		showInactiveUsers: false,
 	});
-	const [scrollToTodayFunction, setScrollToTodayFunction] = useState<any>(() => {});
+	const [scrollToTodayFunction, setScrollToTodayFunction] = useState<any>(() => { });
 	const {
 		loading: userListLoading,
 		error: userListError,
@@ -120,20 +120,20 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 
 	useEffect(() => {
 		if (userListData) {
-			const sortedUserList = sortUserList(viewsFilter.selectedUserSort,userListData.currentCompany.users);;
+			const sortedUserList = sortUserList(viewsFilter.selectedUserSort, userListData.currentCompany.users);;
 			setUserList(sortedUserList);
 		}
-	}, [userListData,viewsFilter]);
+	}, [userListData, viewsFilter]);
 
 	useEffect(() => {
 		if (projectData && projectData.currentCompany?.projects) {
-			const sortedProjectList = sortProjectList(viewsFilter.selectedProjectSort,projectData.currentCompany?.projects);
-			if(viewsFilter.showArchivedProjects){
-			return setProjectList(sortedProjectList);
+			const sortedProjectList = sortProjectList(viewsFilter.selectedProjectSort, projectData.currentCompany?.projects);
+			if (viewsFilter.showArchivedProjects) {
+				return setProjectList(sortedProjectList);
 			}
 			setProjectList(sortedProjectList?.filter((project: ProjectType) => project.status !== "archived"))
 		}
-	}, [projectData,viewsFilter]);
+	}, [projectData, viewsFilter]);
 
 	useEffect(() => {
 		if (clientData) {

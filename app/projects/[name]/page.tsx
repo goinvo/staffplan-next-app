@@ -9,7 +9,6 @@ import {
 	WorkWeekRenderDataType,
 	WorkWeekType,
 	AssignmentType,
-	selectedCell
 } from "../../typeInterfaces";
 import { UPSERT_WORKWEEK } from "../../gqlQueries";
 import WeekDisplay from "../../components/weekDisplay";
@@ -26,13 +25,6 @@ const ProjectPage: React.FC = () => {
 	const [selectedProject, setSelectedProject] = useState<ProjectType | null>(
 		null
 	);
-	const [selectedCell, setSelectedCell] = useState<selectedCell>({
-		week: 0,
-		year: 0,
-		rowId: 0,
-	});
-	const [currEstHours, setCurrEstHours] = useState<string>("0");
-	const [currActHours, setCurrActHours] = useState<string>("0");
 	const [wasSelectedCellEdited, setWasSelectedCellEdited] =
 		useState<boolean>(false);
 	const [rowIdToUserIdMap, setRowIdToUserIdMap] = useState<Map<number, number>>(
@@ -119,8 +111,9 @@ const ProjectPage: React.FC = () => {
 	};
 
 	const handleCurrEstHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setCurrEstHours(e.target.value);
+		localStorage.setItem('currEstHours', e.target.value);
 		const newEstimatedHours = parseInt(e.target.value);
+		const selectedCell = JSON.parse(localStorage.getItem('selectedCell') || '{}');
 		const newWorkWeekData = lookupWorkWeekData(
 			selectedCell.rowId,
 			selectedCell.year,
@@ -151,7 +144,7 @@ const ProjectPage: React.FC = () => {
 				cweek: selectedCell.week,
 				year: selectedCell.year,
 				estimatedHours: newEstimatedHours,
-				actualHours: parseInt(currActHours),
+				actualHours: parseInt(localStorage.getItem('currActHours') || '0'),
 				assignmentId: foundAssignment.id,
 			};
 			updateDataState(newWorkWeekData, selectedCell.rowId);
@@ -160,8 +153,9 @@ const ProjectPage: React.FC = () => {
 	};
 
 	const handleCurrActHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setCurrActHours(e.target.value);
+		localStorage.setItem('currActHours', e.target.value);
 		const newActualHours = parseInt(e.target.value);
+		const selectedCell = JSON.parse(localStorage.getItem('selectedCell') || '{}');
 		const newWorkWeekData = lookupWorkWeekData(
 			selectedCell.rowId,
 			selectedCell.year,
@@ -175,7 +169,7 @@ const ProjectPage: React.FC = () => {
 			const newWorkWeekData = {
 				cweek: selectedCell.week,
 				year: selectedCell.year,
-				estimatedHours: parseInt(currEstHours),
+				estimatedHours: parseInt(localStorage.getItem('currEstHours') || '0'),
 				actualHours: newActualHours,
 				assignmentId: rowIdToUserIdMap.get(selectedCell.rowId),
 			};
@@ -183,11 +177,13 @@ const ProjectPage: React.FC = () => {
 		}
 		setWasSelectedCellEdited(true);
 	};
+
 	const handleUserSelect = (user: UserType) => {
 		const userId = JSON.stringify({ selectedUserId: user.id });
 		const encodeUserId = Buffer.from(userId).toString("base64");
 		router.push("people/" + encodeURIComponent(encodeUserId));
 	};
+
 	const renderCell = (
 		cweek: number,
 		year: number,
@@ -203,13 +199,13 @@ const ProjectPage: React.FC = () => {
 			<>
 				<input
 					className="flex flex-row"
-					value={isSelected ? currEstHours || estimatedHours : estimatedHours}
+					value={isSelected ? localStorage.getItem('currEstHours') ?? estimatedHours : estimatedHours}
 					placeholder="Estimated Hours"
 					onChange={(e) => handleCurrEstHoursChange(e)}
 				/>
 				<input
 					className="flex flex-row"
-					value={isSelected ? currActHours || actualHours : actualHours}
+					value={isSelected ? localStorage.getItem('currActHours') ?? actualHours : actualHours}
 					placeholder="Actual Hours"
 					onChange={(e) => handleCurrActHoursChange(e)}
 				/>
@@ -255,32 +251,32 @@ const ProjectPage: React.FC = () => {
 		return null;
 	};
 
-	const handleOnMouseOverWeek = (week: number, year: number, rowId: number) => {
+	const handleCellFocus = (week: number, year: number, rowId: number) => {
+		console.log("handleCellFocus, week: ", week, " year: ", year, " rowId: ", rowId);
+		localStorage.setItem('selectedCell', JSON.stringify({ week, year, rowId }));
+		const newWorkWeekData = lookupWorkWeekData(rowId, year, week);
+		if (newWorkWeekData) {
+			localStorage.setItem('currEstHours', newWorkWeekData.estimatedHours.toString());
+			localStorage.setItem('currActHours', newWorkWeekData.actualHours.toString());
+		} else {
+			localStorage.setItem('currEstHours', "");
+			localStorage.setItem('currActHours', "");
+		}
+	};
+
+	const handleCellBlur = () => {
 		if (wasSelectedCellEdited) {
 			const oldWorkWeekData = lookupWorkWeekData(
-				selectedCell.rowId,
-				selectedCell.year,
-				selectedCell.week
+				JSON.parse(localStorage.getItem('selectedCell') || '{}').rowId,
+				JSON.parse(localStorage.getItem('selectedCell') || '{}').year,
+				JSON.parse(localStorage.getItem('selectedCell') || '{}').week
 			);
 			if (oldWorkWeekData) {
 				upsertWorkWeekValues(oldWorkWeekData);
 				setWasSelectedCellEdited(false);
 			}
 		}
-		setSelectedCell({ week, year, rowId });
-		const newWorkWeekData = lookupWorkWeekData(
-			selectedCell.rowId,
-			selectedCell.year,
-			selectedCell.week
-		);
-		if (newWorkWeekData) {
-			setCurrEstHours(newWorkWeekData.estimatedHours.toString());
-			setCurrActHours(newWorkWeekData.actualHours.toString());
-		} else {
-			setCurrEstHours("0");
-			setCurrActHours("0");
-		}
-	};
+	}
 
 	useEffect(() => {
 		if (projectList) {
@@ -380,25 +376,23 @@ const ProjectPage: React.FC = () => {
 	}, [usersWithProjectAssignment]);
 	return (
 		<div>
-				{selectedProject ? (<h1>
-					Assignments for {selectedProject.name}{" "}
-					<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
-						<Image
-							src={`${selectedProject.client.avatarUrl}`}
-							alt="client avatar"
-							width={500}
-							height={500}
-						/>
-					</div>
-				</h1>) : ""}
+			{selectedProject ? (<h1>
+				Assignments for {selectedProject.name}{" "}
+				<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
+					<Image
+						src={`${selectedProject.client.avatarUrl}`}
+						alt="client avatar"
+						width={500}
+						height={500}
+					/>
+				</div>
+			</h1>) : ""}
 			{usersWithProjectAssignment ? (
 				<WeekDisplay
 					labelContentsLeft={memoizedLabelContentsLeft}
-					onMouseOverWeek={(week, year, rowId) => {
-						handleOnMouseOverWeek(week, year, rowId);
-					}}
 					renderCell={renderCell}
-					selectedCell={selectedCell}
+					onCellFocus={handleCellFocus}
+					onCellBlur={handleCellBlur}
 				/>
 			) : (
 				<LoadingSpinner />
