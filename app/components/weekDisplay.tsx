@@ -7,6 +7,7 @@ import useInfiniteScroll, {
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import SideListLeft, { sideListGutterHeight } from "./sideListLeft";
 import SideListRight from "./sideListRight";
+import ProjectSummary from "./allProjectsSummary";
 import { render } from "@testing-library/react";
 import {
 	getWeek,
@@ -22,7 +23,7 @@ import { useUserDataContext } from "../userDataContext";
 import { WeekDisplayProps, selectedCell } from "../typeInterfaces";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { get } from "http";
-import { throttle } from 'lodash';
+import { throttle } from "lodash";
 
 type WeekEntry = {
 	date: number;
@@ -50,25 +51,25 @@ const generateWeeksForYear = (beginYear: number): WeeksAndLabels => {
 	const weeks: WeekEntry[] = [];
 	const monthLabels: string[] = [];
 
-    let currentDate = new Date(beginYear, 0, 1);
-    const months = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-    ];
-    let lastMonthLabel = "";
-    const lastDate = new Date(beginYear, 11, 31);
+	let currentDate = new Date(beginYear, 0, 1);
+	const months = [
+		"Jan",
+		"Feb",
+		"Mar",
+		"Apr",
+		"May",
+		"Jun",
+		"Jul",
+		"Aug",
+		"Sep",
+		"Oct",
+		"Nov",
+		"Dec",
+	];
+	let lastMonthLabel = "";
+	const lastDate = new Date(beginYear, 11, 31);
 
-    const weeksInYear = eachWeekOfInterval({ start: currentDate, end: lastDate });
+	const weeksInYear = eachWeekOfInterval({ start: currentDate, end: lastDate });
 
 	// If the first week is in the previous year, skip it
 	if (weeksInYear[0].getFullYear() < beginYear) {
@@ -108,19 +109,50 @@ export const weekWidth = 64;
 const sideOffsetItems = 5;
 
 // The main component that renders the week display
-const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContentsLeft, labelContentsRight, onMouseOverWeek, onMouseClickWeek, onCellFocus, onCellBlur, renderCell, selectedCell }) => {
-    const today = new Date();
-    const startYear = today.getFullYear();
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const [data, setData] = useState<WeeksAndLabels>(generateWeeksForYear(startYear));
-    const [startX, setStartX] = useState(0);
-    const [scrollStartX, setScrollStartX] = useState(0);
-    const [isDragging, setIsDragging] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [yearWindow, setYearWindow] = useState<YearWindow>({ start: startYear, end: startYear });
-    const [sideLabelDivHeightsLeft, setSideLabelDivHeightsLeft] = useState<number[]>([]);
-    const [sideLabelDivHeightsRight, setSideLabelDivHeightsRight] = useState<number[]>([]);
-    const { setScrollToTodayFunction } = useUserDataContext();
+const WeekDisplay: React.FC<WeekDisplayProps> = ({
+	labelContentsLeft,
+	labelContentsRight,
+	onMouseOverWeek,
+	onMouseClickWeek,
+	onCellFocus,
+	onCellBlur,
+	renderCell,
+	selectedCell,
+}) => {
+	const today = new Date();
+	const startYear = today.getFullYear();
+	const months = [
+		"Jan",
+		"Feb",
+		"Mar",
+		"Apr",
+		"May",
+		"Jun",
+		"Jul",
+		"Aug",
+		"Sep",
+		"Oct",
+		"Nov",
+		"Dec",
+	];
+	const [data, setData] = useState<WeeksAndLabels>(
+		generateWeeksForYear(startYear)
+	);
+	const [startX, setStartX] = useState(0);
+	const [scrollStartX, setScrollStartX] = useState(0);
+	const [isDragging, setIsDragging] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+	const [yearWindow, setYearWindow] = useState<YearWindow>({
+		start: startYear,
+		end: startYear,
+	});
+	const [sideLabelDivHeightsLeft, setSideLabelDivHeightsLeft] = useState<
+		number[]
+	>([]);
+	const [sideLabelDivHeightsRight, setSideLabelDivHeightsRight] = useState<
+		number[]
+	>([]);
+	const { setScrollToTodayFunction } = useUserDataContext();
 
 	const router = useRouter();
 	const searchParams = useSearchParams();
@@ -345,61 +377,82 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContentsLeft, labelConte
 		};
 	}, [isDragging, onDragMove]);
 
-    // This function is called when the component is first mounted to link the scrollToToday function to the UserDataContext
-    useEffect(() => {
-        setScrollToTodayFunction(() => scrollToToday);
-    }, []);
+	// This function is called when the component is first mounted to link the scrollToToday function to the UserDataContext
+	useEffect(() => {
+		setScrollToTodayFunction(() => scrollToToday);
+	}, []);
 
+	const handleSetSideLabelDivHeightsLeft = (heights: number[]) => {
+		const updatedTotalHeights = [...heights];
+		let wasRightSideUpdated = false;
 
-    const handleSetSideLabelDivHeightsLeft = (heights: number[]) => {
-        const updatedTotalHeights = [...heights];
-        let wasRightSideUpdated = false;
+		// For each height on the right side, if it's less than the new height from the left side, mark that we need to update the right side
+		sideLabelDivHeightsRight.forEach((height, index) => {
+			if (height < sideLabelDivHeightsRight[index]) {
+				wasRightSideUpdated = true;
+			}
 
-        // For each height on the right side, if it's less than the new height from the left side, mark that we need to update the right side
-        sideLabelDivHeightsRight.forEach((height, index) => {
-            if (height < sideLabelDivHeightsRight[index]) {
-                wasRightSideUpdated = true;
-            }
+			// Update the total height to be the maximum of the two
+			updatedTotalHeights[index] = Math.max(
+				updatedTotalHeights[index] || 0,
+				height
+			);
+		});
+		setSideLabelDivHeightsLeft(updatedTotalHeights);
 
-            // Update the total height to be the maximum of the two
-            updatedTotalHeights[index] = Math.max(updatedTotalHeights[index] || 0, height);
-        });
-        setSideLabelDivHeightsLeft(updatedTotalHeights);
+		// If the right side was updated, update the right side
+		if (wasRightSideUpdated) {
+			setSideLabelDivHeightsRight(updatedTotalHeights);
+		}
+	};
 
-        // If the right side was updated, update the right side
-        if (wasRightSideUpdated) {
-            setSideLabelDivHeightsRight(updatedTotalHeights);
-        }
-    };
+	const handleSetSideLabelDivHeightsRight = (heights: number[]) => {
+		const updatedTotalHeights = [...heights];
+		let wasLeftSideUpdated = false;
 
-    const handleSetSideLabelDivHeightsRight = (heights: number[]) => {
-        const updatedTotalHeights = [...heights];
-        let wasLeftSideUpdated = false;
+		// For each height on the left side, if it's less than the new height from the right side, mark that we need to update the left side
+		sideLabelDivHeightsLeft.forEach((height, index) => {
+			if (height < sideLabelDivHeightsRight[index]) {
+				wasLeftSideUpdated = true;
+			}
 
-        // For each height on the left side, if it's less than the new height from the right side, mark that we need to update the left side
-        sideLabelDivHeightsLeft.forEach((height, index) => {
-            if (height < sideLabelDivHeightsRight[index]) {
-                wasLeftSideUpdated = true;
-            }
+			// Update the total height to be the maximum of the two
+			updatedTotalHeights[index] = Math.max(
+				updatedTotalHeights[index] || 0,
+				height
+			);
+		});
+		setSideLabelDivHeightsRight(updatedTotalHeights);
 
-            // Update the total height to be the maximum of the two
-            updatedTotalHeights[index] = Math.max(updatedTotalHeights[index] || 0, height);
-        });
-        setSideLabelDivHeightsRight(updatedTotalHeights);
+		// If the left side was updated, update the left side
+		if (wasLeftSideUpdated) {
+			setSideLabelDivHeightsLeft(updatedTotalHeights);
+		}
+	};
 
-        // If the left side was updated, update the left side
-        if (wasLeftSideUpdated) {
-            setSideLabelDivHeightsLeft(updatedTotalHeights);
-        }
-    };
-
-
-    return (
+	return (
 		<div className="relative">
-			<SideListLeft labelContents={labelContentsLeft} divHeights={sideLabelDivHeightsLeft} setDivHeights={handleSetSideLabelDivHeightsLeft} offset={48} />
-			{labelContentsRight && <SideListRight labelContents={labelContentsRight} divHeights={sideLabelDivHeightsRight} setDivHeights={handleSetSideLabelDivHeightsRight} offset={48} />}
-			<div className="flex items-center my-4">
-				<button onClick={() => scrollWeeks('left')} className="p-2 rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center"><FaChevronLeft className="timeline-text-accent" /></button>
+			<SideListLeft
+				labelContents={labelContentsLeft}
+				divHeights={sideLabelDivHeightsLeft}
+				setDivHeights={handleSetSideLabelDivHeightsLeft}
+				offset={48}
+			/>
+			{labelContentsRight && (
+				<SideListRight
+					labelContents={labelContentsRight}
+					divHeights={sideLabelDivHeightsRight}
+					setDivHeights={handleSetSideLabelDivHeightsRight}
+					offset={48}
+				/>
+			)}
+			<div className="flex items-center my-4 relative">
+				<button
+					onClick={() => scrollWeeks("left")}
+					className="p-2 bg-white rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center absolute -left-3 -top-3"
+				>
+					<FaChevronLeft className="timeline-text-accent" />
+				</button>
 				<div
 					ref={weekContainerRef}
 					className="flex flex-row overflow-x-auto scrollbar-hide cursor-grab"
@@ -407,27 +460,105 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContentsLeft, labelConte
 				>
 					<div className="flex min-w-max select-none">
 						{data.weeks.map((week, index) => (
-							<div className="flex flex-col text-nowrap" style={{ width: weekWidth + "px" }} key={index}>
-								<div className="flex flex-row grow text-sm">{data.monthLabels[index]}</div>
-								<div className={"flex flex-row grow-0 text-sm"}>{week.date}
-									{week.week === getWeek(today, { weekStartsOn: 1, firstWeekContainsDate: 1 }) && week.year === today.getFullYear() ? <div className="flex flex-row items-center text-xs text-red-500">Today</div> : <></>}
+							<div
+								className="flex flex-col text-nowrap"
+								style={{ width: weekWidth + "px" }}
+								key={index}
+							>
+								<div className="flex flex-row grow text-sm">
+									{data.monthLabels[index]}
+								</div>
+								<div className={"flex flex-row grow-0 text-sm"}>
+									{week.date}
+									{week.week ===
+										getWeek(today, {
+											weekStartsOn: 1,
+											firstWeekContainsDate: 1,
+										}) && week.year === today.getFullYear() ? (
+										<div className="flex flex-row items-center text-xs text-red-500">
+											Today
+										</div>
+									) : (
+										<></>
+									)}
 								</div>
 								<div className={"flex flex-row grow-0 relative"}>
-									<div className={"top-0 left-0 timeline-grid-gap-bg"} style={{ width: weekWidth + "px" }} key={index}>
+									<div
+										className={"top-0 left-0 timeline-grid-gap-bg"}
+										style={{ width: weekWidth + "px" }}
+										key={index}
+									>
 										{labelContentsLeft.map((contents, rowIndex) => {
-											const sideLabelDivHeight = Math.max(sideLabelDivHeightsLeft[rowIndex] || 0, sideLabelDivHeightsRight[rowIndex] || 0);
-											const selectedCell = JSON.parse(localStorage.getItem('selectedCell') || '{}');
-											return <div className="flex border-l timeline-grid-bg timeline-grid-border" style={{ height: sideLabelDivHeight + sideListGutterHeight * 2, marginBottom: sideListGutterHeight }} key={rowIndex}
-												onMouseOver={onMouseOverWeek ? () => onMouseOverWeek(week.week, week.year, rowIndex) : () => { }}
-												onMouseDown={onMouseClickWeek ? () => onMouseClickWeek(week.week, week.year, rowIndex) : () => { }}
-                                                onFocus={onCellFocus ? () => onCellFocus(week.week, week.year, rowIndex) : () => { }}
-                                                onBlur={onCellBlur ? () => onCellBlur(week.week, week.year, rowIndex) : () => { }}>
-												{
-													<div className="flex flex-col">
-														{renderCell ? renderCell(week.week, week.year, rowIndex, (selectedCell && selectedCell.week === week.week && selectedCell.year === week.year && selectedCell.rowId == rowIndex) || false, weekWidth, sideLabelDivHeight + sideListGutterHeight * 2) : <div></div>}
-													</div>
-												}
-											</div>
+											const sideLabelDivHeight = Math.max(
+												sideLabelDivHeightsLeft[rowIndex] || 0,
+												sideLabelDivHeightsRight[rowIndex] || 0
+											);
+											const selectedCell = JSON.parse(
+												localStorage.getItem("selectedCell") || "{}"
+											);
+											return (
+												<div
+													className="flex border-l timeline-grid-bg timeline-grid-border"
+													style={{
+														height:
+															sideLabelDivHeight + sideListGutterHeight * 2,
+														marginBottom: sideListGutterHeight,
+													}}
+													key={rowIndex}
+													onMouseOver={
+														onMouseOverWeek
+															? () =>
+																	onMouseOverWeek(
+																		week.week,
+																		week.year,
+																		rowIndex
+																	)
+															: () => {}
+													}
+													onMouseDown={
+														onMouseClickWeek
+															? () =>
+																	onMouseClickWeek(
+																		week.week,
+																		week.year,
+																		rowIndex
+																	)
+															: () => {}
+													}
+													onFocus={
+														onCellFocus
+															? () =>
+																	onCellFocus(week.week, week.year, rowIndex)
+															: () => {}
+													}
+													onBlur={
+														onCellBlur
+															? () => onCellBlur(week.week, week.year, rowIndex)
+															: () => {}
+													}
+												>
+													{
+														<div className="flex flex-col">
+															{renderCell ? (
+																renderCell(
+																	week.week,
+																	week.year,
+																	rowIndex,
+																	(selectedCell &&
+																		selectedCell.week === week.week &&
+																		selectedCell.year === week.year &&
+																		selectedCell.rowId == rowIndex) ||
+																		false,
+																	weekWidth,
+																	sideLabelDivHeight + sideListGutterHeight * 2
+																)
+															) : (
+																<div></div>
+															)}
+														</div>
+													}
+												</div>
+											);
 										})}
 									</div>
 								</div>
@@ -435,7 +566,12 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({ labelContentsLeft, labelConte
 						))}
 					</div>
 				</div>
-				<button onClick={() => scrollWeeks('right')} className="p-2 rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center"><FaChevronRight className="timeline-text-accent" /></button>
+				<button
+					onClick={() => scrollWeeks("right")}
+					className="p-2 bg-white rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center absolute -right-1 -top-3"
+				>
+					<FaChevronRight className="timeline-text-accent" />
+				</button>
 				{isLoading && <div>Loading...</div>}
 			</div>
 		</div>

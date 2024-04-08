@@ -35,6 +35,8 @@ export interface ProjectType {
 	assignments?: [AssignmentType];
 	__typename?:string;
 	workWeeks?: WorkWeekType[];
+	fte:number;
+	hours:number;
 }
 
 export interface ProjectValuesType {
