@@ -18,6 +18,8 @@ export default function EllipsisProjectMenu({ project }: any) {
 		startsOn,
 		status,
 		cost,
+		hours,
+		fte,
 	} = project;
 	const [confirmed, setConfirmed] = useState(
 		status === "confirmed" ? true : false
@@ -35,6 +37,8 @@ export default function EllipsisProjectMenu({ project }: any) {
 		startsOn,
 		status,
 		cost,
+		fte,
+		hours,
 	};
 	const queryJSONString = JSON.stringify(query);
 	const base64Query = Buffer.from(queryJSONString).toString("base64");
@@ -62,7 +66,6 @@ export default function EllipsisProjectMenu({ project }: any) {
 				return "unconfirmed";
 			}
 		};
-		//last options need to be changed to confirmed and unconfirmed when backend reflects those options
 		const variables = {
 			id: id,
 			clientId: clientId,
@@ -70,6 +73,8 @@ export default function EllipsisProjectMenu({ project }: any) {
 			status: statusCheck(),
 			startsOn: startsOn,
 			cost: cost,
+			fte:fte,
+			hours:hours,
 		};
 		upsertProject({
 			variables: endsOn ? { ...variables, endsOn: endsOn } : variables,

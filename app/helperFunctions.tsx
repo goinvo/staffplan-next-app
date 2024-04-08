@@ -2,10 +2,11 @@ import {
 	ProjectDataMapType,
 	ProjectType,
 	UserAssignmentDataMapType,
+	UserType,
 	WorkWeekBlockMemberType,
 } from "./typeInterfaces";
 import _ from "lodash";
-
+import { DateTime, Interval } from "luxon";
 export function matchWorkWeeks(
 	prevWeeks: WorkWeekBlockMemberType[],
 	currWeeks: WorkWeekBlockMemberType[]
@@ -129,23 +130,10 @@ function processWorkWeeksForAssignment(
 			currentWorkWeekBlock,
 		];
 
-		_.setWith(processedDataMap, [userId, year, cweek], updatedCurrentWeekBlocks);
-
-		console.log(
-			{ ...processedDataMap },
-			"processedDataMap",
-			userId,
-			"userId",
-			year,
-			"year",
-			cweek,
-			"cweek",
-			workWeek,
-			"workWeek",
-			assignment,
-			"assignment",
-			updatedCurrentWeekBlocks,
-			"updatedCurrentWeekBlocks"
+		_.setWith(
+			processedDataMap,
+			[userId, year, cweek],
+			updatedCurrentWeekBlocks
 		);
 	});
 }
@@ -293,7 +281,11 @@ function processWorkWeeks(
 	const updatedCurrentWeekBlocks = [...currentWeekBlocks, currentWorkWeekBlock];
 
 	// Update the processed data map with the updated current week's blocks
-	_.setWith(processedDataMap, [projectId, year, cweek], updatedCurrentWeekBlocks);
+	_.setWith(
+		processedDataMap,
+		[projectId, year, cweek],
+		updatedCurrentWeekBlocks
+	);
 }
 
 function getConsecutivePrevWeeksForProject(
@@ -544,7 +536,7 @@ export const sortProjectList = (
 	projectList: ProjectType[]
 ) => {
 	const arrayToSort = [...projectList];
-	if (sortMethod === "abc") {
+	if (sortMethod === "abcProjectName") {
 		return arrayToSort.sort((a, b) => {
 			const projectA = a.name.toLowerCase();
 			const projectB = b.name.toLowerCase();
@@ -589,4 +581,124 @@ export const sortProjectList = (
 	if (sortMethod === "staffingNeeds") {
 		return arrayToSort;
 	}
+};
+export const sortUserList = (sortMethod: string, userList: UserType[]) => {
+	const arrayToSort = [...userList];
+	if (sortMethod === "abcUserName") {
+		return arrayToSort.sort((a, b) => {
+			const userA = a.name.toLowerCase();
+			const userB = b.name.toLowerCase();
+			if (userA < userB) {
+				return -1;
+			}
+			if (userA > userB) {
+				return 1;
+			}
+			return 0;
+		});
+	}
+	if (sortMethod === "userAvailability") {
+		const today = DateTime.now();
+		const ninetyDaysFromNow = today.plus({
+			days: 90,
+		});
+		const timePeriod = Interval.fromDateTimes(today, ninetyDaysFromNow);
+		return arrayToSort.sort((a, b) => {
+			//if a user has no assignments we have an empty array
+			const userA = a.assignments || [];
+			const userB = b.assignments || [];
+			//we reduce each users assignments into total hours assigned that fall within a 90 day period
+			const totalAssignedHoursUserA = userA.reduce((acc, curr) => {
+				if (curr.startsOn) {
+					const currStartsOn = DateTime.fromISO(curr.startsOn);
+					const isWithinTimePeriod = timePeriod.contains(currStartsOn);
+					if (isWithinTimePeriod) {
+						const weeksBetweenNinety = ninetyDaysFromNow.diff(
+							currStartsOn,
+							"weeks"
+						).weeks;
+						//if the assignment has an end date we calculate the weeks between the start and end date as long as the end date is within the 90 day period
+						if (curr.endsOn) {
+							const currEndsOn = DateTime.fromISO(curr.endsOn);
+							const weeksBetweenEndsOn = currEndsOn.diff(
+								currStartsOn,
+								"weeks"
+							).weeks;
+							//if the end date is after 90 days we calculate the weeks between the start date and 90 days from now
+							if (currEndsOn > ninetyDaysFromNow) {
+								return (
+									acc + (curr.estimatedWeeklyHours * weeksBetweenNinety || 0)
+								);
+							}
+							return (
+								acc + (curr.estimatedWeeklyHours * weeksBetweenEndsOn || 0)
+							);
+						}
+						//if the assignment has no end date we assume it's perpetual and just multiply by weeks til 90 days from now
+						return acc + (curr.estimatedWeeklyHours * weeksBetweenNinety || 0);
+					}
+				}
+				return acc;
+			}, 0);
+			const totalAssignedHoursUserB = userB.reduce((acc, curr) => {
+				if (curr.startsOn) {
+					const currStartsOn = DateTime.fromISO(curr.startsOn);
+					const isWithinTimePeriod = timePeriod.contains(currStartsOn);
+					if (isWithinTimePeriod) {
+						const weeksBetweenNinety = ninetyDaysFromNow.diff(
+							currStartsOn,
+							"weeks"
+						).weeks;
+						if (curr.endsOn) {
+							const currEndsOn = DateTime.fromISO(curr.endsOn);
+							const weeksBetweenEndsOn = currEndsOn.diff(
+								currStartsOn,
+								"weeks"
+							).weeks;
+							if (currEndsOn > ninetyDaysFromNow) {
+								return (
+									acc + (curr.estimatedWeeklyHours * weeksBetweenNinety || 0)
+								);
+							}
+							return (
+								acc + (curr.estimatedWeeklyHours * weeksBetweenEndsOn || 0)
+							);
+						}
+						return acc + (curr.estimatedWeeklyHours * weeksBetweenNinety || 0);
+					}
+				}
+				return acc;
+			}, 0);
+			const hoursA = totalAssignedHoursUserA || 0;
+			const hoursB = totalAssignedHoursUserB || 0;
+			if (hoursA < hoursB) {
+				return -1;
+			}
+			if (hoursA > hoursB) {
+				return 1;
+			}
+			return 0;
+		});
+	}
+	if (sortMethod === "unconfirmedPlans") {
+		//sort what users have the most assignments that are "proposed" greatest to least
+		return arrayToSort.sort((a, b) => {
+			const userA = a.assignments || [];
+			const userB = b.assignments || [];
+			const unconfirmedPlansA = userA.filter(
+				(assignment) => assignment.status === "proposed"
+			);
+			const unconfirmedPlansB = userB.filter(
+				(assignment) => assignment.status === "proposed"
+			);
+			if (unconfirmedPlansA.length < unconfirmedPlansB.length) {
+				return 1;
+			}
+			if (unconfirmedPlansA.length > unconfirmedPlansB.length) {
+				return -1;
+			}
+			return 0;
+		});
+	}
+	return userList;
 };

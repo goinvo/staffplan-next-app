@@ -30,14 +30,14 @@ const AddAssignment = () => {
 			endsOn: parsedProject.endsOn ? parsedProject.endsOn : "",
 			startsOn: parsedProject.startsOn,
 		},
-		hours: "",
+		hours: 40,
 		projectId: parsedProject.id,
 		status: false,
 		userId: "",
 	};
 	const newAssignmentInitialValues = {
 		dates: { endsOn: "", startsOn: "" },
-		hours: "",
+		hours: 40,
 		projectId: "",
 		status: false,
 		userId: "",
@@ -135,17 +135,19 @@ const AddAssignment = () => {
 				errors.dates = { endsOn: "Must select both dates" };
 			}
 		}
+		if (values.hours < 1) {
+			errors.hours = "Hours must be greater than 0";
+		}
 		return errors;
 	};
 
 	const handleProjectSelection = (
 		projectId: React.ChangeEvent<HTMLInputElement>
 	) => {
-			const existingProject = projectList?.find(
-				(project: ProjectType) =>
-					project.id.toString() === projectId.target.value
-			);
-			if (existingProject) setSelectedProject(existingProject);
+		const existingProject = projectList?.find(
+			(project: ProjectType) => project.id.toString() === projectId.target.value
+		);
+		if (existingProject) setSelectedProject(existingProject);
 	};
 	return (
 		<>
@@ -321,6 +323,11 @@ const AddAssignment = () => {
 																{errors.projectId && touched.projectId && (
 																	<div className="text-red-500">
 																		{errors.projectId as ReactNode}
+																	</div>
+																)}
+																{errors.hours && touched.hours && (
+																	<div className="text-red-500">
+																		{errors.hours as ReactNode}
 																	</div>
 																)}
 															</div>
