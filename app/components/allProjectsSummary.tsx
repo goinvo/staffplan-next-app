@@ -23,9 +23,9 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 	return (
 		<div>
 			<p>FTE:{project.fte}</p>
-			{weeks ? <p>weeks:{weeks()}</p> : null}
-			<p>target:{project.hours}</p>
-			<p>planned:{plannedHours}</p>
+			{weeks ? <p>{weeks()}wks</p> : null}
+			{project.hours ? <p>target:{project.hours}hrs</p> : null}
+			<p>planned:{plannedHours}hrs</p>
 		</div>
 	);
 };
