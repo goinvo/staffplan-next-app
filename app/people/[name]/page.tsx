@@ -15,6 +15,7 @@ import WeekDisplay from "../../components/weekDisplay";
 import { useUserDataContext } from "../../userDataContext";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import Image from "next/image";
+import UserSummary from "@/app/components/userSummary";
 
 const UserPage: React.FC = () => {
 	const router = useRouter();
@@ -371,6 +372,13 @@ const UserPage: React.FC = () => {
 									</div>
 									<div>{assignment.project.client.name}</div>
 									<div>{assignment.project.name}</div>
+								</div>
+							)
+						)}
+						labelContentsRight={selectedUser.assignments.map(
+							(assignment: AssignmentType) => (
+								<div key={assignment.id} className="flex gap-x-4 gap-y-4 items-center justify-center">
+									<UserSummary assignment={assignment} />
 								</div>
 							)
 						)}
