@@ -110,6 +110,8 @@ export interface ViewerType {
 export interface ViewsFiltersType { 
 	selectedProjectSort: string;
 	selectedUserSort: string;
+	singleUserSort: string;
+	singleProjectSort: string;
 	assignmentSort: string;
 	rollupSort: string;
 	showSummaries: boolean;

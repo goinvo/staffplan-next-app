@@ -3,7 +3,7 @@ import React from "react";
 import AddDropdown from "./addDropdown";
 import { FaSortAmountDown, FaExpand, FaFilter, FaSearch } from "react-icons/fa";
 import { useUserDataContext } from "../userDataContext";
-import ViewsMenu from "./viewsMenu";
+import ViewsMenu from "./viewsMenu/viewsMenu";
 
 const ActionBar: React.FC = () => {
 	const { scrollToTodayFunction } = useUserDataContext();
@@ -44,8 +44,13 @@ const ActionBar: React.FC = () => {
 				</div>
 			</div>
 			<div className="flex items-center space-x-4">
-				<span className="hover:underline hover:cursor-pointer" onClick={scrollToTodayFunction}>Today</span>
-				<ViewsMenu/>
+				<span
+					className="hover:underline hover:cursor-pointer"
+					onClick={scrollToTodayFunction}
+				>
+					Today
+				</span>
+				<ViewsMenu />
 				<div className="flex items-center border actionbar-border-accent rounded-full">
 					<div
 						className={

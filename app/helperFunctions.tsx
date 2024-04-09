@@ -1,4 +1,5 @@
 import {
+	AssignmentType,
 	ProjectDataMapType,
 	ProjectType,
 	UserAssignmentDataMapType,
@@ -530,7 +531,22 @@ export const drawBar = (
 		/>
 	);
 };
-
+export const sortSingleProject = (sortMethod: string, project: ProjectType) => {
+	const arrayToSort = project.assignments?.length
+	? [...project.assignments]
+	: [];
+	console.log(project, "PROJECT FROM SORT")
+const sortedAssignments = { ...project, assignments: arrayToSort };
+	if (sortMethod === "abcUserName") {
+	}
+	if (sortMethod === "startDate") {
+	}
+	if (sortMethod === "staffingNeeds") {
+	}
+	if (sortMethod === "status") {
+	}
+	return project;
+};
 export const sortProjectList = (
 	sortMethod: string,
 	projectList: ProjectType[]
@@ -577,10 +593,61 @@ export const sortProjectList = (
 			return 0;
 		});
 	}
-	//staffing needs will be defined at a later date, for now it will return the original array
 	if (sortMethod === "staffingNeeds") {
-		return arrayToSort;
+		return arrayToSort.sort((a, b) => {
+			const assignmentCountA = a.assignments?.map(
+				(assignment: AssignmentType) => assignment
+			).length;
+			const assignmentCountB = b.assignments?.map(
+				(assignment: AssignmentType) => assignment
+			).length;
+			const projectA = a.fte - (assignmentCountA ?? 0);
+			const projectB = b.fte - (assignmentCountB ?? 0);
+			if (projectA < projectB) {
+				return 1;
+			}
+			if (projectA > projectB) {
+				return -1;
+			}
+			return 0;
+		});
 	}
+};
+
+export const sortSingleUser = (sortMethod: string, user: UserType) => {
+	const arrayToSort = user.assignments?.length
+		? [...user.assignments]
+		: [];
+	const sortedAssignments = { ...user, assignments: arrayToSort };
+	if (sortMethod === "abcProjectName") {
+		sortedAssignments.assignments.sort((a, b) => {
+			const projectA = a.project.name.toLowerCase();
+			const projectB = b.project.name.toLowerCase();
+			if (projectA < projectB) {
+				return -1;
+			}
+			if (projectA > projectB) {
+				return 1;
+			}
+			return 0;
+		});
+	}
+	if (sortMethod === "startDate") {
+		sortedAssignments.assignments.sort((a, b) => {
+			const projectA = a.startsOn;
+			const projectB = b.startsOn;
+			if (projectA && projectB) {
+				if (projectA < projectB) {
+					return -1;
+				}
+				if (projectA > projectB) {
+					return 1;
+				}
+			}
+			return 0;
+		});
+	}
+	return sortedAssignments;
 };
 export const sortUserList = (sortMethod: string, userList: UserType[]) => {
 	const arrayToSort = [...userList];
