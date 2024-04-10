@@ -35,7 +35,8 @@ const UserPage: React.FC = () => {
 		Map<number, number>
 	>(new Map());
 
-	const { userList, setUserList, viewsFilter } = useUserDataContext();
+	const { setSingleUserPage, userList, setUserList, viewsFilter } =
+		useUserDataContext();
 
 	const [upsertWorkweek] = useMutation(UPSERT_WORKWEEK);
 
@@ -49,19 +50,6 @@ const UserPage: React.FC = () => {
 				actHours: values.actualHours,
 			},
 		});
-	};
-
-	const getUserIdFromName: (name: string) => number | null = (name: string) => {
-		// Iterate through the list of users and find the one with the matching name
-		if (userList) {
-			for (const user of userList) {
-				if (user.name === name) {
-					// Return the user's ID as a number
-					return parseInt(user.id);
-				}
-			}
-		}
-		return null;
 	};
 
 	const addWorkWeekData = (
@@ -314,6 +302,7 @@ const UserPage: React.FC = () => {
 			(user: UserType) => user.id?.toString() === newSelectedId.toString()
 		);
 		if (!selectedUserData) return;
+		setSingleUserPage(selectedUserData);
 		if (!viewsFilter.showArchivedProjects) {
 			const showArchivedProjectsUserData = selectedUserData.assignments.filter(
 				(assignment: AssignmentType) => assignment.status !== "archived"
@@ -376,21 +365,6 @@ const UserPage: React.FC = () => {
 	return (
 		<>
 			<div>
-				{selectedUser ? (
-					<h1>
-						Assignments for {selectedUser.name}{" "}
-						<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
-							<Image
-								src={`${selectedUser.avatarUrl}`}
-								alt="user avatar"
-								width={500}
-								height={500}
-							/>
-						</div>
-					</h1>
-				) : (
-					""
-				)}
 				{userList && selectedUser && selectedUser.assignments && (
 					<WeekDisplay
 						labelContentsLeft={selectedUser.assignments.map(

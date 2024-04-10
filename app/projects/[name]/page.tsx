@@ -38,7 +38,7 @@ const ProjectPage: React.FC = () => {
 	>([]);
 
 	const [upsertWorkweek] = useMutation(UPSERT_WORKWEEK);
-	const { userList, projectList, setProjectList, viewsFilter } =
+	const { userList, projectList, setProjectList, viewsFilter,setSingleProjectPage } =
 		useUserDataContext();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -307,6 +307,7 @@ const ProjectPage: React.FC = () => {
 				(project: ProjectType) => project.id === selectedProjectId
 			);
 			if (foundProject) {
+				setSingleProjectPage(foundProject)
 				setSelectedProject(foundProject);
 			}
 
@@ -413,6 +414,7 @@ const ProjectPage: React.FC = () => {
 			) : (
 				""
 			)}
+			
 			{usersWithProjectAssignment ? (
 				<WeekDisplay
 					labelContentsLeft={memoizedLabelContentsLeft}
