@@ -10,6 +10,7 @@ import { useUserDataContext } from "../userDataContext";
 import { UPSERT_ASSIGNMENT } from "../gqlQueries";
 import { LoadingSpinner } from "./loadingSpinner";
 import { Dialog } from "@headlessui/react";
+import Image from "next/image";
 const AddAssignment = () => {
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
 		{}
@@ -19,11 +20,17 @@ const AddAssignment = () => {
 	const { userList, setUserList, projectList } = useUserDataContext();
 	const modalParam = searchParams.get("assignmentmodal");
 	const projectInParam = searchParams.get("project");
-
-	const decodeQuery = projectInParam
+	const userInParam = searchParams.get("user");
+	const decodeProjectQuery = projectInParam
 		? Buffer.from(projectInParam, "base64").toString()
 		: "";
-	const parsedProject = decodeQuery ? JSON.parse(decodeQuery) : "";
+	const parsedProject = decodeProjectQuery
+		? JSON.parse(decodeProjectQuery)
+		: "";
+	const decodeUserQuery = userInParam
+		? Buffer.from(userInParam, "base64").toString()
+		: "";
+	const parsedUser = decodeUserQuery ? JSON.parse(decodeUserQuery) : "";
 	const showModal = modalParam ? true : false;
 	const autoFillAssignmentValues = {
 		dates: {
@@ -35,6 +42,13 @@ const AddAssignment = () => {
 		status: false,
 		userId: "",
 	};
+	const autoFillUserValues = {
+		dates: { endsOn: "", startsOn: "" },
+		hours: 40,
+		projectId: "",
+		status: false,
+		userId: parsedUser.id,
+	};
 	const newAssignmentInitialValues = {
 		dates: { endsOn: "", startsOn: "" },
 		hours: 40,
@@ -42,9 +56,15 @@ const AddAssignment = () => {
 		status: false,
 		userId: "",
 	};
-	const initialValues = parsedProject
-		? autoFillAssignmentValues
-		: newAssignmentInitialValues;
+	const initialValues = () => {
+		if (parsedProject) {
+			return autoFillAssignmentValues;
+		}
+		if (parsedUser) {
+			return autoFillUserValues;
+		}
+		return newAssignmentInitialValues;
+	};
 	const [
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
@@ -75,10 +95,10 @@ const AddAssignment = () => {
 				const user = userList.find(
 					(user: UserType) => user.id === newAssignment.assignedUser.id
 				);
-				const updatedUser = {
-					...user,
-					assignments: [...user.assignments, newAssignment],
-				};
+				// const updatedUser = {
+				// 	...user,
+				// 	assignments: [...user.assignments, newAssignment],
+				// };
 
 				// Update the user list with the new assignment
 				setUserList((prevUserData: any) => {
@@ -169,7 +189,7 @@ const AddAssignment = () => {
 										<div>
 											<Formik
 												onSubmit={(e) => onSubmitUpsert(e)}
-												initialValues={initialValues}
+												initialValues={initialValues()}
 												validate={validateForm}
 											>
 												{({
@@ -205,7 +225,12 @@ const AddAssignment = () => {
 																					key={`${user.id} + ${user.name}`}
 																					value={user.id}
 																				>
-																					{" "}
+																					<Image
+																						src={`${user.avatarUrl}`}
+																						alt="user avatar"
+																						width={500}
+																						height={500}
+																					/>{" "}
 																					{user.name}
 																				</option>
 																			);
@@ -317,7 +342,7 @@ const AddAssignment = () => {
 																	)}
 																{errors.userId && touched.userId && (
 																	<div className="text-red-500">
-																		{errors.userId}
+																		{errors.userId as ReactNode}
 																	</div>
 																)}
 																{errors.projectId && touched.projectId && (

@@ -2,7 +2,7 @@ import { useUserDataContext } from "@/app/userDataContext";
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import React from "react";
-
+import { EyeIcon } from "@heroicons/react/24/outline";
 export const SingleUserSortOptions = () => {
 	const { viewsFilter, setViewsFilter } = useUserDataContext();
 
@@ -31,7 +31,14 @@ export const SingleUserSortOptions = () => {
 									: "flex items-center border actionbar-border-accent rounded-full px-5 py-1"
 							}
 						>
-							<Menu.Button>Views</Menu.Button>
+							<Menu.Button>
+								<div className="flex items-center">
+									<div className="h-4 w-4 mr-1">
+										<EyeIcon />
+									</div>
+									<span>Views</span>
+								</div>
+							</Menu.Button>
 						</div>
 
 						<Transition
@@ -75,9 +82,7 @@ export const SingleUserSortOptions = () => {
 												<input
 													type="radio"
 													value="startDate"
-													checked={
-														viewsFilter.singleUserSort === "startDate"
-													}
+													checked={viewsFilter.singleUserSort === "startDate"}
 													onChange={handleSortMethodChange}
 													className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
 												/>

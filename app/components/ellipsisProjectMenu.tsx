@@ -26,7 +26,7 @@ export default function EllipsisProjectMenu({ project }: any) {
 	);
 	const dropdownSelectedItemClass = (isActive: boolean) =>
 		isActive
-			? "px-4 py-2 block border-b-2 hover:border-gray-200 hover:text-accentgreen hover:cursor-pointer text-sm"
+			? "px-4 py-2 block hover:text-accentgreen hover:cursor-pointer text-sm"
 			: "text-gray-900 block px-4 py-2 text-sm";
 	const query = {
 		clientName: clientName,
@@ -99,17 +99,7 @@ export default function EllipsisProjectMenu({ project }: any) {
 				leaveTo="transform opacity-0 scale-95"
 			>
 				<Menu.Items className="absolute left-0 top-full z-50 ml-9 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-					<div className="py-1">
-						<Menu.Item>
-							{({ active }) => (
-								<p
-									className={dropdownSelectedItemClass(active)}
-									onClick={handleProjectChange}
-								>
-									View Project
-								</p>
-							)}
-						</Menu.Item>
+					<div className="py-1 border-b-2">
 						<label className="ml-3 inline-block pl-[0.15rem] hover:cursor-pointer text-gray-900 px-4 py-2 text-sm">
 							<input
 								className="mr-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-neutral-300 
@@ -127,24 +117,34 @@ export default function EllipsisProjectMenu({ project }: any) {
 						</label>
 						<Menu.Item>
 							{({ active }) => (
-								<a
-									href={`?assignmentmodal=true&project=${base64Query}`}
+								<p
 									className={dropdownSelectedItemClass(active)}
+									onClick={handleProjectChange}
 								>
-									Add Staff
-								</a>
+									View Project Plan
+								</p>
 							)}
 						</Menu.Item>
 						<Menu.Item>
 							{({ active }) => (
 								<Link
-									href={`?projectmodal=true&project=${base64Query}`}
-									className={dropdownSelectedItemClass(active)}
+								href={`?projectmodal=true&project=${base64Query}`}
+								className={dropdownSelectedItemClass(active)}
 								>
-									Edit Details
+									Edit Project
 								</Link>
 							)}
 						</Menu.Item>
+									<Menu.Item>
+										{({ active }) => (
+											<a
+												href={`?assignmentmodal=true&project=${base64Query}`}
+												className={dropdownSelectedItemClass(active)}
+											>
+												Add Person
+											</a>
+										)}
+									</Menu.Item>
 					</div>
 					<div
 						id={`${project.status}`}

@@ -5,6 +5,7 @@ import { ProjectSortOptions } from "./projectSortOptions";
 import { PeopleSortOptions } from "./peopleSortOptions";
 import { SingleProjectSortOptions } from "./singleProjectSortOptions";
 import { SingleUserSortOptions } from "./singleUserSortOptions";
+
 export default function ViewsMenu() {
 	const pathname = usePathname();
 	const params = useParams();

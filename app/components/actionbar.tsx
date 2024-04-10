@@ -11,7 +11,7 @@ const ActionBar: React.FC = () => {
 		<div className="actionbar flex justify-between items-center bg-gray-50 p-4">
 			<div className="flex items-center space-x-4">
 				<AddDropdown />
-				<div className="flex items-center border actionbar-border-accent rounded-full">
+				{/* <div className="flex items-center border actionbar-border-accent rounded-full">
 					<div
 						className="w-12 h-8 flex justify-center items-center rounded-l-full actionbar-bg-accent actionbar-text-accent"
 						aria-label="sort amount down"
@@ -41,17 +41,18 @@ const ActionBar: React.FC = () => {
 						placeholder="Search"
 						className="flex bg-transparent py-1 border-none border-gray-300"
 					/>
-				</div>
+				</div> */}
 			</div>
 			<div className="flex items-center space-x-4">
+				<ViewsMenu />
 				<span
 					className="hover:underline hover:cursor-pointer"
 					onClick={scrollToTodayFunction}
 				>
 					Today
 				</span>
-				<ViewsMenu />
-				<div className="flex items-center border actionbar-border-accent rounded-full">
+
+				{/* <div className="flex items-center border actionbar-border-accent rounded-full">
 					<div
 						className={
 							"px-4 py-1 rounded-l-full actionbar-border-accent " +
@@ -63,7 +64,7 @@ const ActionBar: React.FC = () => {
 					<div className="px-4 py-1 rounded-r-full border-l actionbar-border-accent">
 						Year
 					</div>
-				</div>
+				</div> */}
 			</div>
 		</div>
 	);

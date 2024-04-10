@@ -2,6 +2,7 @@ import { useUserDataContext } from "@/app/userDataContext";
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import React from "react";
+import { EyeIcon } from "@heroicons/react/24/outline";
 export const ProjectSortOptions = () => {
 	const { viewsFilter, setViewsFilter } = useUserDataContext();
 	const handleSortMethodChange = (
@@ -29,7 +30,14 @@ export const ProjectSortOptions = () => {
 									: "flex items-center border actionbar-border-accent rounded-full px-5 py-1"
 							}
 						>
-							<Menu.Button>Views</Menu.Button>
+							<Menu.Button>
+								<div className="flex items-center">
+									<div className="h-4 w-4 mr-1">
+										<EyeIcon />
+									</div>
+									<span>Views</span>
+								</div>
+							</Menu.Button>
 						</div>
 
 						<Transition
@@ -61,7 +69,7 @@ export const ProjectSortOptions = () => {
 										</label>
 									</div>
 								</div>
-								<div>
+								{/* <div>
 									<p className={"text-gray-500 block px-4 py-2 text-xs"}>
 										Assignments
 									</p>
@@ -154,7 +162,7 @@ export const ProjectSortOptions = () => {
 											</div>
 										</div>
 									</div>
-								</div>
+								</div> */}
 								<div>
 									<div className="pb-3 border-b-2 border-gray-200">
 										<p className={"text-gray-500 block px-4 py-2 text-xs"}>

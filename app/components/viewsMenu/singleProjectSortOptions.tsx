@@ -2,7 +2,7 @@ import { useUserDataContext } from "@/app/userDataContext";
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import React from "react";
-
+import { EyeIcon } from "@heroicons/react/24/outline";
 export const SingleProjectSortOptions = () => {
 	const { viewsFilter, setViewsFilter } = useUserDataContext();
 
@@ -14,7 +14,7 @@ export const SingleProjectSortOptions = () => {
 			singleProjectSort: event.target.value,
 		});
 	};
-    return (
+	return (
 		<>
 			<Menu
 				as="div"
@@ -31,7 +31,14 @@ export const SingleProjectSortOptions = () => {
 									: "flex items-center border actionbar-border-accent rounded-full px-5 py-1"
 							}
 						>
-							<Menu.Button>Views</Menu.Button>
+							<Menu.Button>
+								<div className="flex items-center">
+									<div className="h-4 w-4 mr-1">
+										<EyeIcon />
+									</div>
+									<span>Views</span>
+								</div>
+							</Menu.Button>
 						</div>
 
 						<Transition
@@ -72,20 +79,6 @@ export const SingleProjectSortOptions = () => {
 											<label className="ml-2 text-gray-600">
 												<input
 													type="radio"
-													value="staffingNeeds"
-													checked={
-														viewsFilter.singleProjectSort === "staffingNeeds"
-													}
-													onChange={handleSortMethodChange}
-													className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
-												/>
-												Staffing Needs
-											</label>
-										</div>
-										<div>
-											<label className="ml-2 text-gray-600">
-												<input
-													type="radio"
 													value="startDate"
 													checked={
 														viewsFilter.singleProjectSort === "startDate"
@@ -112,9 +105,9 @@ export const SingleProjectSortOptions = () => {
 											<label className="ml-2 text-gray-600">
 												<input
 													type="radio"
-													value="abcProjectName"
+													value="abcUserName"
 													checked={
-														viewsFilter.singleProjectSort === "abcProjectName"
+														viewsFilter.singleProjectSort === "abcUserName"
 													}
 													onChange={handleSortMethodChange}
 													className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
@@ -123,24 +116,6 @@ export const SingleProjectSortOptions = () => {
 											</label>
 										</div>
 									</div>
-								</div>
-								<div>
-									<label className="block px-4 py-2 text-sm text-gray-600">
-										<input
-											id="showArchivedProjects"
-											type="checkbox"
-											defaultChecked={viewsFilter.showArchivedProjects}
-											className="w-4 h-4 text-accentgreen bg-gray-100 border-gray-300 rounded focus:accentgreen dark:focus:ring-accentgreen dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-200 dark:border-gray-600 mr-3"
-											onClick={() =>
-												setViewsFilter({
-													...viewsFilter,
-													showArchivedProjects:
-														!viewsFilter.showArchivedProjects,
-												})
-											}
-										/>
-										Show Archived Projects
-									</label>
 								</div>
 							</Menu.Items>
 						</Transition>

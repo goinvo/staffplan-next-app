@@ -19,6 +19,7 @@ import {
 import WeekDisplay from "../components/weekDisplay";
 import { LoadingSpinner } from "../components/loadingSpinner";
 import Image from "next/image";
+import EllipsisPeopleMenu from "../components/ellipsisPeopleMenu";
 const PeopleView: React.FC = () => {
 	const [userAssignmentDataMap, setUserAssignmentDataMap] =
 		useState<UserAssignmentDataMapType>({});
@@ -87,7 +88,6 @@ const PeopleView: React.FC = () => {
 
 		return <></>;
 	};
-
 	return (
 		<>
 			{userList ? (
@@ -109,6 +109,9 @@ const PeopleView: React.FC = () => {
 								/>
 							</div>
 							<div className="flex">{user.name}</div>
+							<div>
+								<EllipsisPeopleMenu user={user} />
+							</div>
 						</div>
 					))}
 					renderCell={renderCell}

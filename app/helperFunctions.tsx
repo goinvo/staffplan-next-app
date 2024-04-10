@@ -458,7 +458,7 @@ export const drawFTELabels = (
 								}}
 							>
 								<div
-									className="absolute text-bottom text-black text-xs"
+									className="absolute text-bottom text-black text-xs text-wrap"
 									style={{
 										left: `${labelPadding + gap}px`,
 										bottom: `${labelPadding}px`,
@@ -527,25 +527,60 @@ export const drawBar = (
 		<path
 			key={key}
 			d={topSection + " v " + vLength + " h " + fullBarWidth * -1 + " z"}
-			fill="blue"
+			fill="#72DDC3"
 		/>
 	);
 };
-export const sortSingleProject = (sortMethod: string, project: ProjectType) => {
-	const arrayToSort = project.assignments?.length
-	? [...project.assignments]
-	: [];
-	console.log(project, "PROJECT FROM SORT")
-const sortedAssignments = { ...project, assignments: arrayToSort };
+export const sortSingleProject = (sortMethod: string, users: UserType[]) => {
+	const arrayToSort = users?.length ? [...users] : [];
 	if (sortMethod === "abcUserName") {
+		return arrayToSort.sort((a, b) => {
+			const userA = a.name.toLowerCase();
+			const userB = b.name.toLowerCase();
+			if (userA < userB) {
+				return -1;
+			}
+			if (userA > userB) {
+				return 1;
+			}
+			return 0;
+		});
 	}
 	if (sortMethod === "startDate") {
-	}
-	if (sortMethod === "staffingNeeds") {
+		return arrayToSort.sort((a, b) => {
+			const userA =
+				a.assignments && a.assignments[0].startsOn
+					? a.assignments[0].startsOn
+					: "";
+			const userB =
+				b.assignments && b.assignments[0].startsOn
+					? b.assignments[0].startsOn
+					: "";
+			if (userA < userB) {
+				return -1;
+			}
+			if (userA > userB) {
+				return 1;
+			}
+			return 0;
+		});
 	}
 	if (sortMethod === "status") {
+		return arrayToSort.sort((a, b) => {
+			const userA =
+				a.assignments && a.assignments[0].status ? a.assignments[0].status : "";
+			const userB =
+				b.assignments && b.assignments[0].status ? b.assignments[0].status : "";
+			if (userA < userB) {
+				return -1;
+			}
+			if (userA > userB) {
+				return 1;
+			}
+			return 0;
+		});
 	}
-	return project;
+	return users;
 };
 export const sortProjectList = (
 	sortMethod: string,
@@ -615,9 +650,7 @@ export const sortProjectList = (
 };
 
 export const sortSingleUser = (sortMethod: string, user: UserType) => {
-	const arrayToSort = user.assignments?.length
-		? [...user.assignments]
-		: [];
+	const arrayToSort = user.assignments?.length ? [...user.assignments] : [];
 	const sortedAssignments = { ...user, assignments: arrayToSort };
 	if (sortMethod === "abcProjectName") {
 		sortedAssignments.assignments.sort((a, b) => {
