@@ -3,15 +3,64 @@ import React from "react";
 import AddDropdown from "./addDropdown";
 import { FaSortAmountDown, FaExpand, FaFilter, FaSearch } from "react-icons/fa";
 import { useUserDataContext } from "../userDataContext";
-import ViewsMenu from "./viewsMenu";
-
+import ViewsMenu from "./viewsMenu/viewsMenu";
+import Image from "next/image";
+import { useParams } from "next/navigation";
 const ActionBar: React.FC = () => {
-	const { scrollToTodayFunction } = useUserDataContext();
+	const { scrollToTodayFunction, singleUserPage, singleProjectPage } =
+		useUserDataContext();
+	const params = useParams();
+	const singleViewParam = () => {
+		if (params) {
+			if (params.name) {
+				const decodedString = decodeURIComponent(params.name.toString());
+				const decodedBase64 = Buffer.from(decodedString, "base64").toString(
+					"utf-8"
+				);
+				return JSON.parse(decodedBase64);
+			}
+		}
+		return null;
+	};
+	console.log(singleUserPage, "SINGLE USER PAGE");
 	return (
 		<div className="actionbar flex justify-between items-center bg-gray-50 p-4">
 			<div className="flex items-center space-x-4">
 				<AddDropdown />
-				<div className="flex items-center border actionbar-border-accent rounded-full">
+				{singleUserPage &&
+				singleViewParam() &&
+				singleViewParam().selectedUserId ? (
+					<div className="flex items-center text-white text-xl">
+						<div className="flex w-8 h-8 timeline-grid-bg mr-2 rounded-full overflow-hidden">
+							<Image
+								src={`${singleUserPage.avatarUrl}`}
+								alt="user avatar"
+								width={500}
+								height={500}
+							/>
+						</div>
+						{singleUserPage.name}
+					</div>
+				) : null}
+				{singleProjectPage &&
+				singleViewParam() &&
+				singleViewParam().selectedProjectId ? (
+					<div className="flex items-center text-white text-xl">
+						<div className="flex w-8 h-8 timeline-grid-bg mr-2 rounded-full overflow-hidden">
+							<Image
+								src={`${singleProjectPage.client.avatarUrl}`}
+								alt="user avatar"
+								width={500}
+								height={500}
+							/>
+						</div>
+						<div>
+							<div className="text-sm font-bold">{singleProjectPage.client.name}</div>
+							<div className="text-sm ">{singleProjectPage.name}</div>
+						</div>
+					</div>
+				) : null}
+				{/* <div className="flex items-center border actionbar-border-accent rounded-full">
 					<div
 						className="w-12 h-8 flex justify-center items-center rounded-l-full actionbar-bg-accent actionbar-text-accent"
 						aria-label="sort amount down"
@@ -41,12 +90,18 @@ const ActionBar: React.FC = () => {
 						placeholder="Search"
 						className="flex bg-transparent py-1 border-none border-gray-300"
 					/>
-				</div>
+				</div> */}
 			</div>
 			<div className="flex items-center space-x-4">
-				<span className="hover:underline hover:cursor-pointer" onClick={scrollToTodayFunction}>Today</span>
-				<ViewsMenu/>
-				<div className="flex items-center border actionbar-border-accent rounded-full">
+				<ViewsMenu />
+				<span
+					className="hover:underline hover:cursor-pointer"
+					onClick={scrollToTodayFunction}
+				>
+					Today
+				</span>
+
+				{/* <div className="flex items-center border actionbar-border-accent rounded-full">
 					<div
 						className={
 							"px-4 py-1 rounded-l-full actionbar-border-accent " +
@@ -58,7 +113,7 @@ const ActionBar: React.FC = () => {
 					<div className="px-4 py-1 rounded-r-full border-l actionbar-border-accent">
 						Year
 					</div>
-				</div>
+				</div> */}
 			</div>
 		</div>
 	);

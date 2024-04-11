@@ -3,6 +3,7 @@ import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import Link from "next/link";
 import React from "react";
+import { PlusIcon } from "@heroicons/react/24/solid";
 
 export default function AddDropdown() {
 	const dropdownSelectedItemClass = (isActive: boolean) =>
@@ -19,7 +20,7 @@ export default function AddDropdown() {
 		>
 			<div>
 				<Menu.Button className="actionbar-bg-accent actionbar-text-accent w-8 h-8 rounded-full flex justify-center items-center">
-					+
+					<PlusIcon className="fill-white" />
 				</Menu.Button>
 			</div>
 

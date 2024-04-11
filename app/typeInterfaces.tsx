@@ -8,7 +8,7 @@ export interface AssignmentType {
 	project: ProjectType;
 	startsOn: string | null;
 	status: string;
-	workWeeks: [];
+	workWeeks: WorkWeekType[];
 	estimatedWeeklyHours: number;
 }
 
@@ -35,8 +35,13 @@ export interface ProjectType {
 	assignments?: [AssignmentType];
 	__typename?:string;
 	workWeeks?: WorkWeekType[];
+	fte:number;
+	hours:number;
 }
 
+export interface ProjectSummaryProps {
+	project: ProjectType;
+}
 export interface ProjectValuesType {
 	endsOn: string;
 	hours: number;
@@ -47,6 +52,27 @@ export interface ProjectValuesType {
 	paymentFrequency: string;
 	cost: number;
 }
+
+export interface ProjectDataMapType {
+	[projectId: number]: {
+		[year: number]: {
+			[cweek: number]: WorkWeekBlockMemberType[];
+		};
+	};
+}
+
+export type selectedCell = {
+    week: number;
+    year: number;
+    rowId: number;
+};
+
+export interface SideLabelComponentsType {
+    labelContents: React.ReactNode[];
+	divHeights?: number[];
+	setDivHeights: (heights: number[]) => void;
+    offset: number;
+};
 
 export interface UpsertValues {
 	actualHours: number | string;
@@ -63,6 +89,54 @@ export interface UserType {
 	name: string;
 	assignments?: AssignmentType[];
 	avatarUrl:string;
+}
+
+export interface UserAssignmentDataMapType {
+	[userId: number]: {
+		[year: number]: {
+			[cweek: number]: WorkWeekBlockMemberType[];
+		};
+	};
+}
+
+export interface UserSummaryProps {
+	assignment: AssignmentType;
+}
+export interface ViewerType { 
+	name:string;
+	id:string;
+}
+
+export interface ViewsFiltersType { 
+	selectedProjectSort: string;
+	selectedUserSort: string;
+	singleUserSort: string;
+	singleProjectSort: string;
+	assignmentSort: string;
+	rollupSort: string;
+	showSummaries: boolean;
+	showArchivedProjects: boolean;
+	showInactiveUsers: boolean;
+}
+
+export type WeekDisplayProps = {
+    labelContentsLeft: React.ReactNode[];
+	labelContentsRight?: React.ReactNode[];
+    onMouseOverWeek?: (week: number, year: number, cellId: number) => void;
+    onMouseClickWeek?: (week: number, year: number, cellId: number) => void;
+	onCellFocus? : (week: number, year: number, cellId: number) => void;
+	onCellBlur? : (week: number, year: number, cellId: number) => void;
+    renderCell?: (week: number, year: number, cellId: number, isSelected: boolean, width?: number, height?: number) => ReactNode;
+    selectedCell?: selectedCell;
+};
+
+export interface WorkWeekRenderDataType {
+	cweek: number;
+	year: number;
+	estimatedHours: number;
+	actualHours: number;
+	assignmentId?: number;
+	workWeekBarId?: number;
 }
 
 export interface WorkWeekProps {
@@ -88,66 +162,3 @@ export interface WorkWeekBlockMemberType {
 	isLastConsecutiveWeek: boolean;
 }
 
-export interface UserAssignmentDataMapType {
-	[userId: number]: {
-		[year: number]: {
-			[cweek: number]: WorkWeekBlockMemberType[];
-		};
-	};
-}
-
-export interface ProjectDataMapType {
-	[projectId: number]: {
-		[year: number]: {
-			[cweek: number]: WorkWeekBlockMemberType[];
-		};
-	};
-}
-
-export interface ViewerType { 
-	name:string;
-	id:string;
-}
-
-export interface ViewsFiltersType { 
-	selectedProjectSort: string;
-	selectedUserSort: string;
-	assignmentSort: string;
-	rollupSort: string;
-	showSummaries: boolean;
-	showArchivedProjects: boolean;
-	showInactiveUsers: boolean;
-}
-
-export interface WorkWeekRenderDataType {
-	cweek: number;
-	year: number;
-	estimatedHours: number;
-	actualHours: number;
-	assignmentId?: number;
-	workWeekBarId?: number;
-}
-
-export type WeekDisplayProps = {
-    labelContentsLeft: React.ReactNode[];
-	labelContentsRight?: React.ReactNode[];
-    onMouseOverWeek?: (week: number, year: number, cellId: number) => void;
-    onMouseClickWeek?: (week: number, year: number, cellId: number) => void;
-	onCellFocus? : (week: number, year: number, cellId: number) => void;
-	onCellBlur? : (week: number, year: number, cellId: number) => void;
-    renderCell?: (week: number, year: number, cellId: number, isSelected: boolean, width?: number, height?: number) => ReactNode;
-    selectedCell?: selectedCell;
-};
-
-export type selectedCell = {
-    week: number;
-    year: number;
-    rowId: number;
-};
-
-export interface SideLabelComponentsType {
-    labelContents: React.ReactNode[];
-	divHeights?: number[];
-	setDivHeights: (heights: number[]) => void;
-    offset: number;
-};

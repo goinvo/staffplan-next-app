@@ -16,6 +16,9 @@ import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import { useUserDataContext } from "@/app/userDataContext";
 import ProjectDetails from "@/app/components/projectDetails";
 import Image from "next/image";
+import { sortSingleProject } from "@/app/helperFunctions";
+import UserSummary from "@/app/components/userSummary";
+import ProjectSummary from "@/app/components/allProjectsSummary";
 
 const ProjectPage: React.FC = () => {
 	const params = useParams();
@@ -35,7 +38,8 @@ const ProjectPage: React.FC = () => {
 	>([]);
 
 	const [upsertWorkweek] = useMutation(UPSERT_WORKWEEK);
-	const { userList, projectList, setProjectList } = useUserDataContext();
+	const { userList, projectList, setProjectList, viewsFilter,setSingleProjectPage } =
+		useUserDataContext();
 	const router = useRouter();
 	const pathname = usePathname();
 	const upsertWorkWeekValues = (values: WorkWeekRenderDataType) => {
@@ -111,9 +115,11 @@ const ProjectPage: React.FC = () => {
 	};
 
 	const handleCurrEstHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		localStorage.setItem('currEstHours', e.target.value);
+		localStorage.setItem("currEstHours", e.target.value);
 		const newEstimatedHours = parseInt(e.target.value);
-		const selectedCell = JSON.parse(localStorage.getItem('selectedCell') || '{}');
+		const selectedCell = JSON.parse(
+			localStorage.getItem("selectedCell") || "{}"
+		);
 		const newWorkWeekData = lookupWorkWeekData(
 			selectedCell.rowId,
 			selectedCell.year,
@@ -144,7 +150,7 @@ const ProjectPage: React.FC = () => {
 				cweek: selectedCell.week,
 				year: selectedCell.year,
 				estimatedHours: newEstimatedHours,
-				actualHours: parseInt(localStorage.getItem('currActHours') || '0'),
+				actualHours: parseInt(localStorage.getItem("currActHours") || "0"),
 				assignmentId: foundAssignment.id,
 			};
 			updateDataState(newWorkWeekData, selectedCell.rowId);
@@ -153,9 +159,11 @@ const ProjectPage: React.FC = () => {
 	};
 
 	const handleCurrActHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		localStorage.setItem('currActHours', e.target.value);
+		localStorage.setItem("currActHours", e.target.value);
 		const newActualHours = parseInt(e.target.value);
-		const selectedCell = JSON.parse(localStorage.getItem('selectedCell') || '{}');
+		const selectedCell = JSON.parse(
+			localStorage.getItem("selectedCell") || "{}"
+		);
 		const newWorkWeekData = lookupWorkWeekData(
 			selectedCell.rowId,
 			selectedCell.year,
@@ -169,19 +177,13 @@ const ProjectPage: React.FC = () => {
 			const newWorkWeekData = {
 				cweek: selectedCell.week,
 				year: selectedCell.year,
-				estimatedHours: parseInt(localStorage.getItem('currEstHours') || '0'),
+				estimatedHours: parseInt(localStorage.getItem("currEstHours") || "0"),
 				actualHours: newActualHours,
 				assignmentId: rowIdToUserIdMap.get(selectedCell.rowId),
 			};
 			updateDataState(newWorkWeekData, selectedCell.rowId);
 		}
 		setWasSelectedCellEdited(true);
-	};
-
-	const handleUserSelect = (user: UserType) => {
-		const userId = JSON.stringify({ selectedUserId: user.id });
-		const encodeUserId = Buffer.from(userId).toString("base64");
-		router.push("people/" + encodeURIComponent(encodeUserId));
 	};
 
 	const renderCell = (
@@ -199,13 +201,21 @@ const ProjectPage: React.FC = () => {
 			<>
 				<input
 					className="flex flex-row"
-					value={isSelected ? localStorage.getItem('currEstHours') ?? estimatedHours : estimatedHours}
+					value={
+						isSelected
+							? localStorage.getItem("currEstHours") ?? estimatedHours
+							: estimatedHours
+					}
 					placeholder="Estimated Hours"
 					onChange={(e) => handleCurrEstHoursChange(e)}
 				/>
 				<input
 					className="flex flex-row"
-					value={isSelected ? localStorage.getItem('currActHours') ?? actualHours : actualHours}
+					value={
+						isSelected
+							? localStorage.getItem("currActHours") ?? actualHours
+							: actualHours
+					}
 					placeholder="Actual Hours"
 					onChange={(e) => handleCurrActHoursChange(e)}
 				/>
@@ -252,31 +262,44 @@ const ProjectPage: React.FC = () => {
 	};
 
 	const handleCellFocus = (week: number, year: number, rowId: number) => {
-		console.log("handleCellFocus, week: ", week, " year: ", year, " rowId: ", rowId);
-		localStorage.setItem('selectedCell', JSON.stringify({ week, year, rowId }));
+		console.log(
+			"handleCellFocus, week: ",
+			week,
+			" year: ",
+			year,
+			" rowId: ",
+			rowId
+		);
+		localStorage.setItem("selectedCell", JSON.stringify({ week, year, rowId }));
 		const newWorkWeekData = lookupWorkWeekData(rowId, year, week);
 		if (newWorkWeekData) {
-			localStorage.setItem('currEstHours', newWorkWeekData.estimatedHours.toString());
-			localStorage.setItem('currActHours', newWorkWeekData.actualHours.toString());
+			localStorage.setItem(
+				"currEstHours",
+				newWorkWeekData.estimatedHours.toString()
+			);
+			localStorage.setItem(
+				"currActHours",
+				newWorkWeekData.actualHours.toString()
+			);
 		} else {
-			localStorage.setItem('currEstHours', "");
-			localStorage.setItem('currActHours', "");
+			localStorage.setItem("currEstHours", "");
+			localStorage.setItem("currActHours", "");
 		}
 	};
 
 	const handleCellBlur = () => {
 		if (wasSelectedCellEdited) {
 			const oldWorkWeekData = lookupWorkWeekData(
-				JSON.parse(localStorage.getItem('selectedCell') || '{}').rowId,
-				JSON.parse(localStorage.getItem('selectedCell') || '{}').year,
-				JSON.parse(localStorage.getItem('selectedCell') || '{}').week
+				JSON.parse(localStorage.getItem("selectedCell") || "{}").rowId,
+				JSON.parse(localStorage.getItem("selectedCell") || "{}").year,
+				JSON.parse(localStorage.getItem("selectedCell") || "{}").week
 			);
 			if (oldWorkWeekData) {
 				upsertWorkWeekValues(oldWorkWeekData);
 				setWasSelectedCellEdited(false);
 			}
 		}
-	}
+	};
 
 	useEffect(() => {
 		if (projectList) {
@@ -284,6 +307,7 @@ const ProjectPage: React.FC = () => {
 				(project: ProjectType) => project.id === selectedProjectId
 			);
 			if (foundProject) {
+				setSingleProjectPage(foundProject)
 				setSelectedProject(foundProject);
 			}
 
@@ -293,16 +317,8 @@ const ProjectPage: React.FC = () => {
 				.map((user: UserType) => {
 					// Filter out assignments that don't match the project name
 					const filteredAssignments =
-						user.assignments?.reduce(
-							(acc: AssignmentType[], assignment: AssignmentType) => {
-								if (assignment.project.id === selectedProjectId) {
-									acc.push(assignment);
-								}
-								return acc;
-							},
-							[]
-						) || [];
-
+					user.assignments?.filter((assignment) => {
+						return assignment.project.id === selectedProjectId})
 					return {
 						...user,
 						assignments: filteredAssignments,
@@ -312,7 +328,11 @@ const ProjectPage: React.FC = () => {
 					(user: UserType) => user.assignments && user.assignments.length > 0
 				);
 
-			setUsersWithProjectAssignment(newUsersWithProjectAssignment);
+			const sortedAssignments = sortSingleProject(
+				viewsFilter.singleProjectSort,
+				newUsersWithProjectAssignment
+			);
+			setUsersWithProjectAssignment(sortedAssignments);
 		}
 	}, [projectList, userList]);
 
@@ -376,9 +396,10 @@ const ProjectPage: React.FC = () => {
 	}, [usersWithProjectAssignment]);
 	return (
 		<div>
-			{selectedProject ? (<h1>
-				Assignments for {selectedProject.name}{" "}
-				<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
+			{selectedProject ? (
+			<h1 className="flex justify-between items-center">
+			<div className="flex items-center">
+				<div className="w-16 h-16 timeline-grid-bg rounded-full overflow-hidden mr-4">
 					<Image
 						src={`${selectedProject.client.avatarUrl}`}
 						alt="client avatar"
@@ -386,10 +407,24 @@ const ProjectPage: React.FC = () => {
 						height={500}
 					/>
 				</div>
-			</h1>) : ""}
+				<span>{selectedProject.name}</span>
+			</div>
+			<ProjectSummary project={selectedProject} />
+		</h1>
+			) : (
+				""
+			)}
+			
 			{usersWithProjectAssignment ? (
 				<WeekDisplay
 					labelContentsLeft={memoizedLabelContentsLeft}
+					labelContentsRight={usersWithProjectAssignment.map(user => ( user.assignments?.map((assignment: AssignmentType) => (	<div
+						key={assignment.id}
+						className="flex gap-x-4 gap-y-4 items-center justify-center"
+					>
+						<UserSummary assignment={assignment} />
+					</div>) ) )
+					)}
 					renderCell={renderCell}
 					onCellFocus={handleCellFocus}
 					onCellBlur={handleCellBlur}

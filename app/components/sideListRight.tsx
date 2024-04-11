@@ -21,7 +21,7 @@ const SideListRight: React.FC<SideLabelComponentsType> = ({ labelContents, divHe
         className="flex flex-row bg-white rounded-l p-4"
         style={{ minHeight: divHeights ? divHeights[index] + "px" : "0px" }}
       >
-        {label}
+          {label}
       </div>
     ));
   }, [labelContents]);

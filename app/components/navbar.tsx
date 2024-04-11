@@ -8,6 +8,7 @@ import {
 import { usePathname } from "next/navigation";
 import { useUserDataContext } from "../userDataContext";
 import { LoadingSpinner } from "./loadingSpinner";
+import { FaSearch } from "react-icons/fa";
 
 const Navbar: React.FC = () => {
 	const { viewer } = useUserDataContext();
@@ -21,7 +22,12 @@ const Navbar: React.FC = () => {
 	return (
 		<nav className="navbar bg-gray-100 px-4 h-14 flex justify-between items-center">
 			<div className="flex items-center space-x-4 h-full">
-				<div className="placeholder-logo">Logo</div>
+				<Link
+					href={`/people/${myPlanUrl()}`}
+					className="navbar-text-accent hover:underline"
+				>
+					My StaffPlan
+				</Link>
 				<Link
 					href="/projects"
 					className={`flex h-full justify-between items-center ${
@@ -39,13 +45,17 @@ const Navbar: React.FC = () => {
 					People
 				</Link>
 			</div>
+			<div className="flex justify-center items-center actionbar-text-search">
+					<div className="w-4 h-4 flex mr-2" aria-label="search">
+						<FaSearch/>
+					</div>
+					<input
+						type="text"
+						placeholder="Search"
+						className="flex bg-transparent py-1 border-none border-gray-300"
+					/>
+				</div>
 			<div className="flex items-center space-x-4 py-4">
-				<Link
-					href={`/people/${myPlanUrl()}`}
-					className="navbar-text-accent hover:underline"
-				>
-					My Plan
-				</Link>
 				<div className="h-4 w-4">
 					<ChatBubbleBottomCenterTextIcon />
 				</div>

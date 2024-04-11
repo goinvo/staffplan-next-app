@@ -1,4 +1,5 @@
 import {
+	AssignmentType,
 	ProjectDataMapType,
 	ProjectType,
 	UserAssignmentDataMapType,
@@ -457,7 +458,7 @@ export const drawFTELabels = (
 								}}
 							>
 								<div
-									className="absolute text-bottom text-black text-xs"
+									className="absolute text-bottom text-black text-xs text-wrap"
 									style={{
 										left: `${labelPadding + gap}px`,
 										bottom: `${labelPadding}px`,
@@ -526,11 +527,61 @@ export const drawBar = (
 		<path
 			key={key}
 			d={topSection + " v " + vLength + " h " + fullBarWidth * -1 + " z"}
-			fill="blue"
+			fill="#72DDC3"
 		/>
 	);
 };
-
+export const sortSingleProject = (sortMethod: string, users: UserType[]) => {
+	const arrayToSort = users?.length ? [...users] : [];
+	if (sortMethod === "abcUserName") {
+		return arrayToSort.sort((a, b) => {
+			const userA = a.name.toLowerCase();
+			const userB = b.name.toLowerCase();
+			if (userA < userB) {
+				return -1;
+			}
+			if (userA > userB) {
+				return 1;
+			}
+			return 0;
+		});
+	}
+	if (sortMethod === "startDate") {
+		return arrayToSort.sort((a, b) => {
+			const userA =
+				a.assignments && a.assignments[0].startsOn
+					? a.assignments[0].startsOn
+					: "";
+			const userB =
+				b.assignments && b.assignments[0].startsOn
+					? b.assignments[0].startsOn
+					: "";
+			if (userA < userB) {
+				return -1;
+			}
+			if (userA > userB) {
+				return 1;
+			}
+			return 0;
+		});
+	}
+	if (sortMethod === "status") {
+		return arrayToSort.sort((a, b) => {
+			const userA =
+				a.assignments && a.assignments[0].status ? a.assignments[0].status : "";
+			const userB =
+				b.assignments && b.assignments[0].status ? b.assignments[0].status : "";
+			if (userA < userB) {
+				return -1;
+			}
+			if (userA > userB) {
+				return 1;
+			}
+			return 0;
+		});
+	}
+	return users;
+};
 export const sortProjectList = (
 	sortMethod: string,
 	projectList: ProjectType[]
@@ -577,10 +628,59 @@ export const sortProjectList = (
 			return 0;
 		});
 	}
-	//staffing needs will be defined at a later date, for now it will return the original array
 	if (sortMethod === "staffingNeeds") {
-		return arrayToSort;
+		return arrayToSort.sort((a, b) => {
+			const assignmentCountA = a.assignments?.map(
+				(assignment: AssignmentType) => assignment
+			).length;
+			const assignmentCountB = b.assignments?.map(
+				(assignment: AssignmentType) => assignment
+			).length;
+			const projectA = a.fte - (assignmentCountA ?? 0);
+			const projectB = b.fte - (assignmentCountB ?? 0);
+			if (projectA < projectB) {
+				return 1;
+			}
+			if (projectA > projectB) {
+				return -1;
+			}
+			return 0;
+		});
 	}
+};
+
+export const sortSingleUser = (sortMethod: string, user: UserType) => {
+	const arrayToSort = user.assignments?.length ? [...user.assignments] : [];
+	const sortedAssignments = { ...user, assignments: arrayToSort };
+	if (sortMethod === "abcProjectName") {
+		sortedAssignments.assignments.sort((a, b) => {
+			const projectA = a.project.name.toLowerCase();
+			const projectB = b.project.name.toLowerCase();
+			if (projectA < projectB) {
+				return -1;
+			}
+			if (projectA > projectB) {
+				return 1;
+			}
+			return 0;
+		});
+	}
+	if (sortMethod === "startDate") {
+		sortedAssignments.assignments.sort((a, b) => {
+			const projectA = a.startsOn;
+			const projectB = b.startsOn;
+			if (projectA && projectB) {
+				if (projectA < projectB) {
+					return -1;
+				}
+				if (projectA > projectB) {
+					return 1;
+				}
+			}
+			return 0;
+		});
+	}
+	return sortedAssignments;
 };
 export const sortUserList = (sortMethod: string, userList: UserType[]) => {
 	const arrayToSort = [...userList];

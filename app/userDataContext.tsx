@@ -1,7 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
-import { ProjectType, ClientType, ViewerType, ViewsFiltersType } from "./typeInterfaces";
+import { ProjectType, ClientType,UserType, ViewerType, ViewsFiltersType } from "./typeInterfaces";
 import {
 	GET_USER_LIST,
 	GET_ALL_PROJECTS_DATA,
@@ -21,6 +21,10 @@ export interface UserDataContextType {
 	setViewer: React.Dispatch<React.SetStateAction<ViewerType>>;
 	viewsFilter: ViewsFiltersType;
 	setViewsFilter: React.Dispatch<React.SetStateAction<ViewsFiltersType>>;
+	singleUserPage: UserType;
+	setSingleUserPage: React.Dispatch<React.SetStateAction<UserType>>;
+	singleProjectPage: ProjectType;
+	setSingleProjectPage: React.Dispatch<React.SetStateAction<ProjectType>>;
 	scrollToTodayFunction: () => void;
 	setScrollToTodayFunction: React.Dispatch<React.SetStateAction<() => void>>;
 }
@@ -49,13 +53,17 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 	const [userList, setUserList] = useState<any>(null);
 	const [projectList, setProjectList] = useState<any>(null);
 	const [clientList, setClientList] = useState<any>(null);
+	const [singleUserPage, setSingleUserPage] = useState<any>(null);
+	const [singleProjectPage, setSingleProjectPage] = useState<any>(null);
 	const [viewer, setViewer] = useState<any>(null);
 	const [viewsFilter, setViewsFilter] = useState<ViewsFiltersType>({
 		selectedProjectSort: "abcProjectName",
 		selectedUserSort: "abcUserName",
+		singleUserSort:"abcProjectName",
+		singleProjectSort:"abcUserName",
 		assignmentSort: "slim",
 		rollupSort: "none",
-		showSummaries: false,
+		showSummaries: true,
 		showArchivedProjects: false,
 		showInactiveUsers: false,
 	});
@@ -162,6 +170,10 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 				setViewsFilter,
 				scrollToTodayFunction,
 				setScrollToTodayFunction,
+				singleUserPage,
+				setSingleUserPage,
+				singleProjectPage,
+				setSingleProjectPage,
 			}}
 		>
 			{children}

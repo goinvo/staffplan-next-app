@@ -15,6 +15,7 @@ import WeekDisplay from "../components/weekDisplay";
 import { LoadingSpinner } from "../components/loadingSpinner";
 import EllipsisProjectMenu from "../components/ellipsisProjectMenu";
 import Image from "next/image";
+import ProjectSummary from "../components/allProjectsSummary";
 
 const ProjectsView: React.FC = () => {
 	const [projectAssignmentDataMap, setProjectAssignmentDataMap] =
@@ -110,6 +111,14 @@ const ProjectsView: React.FC = () => {
 							<div>
 								<EllipsisProjectMenu project={project} />
 							</div>
+						</div>
+					))}
+					labelContentsRight={projectList.map((project) => (
+						<div
+							className="flex gap-x-4 gap-y-4 items-center justify-center"
+							key={project.id}
+						>
+							<ProjectSummary project={project} />
 						</div>
 					))}
 					renderCell={renderCell}

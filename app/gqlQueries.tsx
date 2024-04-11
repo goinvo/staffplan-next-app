@@ -154,6 +154,13 @@ export const GET_ALL_PROJECTS_DATA = gql`
 				cost
 				hours
 				fte
+				assignments{
+					id
+					startsOn
+					estimatedWeeklyHours
+					endsOn
+					status
+				  }
 				client {
 					id
 					name
