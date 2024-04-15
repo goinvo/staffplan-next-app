@@ -20,10 +20,6 @@ import { sortSingleUser } from "@/app/helperFunctions";
 const UserPage: React.FC = () => {
 	const router = useRouter();
 	const params = useParams();
-	const decodedString = decodeURIComponent(params.name.toString());
-	const decodedBase64 = Buffer.from(decodedString, "base64").toString("utf-8");
-	const { selectedUserId } = JSON.parse(decodedBase64);
-
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
 	const [workWeekDataLookupMap, setWorkWeekDataLookupMap] = useState<
@@ -346,10 +342,9 @@ const UserPage: React.FC = () => {
 	// If the user list has been loaded and the user's name is in the URL, get the user's ID and load their assignments
 	useEffect(() => {
 		if (clientSide && userList) {
-			const userId = selectedUserId;
-
+			const userId = JSON.parse(decodeURIComponent(params.name.toString()));
 			if (userId) {
-				setSelectedUserData(userId);
+				setSelectedUserData(parseInt(userId.selectedUserId));
 			}
 		}
 	}, [clientSide, userList, params.name, viewsFilter]);
@@ -359,8 +354,7 @@ const UserPage: React.FC = () => {
 		const projectId = JSON.stringify({
 			selectedProjectId: assignment.project.id,
 		});
-		const encodeProjectId = Buffer.from(projectId).toString("base64");
-		router.push("/projects/" + encodeURIComponent(encodeProjectId));
+		router.push("/projects/" + encodeURIComponent(projectId));
 	};
 	return (
 		<>

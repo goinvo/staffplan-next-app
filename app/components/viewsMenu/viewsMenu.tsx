@@ -13,10 +13,7 @@ export default function ViewsMenu() {
 		if (params) {
 			if (params.name) {
 				const decodedString = decodeURIComponent(params.name.toString());
-				const decodedBase64 = Buffer.from(decodedString, "base64").toString(
-					"utf-8"
-				);
-				return JSON.parse(decodedBase64);
+				return JSON.parse(decodedString);
 			}
 		}
 		return null;
