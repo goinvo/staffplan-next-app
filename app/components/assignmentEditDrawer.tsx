@@ -1,12 +1,7 @@
 import { Formik, Field } from "formik";
 import React, { useState } from "react";
 import ProjectDatepicker from "./projectDatepicker";
-import Select, {
-	components,
-	DropdownIndicatorProps,
-	ActionMeta,
-} from "react-select";
-import Option from "react-select";
+import Select, { components, DropdownIndicatorProps } from "react-select";
 import { useUserDataContext } from "../userDataContext";
 import { UserType } from "../typeInterfaces";
 
@@ -39,7 +34,7 @@ export const AssignmentEditDrawer = () => {
 	const [selectedOption, setSelectedOption] = useState<{
 		value: string;
 		label: string;
-	} | null>(null);
+	}>({ value: "", label: "Assign To..." });
 	const { userList } = useUserDataContext();
 	const initialValues = {
 		client: "",
@@ -59,6 +54,12 @@ export const AssignmentEditDrawer = () => {
 		return userList.map((user: UserType) => {
 			return { values: user.id, label: user.name };
 		});
+	};
+
+	const handleUserChange = (selectedOption: any) => {
+		if (selectedOption.value) {
+			return setSelectedOption(selectedOption);
+		}
 	};
 	return (
 		<div>
@@ -183,10 +184,10 @@ export const AssignmentEditDrawer = () => {
 								<Select
 									placeholder={"Assign To..."}
 									value={selectedOption}
-									onChange={setSelectedOption}
+									onChange={handleUserChange}
 									options={listOfUsers()}
 									components={{ DropdownIndicator }}
-                                    defaultValue={selectedOption}
+									defaultValue={selectedOption}
 									theme={(theme) => {
 										return {
 											...theme,
