@@ -17,6 +17,7 @@ import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import Image from "next/image";
 import UserSummary from "@/app/components/userSummary";
 import { sortSingleUser } from "@/app/helperFunctions";
+import { AssignmentEditDrawer } from "@/app/components/assignmentEditDrawer";
 const UserPage: React.FC = () => {
 	const router = useRouter();
 	const params = useParams();
@@ -395,6 +396,9 @@ const UserPage: React.FC = () => {
 						renderCell={renderCell}
 					/>
 				)}
+			</div>
+			<div>
+				<AssignmentEditDrawer/>
 			</div>
 		</>
 	);

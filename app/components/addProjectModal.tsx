@@ -12,7 +12,6 @@ import { Dialog } from "@headlessui/react";
 import { ReactNode } from "react";
 import { useUserDataContext } from "../userDataContext";
 import { LoadingSpinner } from "./loadingSpinner";
-import { parse } from "path";
 
 const AddProject = () => {
 	const [selectedClient, setSelectedClient] = useState<number | string>("");
@@ -306,6 +305,7 @@ const AddProject = () => {
 																	name="dates"
 																	handleBlur={handleBlur}
 																	component={ProjectDatepicker}
+																	projectView={false}
 																/>
 															</div>
 														</div>

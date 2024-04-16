@@ -294,6 +294,7 @@ const AddAssignment = () => {
 																handleBlur={handleBlur}
 																name="dates"
 																component={ProjectDatepicker}
+																assignmentView={true}
 															/>
 														</div>
 														{/* SECTION 3 */}
