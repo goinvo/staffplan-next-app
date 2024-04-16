@@ -225,12 +225,7 @@ const AddAssignment = () => {
 																					key={`${user.id} + ${user.name}`}
 																					value={user.id}
 																				>
-																					<Image
-																						src={`${user.avatarUrl}`}
-																						alt="user avatar"
-																						width={500}
-																						height={500}
-																					/>{" "}
+																					{" "}
 																					{user.name}
 																				</option>
 																			);

@@ -23,8 +23,7 @@ import ProjectSummary from "@/app/components/allProjectsSummary";
 const ProjectPage: React.FC = () => {
 	const params = useParams();
 	const decodedString = decodeURIComponent(params.name.toString());
-	const decodedBase64 = Buffer.from(decodedString, "base64").toString("utf-8");
-	const { selectedProjectId } = JSON.parse(decodedBase64);
+	const { selectedProjectId } = JSON.parse(decodedString);
 	const [selectedProject, setSelectedProject] = useState<ProjectType | null>(
 		null
 	);
@@ -368,8 +367,7 @@ const ProjectPage: React.FC = () => {
 
 	const handleUserChange = (user: UserType) => {
 		const userId = JSON.stringify({ selectedUserId: user.id });
-		const encodeUserId = Buffer.from(userId).toString("base64");
-		router.push("/people" + "/" + encodeURIComponent(encodeUserId));
+		router.push("/people" + "/" + encodeURIComponent(userId));
 	};
 
 	const memoizedLabelContentsLeft = useMemo(() => {

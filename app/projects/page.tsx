@@ -51,8 +51,7 @@ const ProjectsView: React.FC = () => {
 
 	const handleProjectChange = (project: ProjectType) => {
 		const projectId = JSON.stringify({ selectedProjectId: project.id });
-		const encodeProjectId = Buffer.from(projectId).toString("base64");
-		router.push(pathname + "/" + encodeURIComponent(encodeProjectId));
+		router.push(pathname + "/" + encodeURIComponent(projectId));
 	};
 
 	const renderCell = (

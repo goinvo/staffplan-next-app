@@ -17,7 +17,7 @@ const Navbar: React.FC = () => {
 	if (!viewer) return <LoadingSpinner />;
 	const myPlanUrl = () => {
 		const userId = JSON.stringify({ selectedUserId: viewer.id });
-		return Buffer.from(userId).toString("base64");
+		return encodeURIComponent(userId)
 	};
 	return (
 		<nav className="navbar bg-gray-100 px-4 h-14 flex justify-between items-center">

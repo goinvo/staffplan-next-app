@@ -14,15 +14,11 @@ const ActionBar: React.FC = () => {
 		if (params) {
 			if (params.name) {
 				const decodedString = decodeURIComponent(params.name.toString());
-				const decodedBase64 = Buffer.from(decodedString, "base64").toString(
-					"utf-8"
-				);
-				return JSON.parse(decodedBase64);
+				return JSON.parse(decodedString);
 			}
 		}
 		return null;
 	};
-	console.log(singleUserPage, "SINGLE USER PAGE");
 	return (
 		<div className="actionbar flex justify-between items-center bg-gray-50 p-4">
 			<div className="flex items-center space-x-4">
