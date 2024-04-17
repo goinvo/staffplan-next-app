@@ -10,7 +10,6 @@ import { useUserDataContext } from "../userDataContext";
 import { UPSERT_ASSIGNMENT } from "../gqlQueries";
 import { LoadingSpinner } from "./loadingSpinner";
 import { Dialog } from "@headlessui/react";
-import Image from "next/image";
 const AddAssignment = () => {
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
 		{}

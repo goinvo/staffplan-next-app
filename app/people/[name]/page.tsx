@@ -398,7 +398,11 @@ const UserPage: React.FC = () => {
 				)}
 			</div>
 			<div>
-				<AssignmentEditDrawer/>
+				{selectedUser?.assignments
+					? selectedUser?.assignments.map((assignment: AssignmentType) => {
+							return <AssignmentEditDrawer assignment={assignment} key={`${assignment.id}${selectedUser.id}`} />;
+					  })
+					: null}
 			</div>
 		</>
 	);

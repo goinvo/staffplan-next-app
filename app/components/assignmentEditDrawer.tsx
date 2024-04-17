@@ -1,14 +1,29 @@
-import { Formik, Field } from "formik";
+import {
+	Formik,
+	Field,
+	FormikValues,
+	FormikHelpers,
+	FormikHandlers,
+} from "formik";
 import React, { useState } from "react";
 import ProjectDatepicker from "./projectDatepicker";
-import Select, { components, DropdownIndicatorProps } from "react-select";
+import Select, {
+	components,
+	DropdownIndicatorProps,
+	OptionProps,
+} from "react-select";
 import { useUserDataContext } from "../userDataContext";
-import { UserType } from "../typeInterfaces";
-
-interface UserOptionType {
-	value: string;
-	label: string;
-}
+import {
+	AssignmentType,
+	UserType,
+	UserOptionType,
+	AssignmentEditDrawerProps,
+} from "../typeInterfaces";
+import Image from "next/image";
+import { UPSERT_ASSIGNMENT } from "../gqlQueries";
+import { useMutation } from "@apollo/client";
+import { LoadingSpinner } from "./loadingSpinner";
+import { DateTime } from "luxon";
 
 const DropdownIndicator = (props: DropdownIndicatorProps<UserOptionType>) => {
 	return (
@@ -29,43 +44,142 @@ const DropdownIndicator = (props: DropdownIndicatorProps<UserOptionType>) => {
 	);
 };
 
-export const AssignmentEditDrawer = () => {
-	const [confirmed, setConfirmed] = useState(false);
+export const AssignmentEditDrawer = ({
+	assignment,
+}: AssignmentEditDrawerProps) => {
+	console.log(assignment, "ASSIGNMENT");
+	const [confirmed, setConfirmed] = useState(
+		assignment.status === "active" ? true : false
+	);
 	const [selectedOption, setSelectedOption] = useState<{
 		value: string;
 		label: string;
-	}>({ value: "", label: "Assign To..." });
-	const { userList } = useUserDataContext();
+		avatarUrl: string;
+	}>({ value: "", label: "Assign To...", avatarUrl: "" });
+	const { userList, setUserList } = useUserDataContext();
+	const numberOfWeeks = (assignment: AssignmentType) => {
+		if (assignment.endsOn && assignment.startsOn) {
+			const currEndsOn = DateTime.fromISO(assignment.endsOn);
+			const currStartsOn = DateTime.fromISO(assignment.startsOn);
+			return Math.ceil(currEndsOn.diff(currStartsOn, "weeks").weeks);
+		}
+		return 0;
+	};
 	const initialValues = {
-		client: "",
-		cost: 0,
-		dates: { endsOn: "", startsOn: "" },
-		flatRate: 0,
-		hourlyRate: 0,
-		hoursPerWeek: 0,
-		totalHours: 0,
-		name: "",
-		numOfWeeks: "",
-		payRate: "flatRate",
-		status: false,
+		assignmentId: assignment.id,
+		dates: { endsOn: assignment.endsOn, startsOn: assignment.startsOn },
+		hoursPerWeek: assignment.estimatedWeeklyHours,
+		totalHours: numberOfWeeks(assignment)
+			? numberOfWeeks(assignment) * assignment.estimatedWeeklyHours
+			: 0,
+		userId: "",
+		numOfWeeks: numberOfWeeks(assignment),
+		status: assignment.status === "active" ? true : false,
 	};
 
 	const listOfUsers = () => {
 		return userList.map((user: UserType) => {
-			return { values: user.id, label: user.name };
+			return {
+				values: user.id,
+				label: user.name,
+				key: user.id,
+				avatarUrl: user.avatarUrl,
+			};
 		});
 	};
 
-	const handleUserChange = (selectedOption: any) => {
-		if (selectedOption.value) {
+	const { Option } = components;
+	const IconOption = (props: OptionProps<UserOptionType>) => {
+		return (
+			<Option {...props}>
+				<span className="flex pl-1">
+					<Image
+						className="rounded-full overflow-hidden hover:cursor-pointer mr-2"
+						src={props.data.avatarUrl}
+						width={24}
+						height={24}
+						alt={props.data.label}
+					/>
+					{props.data.label}
+				</span>
+			</Option>
+		);
+	};
+
+	const handleUserChange = (
+		selectedOption: any,
+		setFieldValue: <ValueType = FormikValues>(
+			field: string,
+			value: ValueType,
+			shouldValidate?: boolean
+		) => void
+	) => {
+		if (selectedOption.values) {
+			setFieldValue("userId", parseInt(selectedOption.values));
+			// setValues({ ...values, userId: parseInt(selectedOption.values) });
 			return setSelectedOption(selectedOption);
 		}
 	};
+
+	const [
+		upsertAssignment,
+		{ data: mutationData, loading: mutationLoading, error: mutationError },
+	] = useMutation(UPSERT_ASSIGNMENT);
+	if (!userList || mutationLoading) return <LoadingSpinner />;
+	const onSubmitUpsert = ({
+		userId,
+		dates,
+		status,
+		hoursPerWeek,
+	}: FormikValues) => {
+		upsertAssignment({
+			variables: {
+				id: assignment.id,
+				projectId: assignment.project.id,
+				userId: userId,
+				status: status ? "active" : "proposed",
+				startsOn: dates.startsOn,
+				endsOn: dates.endsOn,
+				estimatedWeeklyHours: hoursPerWeek,
+			},
+		}).then((response) => {
+			if (response.data.upsertAssignment) {
+				// Print the values passed into the mutation
+				const newAssignment = response.data.upsertAssignment;
+				setUserList((prevUserData: any) => {
+					const updatedUsers = prevUserData.map((user: UserType) => {
+						if (user.id === newAssignment.assignedUser.id && user.assignments) {
+							return {
+								...user,
+								assignments: [...user.assignments, newAssignment],
+							};
+						}
+						return user;
+					});
+					return updatedUsers;
+				});
+			}
+		});
+	};
+	const handleHoursPerWeekChange = (
+		e: React.ChangeEvent<HTMLInputElement>,
+		values: FormikValues,
+		setFieldValue: <ValueType = FormikValues>(
+			field: string,
+			value: ValueType,
+			shouldValidate?: boolean
+		) => void
+	) => {
+		const numOfWeeks = values.numOfWeeks;
+		const hoursPerWeek = e.target.value;
+		const totalHours = numOfWeeks * parseInt(hoursPerWeek);
+		setFieldValue("totalHours", totalHours);
+	};
 	return (
-		<div>
+		<div className="w-auto flex">
 			<Formik
 				onSubmit={(e) => {
-					// onSubmitUpsert(e);
+					onSubmitUpsert(e);
 				}}
 				initialValues={initialValues}
 				// validate={validateForm}
@@ -82,27 +196,28 @@ export const AssignmentEditDrawer = () => {
 					values,
 					resetForm,
 				}) => (
-					<form onSubmit={handleSubmit} className="max-w-lg mx-auto flex-grow">
-						{/* Section 1 */}
-						<div className="flex">
-							<div className="mr-4 mt-12">
-								<label className="ml-3 inline pl-[0.15rem] hover:cursor-pointer text-gray-900 px-4 py-2 text-sm">
-									<input
-										className="mr-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-neutral-300 
+					<form onSubmit={handleSubmit} className="mx-auto flex-grow px-2">
+						<div className="flex justify-between mr-10 pr-10 w-3/4">
+							<div className="mr-4 mt-5" style={{ width: "200px" }}>
+								{/* Toggle label */}
+								<label className="ml-3 inline pl-[0.15rem] hover:cursor-pointer text-gray-900 px-2 py-2 text-sm flex items-center">
+									<span>
+										<Field
+											className="mr-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-neutral-300 
 																		hover:checked:bg-accentgreen
 																		before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-neutral-100 after:shadow-[0_0px_3px_0_rgb(0_0_0_/_7%),_0_2px_2px_0_rgb(0_0_0_/_4%)] after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-accentgreen checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ml-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-accentgreen checked:after:shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),_0_2px_2px_0_rgba(0,0,0,0.14),_0_1px_5px_0_rgba(0,0,0,0.12)] checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[3px_-1px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:border-accentgreen checked:focus:bg-accentgreen checked:focus:before:ml-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-neutral-600 dark:after:bg-neutral-400 dark:checked:bg-accentgreen dark:checked:after:bg-accentgreen dark:focus:before:shadow-[3px_-1px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca]"
-										type="checkbox"
-										name="status"
-										checked={confirmed}
-										onChange={(e) => {
-											setConfirmed(!confirmed);
-											// onSubmitUpsert(e);
-										}}
-									/>
-									{confirmed ? "Confirmed" : "Unconfirmed"}
+											type="checkbox"
+											name="status"
+										/>
+										{values.status ? "Confirmed" : "Unconfirmed"}
+									</span>
 								</label>
 							</div>
-							<div className="w-1/4 flex flex-col mr-4 mt-6">
+							<div
+								className="w-1/4 flex flex-col mr-4"
+								style={{ width: "150px" }}
+							>
+								{/* Hours/Week input */}
 								<label
 									htmlFor="hours"
 									className="block font-medium text-gray-900"
@@ -120,20 +235,23 @@ export const AssignmentEditDrawer = () => {
 									value={values.hoursPerWeek}
 									onChange={(e) => {
 										handleChange(e);
-										// handleManualHours(e, values, setFieldValue);
+										handleHoursPerWeekChange(e, values, setFieldValue);
 									}}
-									readOnly={values.dates.endsOn ? true : false}
+									style={{ width: "100%" }}
 								/>
 							</div>
-							<div className="w-auto mr-4 mt-7">
+							<div className="w-auto mr-4 mt-1">
+								{/* Project datepicker */}
 								<Field
 									name="dates"
+									selectedAssignment={assignment}
 									handleBlur={handleBlur}
 									component={ProjectDatepicker}
 									assignmentView={true}
 								/>
 							</div>
 							<div className="w-auto flex flex-col mr-4">
+								{/* Weeks input */}
 								<label className="block font-medium text-gray-900">
 									# Weeks
 									<input
@@ -155,6 +273,7 @@ export const AssignmentEditDrawer = () => {
 								</label>
 							</div>
 							<div className="w-auto">
+								{/* Total hours input */}
 								<label
 									htmlFor="hours"
 									className="block font-medium text-gray-900"
@@ -173,32 +292,32 @@ export const AssignmentEditDrawer = () => {
 									value={values.totalHours}
 									onChange={(e) => {
 										handleChange(e);
-										// handleManualHours(e, values, setFieldValue);
 									}}
 								/>
 							</div>
 						</div>
 						{/* Section 2 */}
 						<div className="flex mb-4 justify-between">
-							<div className={""}>
+							<div className={"w-1/3"}>
 								<Select
 									placeholder={"Assign To..."}
 									value={selectedOption}
-									onChange={handleUserChange}
+									onChange={(e) => {
+										handleUserChange(e, setFieldValue);
+									}}
 									options={listOfUsers()}
-									components={{ DropdownIndicator }}
+									components={{ DropdownIndicator, Option: IconOption }}
 									defaultValue={selectedOption}
-									theme={(theme) => {
-										return {
-											...theme,
-											borderRadius: 5,
-											width: "100%",
-											colors: {
-												...theme.colors,
-												primary25: "#02AAA4",
-												primary: "#02AAA4",
-											},
-										};
+									menuPlacement="auto"
+									unstyled
+									classNames={{
+										input: () => "[&_input:focus]:ring-0 text-accent w-1/3",
+										control: () =>
+											"w-1/3 p-2 border border-accentgreen rounded-md text-accentgreen",
+										menu: () =>
+											"bg-white border border-accentgreen rounded-md w-1/3",
+										option: () => `hover:cursor-pointer
+												py-2 w-full`,
 									}}
 								/>
 							</div>
