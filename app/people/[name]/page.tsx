@@ -397,7 +397,7 @@ const UserPage: React.FC = () => {
 					/>
 				)}
 			</div>
-			<div>
+			{/* <div>
 				{selectedUser?.assignments
 					? selectedUser?.assignments.map((assignment: AssignmentType) => {
 							return (
@@ -408,7 +408,7 @@ const UserPage: React.FC = () => {
 							);
 					  })
 					: null}
-			</div>
+			</div> */}
 		</>
 	);
 };
