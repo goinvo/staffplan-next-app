@@ -12,6 +12,10 @@ export interface AssignmentType {
 	estimatedWeeklyHours: number;
 }
 
+export interface AssignmentEditDrawerProps {
+	assignment: AssignmentType;
+}
+
 export interface ClientType {
 	description: string;
 	id: number;
@@ -97,6 +101,12 @@ export interface UserAssignmentDataMapType {
 			[cweek: number]: WorkWeekBlockMemberType[];
 		};
 	};
+}
+
+export interface UserOptionType {
+	value: string;
+	label: string;
+	avatarUrl: string;
 }
 
 export interface UserSummaryProps {

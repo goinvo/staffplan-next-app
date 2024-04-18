@@ -1,34 +1,44 @@
 import React, { FocusEventHandler } from "react";
 import { FieldProps } from "formik";
 import { useSearchParams } from "next/navigation";
-import { ProjectType } from "../typeInterfaces";
+import { AssignmentType, ProjectType } from "../typeInterfaces";
 
 interface DatePickerProps extends FieldProps {
+	selectedAssignment: AssignmentType;
 	selectedProject: ProjectType;
 	handleBlur: FocusEventHandler;
+	projectView: boolean;
+	assignmentView: boolean;
 }
 
-export default function ProjctDatepicker(props: DatePickerProps) {
+export default function ProjectDatepicker(props: DatePickerProps) {
 	const {
 		field: { name, value, onChange },
 		form: { setFieldValue },
 		selectedProject,
+		selectedAssignment,
 		handleBlur,
+		projectView,
+		assignmentView,
 	} = props;
-	const searchParams = useSearchParams();
-	const assignmentModal = searchParams.get("assignmentmodal");
-	const projectModal = searchParams.get("projectmodal");
 
 	const handleCoverDurationClick = () => {
-		if (selectedProject.startsOn && selectedProject.endsOn) {
+		
+		if (selectedProject && selectedProject.startsOn && selectedProject.endsOn) {
 			setFieldValue(name, {
 				startsOn: selectedProject.startsOn,
 				endsOn: selectedProject.endsOn,
 			});
 		}
+		if (selectedAssignment && selectedAssignment.startsOn && selectedAssignment.endsOn) {
+			setFieldValue(name, {
+				startsOn: selectedAssignment.startsOn,
+				endsOn: selectedAssignment.endsOn,
+			});
+		}
 	};
 	const handleEndDateProjectModal = () => {
-		if (projectModal) {
+		if (projectView) {
 			setFieldValue("hourlyRate", 0);
 			setFieldValue("cost", 0);
 			setFieldValue("hours", 0);
@@ -50,12 +60,12 @@ export default function ProjctDatepicker(props: DatePickerProps) {
 						onBlur={handleBlur}
 					/>
 				</label>
-				{assignmentModal ? (
+				{assignmentView ? (
 					<button
 						onClick={() => handleCoverDurationClick()}
 						style={{ color: "teal" }}
 						type="button"
-						disabled={!selectedProject}
+						disabled={!selectedAssignment && !selectedProject}
 					>
 						Cover Project Span
 					</button>

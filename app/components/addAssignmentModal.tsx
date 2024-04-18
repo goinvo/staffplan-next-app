@@ -10,7 +10,6 @@ import { useUserDataContext } from "../userDataContext";
 import { UPSERT_ASSIGNMENT } from "../gqlQueries";
 import { LoadingSpinner } from "./loadingSpinner";
 import { Dialog } from "@headlessui/react";
-import Image from "next/image";
 const AddAssignment = () => {
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
 		{}
@@ -35,23 +34,23 @@ const AddAssignment = () => {
 	const autoFillAssignmentValues = {
 		dates: {
 			endsOn: parsedProject.endsOn ? parsedProject.endsOn : "",
-			startsOn: parsedProject.startsOn,
+			startsOn: parsedProject.startsOn ? parsedProject.startsOn : "",
 		},
-		hours: 40,
+		hours: 0,
 		projectId: parsedProject.id,
 		status: false,
 		userId: "",
 	};
 	const autoFillUserValues = {
 		dates: { endsOn: "", startsOn: "" },
-		hours: 40,
+		hours: 0,
 		projectId: "",
 		status: false,
 		userId: parsedUser.id,
 	};
 	const newAssignmentInitialValues = {
 		dates: { endsOn: "", startsOn: "" },
-		hours: 40,
+		hours: 0,
 		projectId: "",
 		status: false,
 		userId: "",
@@ -77,28 +76,34 @@ const AddAssignment = () => {
 		dates,
 		hours,
 	}: FormikValues) => {
+		const variables = {
+			projectId: projectId,
+			userId: userId,
+			status: status ? "active" : "proposed",
+			estimatedWeeklyHours: hours,
+		};
+		const nullableDates = () => {
+			if (dates.startsOn && dates.endsOn) {
+				return {
+					...variables,
+					endsOn: dates.endsOn,
+					startsOn: dates.startsOn,
+				};
+			}
+			if (dates.startsOn && !dates.endsOn) {
+				return { ...variables, startsOn: dates.startsOn };
+			}
+			if (!dates.startsOn && dates.endsOn) {
+				return { ...variables, endsOn: dates.endsOn };
+			}
+			return variables;
+		};
 		upsertAssignment({
-			variables: {
-				projectId: projectId,
-				userId: userId,
-				status: status ? "active" : "proposed",
-				startsOn: dates.startsOn,
-				endsOn: dates.endsOn,
-				estimatedWeeklyHours: hours,
-			},
+			variables: nullableDates(),
 		}).then((response) => {
 			if (response.data.upsertAssignment) {
 				// Print the values passed into the mutation
 				const newAssignment = response.data.upsertAssignment;
-
-				// Find the user whose ID matches the one in the response
-				const user = userList.find(
-					(user: UserType) => user.id === newAssignment.assignedUser.id
-				);
-				// const updatedUser = {
-				// 	...user,
-				// 	assignments: [...user.assignments, newAssignment],
-				// };
 
 				// Update the user list with the new assignment
 				setUserList((prevUserData: any) => {
@@ -145,18 +150,10 @@ const AddAssignment = () => {
 		if (values.dates) {
 			const startDate = new Date(values.dates.startsOn);
 			const endDate = new Date(values.dates.endsOn);
-			if (startDate > endDate) {
+
+			if (startDate && endDate && startDate > endDate) {
 				errors.dates = { endsOn: "Start must be before end" };
 			}
-			if (
-				startDate.toString() === "Invalid Date" ||
-				endDate.toString() === "Invalid Date"
-			) {
-				errors.dates = { endsOn: "Must select both dates" };
-			}
-		}
-		if (values.hours < 1) {
-			errors.hours = "Hours must be greater than 0";
 		}
 		return errors;
 	};
@@ -277,7 +274,7 @@ const AddAssignment = () => {
 																	<div className="rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
 																		<input
 																			type="number"
-																			min="1"
+																			min="0"
 																			name="hours"
 																			id="hours"
 																			value={values.hours}
@@ -294,6 +291,7 @@ const AddAssignment = () => {
 																handleBlur={handleBlur}
 																name="dates"
 																component={ProjectDatepicker}
+																assignmentView={true}
 															/>
 														</div>
 														{/* SECTION 3 */}

@@ -17,6 +17,7 @@ import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import Image from "next/image";
 import UserSummary from "@/app/components/userSummary";
 import { sortSingleUser } from "@/app/helperFunctions";
+import { AssignmentEditDrawer } from "@/app/components/assignmentEditDrawer";
 const UserPage: React.FC = () => {
 	const router = useRouter();
 	const params = useParams();
@@ -207,7 +208,7 @@ const UserPage: React.FC = () => {
 		onBlur?: () => void
 	) => {
 		const workWeekData = lookupWorkWeekData(rowIndex, year, cweek);
-
+		console.log(workWeekData);
 		const estimatedHours = workWeekData?.estimatedHours || "0";
 		const actualHours = workWeekData?.actualHours || "0";
 
@@ -395,6 +396,18 @@ const UserPage: React.FC = () => {
 						renderCell={renderCell}
 					/>
 				)}
+			</div>
+			<div>
+				{selectedUser?.assignments
+					? selectedUser?.assignments.map((assignment: AssignmentType) => {
+							return (
+								<AssignmentEditDrawer
+									assignment={assignment}
+									key={`${assignment.id}${selectedUser.id}`}
+								/>
+							);
+					  })
+					: null}
 			</div>
 		</>
 	);
