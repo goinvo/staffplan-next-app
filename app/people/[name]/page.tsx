@@ -208,7 +208,7 @@ const UserPage: React.FC = () => {
 		onBlur?: () => void
 	) => {
 		const workWeekData = lookupWorkWeekData(rowIndex, year, cweek);
-
+		console.log(workWeekData);
 		const estimatedHours = workWeekData?.estimatedHours || "0";
 		const actualHours = workWeekData?.actualHours || "0";
 
@@ -400,7 +400,12 @@ const UserPage: React.FC = () => {
 			<div>
 				{selectedUser?.assignments
 					? selectedUser?.assignments.map((assignment: AssignmentType) => {
-							return <AssignmentEditDrawer assignment={assignment} key={`${assignment.id}${selectedUser.id}`} />;
+							return (
+								<AssignmentEditDrawer
+									assignment={assignment}
+									key={`${assignment.id}${selectedUser.id}`}
+								/>
+							);
 					  })
 					: null}
 			</div>

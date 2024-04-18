@@ -2,8 +2,6 @@ import {
 	Formik,
 	Field,
 	FormikValues,
-	FormikHelpers,
-	FormikHandlers,
 } from "formik";
 import React, { useState } from "react";
 import ProjectDatepicker from "./projectDatepicker";
@@ -228,7 +226,7 @@ export const AssignmentEditDrawer = ({
 									type="number"
 									name="hoursPerWeek"
 									id="hoursPerWeek"
-									min={1}
+									min={0}
 									autoComplete="hoursPerWeek"
 									className="block w-full mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 									placeholder=""
@@ -256,14 +254,14 @@ export const AssignmentEditDrawer = ({
 									# Weeks
 									<input
 										type="number"
-										min="1"
+										min="0"
 										max="100"
 										step="1"
 										name="numOfWeeks"
 										id="numOfWeeks"
 										autoComplete="numOfWeeks"
 										className="block w-full mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
-										placeholder="1"
+										placeholder="0"
 										onBlur={handleBlur}
 										onChange={(e) => {
 											handleChange(e);
@@ -284,7 +282,7 @@ export const AssignmentEditDrawer = ({
 									type="number"
 									name="totalHours"
 									id="totalHours"
-									min={1}
+									min={0}
 									readOnly={true}
 									autoComplete="totalHours"
 									className="block w-full mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"

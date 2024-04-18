@@ -33,7 +33,7 @@ const AddProject = () => {
 		},
 		hours: parsedProject.hours ? parsedProject.hours : 0,
 		name: parsedProject.name,
-		numOfFTE: parsedProject.fte ? parsedProject.fte : "",
+		numOfFTE: parsedProject.fte ? parsedProject.fte : 0,
 		payRate: "flatRate",
 		cost: parsedProject.cost,
 		status: parsedProject.status === "confirmed" ? true : false,
@@ -48,7 +48,7 @@ const AddProject = () => {
 		hourlyRate: 0,
 		hours: 0,
 		name: "",
-		numOfFTE: "",
+		numOfFTE: 0,
 		payRate: "flatRate",
 		status: false,
 	};
@@ -81,15 +81,28 @@ const AddProject = () => {
 			clientId: values.client,
 			name: values.name,
 			status: values.status ? "confirmed" : "unconfirmed",
-			startsOn: values.dates.startsOn,
 			cost: values.cost,
-			fte:values.numOfFTE,
+			fte: values.numOfFTE,
 			hours: values.hours,
 		};
+		const nullableDates = () => {
+			if (values.dates.startsOn && values.dates.endsOn) {
+				return {
+					...variables,
+					endsOn: values.dates.endsOn,
+					startsOn: values.dates.startsOn,
+				};
+			}
+			if (values.dates.startsOn && !values.dates.endsOn) {
+				return { ...variables, startsOn: values.dates.startsOn };
+			}
+			if (!values.dates.startsOn && values.dates.endsOn) {
+				return { ...variables, endsOn: values.dates.endsOn };
+			}
+			return variables;
+		};
 		upsertProject({
-			variables: values.dates.endsOn
-				? { ...variables, endsOn: values.dates.endsOn }
-				: variables,
+			variables: nullableDates(),
 		}).then(() => router.back());
 	};
 	const onCancel = () => router.back();
@@ -125,22 +138,22 @@ const AddProject = () => {
 				errors.name = "Project name already in use";
 			}
 		}
-		if (!values.dates.startsOn) {
-			errors.dates = { endsOn: "Start date is required" };
-		}
-		if (values.dates) {
-			const startDate = new Date(values.dates.startsOn);
-			const endDate = new Date(values.dates.endsOn);
-			if (startDate > endDate) {
-				errors.dates = { endsOn: "Start must be before end" };
-			}
-			if (startDate.toString() === "Invalid Date") {
-				errors.dates = { endsOn: "Must select start date" };
-			}
-		}
-		if (values.payRate === "flatRate" && values.cost < 1) {
-			errors.payRate = "Set the total cost";
-		}
+		// if (!values.dates.startsOn) {
+		// 	errors.dates = { endsOn: "Start date is required" };
+		// }
+		// if (values.dates) {
+		// 	const startDate = new Date(values.dates.startsOn);
+		// 	const endDate = new Date(values.dates.endsOn);
+		// 	if (startDate > endDate) {
+		// 		errors.dates = { endsOn: "Start must be before end" };
+		// 	}
+		// 	if (startDate.toString() === "Invalid Date") {
+		// 		errors.dates = { endsOn: "Must select start date" };
+		// 	}
+		// }
+		// if (values.payRate === "flatRate" && values.cost < 1) {
+		// 	errors.payRate = "Set the total cost";
+		// }
 		return errors;
 	};
 	const setTotalCost = (
@@ -265,13 +278,7 @@ const AddProject = () => {
 																	id="client"
 																	className="block mt-1 px-2 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 																>
-																	<option
-																		value={
-																			""
-																		}
-																	>
-																	SELECT
-																	</option>
+																	<option value={""}>SELECT</option>
 																	{clientList?.map((client: ClientType) => {
 																		return (
 																			<option
@@ -316,7 +323,7 @@ const AddProject = () => {
 																	FTE
 																	<input
 																		type="number"
-																		min="1"
+																		min="0"
 																		max="100"
 																		step="0.5"
 																		name="numOfFTE"
@@ -344,7 +351,7 @@ const AddProject = () => {
 																	type="number"
 																	name="hours"
 																	id="hours"
-																	min={1}
+																	min={0}
 																	autoComplete="hours"
 																	className="block w-full mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 																	placeholder=""

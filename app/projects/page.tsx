@@ -26,7 +26,7 @@ const ProjectsView: React.FC = () => {
 	const router = useRouter();
 	const pathname = usePathname();
 
-	const { projectList, viewsFilter } = useUserDataContext();
+	const { projectList } = useUserDataContext();
 
 	useEffect(() => {
 		if (projectList) {
@@ -92,13 +92,10 @@ const ProjectsView: React.FC = () => {
 				<WeekDisplay
 					labelContentsLeft={projectList.map((project) => (
 						<div
-							className="flex gap-x-4 gap-y-4 items-center justify-center"
+							className="flex gap-x-4 gap-y-4 items-center relative"
 							key={project.id}
 						>
-							<div
-								className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden hover:cursor-pointer"
-								onClick={() => handleProjectChange(project)}
-							>
+							<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
 								<Image
 									src={`${project.client.avatarUrl}`}
 									alt="client avatar"
@@ -106,10 +103,41 @@ const ProjectsView: React.FC = () => {
 									height={500}
 								/>
 							</div>
-							<div className="flex">{project.name}</div>
+							<div
+								className="flex hover:cursor-pointer"
+								onClick={() => handleProjectChange(project)}
+							>
+								{project.name}
+							</div>
 							<div>
 								<EllipsisProjectMenu project={project} />
 							</div>
+							{/* svg status tag */}
+							{project.status === "unconfirmed" && (
+								<svg
+									width="375"
+									height="50"
+									viewBox="-335 0 500 100"
+									xmlns="http://www.w3.org/2000/svg"
+									className="absolute -top-5"
+								>
+									<path
+										d="M10,10 L150,10 L150,50 L20,50 Q10,50 10,40 Z"
+										fill="gray"
+									/>
+									<line
+										x1="10"
+										y1="13"
+										x2="-500"
+										y2="13"
+										stroke="gray"
+										strokeWidth="5"
+									/>
+									<text x="15" y="40" fill="white" font-size="20">
+										Unconfirmed
+									</text>
+								</svg>
+							)}
 						</div>
 					))}
 					labelContentsRight={projectList.map((project) => (

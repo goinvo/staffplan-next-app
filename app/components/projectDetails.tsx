@@ -48,16 +48,29 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 			clientId: values.client,
 			name: values.name,
 			status: values.status ? "confirmed" : "unconfirmed",
-			startsOn: values.dates.startsOn,
 			cost: values.cost,
 			fte: values.numOfFTE,
 			hours: values.hours,
 		};
+		const nullableDates = () => {
+			if (values.dates.startsOn && values.dates.endsOn) {
+				return {
+					...variables,
+					endsOn: values.dates.endsOn,
+					startsOn: values.dates.startsOn,
+				};
+			}
+			if (values.dates.startsOn && !values.dates.endsOn) {
+				return { ...variables, startsOn: values.dates.startsOn };
+			}
+			if (!values.dates.startsOn && values.dates.endsOn) {
+				return { ...variables, endsOn: values.dates.endsOn };
+			}
+			return variables;
+		};
 		upsertProject({
-			variables: values.dates.endsOn
-				? { ...variables, endsOn: values.dates.endsOn }
-				: variables,
-		});
+			variables: nullableDates(),
+		})
 	};
 	const validateForm = (values: FormikValues) => {
 		const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
@@ -75,7 +88,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 		if (!values.name) {
 			errors.name = "Project Name is required";
 		}
-		if (values.name && !project) {
+		if (values.name && selectedClient) {
 			const currentClient = clientList.find((client: ClientType) => {
 				if (client.id === selectedClient) return client;
 			});
@@ -90,22 +103,6 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 			if (projectNameExists) {
 				errors.name = "Project name already in use";
 			}
-		}
-		if (!values.dates.startsOn) {
-			errors.dates = { endsOn: "Start date is required" };
-		}
-		if (values.dates) {
-			const startDate = new Date(values.dates.startsOn);
-			const endDate = new Date(values.dates.endsOn);
-			if (startDate > endDate) {
-				errors.dates = { endsOn: "Start must be before end" };
-			}
-			if (startDate.toString() === "Invalid Date") {
-				errors.dates = { endsOn: "Must select start date" };
-			}
-		}
-		if (values.payRate === "flatRate" && values.cost < 1) {
-			errors.payRate = "Set the total cost";
 		}
 		return errors;
 	};
@@ -261,7 +258,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 												FTE
 												<input
 													type="number"
-													min="1"
+													min="0"
 													max="100"
 													step="0.5"
 													name="numOfFTE"
@@ -289,7 +286,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 												type="number"
 												name="hours"
 												id="hours"
-												min={1}
+												min={0}
 												autoComplete="hours"
 												className="block w-full mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 												placeholder=""
