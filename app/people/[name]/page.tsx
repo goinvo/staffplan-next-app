@@ -18,11 +18,14 @@ import Image from "next/image";
 import UserSummary from "@/app/components/userSummary";
 import { sortSingleUser } from "@/app/helperFunctions";
 import { AssignmentEditDrawer } from "@/app/components/assignmentEditDrawer";
+import { PlusIcon } from "@heroicons/react/24/solid";
+import AddAssignmentSinglePerson from "@/app/components/addAssignmentSinglePerson";
 const UserPage: React.FC = () => {
 	const router = useRouter();
 	const params = useParams();
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
+	const [addAssignmentVisible, setAddAssignmentVisible] = useState(false);
 	const [workWeekDataLookupMap, setWorkWeekDataLookupMap] = useState<
 		Map<number, Map<number, WorkWeekRenderDataType>>[]
 	>([]);
@@ -208,7 +211,6 @@ const UserPage: React.FC = () => {
 		onBlur?: () => void
 	) => {
 		const workWeekData = lookupWorkWeekData(rowIndex, year, cweek);
-		console.log(workWeekData);
 		const estimatedHours = workWeekData?.estimatedHours || "0";
 		const actualHours = workWeekData?.actualHours || "0";
 
@@ -357,6 +359,11 @@ const UserPage: React.FC = () => {
 		});
 		router.push("/projects/" + encodeURIComponent(projectId));
 	};
+	const onClose = () => setAddAssignmentVisible(false);
+	const onComplete = () => {
+		setAddAssignmentVisible(false);
+		console.log("completed modal")
+	};
 	return (
 		<>
 			<div>
@@ -409,6 +416,12 @@ const UserPage: React.FC = () => {
 					  })
 					: null}
 			</div> */}
+			<div>
+				<button className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center" onClick={()=> setAddAssignmentVisible(true)}>
+					<PlusIcon className="fill-accentgreen" />
+				</button>
+				{addAssignmentVisible && <AddAssignmentSinglePerson user={selectedUser} onClose={onClose} onComplete={onComplete} />}
+			</div>
 		</>
 	);
 };

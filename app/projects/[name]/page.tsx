@@ -19,11 +19,14 @@ import Image from "next/image";
 import { sortSingleProject } from "@/app/helperFunctions";
 import UserSummary from "@/app/components/userSummary";
 import ProjectSummary from "@/app/components/allProjectsSummary";
+import { PlusIcon } from "@heroicons/react/24/solid";
+import AddAssignmentSingleProject from "@/app/components/addAssignmentSIngleProject";
 
 const ProjectPage: React.FC = () => {
 	const params = useParams();
 	const decodedString = decodeURIComponent(params.name.toString());
 	const { selectedProjectId } = JSON.parse(decodedString);
+	const [addAssignmentVisible, setAddAssignmentVisible] = useState(false);
 	const [selectedProject, setSelectedProject] = useState<ProjectType | null>(
 		null
 	);
@@ -392,6 +395,11 @@ const ProjectPage: React.FC = () => {
 			);
 		});
 	}, [usersWithProjectAssignment]);
+	const onClose = () => setAddAssignmentVisible(false);
+	const onComplete = () => {
+		setAddAssignmentVisible(false);
+		console.log("completed modal")
+	};
 	return (
 		<div>
 			{selectedProject ? (
@@ -440,6 +448,12 @@ const ProjectPage: React.FC = () => {
 				) : (
 					<></>
 				)}
+			</div>
+			<div>
+				<button className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center" onClick={()=> setAddAssignmentVisible(true)}>
+					<PlusIcon className="fill-accentgreen" />
+				</button>
+				{addAssignmentVisible && <AddAssignmentSingleProject project={selectedProject} onClose={onClose} onComplete={onComplete} />}
 			</div>
 		</div>
 	);

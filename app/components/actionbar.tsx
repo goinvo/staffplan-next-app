@@ -22,7 +22,7 @@ const ActionBar: React.FC = () => {
 	return (
 		<div className="actionbar flex justify-between items-center bg-gray-50 p-4">
 			<div className="flex items-center space-x-4">
-				<AddDropdown />
+				{!singleViewParam() ? <AddDropdown /> : null}
 				{singleUserPage &&
 				singleViewParam() &&
 				singleViewParam().selectedUserId ? (
