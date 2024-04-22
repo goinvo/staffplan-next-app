@@ -1,15 +1,12 @@
 "use client";
-import { useState, useEffect, ReactNode } from "react";
+import { useState, ReactNode } from "react";
 import ProjectDatepicker from "./projectDatepicker";
-import { useSearchParams, useRouter } from "next/navigation";
 import { useMutation } from "@apollo/client";
-import withApollo from "@/lib/withApollo";
 import { AssignmentType, ProjectType, UserType } from "../typeInterfaces";
 import { Field, Formik, FormikValues } from "formik";
 import { useUserDataContext } from "../userDataContext";
 import { UPSERT_ASSIGNMENT } from "../gqlQueries";
 import { LoadingSpinner } from "./loadingSpinner";
-import { Dialog } from "@headlessui/react";
 interface AddAssignmentSingleProjectProps {
 	project: ProjectType | null;
 	onClose: () => void;
