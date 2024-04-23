@@ -333,7 +333,6 @@ const ProjectPage: React.FC = () => {
 				.filter(
 					(user: UserType) => user.assignments && user.assignments.length > 0
 				);
-
 			const sortedAssignments = sortSingleProject(
 				viewsFilter.singleProjectSort,
 				newUsersWithProjectAssignment
@@ -379,22 +378,26 @@ const ProjectPage: React.FC = () => {
 	const memoizedLabelContentsLeft = useMemo(() => {
 		return usersWithProjectAssignment.map((user: UserType) => {
 			return (
-				<div
-					className="flex gap-x-4 gap-y-4 items-center justify-center"
-					key={user.id}
-				>
-					<div onClick={() => handleUserChange(user)}>
-						<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden hover:cursor-pointer">
-							<Image
-								src={`${user.avatarUrl}`}
-								alt="user avatar"
-								width={500}
-								height={500}
-							/>
-						</div>
-					</div>
-					<div className="flex">{user.name}</div>
-				</div>
+				<div className="flex gap-x-4 gap-y-4 items-center justify-center" key={user.id}>
+    <div>
+        <div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
+            <Image
+                src={`${user.avatarUrl}`}
+                alt="user avatar"
+                width={500}
+                height={500}
+            />
+        </div>
+    </div>
+    <div className="hover:cursor-pointer" onClick={() => handleUserChange(user)}>
+        <div>{user.name}</div>
+        {user.assignments && user.assignments.map((assignment: AssignmentType) => (
+            <div key={assignment.id} className="text-red-500">
+                {assignment.status === "active" ? null : "Unconfirmed Assignment"}
+            </div>
+        ))}
+    </div>
+</div>
 			);
 		});
 	}, [usersWithProjectAssignment]);

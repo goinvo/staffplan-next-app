@@ -367,11 +367,8 @@ const UserPage: React.FC = () => {
 					<WeekDisplay
 						labelContentsLeft={selectedUser.assignments.map(
 							(assignment: AssignmentType) => (
-								<div
-									key={assignment.id}
-									onClick={() => handleProjectChange(assignment)}
-								>
-									<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden hover:cursor-pointer">
+								<div key={assignment.id}>
+									<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
 										<Image
 											src={`${assignment.project.client.avatarUrl}`}
 											alt="client avatar"
@@ -380,7 +377,15 @@ const UserPage: React.FC = () => {
 										/>
 									</div>
 									<div>{assignment.project.client.name}</div>
-									<div>{assignment.project.name}</div>
+									<div
+										className="hover:cursor-pointer"
+										onClick={() => handleProjectChange(assignment)}
+									>
+										{assignment.project.name}
+									</div>
+									{assignment.status === "active" ? null : (
+										<div className="text-red-500"> Unconfirmed Assignment</div>
+									)}
 								</div>
 							)
 						)}
@@ -413,10 +418,19 @@ const UserPage: React.FC = () => {
 					: null}
 			</div> */}
 			<div>
-				<button className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center" onClick={()=> setAddAssignmentVisible(true)}>
+				<button
+					className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center"
+					onClick={() => setAddAssignmentVisible(true)}
+				>
 					<PlusIcon className="fill-accentgreen" />
 				</button>
-				{addAssignmentVisible && <AddAssignmentSinglePerson user={selectedUser} onClose={onClose} onComplete={onComplete} />}
+				{addAssignmentVisible && (
+					<AddAssignmentSinglePerson
+						user={selectedUser}
+						onClose={onClose}
+						onComplete={onComplete}
+					/>
+				)}
 			</div>
 		</>
 	);

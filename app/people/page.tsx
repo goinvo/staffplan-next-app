@@ -96,8 +96,7 @@ const PeopleView: React.FC = () => {
 							key={user.id}
 						>
 							<div
-								className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden hover:cursor-pointer"
-								onClick={() => handleUserChange(user)}
+								className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden"
 							>
 								<Image
 									src={`${user.avatarUrl}`}
@@ -106,7 +105,7 @@ const PeopleView: React.FC = () => {
 									height={500}
 								/>
 							</div>
-							<div className="flex">{user.name}</div>
+							<div className="flex hover:cursor-pointer" onClick={() => handleUserChange(user)}>{user.name}</div>
 							<div>
 								<EllipsisPeopleMenu user={user} />
 							</div>
