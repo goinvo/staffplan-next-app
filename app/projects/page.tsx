@@ -50,8 +50,7 @@ const ProjectsView: React.FC = () => {
 	}, [projectList]);
 
 	const handleProjectChange = (project: ProjectType) => {
-		const projectId = JSON.stringify({ selectedProjectId: project.id });
-		router.push(pathname + "/" + encodeURIComponent(projectId));
+		router.push(pathname + "/" + encodeURIComponent(project.id));
 	};
 
 	const renderCell = (
@@ -133,7 +132,7 @@ const ProjectsView: React.FC = () => {
 										stroke="gray"
 										strokeWidth="5"
 									/>
-									<text x="15" y="40" fill="white" font-size="20">
+									<text x="15" y="40" fill="white" fontSize="20">
 										Unconfirmed
 									</text>
 								</svg>

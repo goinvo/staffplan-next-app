@@ -52,8 +52,7 @@ const PeopleView: React.FC = () => {
 	}, [userList]);
 
 	const handleUserChange = (user: UserType) => {
-		const userId = JSON.stringify({ selectedUserId: user.id });
-		router.push(pathname + "/" + encodeURIComponent(userId));
+		user.id && router.push(pathname + "/" + encodeURIComponent(user.id));
 	};
 
 	const renderCell = (

@@ -345,19 +345,16 @@ const UserPage: React.FC = () => {
 	// If the user list has been loaded and the user's name is in the URL, get the user's ID and load their assignments
 	useEffect(() => {
 		if (clientSide && userList) {
-			const userId = JSON.parse(decodeURIComponent(params.name.toString()));
+			const userId = decodeURIComponent(params.userId.toString());
 			if (userId) {
-				setSelectedUserData(parseInt(userId.selectedUserId));
+				setSelectedUserData(parseInt(userId));
 			}
 		}
 	}, [clientSide, userList, params.name, viewsFilter]);
 
 	if (!userList) return <LoadingSpinner />;
 	const handleProjectChange = (assignment: AssignmentType) => {
-		const projectId = JSON.stringify({
-			selectedProjectId: assignment.project.id,
-		});
-		router.push("/projects/" + encodeURIComponent(projectId));
+		router.push("/projects/" + encodeURIComponent(assignment.project.id));
 	};
 	const onClose = () => setAddAssignmentVisible(false);
 	const onComplete = () => {

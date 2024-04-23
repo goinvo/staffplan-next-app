@@ -47,8 +47,7 @@ export default function EllipsisProjectMenu({ project }: any) {
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_PROJECT, { errorPolicy: "all" });
 	const handleProjectChange = () => {
-		const projectId = JSON.stringify({ selectedProjectId: id });
-		router.push(pathname + "/" + encodeURIComponent(projectId));
+		router.push(pathname + "/" + encodeURIComponent(id));
 	};
 	const onSubmitUpsert = (e: BaseSyntheticEvent) => {
 		const statusCheck = () => {
