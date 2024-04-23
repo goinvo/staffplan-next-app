@@ -312,7 +312,6 @@ const ProjectPage: React.FC = () => {
 			const foundProject = projectList.find(
 				(project: ProjectType) => project.id.toString() === selectedProjectId
 			);
-			console.log(foundProject, "foundProject")
 			if (foundProject) {
 				setSingleProjectPage(foundProject);
 				setSelectedProject(foundProject);
@@ -402,7 +401,6 @@ const ProjectPage: React.FC = () => {
 	const onClose = () => setAddAssignmentVisible(false);
 	const onComplete = () => {
 		setAddAssignmentVisible(false);
-		console.log("completed modal");
 	};
 	return (
 		<div>

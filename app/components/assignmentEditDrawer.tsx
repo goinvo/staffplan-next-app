@@ -45,7 +45,6 @@ const DropdownIndicator = (props: DropdownIndicatorProps<UserOptionType>) => {
 export const AssignmentEditDrawer = ({
 	assignment,
 }: AssignmentEditDrawerProps) => {
-	console.log(assignment, "ASSIGNMENT");
 	const [confirmed, setConfirmed] = useState(
 		assignment.status === "active" ? true : false
 	);

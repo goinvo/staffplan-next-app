@@ -34,22 +34,22 @@ const AddProject = () => {
 		hours: parsedProject.hours ? parsedProject.hours : 0,
 		name: parsedProject.name,
 		numOfFTE: parsedProject.fte ? parsedProject.fte : 0,
-		payRate: "flatRate",
+		payRate: parsedProject.rateType ? parsedProject.rateType : "fixed",
 		cost: parsedProject.cost,
 		status: parsedProject.status === "confirmed" ? true : false,
 		hourlyRate: 0,
-		flatRate: 0,
+		fixedRate: 0,
 	};
 	const newProjectInitialValues = {
 		client: "",
 		cost: 0,
 		dates: { endsOn: "", startsOn: "" },
-		flatRate: 0,
+		fixedRate: 0,
 		hourlyRate: 0,
 		hours: 0,
 		name: "",
 		numOfFTE: 0,
-		payRate: "flatRate",
+		payRate: "fixed",
 		status: false,
 	};
 	const initialValues = parsedProject
@@ -84,6 +84,7 @@ const AddProject = () => {
 			cost: values.cost,
 			fte: values.numOfFTE,
 			hours: values.hours,
+			rateType: values.payRate,
 		};
 		const nullableDates = () => {
 			if (values.dates.startsOn && values.dates.endsOn) {
@@ -165,7 +166,7 @@ const AddProject = () => {
 			shouldValidate?: boolean
 		) => void
 	) => {
-		if (values.payRate === "hourlyRate") {
+		if (values.payRate === "hourly") {
 			setFieldValue("cost", parseInt(event.target.value) * values.hours);
 		}
 	};
@@ -200,7 +201,7 @@ const AddProject = () => {
 	) => {
 		if (
 			values.hourlyRate > 0 &&
-			values.payRate === "hourlyRate" &&
+			values.payRate === "hourly" &&
 			!values.dates.endsOn
 		) {
 			const totalCost = parseInt(event.target.value) * values.hourlyRate;
@@ -372,8 +373,8 @@ const AddProject = () => {
 																		<Field
 																			type="radio"
 																			name="payRate"
-																			value="flatRate"
-																			id="flatRate"
+																			value="fixed"
+																			id="fixed"
 																			onChange={(
 																				e: React.ChangeEvent<HTMLInputElement>
 																			) => {
@@ -383,7 +384,7 @@ const AddProject = () => {
 																			}}
 																			className="form-radio text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent mr-1"
 																		/>
-																		Flat Rate
+																		Fixed Rate
 																	</label>
 																</div>
 																<div className="block">
@@ -391,8 +392,8 @@ const AddProject = () => {
 																		<Field
 																			type="radio"
 																			name="payRate"
-																			value="hourlyRate"
-																			id="hourlyRate"
+																			value="hourly"
+																			id="hourly"
 																			onChange={(
 																				e: React.ChangeEvent<HTMLInputElement>
 																			) => {
@@ -413,7 +414,7 @@ const AddProject = () => {
 																		</span>
 																		<input
 																			disabled={
-																				values.payRate === "flatRate" ||
+																				values.payRate === "fixed" ||
 																				values.hours === 0
 																			}
 																			type="number"
@@ -428,7 +429,7 @@ const AddProject = () => {
 																				setTotalCost(e, values, setFieldValue);
 																			}}
 																			className={
-																				values.payRate === "flatRate"
+																				values.payRate === "fixed"
 																					? "bg-slate-500 w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 																					: "w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 																			}
@@ -443,7 +444,7 @@ const AddProject = () => {
 																			$
 																		</span>
 																		<input
-																			disabled={values.payRate === "hourlyRate"}
+																			disabled={values.payRate === "hourly"}
 																			type="number"
 																			min="0"
 																			name="cost"

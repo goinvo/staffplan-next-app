@@ -20,6 +20,7 @@ export default function EllipsisProjectMenu({ project }: any) {
 		cost,
 		hours,
 		fte,
+		rateType
 	} = project;
 	const [confirmed, setConfirmed] = useState(
 		status === "confirmed" ? true : false
@@ -39,6 +40,7 @@ export default function EllipsisProjectMenu({ project }: any) {
 		cost,
 		fte,
 		hours,
+		rateType
 	};
 	const queryJSONString = JSON.stringify(query);
 	const base64Query = Buffer.from(queryJSONString).toString("base64");

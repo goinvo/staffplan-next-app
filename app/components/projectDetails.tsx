@@ -24,11 +24,11 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 		hours: project.hours,
 		name: project.name,
 		numOfFTE: project.fte,
-		payRate: "flatRate",
+		payRate: project.payRate ? project.payRate : "fixed",
 		cost: project.cost,
 		status: project.status === "confirmed" ? true : false,
 		hourlyRate: 0,
-		flatRate: 0,
+		fixedRate: 0,
 	};
 
 	const [upsertProject] = useMutation(UPSERT_PROJECT, {
@@ -51,6 +51,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 			cost: values.cost,
 			fte: values.numOfFTE,
 			hours: values.hours,
+			rateType: values.payRate,
 		};
 		const nullableDates = () => {
 			if (values.dates.startsOn && values.dates.endsOn) {
@@ -115,7 +116,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 			shouldValidate?: boolean
 		) => void
 	) => {
-		if (values.payRate === "hourlyRate") {
+		if (values.payRate === "hourly") {
 			setFieldValue("cost", parseInt(event.target.value) * values.hours);
 		}
 	};
@@ -150,7 +151,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 	) => {
 		if (
 			values.hourlyRate > 0 &&
-			values.payRate === "hourlyRate" &&
+			values.payRate === "hourly" &&
 			!values.dates.endsOn
 		) {
 			const totalCost = parseInt(event.target.value) * values.hourlyRate;
@@ -307,8 +308,8 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 													<Field
 														type="radio"
 														name="payRate"
-														value="flatRate"
-														id="flatRate"
+														value="fixed"
+														id="fixed"
 														onChange={(
 															e: React.ChangeEvent<HTMLInputElement>
 														) => {
@@ -318,7 +319,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 														}}
 														className="form-radio text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
 													/>
-													Flat Rate
+													Fixed Rate
 												</label>
 											</div>
 											<div className="block">
@@ -326,8 +327,8 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 													<Field
 														type="radio"
 														name="payRate"
-														value="hourlyRate"
-														id="hourlyRate"
+														value="hourly"
+														id="hourly"
 														onChange={(
 															e: React.ChangeEvent<HTMLInputElement>
 														) => {
@@ -348,7 +349,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 													</span>
 													<input
 														disabled={
-															values.payRate === "flatRate" ||
+															values.payRate === "fixed" ||
 															values.hours === 0
 														}
 														type="number"
@@ -363,7 +364,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 															setTotalCost(e, values, setFieldValue);
 														}}
 														className={
-															values.payRate === "flatRate"
+															values.payRate === "fixed"
 																? "bg-slate-500 w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 																: "w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 														}
@@ -378,7 +379,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 														$
 													</span>
 													<input
-														disabled={values.payRate === "hourlyRate"}
+														disabled={values.payRate === "hourly"}
 														type="number"
 														min="0"
 														name="cost"

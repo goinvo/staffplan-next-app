@@ -10,6 +10,7 @@ export const GET_ASSIGNMENT_DATA = gql`
 				name
 				status
 				paymentFrequency
+				rateType
 				startsOn
 				endsOn
 				users {
@@ -53,6 +54,7 @@ export const GET_PROJECT_DATA = gql`
 				paymentFrequency
 				startsOn
 				endsOn
+				rateType
 				assignments {
 					assignedUser {
 						name
@@ -152,6 +154,7 @@ export const GET_ALL_PROJECTS_DATA = gql`
 				startsOn
 				endsOn
 				cost
+				rateType
 				hours
 				fte
 				assignments{
@@ -270,6 +273,7 @@ export const UPSERT_PROJECT = gql`
 		$status: String
 		$startsOn: ISO8601Date
 		$endsOn: ISO8601Date
+		$rateType: String
 		$cost: Float
 		$hours: Int
 		$fte: Float
@@ -284,6 +288,7 @@ export const UPSERT_PROJECT = gql`
 			cost: $cost
 			hours: $hours
 			fte: $fte
+			rateType: $rateType
 		) {
 			id
 			client {
@@ -299,6 +304,7 @@ export const UPSERT_PROJECT = gql`
 			endsOn
 			hours
 			fte
+			rateType
 			workWeeks {
 				actualHours
 				estimatedHours

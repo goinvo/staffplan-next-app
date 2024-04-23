@@ -359,7 +359,6 @@ const UserPage: React.FC = () => {
 	const onClose = () => setAddAssignmentVisible(false);
 	const onComplete = () => {
 		setAddAssignmentVisible(false);
-		console.log("completed modal")
 	};
 	return (
 		<>
