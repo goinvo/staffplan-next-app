@@ -10,22 +10,12 @@ const ActionBar: React.FC = () => {
 	const { scrollToTodayFunction, singleUserPage, singleProjectPage } =
 		useUserDataContext();
 	const params = useParams();
-	const singleViewParam = () => {
-		if (params) {
-			if (params.name) {
-				const decodedString = decodeURIComponent(params.name.toString());
-				return JSON.parse(decodedString);
-			}
-		}
-		return null;
-	};
 	return (
 		<div className="actionbar flex justify-between items-center bg-gray-50 p-4">
 			<div className="flex items-center space-x-4">
-				<AddDropdown />
+				{!params.userId && !params.projectId ? <AddDropdown /> : null}
 				{singleUserPage &&
-				singleViewParam() &&
-				singleViewParam().selectedUserId ? (
+				params.userId ? (
 					<div className="flex items-center text-white text-xl">
 						<div className="flex w-8 h-8 timeline-grid-bg mr-2 rounded-full overflow-hidden">
 							<Image
@@ -39,8 +29,7 @@ const ActionBar: React.FC = () => {
 					</div>
 				) : null}
 				{singleProjectPage &&
-				singleViewParam() &&
-				singleViewParam().selectedProjectId ? (
+				params.projectId ? (
 					<div className="flex items-center text-white text-xl">
 						<div className="flex w-8 h-8 timeline-grid-bg mr-2 rounded-full overflow-hidden">
 							<Image

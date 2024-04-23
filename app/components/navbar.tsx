@@ -16,8 +16,7 @@ const Navbar: React.FC = () => {
 	const activeTab = "navbar-border-accent border-b-2";
 	if (!viewer) return <LoadingSpinner />;
 	const myPlanUrl = () => {
-		const userId = JSON.stringify({ selectedUserId: viewer.id });
-		return encodeURIComponent(userId)
+		return encodeURIComponent(viewer.id)
 	};
 	return (
 		<nav className="navbar bg-gray-100 px-4 h-14 flex justify-between items-center">

@@ -9,28 +9,19 @@ import { SingleUserSortOptions } from "./singleUserSortOptions";
 export default function ViewsMenu() {
 	const pathname = usePathname();
 	const params = useParams();
-	const singleViewParam = () => {
-		if (params) {
-			if (params.name) {
-				const decodedString = decodeURIComponent(params.name.toString());
-				return JSON.parse(decodedString);
-			}
-		}
-		return null;
-	};
 	const currentOpenTab = pathname.split("/")[1];
 	return (
 		<>
-			{singleViewParam() && singleViewParam().selectedUserId ? (
+			{params && params.userId ? (
 				<SingleUserSortOptions />
 			) : null}
-			{singleViewParam() && singleViewParam().selectedProjectId ? (
+			{params && params.projectId ? (
 				<SingleProjectSortOptions />
 			) : null}
-			{!singleViewParam() && currentOpenTab === "projects" ? (
+			{currentOpenTab === "projects" && !params.projectId ? (
 				<ProjectSortOptions />
 			) : null}
-			{!singleViewParam() && currentOpenTab === "people" ? (
+			{currentOpenTab === "people" && !params.userId ? (
 				<PeopleSortOptions />
 			) : null}
 		</>

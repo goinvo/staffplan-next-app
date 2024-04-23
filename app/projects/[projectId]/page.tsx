@@ -19,11 +19,13 @@ import Image from "next/image";
 import { sortSingleProject } from "@/app/helperFunctions";
 import UserSummary from "@/app/components/userSummary";
 import ProjectSummary from "@/app/components/allProjectsSummary";
+import { PlusIcon } from "@heroicons/react/24/solid";
+import AddAssignmentSingleProject from "@/app/components/addAssignmentSIngleProject";
 
 const ProjectPage: React.FC = () => {
 	const params = useParams();
-	const decodedString = decodeURIComponent(params.name.toString());
-	const { selectedProjectId } = JSON.parse(decodedString);
+	const selectedProjectId = decodeURIComponent(params.projectId.toString());
+	const [addAssignmentVisible, setAddAssignmentVisible] = useState(false);
 	const [selectedProject, setSelectedProject] = useState<ProjectType | null>(
 		null
 	);
@@ -37,8 +39,13 @@ const ProjectPage: React.FC = () => {
 	>([]);
 
 	const [upsertWorkweek] = useMutation(UPSERT_WORKWEEK);
-	const { userList, projectList, setProjectList, viewsFilter,setSingleProjectPage } =
-		useUserDataContext();
+	const {
+		userList,
+		projectList,
+		setProjectList,
+		viewsFilter,
+		setSingleProjectPage,
+	} = useUserDataContext();
 	const router = useRouter();
 	const pathname = usePathname();
 	const upsertWorkWeekValues = (values: WorkWeekRenderDataType) => {
@@ -303,10 +310,11 @@ const ProjectPage: React.FC = () => {
 	useEffect(() => {
 		if (projectList) {
 			const foundProject = projectList.find(
-				(project: ProjectType) => project.id === selectedProjectId
+				(project: ProjectType) => project.id.toString() === selectedProjectId
 			);
+			console.log(foundProject, "foundProject")
 			if (foundProject) {
-				setSingleProjectPage(foundProject)
+				setSingleProjectPage(foundProject);
 				setSelectedProject(foundProject);
 			}
 
@@ -315,9 +323,9 @@ const ProjectPage: React.FC = () => {
 			const newUsersWithProjectAssignment = userList
 				.map((user: UserType) => {
 					// Filter out assignments that don't match the project name
-					const filteredAssignments =
-					user.assignments?.filter((assignment) => {
-						return assignment.project.id === selectedProjectId})
+					const filteredAssignments = user.assignments?.filter((assignment) => {
+						return assignment.project.id.toString() === selectedProjectId;
+					});
 					return {
 						...user,
 						assignments: filteredAssignments,
@@ -366,8 +374,7 @@ const ProjectPage: React.FC = () => {
 	}, [selectedProject]);
 
 	const handleUserChange = (user: UserType) => {
-		const userId = JSON.stringify({ selectedUserId: user.id });
-		router.push("/people" + "/" + encodeURIComponent(userId));
+		user.id && router.push("/people" + "/" + encodeURIComponent(user.id));
 	};
 
 	const memoizedLabelContentsLeft = useMemo(() => {
@@ -392,36 +399,44 @@ const ProjectPage: React.FC = () => {
 			);
 		});
 	}, [usersWithProjectAssignment]);
+	const onClose = () => setAddAssignmentVisible(false);
+	const onComplete = () => {
+		setAddAssignmentVisible(false);
+		console.log("completed modal");
+	};
 	return (
 		<div>
 			{selectedProject ? (
-			<h1 className="flex justify-between items-center">
-			<div className="flex items-center">
-				<div className="w-16 h-16 timeline-grid-bg rounded-full overflow-hidden mr-4">
-					<Image
-						src={`${selectedProject.client.avatarUrl}`}
-						alt="client avatar"
-						width={500}
-						height={500}
-					/>
-				</div>
-				<span>{selectedProject.name}</span>
-			</div>
-			<ProjectSummary project={selectedProject} />
-		</h1>
+				<h1 className="flex justify-between items-center">
+					<div className="flex items-center">
+						<div className="w-16 h-16 timeline-grid-bg rounded-full overflow-hidden mr-4">
+							<Image
+								src={`${selectedProject.client.avatarUrl}`}
+								alt="client avatar"
+								width={500}
+								height={500}
+							/>
+						</div>
+						<span>{selectedProject.name}</span>
+					</div>
+					<ProjectSummary project={selectedProject} />
+				</h1>
 			) : (
 				""
 			)}
-			
+
 			{usersWithProjectAssignment ? (
 				<WeekDisplay
 					labelContentsLeft={memoizedLabelContentsLeft}
-					labelContentsRight={usersWithProjectAssignment.map(user => ( user.assignments?.map((assignment: AssignmentType) => (	<div
-						key={assignment.id}
-						className="flex gap-x-4 gap-y-4 items-center justify-center"
-					>
-						<UserSummary assignment={assignment} />
-					</div>) ) )
+					labelContentsRight={usersWithProjectAssignment.map((user) =>
+						user.assignments?.map((assignment: AssignmentType) => (
+							<div
+								key={assignment.id}
+								className="flex gap-x-4 gap-y-4 items-center justify-center"
+							>
+								<UserSummary assignment={assignment} />
+							</div>
+						))
 					)}
 					renderCell={renderCell}
 					onCellFocus={handleCellFocus}
@@ -439,6 +454,21 @@ const ProjectPage: React.FC = () => {
 					/>
 				) : (
 					<></>
+				)}
+			</div>
+			<div>
+				<button
+					className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center"
+					onClick={() => setAddAssignmentVisible(true)}
+				>
+					<PlusIcon className="fill-accentgreen" />
+				</button>
+				{addAssignmentVisible && (
+					<AddAssignmentSingleProject
+						project={selectedProject}
+						onClose={onClose}
+						onComplete={onComplete}
+					/>
 				)}
 			</div>
 		</div>

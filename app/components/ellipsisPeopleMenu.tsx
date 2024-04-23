@@ -20,8 +20,7 @@ export default function EllipsisPeopleMenu({ user }: any) {
 	const queryJSONString = JSON.stringify(query);
 	const base64Query = Buffer.from(queryJSONString).toString("base64");
 	const handleUserChange = () => {
-		const userId = JSON.stringify({ selectedUserId: id });
-		router.push(pathname + "/" + encodeURIComponent(userId));
+		router.push(pathname + "/" + encodeURIComponent(user.id));
 	};
 	return (
 		<Menu
