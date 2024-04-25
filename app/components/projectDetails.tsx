@@ -24,13 +24,11 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 		hours: project.hours,
 		name: project.name,
 		numOfFTE: project.fte,
-		payRate: project.payRate ? project.payRate : "fixed",
+		rateType: project.rateType ? project.rateType : "fixed",
 		cost: project.cost,
 		status: project.status === "confirmed" ? true : false,
-		hourlyRate: 0,
-		fixedRate: 0,
+		hourlyRate: project.hourlyRate > 0 ? project.hourlyRate : 0,
 	};
-
 	const [upsertProject] = useMutation(UPSERT_PROJECT, {
 		errorPolicy: "all",
 		onCompleted({ upsertProject }) {
@@ -51,7 +49,8 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 			cost: values.cost,
 			fte: values.numOfFTE,
 			hours: values.hours,
-			rateType: values.payRate,
+			rateType: values.rateType,
+			hourlyRate: values.hourlyRate,
 		};
 		const nullableDates = () => {
 			if (values.dates.startsOn && values.dates.endsOn) {
@@ -116,7 +115,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 			shouldValidate?: boolean
 		) => void
 	) => {
-		if (values.payRate === "hourly") {
+		if (values.rateType === "hourly") {
 			setFieldValue("cost", parseInt(event.target.value) * values.hours);
 		}
 	};
@@ -151,7 +150,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 	) => {
 		if (
 			values.hourlyRate > 0 &&
-			values.payRate === "hourly" &&
+			values.rateType === "hourly" &&
 			!values.dates.endsOn
 		) {
 			const totalCost = parseInt(event.target.value) * values.hourlyRate;
@@ -307,7 +306,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 												<label>
 													<Field
 														type="radio"
-														name="payRate"
+														name="rateType"
 														value="fixed"
 														id="fixed"
 														onChange={(
@@ -326,7 +325,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 												<label>
 													<Field
 														type="radio"
-														name="payRate"
+														name="rateType"
 														value="hourly"
 														id="hourly"
 														onChange={(
@@ -349,7 +348,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 													</span>
 													<input
 														disabled={
-															values.payRate === "fixed" ||
+															values.rateType === "fixed" ||
 															values.hours === 0
 														}
 														type="number"
@@ -364,7 +363,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 															setTotalCost(e, values, setFieldValue);
 														}}
 														className={
-															values.payRate === "fixed"
+															values.rateType === "fixed"
 																? "bg-slate-500 w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 																: "w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 														}
@@ -379,7 +378,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 														$
 													</span>
 													<input
-														disabled={values.payRate === "hourly"}
+														disabled={values.rateType === "hourly"}
 														type="number"
 														min="0"
 														name="cost"
@@ -443,8 +442,8 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 													{errors.cost as ReactNode}
 												</div>
 											)}
-											{errors.payRate && touched.payRate && (
-												<div className="text-red-500">{errors.payRate as ReactNode}</div>
+											{errors.rateType && touched.rateType && (
+												<div className="text-red-500">{errors.rateType as ReactNode}</div>
 											)}
 											{errors.numOfFTE && touched.numOfFTE && (
 												<div className="text-red-500">{errors.numOfFTE as ReactNode}</div>

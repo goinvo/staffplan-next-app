@@ -13,6 +13,7 @@ export const GET_ASSIGNMENT_DATA = gql`
 				rateType
 				startsOn
 				endsOn
+				hourlyRate
 				users {
 					id
 					name
@@ -55,6 +56,7 @@ export const GET_PROJECT_DATA = gql`
 				startsOn
 				endsOn
 				rateType
+				hourlyRate
 				assignments {
 					assignedUser {
 						name
@@ -155,6 +157,7 @@ export const GET_ALL_PROJECTS_DATA = gql`
 				endsOn
 				cost
 				rateType
+				hourlyRate
 				hours
 				fte
 				assignments{
@@ -277,6 +280,7 @@ export const UPSERT_PROJECT = gql`
 		$cost: Float
 		$hours: Int
 		$fte: Float
+		$hourlyRate: Int
 	) {
 		upsertProject(
 			id: $id
@@ -289,6 +293,7 @@ export const UPSERT_PROJECT = gql`
 			hours: $hours
 			fte: $fte
 			rateType: $rateType
+			hourlyRate: $hourlyRate
 		) {
 			id
 			client {
@@ -305,6 +310,7 @@ export const UPSERT_PROJECT = gql`
 			hours
 			fte
 			rateType
+			hourlyRate
 			workWeeks {
 				actualHours
 				estimatedHours

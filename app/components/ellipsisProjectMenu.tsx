@@ -20,11 +20,13 @@ export default function EllipsisProjectMenu({ project }: any) {
 		cost,
 		hours,
 		fte,
-		rateType
+		rateType,
+		hourlyRate
 	} = project;
 	const [confirmed, setConfirmed] = useState(
 		status === "confirmed" ? true : false
 	);
+	
 	const dropdownSelectedItemClass = (isActive: boolean) =>
 		isActive
 			? "px-4 py-2 block hover:text-accentgreen hover:cursor-pointer text-sm"
@@ -40,7 +42,8 @@ export default function EllipsisProjectMenu({ project }: any) {
 		cost,
 		fte,
 		hours,
-		rateType
+		rateType,
+		hourlyRate
 	};
 	const queryJSONString = JSON.stringify(query);
 	const base64Query = Buffer.from(queryJSONString).toString("base64");

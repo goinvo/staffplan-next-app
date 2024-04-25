@@ -34,22 +34,20 @@ const AddProject = () => {
 		hours: parsedProject.hours ? parsedProject.hours : 0,
 		name: parsedProject.name,
 		numOfFTE: parsedProject.fte ? parsedProject.fte : 0,
-		payRate: parsedProject.rateType ? parsedProject.rateType : "fixed",
+		rateType: parsedProject.rateType ? parsedProject.rateType : "fixed",
 		cost: parsedProject.cost,
 		status: parsedProject.status === "confirmed" ? true : false,
-		hourlyRate: 0,
-		fixedRate: 0,
+		hourlyRate: parsedProject.hourlyRate > 0 ? parsedProject.hourlyRate : 0,
 	};
 	const newProjectInitialValues = {
 		client: "",
 		cost: 0,
 		dates: { endsOn: "", startsOn: "" },
-		fixedRate: 0,
 		hourlyRate: 0,
 		hours: 0,
 		name: "",
 		numOfFTE: 0,
-		payRate: "fixed",
+		rateType: "fixed",
 		status: false,
 	};
 	const initialValues = parsedProject
@@ -84,7 +82,8 @@ const AddProject = () => {
 			cost: values.cost,
 			fte: values.numOfFTE,
 			hours: values.hours,
-			rateType: values.payRate,
+			rateType: values.rateType,
+			hourlyRate: values.hourlyRate,
 		};
 		const nullableDates = () => {
 			if (values.dates.startsOn && values.dates.endsOn) {
@@ -152,8 +151,8 @@ const AddProject = () => {
 		// 		errors.dates = { endsOn: "Must select start date" };
 		// 	}
 		// }
-		// if (values.payRate === "flatRate" && values.cost < 1) {
-		// 	errors.payRate = "Set the total cost";
+		// if (values.rateType === "flatRate" && values.cost < 1) {
+		// 	errors.rateType = "Set the total cost";
 		// }
 		return errors;
 	};
@@ -166,7 +165,7 @@ const AddProject = () => {
 			shouldValidate?: boolean
 		) => void
 	) => {
-		if (values.payRate === "hourly") {
+		if (values.rateType === "hourly") {
 			setFieldValue("cost", parseInt(event.target.value) * values.hours);
 		}
 	};
@@ -201,7 +200,7 @@ const AddProject = () => {
 	) => {
 		if (
 			values.hourlyRate > 0 &&
-			values.payRate === "hourly" &&
+			values.rateType === "hourly" &&
 			!values.dates.endsOn
 		) {
 			const totalCost = parseInt(event.target.value) * values.hourlyRate;
@@ -372,7 +371,7 @@ const AddProject = () => {
 																	<label>
 																		<Field
 																			type="radio"
-																			name="payRate"
+																			name="rateType"
 																			value="fixed"
 																			id="fixed"
 																			onChange={(
@@ -391,7 +390,7 @@ const AddProject = () => {
 																	<label>
 																		<Field
 																			type="radio"
-																			name="payRate"
+																			name="rateType"
 																			value="hourly"
 																			id="hourly"
 																			onChange={(
@@ -414,7 +413,7 @@ const AddProject = () => {
 																		</span>
 																		<input
 																			disabled={
-																				values.payRate === "fixed" ||
+																				values.rateType === "fixed" ||
 																				values.hours === 0
 																			}
 																			type="number"
@@ -429,7 +428,7 @@ const AddProject = () => {
 																				setTotalCost(e, values, setFieldValue);
 																			}}
 																			className={
-																				values.payRate === "fixed"
+																				values.rateType === "fixed"
 																					? "bg-slate-500 w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 																					: "w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 																			}
@@ -444,7 +443,7 @@ const AddProject = () => {
 																			$
 																		</span>
 																		<input
-																			disabled={values.payRate === "hourly"}
+																			disabled={values.rateType === "hourly"}
 																			type="number"
 																			min="0"
 																			name="cost"
@@ -509,9 +508,9 @@ const AddProject = () => {
 																		{errors.cost as ReactNode}
 																	</div>
 																)}
-																{errors.payRate && touched.payRate && (
+																{errors.rateType && touched.rateType && (
 																	<div className="text-red-500">
-																		{errors.payRate as ReactNode}
+																		{errors.rateType as ReactNode}
 																	</div>
 																)}
 																{errors.numOfFTE && touched.numOfFTE && (
