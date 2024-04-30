@@ -152,6 +152,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 	const [sideLabelDivHeightsRight, setSideLabelDivHeightsRight] = useState<
 		number[]
 	>([]);
+	const [projectDrawerIndex, setProjectDrawerIndex] = useState<number>(-1);
 	const { setScrollToTodayFunction } = useUserDataContext();
 
 	const router = useRouter();
@@ -173,10 +174,10 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 				// Update the data of what needs to be rendered on the screen accordingly
 				setData(
 					(prev) =>
-						({
-							weeks: [...newData.weeks, ...prev.weeks],
-							monthLabels: [...newData.monthLabels, ...prev.monthLabels],
-						} as WeeksAndLabels)
+					({
+						weeks: [...newData.weeks, ...prev.weeks],
+						monthLabels: [...newData.monthLabels, ...prev.monthLabels],
+					} as WeeksAndLabels)
 				);
 				// If we scroll too much to the right, we need to load more weeks from the next year
 			} else {
@@ -186,10 +187,10 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 
 				setData(
 					(prev) =>
-						({
-							weeks: [...prev.weeks, ...newData.weeks],
-							monthLabels: [...prev.monthLabels, ...newData.monthLabels],
-						} as WeeksAndLabels)
+					({
+						weeks: [...prev.weeks, ...newData.weeks],
+						monthLabels: [...prev.monthLabels, ...newData.monthLabels],
+					} as WeeksAndLabels)
 				);
 			}
 		} finally {
@@ -380,6 +381,9 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 	// This function is called when the component is first mounted to link the scrollToToday function to the UserDataContext
 	useEffect(() => {
 		setScrollToTodayFunction(() => scrollToToday);
+
+		// TODO: Remove this when the project drawer is implemented
+		setProjectDrawerIndex(2);
 	}, []);
 
 	const handleSetSideLabelDivHeightsLeft = (heights: number[]) => {
@@ -458,114 +462,89 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 					className="flex flex-row overflow-x-auto scrollbar-hide cursor-grab"
 					onMouseDown={onDragStart}
 				>
-					<div className="flex min-w-max select-none">
-						{data.weeks.map((week, index) => (
-							<div
-								className="flex flex-col text-nowrap"
-								style={{ width: weekWidth + "px" }}
-								key={index}
-							>
-								<div className="flex flex-row grow text-sm">
-									{data.monthLabels[index]}
-								</div>
-								<div className={"flex flex-row grow-0 text-sm"}>
-									{week.date}
-									{week.week ===
-										getWeek(today, {
-											weekStartsOn: 1,
-											firstWeekContainsDate: 1,
-										}) && week.year === today.getFullYear() ? (
-										<div className="flex flex-row items-center text-xs text-red-500">
-											Today
-										</div>
-									) : (
-										<></>
-									)}
-								</div>
-								<div className={"flex flex-row grow-0 relative"}>
-									<div
-										className={"top-0 left-0 timeline-grid-gap-bg"}
-										style={{ width: weekWidth + "px" }}
-										key={index}
-									>
-										{labelContentsLeft.map((contents, rowIndex) => {
-											const sideLabelDivHeight = Math.max(
-												sideLabelDivHeightsLeft[rowIndex] || 0,
-												sideLabelDivHeightsRight[rowIndex] || 0
-											);
-											const selectedCell = JSON.parse(
-												localStorage.getItem("selectedCell") || "{}"
-											);
-											return (
-												<div
-													className="flex border-l timeline-grid-bg timeline-grid-border"
-													style={{
-														height:
-															sideLabelDivHeight + sideListGutterHeight * 2,
-														marginBottom: sideListGutterHeight,
-													}}
-													key={rowIndex}
-													onMouseOver={
-														onMouseOverWeek
-															? () =>
-																	onMouseOverWeek(
-																		week.week,
-																		week.year,
-																		rowIndex
-																	)
-															: () => {}
-													}
-													onMouseDown={
-														onMouseClickWeek
-															? () =>
-																	onMouseClickWeek(
-																		week.week,
-																		week.year,
-																		rowIndex
-																	)
-															: () => {}
-													}
-													onFocus={
-														onCellFocus
-															? () =>
-																	onCellFocus(week.week, week.year, rowIndex)
-															: () => {}
-													}
-													onBlur={
-														onCellBlur
-															? () => onCellBlur(week.week, week.year, rowIndex)
-															: () => {}
-													}
-												>
-													{
-														<div className="flex flex-col">
-															{renderCell ? (
-																renderCell(
-																	week.week,
-																	week.year,
-																	rowIndex,
-																	(selectedCell &&
-																		selectedCell.week === week.week &&
-																		selectedCell.year === week.year &&
-																		selectedCell.rowId == rowIndex) ||
-																		false,
-																	weekWidth,
-																	sideLabelDivHeight + sideListGutterHeight * 2
-																)
-															) : (
-																<div></div>
-															)}
-															
-														</div>
-													}
-												</div>
-											);
-										})}
+					<div className="flex flex-col min-w-max select-none">
+						<div className="flex flex-row">
+							{data.weeks.map((week, index) => (
+								<div
+									className="flex flex-col text-nowrap"
+									style={{ width: weekWidth + "px" }}
+									key={index}
+								>
+									<div className="flex flex-row grow text-sm">
+										{data.monthLabels[index]}
 									</div>
-									
+									<div className={"flex flex-row grow-0 text-sm"}>
+										{week.date}
+										{week.week ===
+											getWeek(today, {
+												weekStartsOn: 1,
+												firstWeekContainsDate: 1,
+											}) && week.year === today.getFullYear() ? (
+											<div className="flex flex-row items-center text-xs text-red-500">
+												Today
+											</div>
+										) : (
+											<></>
+										)}
+									</div>
+
 								</div>
-							</div>
-						))}
+							))}
+						</div>
+						{labelContentsLeft.map((contents, rowIndex) => {
+							const sideLabelDivHeight = Math.max(
+								sideLabelDivHeightsLeft[rowIndex] || 0,
+								sideLabelDivHeightsRight[rowIndex] || 0
+							);
+							const selectedCell = JSON.parse(localStorage.getItem("selectedCell") || "{}");
+
+							return (
+								<>
+								<div
+									className="flex flex-row timeline-grid-bg"
+									style={{
+										height: sideLabelDivHeight + sideListGutterHeight * 2,
+										marginBottom: sideListGutterHeight,
+									}}
+									key={rowIndex}
+								>
+									{data.weeks.map((week, index) => (
+										<div
+											className="flex flex-col border-l timeline-grid-gap-bg timeline-grid-border"
+											style={{ width: weekWidth + "px" }}
+											key={index}
+											onMouseOver={
+												onMouseOverWeek ? () => onMouseOverWeek(week.week, week.year, rowIndex) : () => { }
+											}
+											onMouseDown={
+												onMouseClickWeek ? () => onMouseClickWeek(week.week, week.year, rowIndex) : () => { }
+											}
+											onFocus={onCellFocus ? () => onCellFocus(week.week, week.year, rowIndex) : () => { }}
+											onBlur={onCellBlur ? () => onCellBlur(week.week, week.year, rowIndex) : () => { }}
+										>
+											{renderCell ? (
+												renderCell(
+													week.week,
+													week.year,
+													rowIndex,
+													(selectedCell &&
+														selectedCell.week === week.week &&
+														selectedCell.year === week.year &&
+														selectedCell.rowId === rowIndex) ||
+													false,
+													weekWidth,
+													sideLabelDivHeight + sideListGutterHeight * 2
+												)
+											) : (
+												<div></div>
+											)}
+										</div>
+									))}
+								</div>
+								{/* {projectDrawerIndex === rowIndex && <div className="flex flex-row">PROJECT DRAWER GOES HERE</div>} */}
+								</>
+							);
+						})}
 					</div>
 				</div>
 				<button
