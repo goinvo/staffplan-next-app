@@ -402,12 +402,29 @@ const UserPage: React.FC = () => {
 						onCellFocus={handleCellFocus}
 						onCellBlur={handleCellBlur}
 						renderCell={renderCell}
+						drawerContents={
+							selectedUser?.assignments
+								? selectedUser?.assignments.map(
+										(assignment: AssignmentType) => {
+											console.log(assignment,"assignment")
+											return (
+												<AssignmentEditDrawer
+													assignment={assignment}
+													key={`${assignment.id}${selectedUser.id}`}
+												/>
+											);
+										}
+								  )
+								: null
+						}
+						drawerIndex={1}
 					/>
 				)}
 			</div>
 			{/* <div>
 				{selectedUser?.assignments
 					? selectedUser?.assignments.map((assignment: AssignmentType) => {
+							console.log(assignment);
 							return (
 								<AssignmentEditDrawer
 									assignment={assignment}

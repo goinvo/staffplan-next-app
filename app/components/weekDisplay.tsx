@@ -121,6 +121,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 	drawerContents,
 	drawerIndex
 }) => {
+	console.log(drawerContents, drawerIndex, "drawerContents, drawerIndex");
 	const today = new Date();
 	const startYear = today.getFullYear();
 	const months = [
@@ -140,6 +141,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 	const [data, setData] = useState<WeeksAndLabels>(
 		generateWeeksForYear(startYear)
 	);
+	const [focusedRowIndex, setFocusedRowIndex] = useState<number | null>(null);
 	const [startX, setStartX] = useState(0);
 	const [scrollStartX, setScrollStartX] = useState(0);
 	const [isDragging, setIsDragging] = useState(false);
@@ -514,14 +516,14 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 						</div>
 						{/* Render the table rows */}
 						{labelContentsLeft.map((contents, rowIndex) => {
+							console.log(drawerContents, drawerIndex, "drawerContents, drawerIndex")
 							const sideLabelDivHeight = Math.max(
 								sideLabelDivHeightsLeft[rowIndex] || 0,
 								sideLabelDivHeightsRight[rowIndex] || 0
 							);
 							const selectedCell = JSON.parse(localStorage.getItem("selectedCell") || "{}");
-
 							return (
-								<div key={rowIndex}>
+								<div key={rowIndex} onFocus={()=> setFocusedRowIndex(rowIndex)}>
 									<div
 										className="flex flex-row timeline-grid-bg"
 										style={{
