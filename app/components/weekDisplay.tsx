@@ -557,13 +557,11 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 											</div>
 										))}
 									</div>
-									{drawerIndex === rowIndex &&
+									{drawerIndex === rowIndex && drawerContents &&
 										<>
 											<div className="flex flex-row" style={{ height: drawerHeight + "px" }} ref={drawerRef} />
 											<div className="flex flex-row absolute left-0" style={{ top: (40 + sideListGutterHeight * 2 * (drawerIndex + 1) + sideListGutterHeight * drawerIndex + sideLabelDivHeightsRight.slice(0, drawerIndex + 1).reduce((sum, num) => sum + num, 0)) + "px" }} ref={drawerRef}>
-												{/* {drawerContents} */}
-												<div>Drawer Contents</div>
-												<div>Drawer Contents</div>
+												{drawerContents}
 											</div>
 										</>}
 								</div>
