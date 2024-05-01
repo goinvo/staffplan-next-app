@@ -138,6 +138,8 @@ export type WeekDisplayProps = {
 	onCellBlur? : (week: number, year: number, cellId: number) => void;
     renderCell?: (week: number, year: number, cellId: number, isSelected: boolean, width?: number, height?: number) => ReactNode;
     selectedCell?: selectedCell;
+	drawerContents?: React.ReactNode;
+	drawerRowIndex?: number;
 };
 
 export interface WorkWeekRenderDataType {

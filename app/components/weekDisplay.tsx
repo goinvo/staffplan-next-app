@@ -118,6 +118,8 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 	onCellBlur,
 	renderCell,
 	selectedCell,
+	drawerContents,
+	drawerRowIndex,
 }) => {
 	const today = new Date();
 	const startYear = today.getFullYear();
@@ -402,11 +404,12 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 				height
 			);
 		});
-		setSideLabelDivHeightsLeft(updatedTotalHeights);
+		setSideLabelDivHeightsLeft([...updatedTotalHeights]);
 
 		// If the right side was updated, update the right side
 		if (wasRightSideUpdated) {
-			setSideLabelDivHeightsRight(updatedTotalHeights);
+			console.log("Updating right side div heights; heights: ", updatedTotalHeights);
+			setSideLabelDivHeightsRight([...updatedTotalHeights]);
 		}
 	};
 
@@ -426,14 +429,17 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 				height
 			);
 		});
-		setSideLabelDivHeightsRight(updatedTotalHeights);
+		setSideLabelDivHeightsRight([...updatedTotalHeights]);
 
 		// If the left side was updated, update the left side
 		if (wasLeftSideUpdated) {
-			setSideLabelDivHeightsLeft(updatedTotalHeights);
+			const newLeftSideHeights = [...updatedTotalHeights];
+			console.log("Updating left side div heights; heights: ", updatedTotalHeights);
+			setSideLabelDivHeightsLeft(newLeftSideHeights);
 		}
 	};
 
+	console.log("rendering week display; left side div heights: ", sideLabelDivHeightsLeft, "right side div heights: ", sideLabelDivHeightsRight);
 	return (
 		<div className="relative">
 			<SideListLeft
@@ -500,48 +506,50 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 
 							return (
 								<>
-								<div
-									className="flex flex-row timeline-grid-bg"
-									style={{
-										height: sideLabelDivHeight + sideListGutterHeight * 2,
-										marginBottom: sideListGutterHeight,
-									}}
-									key={rowIndex}
-								>
-									{data.weeks.map((week, index) => (
-										<div
-											className="flex flex-col border-l timeline-grid-gap-bg timeline-grid-border"
-											style={{ width: weekWidth + "px" }}
-											key={index}
-											onMouseOver={
-												onMouseOverWeek ? () => onMouseOverWeek(week.week, week.year, rowIndex) : () => { }
-											}
-											onMouseDown={
-												onMouseClickWeek ? () => onMouseClickWeek(week.week, week.year, rowIndex) : () => { }
-											}
-											onFocus={onCellFocus ? () => onCellFocus(week.week, week.year, rowIndex) : () => { }}
-											onBlur={onCellBlur ? () => onCellBlur(week.week, week.year, rowIndex) : () => { }}
-										>
-											{renderCell ? (
-												renderCell(
-													week.week,
-													week.year,
-													rowIndex,
-													(selectedCell &&
-														selectedCell.week === week.week &&
-														selectedCell.year === week.year &&
-														selectedCell.rowId === rowIndex) ||
-													false,
-													weekWidth,
-													sideLabelDivHeight + sideListGutterHeight * 2
-												)
-											) : (
-												<div></div>
-											)}
-										</div>
-									))}
-								</div>
-								{/* {projectDrawerIndex === rowIndex && <div className="flex flex-row">PROJECT DRAWER GOES HERE</div>} */}
+									<div
+										className="flex flex-row timeline-grid-bg"
+										style={{
+											height: sideLabelDivHeight + sideListGutterHeight * 2,
+											marginBottom: sideListGutterHeight,
+										}}
+										key={rowIndex}
+									>
+										{data.weeks.map((week, index) => (
+											<div
+												className="flex flex-col border-l timeline-grid-gap-bg timeline-grid-border"
+												style={{ width: weekWidth + "px" }}
+												key={index}
+												onMouseOver={
+													onMouseOverWeek ? () => onMouseOverWeek(week.week, week.year, rowIndex) : () => { }
+												}
+												onMouseDown={
+													onMouseClickWeek ? () => onMouseClickWeek(week.week, week.year, rowIndex) : () => { }
+												}
+												onFocus={onCellFocus ? () => onCellFocus(week.week, week.year, rowIndex) : () => { }}
+												onBlur={onCellBlur ? () => onCellBlur(week.week, week.year, rowIndex) : () => { }}
+											>
+												{renderCell ? (
+													renderCell(
+														week.week,
+														week.year,
+														rowIndex,
+														(selectedCell &&
+															selectedCell.week === week.week &&
+															selectedCell.year === week.year &&
+															selectedCell.rowId === rowIndex) ||
+														false,
+														weekWidth,
+														sideLabelDivHeight + sideListGutterHeight * 2
+													)
+												) : (
+													<div></div>
+												)}
+											</div>
+										))}
+									</div>
+									{drawerContents && projectDrawerIndex === rowIndex && <div className="flex flex-row">
+										{drawerContents}
+									</div>}
 								</>
 							);
 						})}
