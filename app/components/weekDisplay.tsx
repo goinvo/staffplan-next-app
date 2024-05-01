@@ -118,8 +118,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 	onCellBlur,
 	renderCell,
 	selectedCell,
-	drawerContents,
-	drawerRowIndex,
+	drawerContents
 }) => {
 	const today = new Date();
 	const startYear = today.getFullYear();
@@ -154,9 +153,10 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 	const [sideLabelDivHeightsRight, setSideLabelDivHeightsRight] = useState<
 		number[]
 	>([]);
-	const [projectDrawerIndex, setProjectDrawerIndex] = useState<number>(-1);
+	const [drawerIndex, setdrawerIndex] = useState<number>(-1);
 	const { setScrollToTodayFunction } = useUserDataContext();
-
+	const drawerRef = React.useRef<HTMLDivElement>(null);
+	const [drawerHeight, setDrawerHeight] = useState(0);
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
@@ -385,8 +385,16 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 		setScrollToTodayFunction(() => scrollToToday);
 
 		// TODO: Remove this when the project drawer is implemented
-		setProjectDrawerIndex(2);
+		setdrawerIndex(4);
 	}, []);
+
+	useEffect(() => {
+		// Set drawer height according to the height of the drawer contents
+		if (drawerRef.current) {
+			setDrawerHeight(drawerRef.current.offsetHeight);
+			console.log("Drawer Height: ", drawerRef.current.offsetHeight);
+		}
+	}, [drawerIndex]);
 
 	const handleSetSideLabelDivHeightsLeft = (heights: number[]) => {
 		const updatedTotalHeights = [...heights];
@@ -408,7 +416,6 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 
 		// If the right side was updated, update the right side
 		if (wasRightSideUpdated) {
-			console.log("Updating right side div heights; heights: ", updatedTotalHeights);
 			setSideLabelDivHeightsRight([...updatedTotalHeights]);
 		}
 	};
@@ -434,12 +441,10 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 		// If the left side was updated, update the left side
 		if (wasLeftSideUpdated) {
 			const newLeftSideHeights = [...updatedTotalHeights];
-			console.log("Updating left side div heights; heights: ", updatedTotalHeights);
 			setSideLabelDivHeightsLeft(newLeftSideHeights);
 		}
 	};
 
-	console.log("rendering week display; left side div heights: ", sideLabelDivHeightsLeft, "right side div heights: ", sideLabelDivHeightsRight);
 	return (
 		<div className="relative">
 			<SideListLeft
@@ -447,6 +452,8 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 				divHeights={sideLabelDivHeightsLeft}
 				setDivHeights={handleSetSideLabelDivHeightsLeft}
 				offset={48}
+				drawerIndex={drawerIndex}
+				drawerHeight={drawerHeight}
 			/>
 			{labelContentsRight && (
 				<SideListRight
@@ -454,6 +461,8 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 					divHeights={sideLabelDivHeightsRight}
 					setDivHeights={handleSetSideLabelDivHeightsRight}
 					offset={48}
+					drawerIndex={drawerIndex}
+					drawerHeight={drawerHeight}
 				/>
 			)}
 			<div className="flex items-center my-4 relative">
@@ -465,7 +474,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 				</button>
 				<div
 					ref={weekContainerRef}
-					className="flex flex-row overflow-x-auto scrollbar-hide cursor-grab"
+					className="flex flex-row overflow-x-auto scrollbar-hide cursor-grab select-none"
 					onMouseDown={onDragStart}
 				>
 					<div className="flex flex-col min-w-max select-none">
@@ -505,14 +514,13 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 							const selectedCell = JSON.parse(localStorage.getItem("selectedCell") || "{}");
 
 							return (
-								<>
+								<div key={rowIndex}>
 									<div
 										className="flex flex-row timeline-grid-bg"
 										style={{
 											height: sideLabelDivHeight + sideListGutterHeight * 2,
 											marginBottom: sideListGutterHeight,
 										}}
-										key={rowIndex}
 									>
 										{data.weeks.map((week, index) => (
 											<div
@@ -547,10 +555,16 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 											</div>
 										))}
 									</div>
-									{drawerContents && projectDrawerIndex === rowIndex && <div className="flex flex-row">
-										{drawerContents}
-									</div>}
-								</>
+									{drawerIndex === rowIndex &&
+										<>
+											<div className="flex flex-row" style={{ height: drawerHeight + "px" }} ref={drawerRef} />
+											<div className="flex flex-row absolute left-0" style={{ top: (sideListGutterHeight * 5 * drawerIndex + sideListGutterHeight * 3 + sideLabelDivHeightsRight.slice(0, drawerIndex + 1).reduce((sum, num) => sum + num, 0)) + "px" }} ref={drawerRef}>
+												{/* {drawerContents} */}
+												<div>Drawer Contents</div>
+												<div>Drawer Contents</div>
+											</div>
+										</>}
+								</div>
 							);
 						})}
 					</div>

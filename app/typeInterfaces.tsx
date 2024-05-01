@@ -76,7 +76,18 @@ export interface SideLabelComponentsType {
 	divHeights?: number[];
 	setDivHeights: (heights: number[]) => void;
     offset: number;
+	drawerIndex: number;
+	drawerHeight: number;
 };
+
+export interface SideListItemType {
+	labelIndex: number;
+	labelContent: React.ReactNode;
+	divHeight: number | null;
+	divRefs: React.MutableRefObject<(HTMLDivElement | null)[]>;
+	setDivHeights: (heights: number[]) => void;
+  }
+  
 
 export interface UpsertValues {
 	actualHours: number | string;
