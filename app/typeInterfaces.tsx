@@ -150,7 +150,7 @@ export type WeekDisplayProps = {
     renderCell?: (week: number, year: number, cellId: number, isSelected: boolean, width?: number, height?: number) => ReactNode;
     selectedCell?: selectedCell;
 	drawerContents?: React.ReactNode;
-	drawerRowIndex?: number;
+	drawerIndex?: number;
 };
 
 export interface WorkWeekRenderDataType {

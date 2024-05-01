@@ -118,7 +118,8 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 	onCellBlur,
 	renderCell,
 	selectedCell,
-	drawerContents
+	drawerContents,
+	drawerIndex
 }) => {
 	const today = new Date();
 	const startYear = today.getFullYear();
@@ -153,7 +154,6 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 	const [sideLabelDivHeightsRight, setSideLabelDivHeightsRight] = useState<
 		number[]
 	>([]);
-	const [drawerIndex, setdrawerIndex] = useState<number>(-1);
 	const { setScrollToTodayFunction } = useUserDataContext();
 	const drawerRef = React.useRef<HTMLDivElement>(null);
 	const [drawerHeight, setDrawerHeight] = useState(0);
@@ -383,9 +383,6 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 	// This function is called when the component is first mounted to link the scrollToToday function to the UserDataContext
 	useEffect(() => {
 		setScrollToTodayFunction(() => scrollToToday);
-
-		// TODO: Remove this when the project drawer is implemented
-		setdrawerIndex(4);
 	}, []);
 
 	useEffect(() => {
@@ -455,7 +452,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 				divHeights={sideLabelDivHeightsLeft}
 				setDivHeights={handleSetSideLabelDivHeightsLeft}
 				offset={48}
-				drawerIndex={drawerIndex}
+				drawerIndex={drawerIndex ?? -1}
 				drawerHeight={drawerHeight}
 			/>
 			{/* Render right side list */}
@@ -465,7 +462,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 					divHeights={sideLabelDivHeightsRight}
 					setDivHeights={handleSetSideLabelDivHeightsRight}
 					offset={48}
-					drawerIndex={drawerIndex}
+					drawerIndex={drawerIndex ?? -1}
 					drawerHeight={drawerHeight}
 				/>
 			)}
