@@ -438,6 +438,8 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 		});
 		setSideLabelDivHeightsRight([...updatedTotalHeights]);
 
+		console.log("Right Side Heights: ", updatedTotalHeights);
+
 		// If the left side was updated, update the left side
 		if (wasLeftSideUpdated) {
 			const newLeftSideHeights = [...updatedTotalHeights];
@@ -447,14 +449,14 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 
 	return (
 		<div className="relative">
-			<SideListLeft
+			{/* <SideListLeft
 				labelContents={labelContentsLeft}
 				divHeights={sideLabelDivHeightsLeft}
 				setDivHeights={handleSetSideLabelDivHeightsLeft}
 				offset={48}
 				drawerIndex={drawerIndex}
 				drawerHeight={drawerHeight}
-			/>
+			/> */}
 			{labelContentsRight && (
 				<SideListRight
 					labelContents={labelContentsRight}
@@ -558,7 +560,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 									{drawerIndex === rowIndex &&
 										<>
 											<div className="flex flex-row" style={{ height: drawerHeight + "px" }} ref={drawerRef} />
-											<div className="flex flex-row absolute left-0" style={{ top: (sideListGutterHeight * 5 * drawerIndex + sideListGutterHeight * 3 + sideLabelDivHeightsRight.slice(0, drawerIndex + 1).reduce((sum, num) => sum + num, 0)) + "px" }} ref={drawerRef}>
+											<div className="flex flex-row absolute left-0" style={{ top: (40 + sideListGutterHeight * 2 * (drawerIndex + 1) + sideListGutterHeight * drawerIndex + sideLabelDivHeightsRight.slice(0, drawerIndex + 1).reduce((sum, num) => sum + num, 0)) + "px" }} ref={drawerRef}>
 												{/* {drawerContents} */}
 												<div>Drawer Contents</div>
 												<div>Drawer Contents</div>
