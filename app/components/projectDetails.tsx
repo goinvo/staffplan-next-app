@@ -32,7 +32,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 	const [upsertProject] = useMutation(UPSERT_PROJECT, {
 		errorPolicy: "all",
 		onCompleted({ upsertProject }) {
-			const updatedProjectList = projectList.map((project:ProjectType) => {
+			const updatedProjectList = projectList.map((project: ProjectType) => {
 				if (project.id === upsertProject.id) return upsertProject;
 				return project;
 			});
@@ -70,7 +70,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 		};
 		upsertProject({
 			variables: nullableDates(),
-		})
+		});
 	};
 	const validateForm = (values: FormikValues) => {
 		const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
@@ -161,7 +161,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 	return (
 		<>
 			<div className="bg-white p-10">
-				<div className="sm:flex-auto">
+				<div className="flex flex-auto">
 					<div>
 						<Formik
 							onSubmit={(e) => {
@@ -182,7 +182,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 								setFieldValue,
 								resetForm,
 							}) => (
-								<form onSubmit={handleSubmit} className="max-w-lg mx-auto">
+								<form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
 									{/* section 1 */}
 									<div className="flex mb-4 pb-2 border-b-4">
 										<div className="w-1/2 -mr-1 flex flex-col">
@@ -239,20 +239,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 										</div>
 									</div>
 									{/* section 2 */}
-									<div className="flex mb-4 pb-2">
-										<div className="w-1/5 mr-4 flex flex-col">
-											<label>
-												Planning
-												<Field
-													name="dates"
-													handleBlur={handleBlur}
-													component={ProjectDatepicker}
-												/>
-											</label>
-										</div>
-									</div>
-									{/* section 3 */}
-									<div className="flex mb-4 pb-2 border-b-4 space-x-10">
+									<div className="flex mb-4 pb-2 border-b-4">
 										<div className="w-1/4 mr-4 flex flex-col">
 											<label className="block font-medium text-gray-900">
 												FTE
@@ -275,7 +262,16 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 												/>
 											</label>
 										</div>
-										<div className="w-1/4 flex flex-col">
+										<div className="w-1/2 mt-1 mr-4 flex flex-col">
+											<label>
+												<Field
+													name="dates"
+													handleBlur={handleBlur}
+													component={ProjectDatepicker}
+												/>
+											</label>
+										</div>
+										<div className="w-1/5">
 											<label
 												htmlFor="hours"
 												className="block font-medium text-gray-900"
@@ -299,8 +295,8 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 											/>
 										</div>
 									</div>
-									{/* Section 4 */}
-									<div className="flex mb-4 pb-2 border-b-4">
+									{/* Section 3 */}
+									<div className="flex mb-4 pb-2 border-b-4 justify-evenly">
 										<div className="w-1/3 -mr-1 flex flex-col">
 											<div className="block">
 												<label>
@@ -348,8 +344,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 													</span>
 													<input
 														disabled={
-															values.rateType === "fixed" ||
-															values.hours === 0
+															values.rateType === "fixed" || values.hours === 0
 														}
 														type="number"
 														min="0"
@@ -398,7 +393,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 											</label>
 										</div>
 									</div>
-									{/* section 5 */}
+									{/* section 4 */}
 									<div className="flex mb-4 justify-between">
 										<div className="mr-2">
 											<button
@@ -443,10 +438,14 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 												</div>
 											)}
 											{errors.rateType && touched.rateType && (
-												<div className="text-red-500">{errors.rateType as ReactNode}</div>
+												<div className="text-red-500">
+													{errors.rateType as ReactNode}
+												</div>
 											)}
 											{errors.numOfFTE && touched.numOfFTE && (
-												<div className="text-red-500">{errors.numOfFTE as ReactNode}</div>
+												<div className="text-red-500">
+													{errors.numOfFTE as ReactNode}
+												</div>
 											)}
 										</div>
 									</div>
