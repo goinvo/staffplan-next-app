@@ -118,6 +118,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 	onCellBlur,
 	renderCell,
 	selectedCell,
+	drawerContents
 }) => {
 	const today = new Date();
 	const startYear = today.getFullYear();
@@ -152,8 +153,10 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 	const [sideLabelDivHeightsRight, setSideLabelDivHeightsRight] = useState<
 		number[]
 	>([]);
+	const [drawerIndex, setdrawerIndex] = useState<number>(-1);
 	const { setScrollToTodayFunction } = useUserDataContext();
-
+	const drawerRef = React.useRef<HTMLDivElement>(null);
+	const [drawerHeight, setDrawerHeight] = useState(0);
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
@@ -173,10 +176,10 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 				// Update the data of what needs to be rendered on the screen accordingly
 				setData(
 					(prev) =>
-						({
-							weeks: [...newData.weeks, ...prev.weeks],
-							monthLabels: [...newData.monthLabels, ...prev.monthLabels],
-						} as WeeksAndLabels)
+					({
+						weeks: [...newData.weeks, ...prev.weeks],
+						monthLabels: [...newData.monthLabels, ...prev.monthLabels],
+					} as WeeksAndLabels)
 				);
 				// If we scroll too much to the right, we need to load more weeks from the next year
 			} else {
@@ -186,10 +189,10 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 
 				setData(
 					(prev) =>
-						({
-							weeks: [...prev.weeks, ...newData.weeks],
-							monthLabels: [...prev.monthLabels, ...newData.monthLabels],
-						} as WeeksAndLabels)
+					({
+						weeks: [...prev.weeks, ...newData.weeks],
+						monthLabels: [...prev.monthLabels, ...newData.monthLabels],
+					} as WeeksAndLabels)
 				);
 			}
 		} finally {
@@ -380,7 +383,18 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 	// This function is called when the component is first mounted to link the scrollToToday function to the UserDataContext
 	useEffect(() => {
 		setScrollToTodayFunction(() => scrollToToday);
+
+		// TODO: Remove this when the project drawer is implemented
+		setdrawerIndex(4);
 	}, []);
+
+	useEffect(() => {
+		// Set drawer height according to the height of the drawer contents
+		if (drawerRef.current) {
+			setDrawerHeight(drawerRef.current.offsetHeight);
+			console.log("Drawer Height: ", drawerRef.current.offsetHeight);
+		}
+	}, [drawerIndex]);
 
 	const handleSetSideLabelDivHeightsLeft = (heights: number[]) => {
 		const updatedTotalHeights = [...heights];
@@ -398,11 +412,11 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 				height
 			);
 		});
-		setSideLabelDivHeightsLeft(updatedTotalHeights);
+		setSideLabelDivHeightsLeft([...updatedTotalHeights]);
 
 		// If the right side was updated, update the right side
 		if (wasRightSideUpdated) {
-			setSideLabelDivHeightsRight(updatedTotalHeights);
+			setSideLabelDivHeightsRight([...updatedTotalHeights]);
 		}
 	};
 
@@ -422,31 +436,42 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 				height
 			);
 		});
-		setSideLabelDivHeightsRight(updatedTotalHeights);
+		setSideLabelDivHeightsRight([...updatedTotalHeights]);
+
+		console.log("Right Side Heights: ", updatedTotalHeights);
 
 		// If the left side was updated, update the left side
 		if (wasLeftSideUpdated) {
-			setSideLabelDivHeightsLeft(updatedTotalHeights);
+			const newLeftSideHeights = [...updatedTotalHeights];
+			setSideLabelDivHeightsLeft(newLeftSideHeights);
 		}
 	};
 
 	return (
 		<div className="relative">
+			{/* Render left side list */}
 			<SideListLeft
 				labelContents={labelContentsLeft}
 				divHeights={sideLabelDivHeightsLeft}
 				setDivHeights={handleSetSideLabelDivHeightsLeft}
 				offset={48}
+				drawerIndex={drawerIndex}
+				drawerHeight={drawerHeight}
 			/>
+			{/* Render right side list */}
 			{labelContentsRight && (
 				<SideListRight
 					labelContents={labelContentsRight}
 					divHeights={sideLabelDivHeightsRight}
 					setDivHeights={handleSetSideLabelDivHeightsRight}
 					offset={48}
+					drawerIndex={drawerIndex}
+					drawerHeight={drawerHeight}
 				/>
 			)}
+			{/* Render the main content */}
 			<div className="flex items-center my-4 relative">
+				{/* Button to scroll weeks left */}
 				<button
 					onClick={() => scrollWeeks("left")}
 					className="p-2 bg-white rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center absolute -left-3 -top-3"
@@ -455,126 +480,113 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 				</button>
 				<div
 					ref={weekContainerRef}
-					className="flex flex-row overflow-x-auto scrollbar-hide cursor-grab"
+					className="flex flex-row overflow-x-auto scrollbar-hide cursor-grab select-none"
 					onMouseDown={onDragStart}
 				>
-					<div className="flex min-w-max select-none">
-						{data.weeks.map((week, index) => (
-							<div
-								className="flex flex-col text-nowrap"
-								style={{ width: weekWidth + "px" }}
-								key={index}
-							>
-								<div className="flex flex-row grow text-sm">
-									{data.monthLabels[index]}
-								</div>
-								<div className={"flex flex-row grow-0 text-sm"}>
-									{week.date}
-									{week.week ===
-										getWeek(today, {
-											weekStartsOn: 1,
-											firstWeekContainsDate: 1,
-										}) && week.year === today.getFullYear() ? (
-										<div className="flex flex-row items-center text-xs text-red-500">
-											Today
-										</div>
-									) : (
-										<></>
-									)}
-								</div>
-								<div className={"flex flex-row grow-0 relative"}>
-									<div
-										className={"top-0 left-0 timeline-grid-gap-bg"}
-										style={{ width: weekWidth + "px" }}
-										key={index}
-									>
-										{labelContentsLeft.map((contents, rowIndex) => {
-											const sideLabelDivHeight = Math.max(
-												sideLabelDivHeightsLeft[rowIndex] || 0,
-												sideLabelDivHeightsRight[rowIndex] || 0
-											);
-											const selectedCell = JSON.parse(
-												localStorage.getItem("selectedCell") || "{}"
-											);
-											return (
-												<div
-													className="flex border-l timeline-grid-bg timeline-grid-border"
-													style={{
-														height:
-															sideLabelDivHeight + sideListGutterHeight * 2,
-														marginBottom: sideListGutterHeight,
-													}}
-													key={rowIndex}
-													onMouseOver={
-														onMouseOverWeek
-															? () =>
-																	onMouseOverWeek(
-																		week.week,
-																		week.year,
-																		rowIndex
-																	)
-															: () => {}
-													}
-													onMouseDown={
-														onMouseClickWeek
-															? () =>
-																	onMouseClickWeek(
-																		week.week,
-																		week.year,
-																		rowIndex
-																	)
-															: () => {}
-													}
-													onFocus={
-														onCellFocus
-															? () =>
-																	onCellFocus(week.week, week.year, rowIndex)
-															: () => {}
-													}
-													onBlur={
-														onCellBlur
-															? () => onCellBlur(week.week, week.year, rowIndex)
-															: () => {}
-													}
-												>
-													{
-														<div className="flex flex-col">
-															{renderCell ? (
-																renderCell(
-																	week.week,
-																	week.year,
-																	rowIndex,
-																	(selectedCell &&
-																		selectedCell.week === week.week &&
-																		selectedCell.year === week.year &&
-																		selectedCell.rowId == rowIndex) ||
-																		false,
-																	weekWidth,
-																	sideLabelDivHeight + sideListGutterHeight * 2
-																)
-															) : (
-																<div></div>
-															)}
-															
-														</div>
-													}
-												</div>
-											);
-										})}
+					{/* Render the month and week labels */}
+					<div className="flex flex-col min-w-max select-none">
+						<div className="flex flex-row">
+							{data.weeks.map((week, index) => (
+								<div
+									className="flex flex-col text-nowrap"
+									style={{ width: weekWidth + "px" }}
+									key={index}
+								>
+									{/* Month labels */}
+									<div className="flex flex-row grow text-sm">
+										{data.monthLabels[index]}
 									</div>
-									
+									{/* Week labels */}
+									<div className={"flex flex-row grow-0 text-sm"}>
+										{week.date}
+										{week.week ===
+											getWeek(today, {
+												weekStartsOn: 1,
+												firstWeekContainsDate: 1,
+											}) && week.year === today.getFullYear() ? (
+											<div className="flex flex-row items-center text-xs text-red-500">
+												Today
+											</div>
+										) : (
+											<></>
+										)}
+									</div>
+
 								</div>
-							</div>
-						))}
+							))}
+						</div>
+						{/* Render the table rows */}
+						{labelContentsLeft.map((contents, rowIndex) => {
+							const sideLabelDivHeight = Math.max(
+								sideLabelDivHeightsLeft[rowIndex] || 0,
+								sideLabelDivHeightsRight[rowIndex] || 0
+							);
+							const selectedCell = JSON.parse(localStorage.getItem("selectedCell") || "{}");
+
+							return (
+								<div key={rowIndex}>
+									<div
+										className="flex flex-row timeline-grid-bg"
+										style={{
+											height: sideLabelDivHeight + sideListGutterHeight * 2,
+											marginBottom: sideListGutterHeight,
+										}}
+									>
+										{/* Render the individual weeks */}
+										{data.weeks.map((week, index) => (
+											<div
+												className="flex flex-col border-l timeline-grid-gap-bg timeline-grid-border"
+												style={{ width: weekWidth + "px" }}
+												key={index}
+												onMouseOver={
+													onMouseOverWeek ? () => onMouseOverWeek(week.week, week.year, rowIndex) : () => { }
+												}
+												onMouseDown={
+													onMouseClickWeek ? () => onMouseClickWeek(week.week, week.year, rowIndex) : () => { }
+												}
+												onFocus={onCellFocus ? () => onCellFocus(week.week, week.year, rowIndex) : () => { }}
+												onBlur={onCellBlur ? () => onCellBlur(week.week, week.year, rowIndex) : () => { }}
+											>
+												{/* Render the contents for the given week */}
+												{renderCell ? (
+													renderCell(
+														week.week,
+														week.year,
+														rowIndex,
+														(selectedCell &&
+															selectedCell.week === week.week &&
+															selectedCell.year === week.year &&
+															selectedCell.rowId === rowIndex) ||
+														false,
+														weekWidth,
+														sideLabelDivHeight + sideListGutterHeight * 2
+													)
+												) : (
+													<div></div>
+												)}
+											</div>
+										))}
+									</div>
+									{/* Render the drawer if there is one. For demonstration purposes I call setdrawerIndex(4) in a useEffect so you can see one of the drawers, but remove it and customise it to where you want the drawer */}
+									{drawerIndex === rowIndex && drawerContents &&
+										<>
+											<div className="flex flex-row" style={{ height: drawerHeight + "px" }} ref={drawerRef} />
+											<div className="flex flex-row absolute left-0" style={{ top: (40 + sideListGutterHeight * 2 * (drawerIndex + 1) + sideListGutterHeight * drawerIndex + sideLabelDivHeightsRight.slice(0, drawerIndex + 1).reduce((sum, num) => sum + num, 0)) + "px" }} ref={drawerRef}>
+												{drawerContents}
+											</div>
+										</>}
+								</div>
+							);
+						})}
 					</div>
 				</div>
+				{/* Scroll weeks to the right */}
 				<button
 					onClick={() => scrollWeeks("right")}
 					className="p-2 bg-white rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center absolute -right-1 -top-3"
 				>
 					<FaChevronRight className="timeline-text-accent" />
 				</button>
-				{isLoading && <div>Loading...</div>}
 			</div>
 		</div>
 	);

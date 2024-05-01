@@ -76,7 +76,18 @@ export interface SideLabelComponentsType {
 	divHeights?: number[];
 	setDivHeights: (heights: number[]) => void;
     offset: number;
+	drawerIndex: number;
+	drawerHeight: number;
 };
+
+export interface SideListItemType {
+	labelIndex: number;
+	labelContent: React.ReactNode;
+	divHeight: number | null;
+	divRefs: React.MutableRefObject<(HTMLDivElement | null)[]>;
+	setDivHeights: (heights: number[]) => void;
+  }
+  
 
 export interface UpsertValues {
 	actualHours: number | string;
@@ -138,6 +149,8 @@ export type WeekDisplayProps = {
 	onCellBlur? : (week: number, year: number, cellId: number) => void;
     renderCell?: (week: number, year: number, cellId: number, isSelected: boolean, width?: number, height?: number) => ReactNode;
     selectedCell?: selectedCell;
+	drawerContents?: React.ReactNode;
+	drawerRowIndex?: number;
 };
 
 export interface WorkWeekRenderDataType {
