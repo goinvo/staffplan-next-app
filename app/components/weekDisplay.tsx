@@ -449,14 +449,16 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 
 	return (
 		<div className="relative">
-			{/* <SideListLeft
+			{/* Render left side list */}
+			<SideListLeft
 				labelContents={labelContentsLeft}
 				divHeights={sideLabelDivHeightsLeft}
 				setDivHeights={handleSetSideLabelDivHeightsLeft}
 				offset={48}
 				drawerIndex={drawerIndex}
 				drawerHeight={drawerHeight}
-			/> */}
+			/>
+			{/* Render right side list */}
 			{labelContentsRight && (
 				<SideListRight
 					labelContents={labelContentsRight}
@@ -467,7 +469,9 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 					drawerHeight={drawerHeight}
 				/>
 			)}
+			{/* Render the main content */}
 			<div className="flex items-center my-4 relative">
+				{/* Button to scroll weeks left */}
 				<button
 					onClick={() => scrollWeeks("left")}
 					className="p-2 bg-white rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center absolute -left-3 -top-3"
@@ -479,6 +483,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 					className="flex flex-row overflow-x-auto scrollbar-hide cursor-grab select-none"
 					onMouseDown={onDragStart}
 				>
+					{/* Render the month and week labels */}
 					<div className="flex flex-col min-w-max select-none">
 						<div className="flex flex-row">
 							{data.weeks.map((week, index) => (
@@ -487,9 +492,11 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 									style={{ width: weekWidth + "px" }}
 									key={index}
 								>
+									{/* Month labels */}
 									<div className="flex flex-row grow text-sm">
 										{data.monthLabels[index]}
 									</div>
+									{/* Week labels */}
 									<div className={"flex flex-row grow-0 text-sm"}>
 										{week.date}
 										{week.week ===
@@ -508,6 +515,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 								</div>
 							))}
 						</div>
+						{/* Render the table rows */}
 						{labelContentsLeft.map((contents, rowIndex) => {
 							const sideLabelDivHeight = Math.max(
 								sideLabelDivHeightsLeft[rowIndex] || 0,
@@ -524,6 +532,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 											marginBottom: sideListGutterHeight,
 										}}
 									>
+										{/* Render the individual weeks */}
 										{data.weeks.map((week, index) => (
 											<div
 												className="flex flex-col border-l timeline-grid-gap-bg timeline-grid-border"
@@ -538,6 +547,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 												onFocus={onCellFocus ? () => onCellFocus(week.week, week.year, rowIndex) : () => { }}
 												onBlur={onCellBlur ? () => onCellBlur(week.week, week.year, rowIndex) : () => { }}
 											>
+												{/* Render the contents for the given week */}
 												{renderCell ? (
 													renderCell(
 														week.week,
@@ -557,6 +567,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 											</div>
 										))}
 									</div>
+									{/* Render the drawer if there is one. For demonstration purposes I call setdrawerIndex(4) in a useEffect so you can see one of the drawers, but remove it and customise it to where you want the drawer */}
 									{drawerIndex === rowIndex && drawerContents &&
 										<>
 											<div className="flex flex-row" style={{ height: drawerHeight + "px" }} ref={drawerRef} />
@@ -569,13 +580,13 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 						})}
 					</div>
 				</div>
+				{/* Scroll weeks to the right */}
 				<button
 					onClick={() => scrollWeeks("right")}
 					className="p-2 bg-white rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center absolute -right-1 -top-3"
 				>
 					<FaChevronRight className="timeline-text-accent" />
 				</button>
-				{isLoading && <div>Loading...</div>}
 			</div>
 		</div>
 	);
