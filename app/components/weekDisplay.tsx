@@ -97,7 +97,6 @@ const generateWeeksForYear = (beginYear: number): WeeksAndLabels => {
 			monthLabels.push(""); // No label for this entry
 		}
 	}
-
 	return { weeks, monthLabels };
 };
 
@@ -108,35 +107,25 @@ export const weekWidth = 64;
 // At 5, the current date will be 5 weeks from the left side of the screen
 const sideOffsetItems = 5;
 
+// move to helper Corbin
+const noOp = () => {};
+
 // The main component that renders the week display
 const WeekDisplay: React.FC<WeekDisplayProps> = ({
+	drawerContents,
+	drawerIndex,
 	labelContentsLeft,
 	labelContentsRight,
-	onMouseOverWeek,
-	onMouseClickWeek,
-	onCellFocus,
-	onCellBlur,
+	onCellBlur = noOp,
+	onCellFocus = noOp,
+	onMouseClickWeek = noOp,
+	onMouseOverWeek = noOp,
 	renderCell,
 	selectedCell,
-	drawerContents,
-	drawerIndex
 }) => {
 	const today = new Date();
 	const startYear = today.getFullYear();
-	const months = [
-		"Jan",
-		"Feb",
-		"Mar",
-		"Apr",
-		"May",
-		"Jun",
-		"Jul",
-		"Aug",
-		"Sep",
-		"Oct",
-		"Nov",
-		"Dec",
-	];
+
 	const [data, setData] = useState<WeeksAndLabels>(
 		generateWeeksForYear(startYear)
 	);
@@ -158,7 +147,6 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 	const drawerRef = React.useRef<HTMLDivElement>(null);
 	const [drawerHeight, setDrawerHeight] = useState(0);
 	const router = useRouter();
-	const searchParams = useSearchParams();
 
 	// This is the async function that is called to load more weeks when necessary
 	const loadMoreWeeks = async (direction: ScrollDirection) => {
@@ -166,8 +154,13 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 			// If we scroll too much to the left, we need to load more weeks from the previous year
 			if (direction === ScrollDirection.LEFT) {
 				// Adjust the year window, which dictates which years are currently loaded
-				yearWindow.start -= 1;
-				const newData = await loadMore(yearWindow.start);
+				const newYearWindow = { ...yearWindow, start: yearWindow.start - 1 };
+
+				// maybe do this??
+				setYearWindow(newYearWindow);
+				// end maybe
+
+				const newData = await loadMore(newYearWindow.start);
 
 				// Offset the scroll position by the width of the newly loaded weeks so dragging isn't wonky
 				setIsLoading(true);
@@ -176,23 +169,28 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 				// Update the data of what needs to be rendered on the screen accordingly
 				setData(
 					(prev) =>
-					({
-						weeks: [...newData.weeks, ...prev.weeks],
-						monthLabels: [...newData.monthLabels, ...prev.monthLabels],
-					} as WeeksAndLabels)
+						({
+							weeks: [...newData.weeks, ...prev.weeks],
+							monthLabels: [...newData.monthLabels, ...prev.monthLabels],
+						} as WeeksAndLabels)
 				);
 				// If we scroll too much to the right, we need to load more weeks from the next year
 			} else {
-				yearWindow.end += 1;
-				const newData = await loadMore(yearWindow.end);
+				const newYearWindow = { ...yearWindow, end: yearWindow.end + 1 };
+				const newData = await loadMore(newYearWindow.end);
+
+				// maybe do this?
+				setYearWindow(newYearWindow);
+				// end maybe
+
 				setIsLoading(true);
 
 				setData(
 					(prev) =>
-					({
-						weeks: [...prev.weeks, ...newData.weeks],
-						monthLabels: [...prev.monthLabels, ...newData.monthLabels],
-					} as WeeksAndLabels)
+						({
+							weeks: [...prev.weeks, ...newData.weeks],
+							monthLabels: [...prev.monthLabels, ...newData.monthLabels],
+						} as WeeksAndLabels)
 				);
 			}
 		} finally {
@@ -468,13 +466,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 			)}
 			{/* Render the main content */}
 			<div className="flex items-center my-4 relative">
-				{/* Button to scroll weeks left */}
-				<button
-					onClick={() => scrollWeeks("left")}
-					className="p-2 bg-white rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center absolute -left-3 -top-3"
-				>
-					<FaChevronLeft className="timeline-text-accent" />
-				</button>
+				<ScrollLeft onClick={() => scrollWeeks("left")} />
 				<div
 					ref={weekContainerRef}
 					className="flex flex-row overflow-x-auto scrollbar-hide cursor-grab select-none"
@@ -484,32 +476,11 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 					<div className="flex flex-col min-w-max select-none">
 						<div className="flex flex-row">
 							{data.weeks.map((week, index) => (
-								<div
-									className="flex flex-col text-nowrap"
-									style={{ width: weekWidth + "px" }}
+								<CalendarHeader
 									key={index}
-								>
-									{/* Month labels */}
-									<div className="flex flex-row grow text-sm">
-										{data.monthLabels[index]}
-									</div>
-									{/* Week labels */}
-									<div className={"flex flex-row grow-0 text-sm"}>
-										{week.date}
-										{week.week ===
-											getWeek(today, {
-												weekStartsOn: 1,
-												firstWeekContainsDate: 1,
-											}) && week.year === today.getFullYear() ? (
-											<div className="flex flex-row items-center text-xs text-red-500">
-												Today
-											</div>
-										) : (
-											<></>
-										)}
-									</div>
-
-								</div>
+									monthLabel={data.monthLabels[index]}
+									week={week}
+								/>
 							))}
 						</div>
 						{/* Render the table rows */}
@@ -518,7 +489,9 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 								sideLabelDivHeightsLeft[rowIndex] || 0,
 								sideLabelDivHeightsRight[rowIndex] || 0
 							);
-							const selectedCell = JSON.parse(localStorage.getItem("selectedCell") || "{}");
+							const selectedCell = JSON.parse(
+								localStorage.getItem("selectedCell") || "{}"
+							);
 
 							return (
 								<div key={rowIndex}>
@@ -530,63 +503,138 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 										}}
 									>
 										{/* Render the individual weeks */}
-										{data.weeks.map((week, index) => (
-											<div
-												className="flex flex-col border-l timeline-grid-gap-bg timeline-grid-border"
-												style={{ width: weekWidth + "px" }}
-												key={index}
-												onMouseOver={
-													onMouseOverWeek ? () => onMouseOverWeek(week.week, week.year, rowIndex) : () => { }
-												}
-												onMouseDown={
-													onMouseClickWeek ? () => onMouseClickWeek(week.week, week.year, rowIndex) : () => { }
-												}
-												onFocus={onCellFocus ? () => onCellFocus(week.week, week.year, rowIndex) : () => { }}
-												onBlur={onCellBlur ? () => onCellBlur(week.week, week.year, rowIndex) : () => { }}
-											>
-												{/* Render the contents for the given week */}
-												{renderCell ? (
-													renderCell(
-														week.week,
-														week.year,
-														rowIndex,
-														(selectedCell &&
-															selectedCell.week === week.week &&
-															selectedCell.year === week.year &&
-															selectedCell.rowId === rowIndex) ||
-														false,
-														weekWidth,
-														sideLabelDivHeight + sideListGutterHeight * 2
-													)
-												) : (
-													<div></div>
-												)}
-											</div>
-										))}
+										{data.weeks.map((week, index) => {
+											const isSelected =
+												(selectedCell &&
+													selectedCell.week === week.week &&
+													selectedCell.year === week.year &&
+													selectedCell.rowId === rowIndex) ||
+												false;
+
+											const cellHeight =
+												sideLabelDivHeight + sideListGutterHeight * 2;
+
+											return (
+												<div
+													className="flex flex-col border-l timeline-grid-gap-bg timeline-grid-border"
+													style={{ width: weekWidth + "px" }}
+													key={index}
+													onMouseOver={() =>
+														onMouseOverWeek(week.week, week.year, rowIndex)
+													}
+													onMouseDown={() =>
+														onMouseClickWeek(week.week, week.year, rowIndex)
+													}
+													onFocus={() =>
+														onCellFocus(week.week, week.year, rowIndex)
+													}
+													onBlur={() =>
+														onCellBlur(week.week, week.year, rowIndex)
+													}
+												>
+													{/* Render the contents for the given week */}
+													{renderCell ? (
+														renderCell(
+															week.week,
+															week.year,
+															rowIndex,
+															isSelected,
+															weekWidth,
+															cellHeight
+														)
+													) : (
+														<div></div>
+													)}
+												</div>
+											);
+										})}
 									</div>
 									{/* Render the drawer if there is one. For demonstration purposes I call setdrawerIndex(4) in a useEffect so you can see one of the drawers, but remove it and customise it to where you want the drawer */}
-									{drawerIndex === rowIndex && drawerContents &&
+									{drawerIndex === rowIndex && drawerContents && (
 										<>
-											<div className="flex flex-row" style={{ height: drawerHeight + "px" }} ref={drawerRef} />
-											<div className="flex flex-row absolute left-0" style={{ top: (40 + sideListGutterHeight * 2 * (drawerIndex + 1) + sideListGutterHeight * drawerIndex + sideLabelDivHeightsRight.slice(0, drawerIndex + 1).reduce((sum, num) => sum + num, 0)) + "px" }} ref={drawerRef}>
+											<div
+												className="flex flex-row"
+												style={{ height: drawerHeight + "px" }}
+												ref={drawerRef}
+											/>
+											<div
+												className="flex flex-row absolute left-0"
+												style={{
+													top:
+														40 +
+														sideListGutterHeight * 2 * (drawerIndex + 1) +
+														sideListGutterHeight * drawerIndex +
+														sideLabelDivHeightsRight
+															.slice(0, drawerIndex + 1)
+															.reduce((sum, num) => sum + num, 0) +
+														"px",
+												}}
+												ref={drawerRef}
+											>
 												{drawerContents}
 											</div>
-										</>}
+										</>
+									)}
 								</div>
 							);
 						})}
 					</div>
 				</div>
-				{/* Scroll weeks to the right */}
-				<button
-					onClick={() => scrollWeeks("right")}
-					className="p-2 bg-white rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center absolute -right-1 -top-3"
-				>
-					<FaChevronRight className="timeline-text-accent" />
-				</button>
+				<ScrollRight onClick={() => scrollWeeks("right")} />
 			</div>
 		</div>
 	);
 };
 
 export default WeekDisplay;
+
+const ScrollLeft: React.FC<any> = ({ onClick }) => {
+	return (
+		<button
+			onClick={onClick}
+			className="p-2 bg-white rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center absolute -left-3 -top-3"
+		>
+			<FaChevronLeft className="timeline-text-accent" />
+		</button>
+	);
+};
+
+const ScrollRight: React.FC<any> = ({ onClick }) => {
+	return (
+		<button
+			onClick={onClick}
+			className="p-2 bg-white rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center absolute -right-1 -top-3"
+		>
+			<FaChevronRight className="timeline-text-accent" />
+		</button>
+	);
+};
+
+const CalendarHeader: React.FC<any> = ({ monthLabel, week }) => {
+	const today = new Date();
+
+	return (
+		<div
+			className="flex flex-col text-nowrap"
+			style={{ width: weekWidth + "px" }}
+		>
+			{/* Month labels */}
+			<div className="flex flex-row grow text-sm">{monthLabel}</div>
+			{/* Week labels */}
+			<div className={"flex flex-row grow-0 text-sm"}>
+				{week.date}
+				{week.week ===
+					getWeek(today, {
+						weekStartsOn: 1,
+						firstWeekContainsDate: 1,
+					}) && week.year === today.getFullYear() ? (
+					<div className="flex flex-row items-center text-xs text-red-500">
+						Today
+					</div>
+				) : (
+					<></>
+				)}
+			</div>
+		</div>
+	);
+};
