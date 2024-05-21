@@ -548,6 +548,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 												</div>
 											);
 										})}
+									
 									</div>
 									{/* Render the drawer if there is one. For demonstration purposes I call setdrawerIndex(4) in a useEffect so you can see one of the drawers, but remove it and customise it to where you want the drawer */}
 									{drawerIndex === rowIndex && drawerContents && (
@@ -638,3 +639,4 @@ const CalendarHeader: React.FC<any> = ({ monthLabel, week }) => {
 		</div>
 	);
 };
+

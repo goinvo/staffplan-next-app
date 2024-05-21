@@ -20,6 +20,8 @@ import { sortSingleUser } from "@/app/helperFunctions";
 import { AssignmentEditDrawer } from "@/app/components/assignmentEditDrawer";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import AddAssignmentSinglePerson from "@/app/components/addAssignmentSinglePerson";
+import { ScrollingCalendar } from "@/app/components/weekDisplayPrototype/scrollingCalendar";
+import { TableRow } from "@/app/components/weekDisplayPrototype/tableRow";
 const UserPage: React.FC = () => {
 	const router = useRouter();
 	const params = useParams();
@@ -360,10 +362,13 @@ const UserPage: React.FC = () => {
 	const onComplete = () => {
 		setAddAssignmentVisible(false);
 	};
+	console.log(selectedUser);
+	// console.log(selectedUser?.assignments)
+	// console.log(userList)
 	return (
 		<>
 			<div>
-				{userList && selectedUser && selectedUser.assignments && (
+				{/* {userList && selectedUser && selectedUser.assignments && (
 					<WeekDisplay
 						labelContentsLeft={selectedUser.assignments.map(
 							(assignment: AssignmentType) => (
@@ -403,8 +408,10 @@ const UserPage: React.FC = () => {
 						onCellBlur={handleCellBlur}
 						renderCell={renderCell}
 					/>
-				)}
+				)} */}
 			</div>
+			<ScrollingCalendar />
+
 			{/* <div>
 				{selectedUser?.assignments
 					? selectedUser?.assignments.map((assignment: AssignmentType) => {
@@ -417,7 +424,7 @@ const UserPage: React.FC = () => {
 					  })
 					: null}
 			</div> */}
-			<div>
+			{/* <div>
 				<button
 					className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center"
 					onClick={() => setAddAssignmentVisible(true)}
@@ -431,7 +438,7 @@ const UserPage: React.FC = () => {
 						onComplete={onComplete}
 					/>
 				)}
-			</div>
+			</div> */}
 		</>
 	);
 };

@@ -9,10 +9,14 @@ import {
 	GET_VIEWER,
 } from "./gqlQueries";
 import { sortProjectList, sortUserList } from "./helperFunctions";
+import { DateTime } from "luxon";
+import { currentQuarter, currentYear } from "./components/weekDisplayPrototype/scrollingCalendar";
 
 export interface UserDataContextType {
 	userList: any;
 	setUserList: React.Dispatch<React.SetStateAction<any>>;
+	dateRange: any;
+	setDateRange: React.Dispatch<React.SetStateAction<any>>;
 	projectList: ProjectType[];
 	setProjectList: React.Dispatch<React.SetStateAction<ProjectType[]>>;
 	clientList: ClientType[];
@@ -50,6 +54,7 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 	children,
 }) => {
 	const [clientSide, setClientSide] = useState(false);
+	const [dateRange, setDateRange] = useState({quarter:currentQuarter, year:currentYear})
 	const [userList, setUserList] = useState<any>(null);
 	const [projectList, setProjectList] = useState<any>(null);
 	const [clientList, setClientList] = useState<any>(null);
@@ -164,6 +169,8 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 				setProjectList,
 				clientList,
 				setClientList,
+				dateRange,
+				setDateRange,
 				viewer,
 				setViewer,
 				viewsFilter,
