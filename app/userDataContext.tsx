@@ -9,7 +9,6 @@ import {
 	GET_VIEWER,
 } from "./gqlQueries";
 import { sortProjectList, sortUserList } from "./helperFunctions";
-import { DateTime } from "luxon";
 import { currentQuarter, currentYear } from "./components/weekDisplayPrototype/scrollingCalendar";
 
 export interface UserDataContextType {
