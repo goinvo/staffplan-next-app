@@ -31,11 +31,11 @@ export const UserAssignmentRow = ({
 		router.push("/projects/" + encodeURIComponent(assignment.project.id));
 	};
 	return (
-		<div className="flex">
+		<div className="flex h-20">
 			{isFirstMonth && (
 				<UserLabel assignment={assignment} clickHandler={handleProjectChange} />
 			)}
-			<div className="flex border-b border-gray-300">
+			<div className="flex border-b ml-1 border-gray-300 justify-between w-full">
 				{mondays.cweeks.map((cweek, cweekIndex) => {
 					const workWeekElements = assignment.workWeeks.map(
 						(workWeek, workWeekIndex) => {

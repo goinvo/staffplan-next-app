@@ -5,7 +5,7 @@ import { UserLabelProps } from '../typeInterfaces';
 export const UserLabel = ({assignment, clickHandler}:UserLabelProps) => {
   return (
     <div
-				className="hover:cursor-pointer"
+				className="hover:cursor-pointer z-10 w-64"
 				onClick={() => clickHandler(assignment)}
 			>
 				<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">

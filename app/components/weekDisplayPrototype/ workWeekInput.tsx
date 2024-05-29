@@ -75,7 +75,7 @@ export const WorkWeekInput = ({
 							>
 								<input
 									value={values.estimatedHours}
-									className="border border-red-500 w-10 rounded p-2 mb-1"
+									className="border border-gray-300 w-10 rounded p-2 mb-1"
 									name="estHours"
 									id="estimatedHours"
 									onClick={(e) => {
@@ -93,7 +93,7 @@ export const WorkWeekInput = ({
 									value={values.actualHours}
 									name="actualHours"
 									id="actHours"
-									className="border border-red-500 w-10 rounded p-2 mb-1"
+									className="border border-gray-300 w-10 rounded p-2 mb-1"
 									onChange={handleChange}
 									onClick={(e) => {
 										console.log(workWeek, cweek, year, "WORK WEEK CLICKED");
@@ -130,9 +130,11 @@ export const WorkWeekInput = ({
 								onSubmit={handleSubmit}
 								className="flex flex-col items-center"
 							>
+								<div className="flex flex-col">
+
 								<input
 									value={values.estimatedHours}
-									className="border border-green-500 w-10 rounded p-2 mb-1"
+									className="border border-gray-300 w-10 rounded p-2 mb-1"
 									name="estimatedHours"
 									id="estHours"
 									onChange={handleChange}
@@ -145,20 +147,21 @@ export const WorkWeekInput = ({
 											upsertWorkWeekValues(values);
 										}
 									}}
-								/>
+									/>
 								<input
 									value={values.actualHours}
 									name="actualHours"
 									id="actHours"
 									onChange={handleChange}
-									className="border border-green-500 w-10 rounded p-2 mb-1"
+									className="border border-gray-300 w-10 rounded p-2 mb-1"
 									onBlur={(e) => {
 										handleBlur("actHours");
 										if (values.estimatedHours && values.actualHours) {
 											upsertWorkWeekValues(values);
 										}
 									}}
-								/>
+									/>
+									</div>
 							</form>
 						)}
 					</Formik>
