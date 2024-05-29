@@ -113,7 +113,11 @@ export interface UserAssignmentDataMapType {
 		};
 	};
 }
-
+export interface UserLabelProps {
+	assignment: AssignmentType;
+	clickHandler: (assignment: AssignmentType) => void;
+  
+  }
 export interface UserOptionType {
 	value: string;
 	label: string;

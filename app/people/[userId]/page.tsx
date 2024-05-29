@@ -21,8 +21,6 @@ import { AssignmentEditDrawer } from "@/app/components/assignmentEditDrawer";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import AddAssignmentSinglePerson from "@/app/components/addAssignmentSinglePerson";
 import { ScrollingCalendar } from "@/app/components/weekDisplayPrototype/scrollingCalendar";
-import { TableRow } from "@/app/components/weekDisplayPrototype/tableRow";
-import { Month } from "@/app/components/weekDisplayPrototype/month";
 import { UserAssignmentRow } from "@/app/components/weekDisplayPrototype/userAssignmentRow";
 const UserPage: React.FC = () => {
 	const router = useRouter();
@@ -412,7 +410,13 @@ const UserPage: React.FC = () => {
 			<ScrollingCalendar>
 				{selectedUser?.assignments?.map((assignment: AssignmentType, index) => {
 					return (
-							<UserAssignmentRow key={index} assignment={assignment} />
+						<UserAssignmentRow
+							key={index}
+							assignment={assignment}
+							monthData={{ monthLabel: "", year: 0 }}
+							isFirstMonth={true}
+							isLastMonth={true}
+						/>
 					);
 				})}
 			</ScrollingCalendar>
