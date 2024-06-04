@@ -27,7 +27,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 	return (
 		<>
 			{viewsFilter.showSummaries ? (
-				<div className="w-40 flex flex-col">
+				<div className="w-40 flex flex-col absolute right-0">
 					{futurePlan() ? (
 						<div className="flex justify-between items-end border-b-2 border-accentgreen bg-green-50 mb-1">
 							<label className="text-sm">future plan</label>

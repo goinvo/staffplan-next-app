@@ -161,11 +161,24 @@ export const GET_ALL_PROJECTS_DATA = gql`
 				hours
 				fte
 				assignments{
+					assignedUser{
+						name
+						avatarUrl
+					}
 					id
 					startsOn
 					estimatedWeeklyHours
 					endsOn
 					status
+					workWeeks{
+						actualHours
+						estimatedHours
+						cweek
+						year
+						user {
+							name
+						}
+					}
 				  }
 				client {
 					id

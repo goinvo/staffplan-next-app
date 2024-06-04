@@ -1,12 +1,12 @@
 import { AssignmentType } from "@/app/typeInterfaces";
 import { useUserDataContext } from "@/app/userDataContext";
 import React from "react";
-import { getMondays } from "./helpers";
+import { getMondays } from "../weekDisplayPrototype/helpers";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
 import UserSummary from "../userSummary";
-import { UserLabel } from "../userLabel";
-import { WorkWeekInput } from "./ workWeekInput";
+import { UserLabel } from "./userLabel";
+import { WorkWeekInput } from "./workWeekInput";
 
 interface UserAssignmentRowProps {
 	assignment: AssignmentType;
@@ -31,7 +31,7 @@ export const UserAssignmentRow = ({
 		router.push("/projects/" + encodeURIComponent(assignment.project.id));
 	};
 	return (
-		<div className="flex h-20">
+		<div className="flex">
 			{isFirstMonth && (
 				<UserLabel assignment={assignment} clickHandler={handleProjectChange} />
 			)}
