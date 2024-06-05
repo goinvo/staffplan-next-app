@@ -54,7 +54,7 @@ export const WorkWeekInput = ({
 	return (
 		<>
 			{workWeek ? (
-				<div className="flex flex-col items-center pr-10">
+				<div className="flex flex-col items-center pt-2 justify-center">
 					<Formik
 						onSubmit={(e) => upsertWorkWeekValues(e)}
 						initialValues={initialValues}
@@ -71,7 +71,7 @@ export const WorkWeekInput = ({
 						}) => (
 							<form
 								onSubmit={handleSubmit}
-								className="flex flex-col items-center"
+								className="flex flex-col items-center justify-center"
 							>
 								<input
 									value={values.estimatedHours}
@@ -111,7 +111,7 @@ export const WorkWeekInput = ({
 				</div>
 			) : null}
 			{assignment && !workWeek ? (
-				<div className="flex flex-col items-center pr-10">
+				<div className="flex flex-col items-center pt-2">
 					<Formik
 						onSubmit={(e) => upsertWorkWeekValues(e)}
 						initialValues={initialValues}

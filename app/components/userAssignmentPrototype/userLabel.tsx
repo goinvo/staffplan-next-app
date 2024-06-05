@@ -5,10 +5,10 @@ import { UserLabelProps } from "../../typeInterfaces";
 export const UserLabel = ({ assignment, clickHandler }: UserLabelProps) => {
 	return (
 		<div
-			className="hover:cursor-pointer z-10 w-64 absolute left-0"
+			className="hover:cursor-pointer w-64 absolute left-0  overflow-hidden"
 			onClick={() => clickHandler(assignment)}
 		>
-			<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
+			<div className=" flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
 				<Image
 					src={`${assignment.project.client.avatarUrl}`}
 					alt="client avatar"

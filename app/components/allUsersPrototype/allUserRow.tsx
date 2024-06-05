@@ -1,4 +1,4 @@
-import { UserType } from "@/app/typeInterfaces";
+import { UserType, WorkWeekType } from "@/app/typeInterfaces";
 import { useUserDataContext } from "@/app/userDataContext";
 import React from "react";
 import { getMondays } from "../weekDisplayPrototype/helpers";
@@ -11,6 +11,14 @@ interface AllUserRowProps {
 	isFirstMonth: boolean;
 	isLastMonth: boolean;
 	monthData: { monthLabel: string; year: number };
+}
+interface Accumulator {
+	[cweek: number]: {
+		cweek: number;
+		actualHours: number;
+		estimatedHours: number;
+		year: number;
+	};
 }
 export const AllUserRow = ({
 	user,
@@ -31,12 +39,12 @@ export const AllUserRow = ({
 		}
 	};
 
-	const totalActualWeekHours = Object.values(
-		(user.assignments ?? []).reduce((acc, assignment) => {
+	const totalWorkWeekHours = Object.values(
+		(user.assignments ?? []).reduce<Accumulator>((acc, assignment) => {
 			assignment.workWeeks.forEach((workWeek) => {
 				const cweek = workWeek.cweek;
-				const actualHours = workWeek.actualHours;
-				const estimatedHours = workWeek.estimatedHours;
+				const actualHours = workWeek.actualHours ?? 0;
+				const estimatedHours = workWeek.estimatedHours ?? 0;
 				if (!acc[cweek]) {
 					acc[cweek] = {
 						cweek,
@@ -48,10 +56,11 @@ export const AllUserRow = ({
 				acc[cweek].actualHours += actualHours;
 				acc[cweek].estimatedHours += estimatedHours;
 			});
+
 			return acc;
 		}, {})
 	);
-    console.log(user, "USER")
+	console.log(totalWorkWeekHours, "total actual hours");
 	return (
 		<div className="flex">
 			{isFirstMonth && (
@@ -59,26 +68,29 @@ export const AllUserRow = ({
 			)}
 			<div className="flex border-b ml-1 border-gray-300 justify-between w-full h-28">
 				{mondays.cweeks.map((cweek, cweekIndex) => {
-					const workWeekElements = totalActualWeekHours.map(
+					const workWeekElements = totalWorkWeekHours.map(
 						(workWeek, workWeekIndex) => {
-							if (workWeek.cweek === cweek && workWeek.year === mondays.year) {
-								if (workWeek.actualHours > 0) {
+							if (
+								(workWeek as WorkWeekType).cweek === cweek &&
+								(workWeek as any).year === mondays.year
+							) {
+								if ((workWeek as any).actualHours > 0) {
 									return (
 										<div
 											key={`${cweek}has-actual-hours`}
-											className="bg-green-200 w-4 h-4 rounded-full"
+											className="bg-red-200 w-4 h-4 rounded-full"
 										>
-											{workWeek.actualHours}
+											{(workWeek as any).actualHours}
 										</div>
 									);
 								}
-								if (workWeek.actualHours <= 0) {
+								if ((workWeek as any).actualHours <= 0) {
 									return (
 										<div
-											key={`${cweek}${workWeek.year}no-actual-hours`}
-											className="bg-red-200 w-4 h-4 rounded-full"
+											key={`${cweek}${(workWeek as any).year}no-actual-hours`}
+											className="bg-green-200 w-4 h-4 rounded-full"
 										>
-											{workWeek.estimatedHours}
+											{(workWeek as any).estimatedHours}
 										</div>
 									);
 								}
@@ -96,17 +108,14 @@ export const AllUserRow = ({
 							key={`cweek-${cweekIndex}`}
 							className="flex-1 flex flex-col items-center"
 						>
-							{hasWorkWeek ? (
+							{hasWorkWeek && (user.assignments ?? []).length > 0 ? (
 								workWeekElements
 							) : (
 								<div key={`${cweek}HELLO`}>cweek{cweek}</div>
 							)}
-                            {!user.assignments.length ? (
-                                <div key={`${cweek}NOASSIGNMENTS`}>0</div>
-                            ) : (
-                               null
-                            
-                            )}
+							{!hasWorkWeek && !user.assignments?.length ? (
+								<div key={`${cweek}NOASSIGNMENTS`}>0</div>
+							) : null}
 						</div>
 					);
 				})}

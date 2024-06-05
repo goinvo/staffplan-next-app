@@ -54,11 +54,11 @@ export const ScrollingCalendar = ({ children }: any) => {
 			>
 				<FaChevronLeft className="timeline-text-accent" />
 			</button>
-			<div className="flex-grow flex justify-between">
+			<div className="flex-grow flex justify-stretch">
 				{months.map((monthData, index) => (
 					<div key={index} className="flex-1">
-						<h2>{showYear(monthData)}</h2>
-						<div className="flex justify-between pr-10">
+						<div className="flex justify-center">{showYear(monthData)}</div>
+						<div className="flex ">
 							{(() => {
 								const { mondays } = getMondays(
 									DateTime.local(
@@ -68,7 +68,7 @@ export const ScrollingCalendar = ({ children }: any) => {
 									).toISO()
 								);
 								return mondays.map((day, dayIndex) => (
-									<div key={dayIndex} className="flex">
+									<div key={dayIndex} className="flex grow justify-center">
 										{day}
 									</div>
 								));
