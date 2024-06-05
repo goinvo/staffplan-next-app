@@ -1,5 +1,10 @@
 import { ReactNode } from 'react';
 
+export interface AllUserLabelProps {
+	user: UserType;
+	clickHandler: (user: UserType) => void;
+  
+  }
 export interface AssignmentType {
 	assignedUser: UserType;
 	endsOn: string | null;

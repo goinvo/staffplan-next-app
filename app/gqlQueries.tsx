@@ -163,6 +163,7 @@ export const GET_ALL_PROJECTS_DATA = gql`
 				assignments{
 					assignedUser{
 						name
+						id
 						avatarUrl
 					}
 					id

@@ -27,16 +27,21 @@ export const ProjectAssignmentRow = ({
 			"day"
 		)
 	);
-	const handleProjectChange = (assignment: AssignmentType) => {
-		router.push("/projects/" + encodeURIComponent(assignment.project.id));
+	const handleUserChange = (assignment: AssignmentType) => {
+		const user = assignment.assignedUser.id?.toString();
+		if (user) {
+			router.push("/people/" + encodeURIComponent(user));
+		}
 	};
-	// console.log(assignment, "ASSIGNMENT IN PROJECT ASSIGNMENT")
 	return (
 		<div className="flex">
 			{isFirstMonth && (
-				<ProjectUserLabel assignment={assignment} clickHandler={handleProjectChange} />
+				<ProjectUserLabel
+					assignment={assignment}
+					clickHandler={handleUserChange}
+				/>
 			)}
-			<div className="flex border-b ml-1 border-gray-300 justify-between w-full">
+			<div className="flex border-b ml-1 border-gray-300 justify-between w-full h-32">
 				{mondays.cweeks.map((cweek, cweekIndex) => {
 					const workWeekElements = assignment.workWeeks.map(
 						(workWeek, workWeekIndex) => {

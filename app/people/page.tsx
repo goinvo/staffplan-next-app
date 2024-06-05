@@ -20,6 +20,8 @@ import WeekDisplay from "../components/weekDisplay";
 import { LoadingSpinner } from "../components/loadingSpinner";
 import Image from "next/image";
 import EllipsisPeopleMenu from "../components/ellipsisPeopleMenu";
+import { ScrollingCalendar } from "../components/weekDisplayPrototype/scrollingCalendar";
+import { AllUserRow } from "../components/allUsersPrototype/allUserRow";
 const PeopleView: React.FC = () => {
 	const [userAssignmentDataMap, setUserAssignmentDataMap] =
 		useState<UserAssignmentDataMapType>({});
@@ -89,30 +91,48 @@ const PeopleView: React.FC = () => {
 	return (
 		<>
 			{userList ? (
-				<WeekDisplay
-					labelContentsLeft={userList?.map((user: UserType) => (
-						<div
-							className="flex gap-x-4 gap-y-4 items-center justify-center"
-							key={user.id}
-						>
+				<>
+					{/* <WeekDisplay
+						labelContentsLeft={userList?.map((user: UserType) => (
 							<div
-								className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden"
+								className="flex gap-x-4 gap-y-4 items-center justify-center"
+								key={user.id}
 							>
-								<Image
-									src={`${user.avatarUrl}`}
-									alt="user avatar"
-									width={500}
-									height={500}
+								<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
+									<Image
+										src={`${user.avatarUrl}`}
+										alt="user avatar"
+										width={500}
+										height={500}
+									/>
+								</div>
+								<div
+									className="flex hover:cursor-pointer"
+									onClick={() => handleUserChange(user)}
+								>
+									{user.name}
+								</div>
+								<div>
+									<EllipsisPeopleMenu user={user} />
+								</div>
+							</div>
+						))}
+						renderCell={renderCell}
+					/> */}
+					<ScrollingCalendar>
+						{userList?.map((user: UserType, index: number) => {
+							return (
+								<AllUserRow
+									key={index}
+									user={user}
+									monthData={{ monthLabel: "", year: 0 }}
+									isFirstMonth={true}
+									isLastMonth={true}
 								/>
-							</div>
-							<div className="flex hover:cursor-pointer" onClick={() => handleUserChange(user)}>{user.name}</div>
-							<div>
-								<EllipsisPeopleMenu user={user} />
-							</div>
-						</div>
-					))}
-					renderCell={renderCell}
-				/>
+							);
+						})}
+					</ScrollingCalendar>
+				</>
 			) : (
 				<LoadingSpinner />
 			)}
