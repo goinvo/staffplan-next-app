@@ -49,3 +49,18 @@ export const getMonths = (startDate: any, endDate: any) => {
 		}
 	);
 };
+
+export const getAssignmentcWeeks = (startDate: any, endDate:any) => {
+    const start = DateTime.fromISO(startDate);
+    const end = DateTime.fromISO(endDate);
+
+    const cweeks = Array.from(
+        { length: end.diff(start, "days").days + 1 },
+        (_, dayIndex) => {
+            const day = start.plus({ days: dayIndex });
+            return day.weekday === 1 ? day.weekNumber : null;
+        }
+    ).filter((week) => week !== null);
+
+    return { cweeks,year: start.year};
+};

@@ -1,7 +1,10 @@
 import { UserType, WorkWeekType } from "@/app/typeInterfaces";
 import { useUserDataContext } from "@/app/userDataContext";
 import React from "react";
-import { getMondays } from "../weekDisplayPrototype/helpers";
+import {
+	getAssignmentcWeeks,
+	getMondays,
+} from "../weekDisplayPrototype/helpers";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
 import { AllUserLabel } from "./allUserLabel";
@@ -60,7 +63,13 @@ export const AllUserRow = ({
 			return acc;
 		}, {})
 	);
-	console.log(totalWorkWeekHours, "total actual hours");
+	const listOfCWeeks = user.assignments?.map((assignment) => {
+		return getAssignmentcWeeks(assignment.startsOn, assignment.endsOn);
+	});
+	console.log(mondays, 'mondays ')
+	console.log(user.assignments, 'user assignments')
+	// console.log(listOfCWeeks, "list of cweeks");
+	// console.log(totalWorkWeekHours, "total actual hours");
 	return (
 		<div className="flex">
 			{isFirstMonth && (

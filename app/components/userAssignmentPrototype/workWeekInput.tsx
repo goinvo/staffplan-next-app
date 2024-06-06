@@ -73,38 +73,40 @@ export const WorkWeekInput = ({
 								onSubmit={handleSubmit}
 								className="flex flex-col items-center"
 							>
-								<input
-									value={values.estimatedHours}
-									className="border border-gray-300 w-10 rounded p-2 mb-1"
-									name="estHours"
-									id="estimatedHours"
-									onClick={(e) => {
-										console.log(workWeek, cweek, year, "WORK WEEK CLICKED");
-									}}
-									onChange={handleChange}
-									onBlur={(e) => {
-										handleBlur("estHours");
-										if (values.estimatedHours && values.actualHours) {
-											upsertWorkWeekValues(values);
-										}
-									}}
-								/>
-								<input
-									value={values.actualHours}
-									name="actualHours"
-									id="actHours"
-									className="border border-gray-300 w-10 rounded p-2 mb-1"
-									onChange={handleChange}
-									onClick={(e) => {
-										console.log(workWeek, cweek, year, "WORK WEEK CLICKED");
-									}}
-									onBlur={(e) => {
-										handleBlur("actHours");
-										if (values.estimatedHours && values.actualHours) {
-											upsertWorkWeekValues(values);
-										}
-									}}
-								/>
+								<div className="flex flex-col pt-2 z-10">
+									<input
+										value={values.estimatedHours}
+										className="border border-gray-300 w-10 rounded p-2 mb-1"
+										name="estHours"
+										id="estimatedHours"
+										onClick={(e) => {
+											console.log(workWeek, cweek, year, "WORK WEEK CLICKED");
+										}}
+										onChange={handleChange}
+										onBlur={(e) => {
+											handleBlur("estHours");
+											if (values.estimatedHours && values.actualHours) {
+												upsertWorkWeekValues(values);
+											}
+										}}
+									/>
+									<input
+										value={values.actualHours}
+										name="actualHours"
+										id="actHours"
+										className="border border-gray-300 w-10 rounded p-2 mb-1"
+										onChange={handleChange}
+										onClick={(e) => {
+											console.log(workWeek, cweek, year, "WORK WEEK CLICKED");
+										}}
+										onBlur={(e) => {
+											handleBlur("actHours");
+											if (values.estimatedHours && values.actualHours) {
+												upsertWorkWeekValues(values);
+											}
+										}}
+									/>
+								</div>
 							</form>
 						)}
 					</Formik>
@@ -131,37 +133,41 @@ export const WorkWeekInput = ({
 								className="flex flex-col items-center"
 							>
 								<div className="flex flex-col pt-2 z-10">
-
-								<input
-									value={values.estimatedHours}
-									className="border border-gray-300 w-10 rounded p-2 mb-1"
-									name="estimatedHours"
-									id="estHours"
-									onChange={handleChange}
-									onClick={(e) => {
-										console.log(assignment, cweek, year, "ASSIGNMENT CLICKED");
-									}}
-									onBlur={(e) => {
-										handleBlur("estHours");
-										if (values.estimatedHours && values.actualHours) {
-											upsertWorkWeekValues(values);
-										}
-									}}
+									<input
+										value={values.estimatedHours}
+										className="border border-gray-300 w-10 rounded p-2 mb-1"
+										name="estimatedHours"
+										id="estHours"
+										onChange={handleChange}
+										onClick={(e) => {
+											console.log(
+												assignment,
+												cweek,
+												year,
+												"ASSIGNMENT CLICKED"
+											);
+										}}
+										onBlur={(e) => {
+											handleBlur("estHours");
+											if (values.estimatedHours && values.actualHours) {
+												upsertWorkWeekValues(values);
+											}
+										}}
 									/>
-								<input
-									value={values.actualHours}
-									name="actualHours"
-									id="actHours"
-									onChange={handleChange}
-									className="border border-gray-300 w-10 rounded p-2 mb-1"
-									onBlur={(e) => {
-										handleBlur("actHours");
-										if (values.estimatedHours && values.actualHours) {
-											upsertWorkWeekValues(values);
-										}
-									}}
+									<input
+										value={values.actualHours}
+										name="actualHours"
+										id="actHours"
+										onChange={handleChange}
+										className="border border-gray-300 w-10 rounded p-2 mb-1"
+										onBlur={(e) => {
+											handleBlur("actHours");
+											if (values.estimatedHours && values.actualHours) {
+												upsertWorkWeekValues(values);
+											}
+										}}
 									/>
-									</div>
+								</div>
 							</form>
 						)}
 					</Formik>

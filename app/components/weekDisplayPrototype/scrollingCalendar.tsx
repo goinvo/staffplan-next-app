@@ -68,7 +68,7 @@ export const ScrollingCalendar = ({ children }: any) => {
 									).toISO()
 								);
 								return mondays.map((day, dayIndex) => (
-									<div key={dayIndex} className="flex grow justify-center">
+									<div key={dayIndex} className="flex grow justify-center border-b border-gray-300">
 										{day}
 									</div>
 								));
