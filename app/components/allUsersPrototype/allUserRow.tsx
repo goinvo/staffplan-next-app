@@ -65,14 +65,7 @@ export const AllUserRow = ({
 			return acc;
 		}, {})
 	);
-	const listOfCWeeks = user.assignments?.map((assignment) => {
-		return getAssignmentcWeeks(assignment.startsOn, assignment.endsOn);
-	});
-	// console.log(mondays, 'mondays ')
-	// console.log(user.assignments, 'user assignments')
-	// console.log(listOfCWeeks, "list of cweeks");
-	// console.log(totalWorkWeekHours, "total actual hours");
-	console.log(user, "USER ASSIGNMENTS")
+
 	return (
 		<div className="flex">
 			{isFirstMonth && (
@@ -82,7 +75,9 @@ export const AllUserRow = ({
 				{mondays.cweeks.map((cweek, cweekIndex) => {
 					const totalEstimatedWeeklyHours = user.assignments?.reduce(
 						(acc, assignment) => {
-							if (assignmentContainsCWeek(assignment, cweek, mondays.year)) {
+							if (
+								assignmentContainsCWeek(assignment, cweek as any, mondays.year)
+							) {
 								return acc + assignment.estimatedWeeklyHours;
 							}
 							return acc;
@@ -99,7 +94,7 @@ export const AllUserRow = ({
 									return (
 										<div
 											key={`${cweek}has-actual-hours`}
-											className="bg-red-200 w-8 h-8 justify-center flex rounded-full"
+											className="bg-red-200 w-8 h-8 justify-center rounded-full items-center"
 										>
 											{(workWeek as any).actualHours}
 										</div>
@@ -109,7 +104,7 @@ export const AllUserRow = ({
 									return (
 										<div
 											key={`${cweek}${(workWeek as any).year}no-actual-hours`}
-											className="bg-blue-200 w-8 h-8 justify-center flex rounded-full"
+											className="bg-blue-200 w-8 h-8 justify-center rounded-full items-center"
 										>
 											{(workWeek as any).estimatedHours}
 										</div>
@@ -127,12 +122,17 @@ export const AllUserRow = ({
 					return (
 						<div
 							key={`cweek-${cweekIndex}`}
-							className="flex-1 flex flex-col items-center"
+							className="flex-1 flex flex-col justify-center items-center border-r border-gray-300"
 						>
 							{hasWorkWeek && (user.assignments ?? []).length > 0 ? (
 								workWeekElements
 							) : (
-								<div className="bg-green-200 w-8 h-8 justify-center flex rounded-full" key={`${cweek}HELLO`}>{totalEstimatedWeeklyHours}</div>
+								<div
+									className="bg-green-200 w-8 h-8 justify-center rounded-full items-center"
+									key={`${cweek}HELLO`}
+								>
+									{totalEstimatedWeeklyHours}
+								</div>
 							)}
 						</div>
 					);
