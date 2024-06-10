@@ -2,12 +2,14 @@ import { UserType, WorkWeekType } from "@/app/typeInterfaces";
 import { useUserDataContext } from "@/app/userDataContext";
 import React from "react";
 import {
+	assignmentContainsCWeek,
 	getAssignmentcWeeks,
 	getMondays,
 } from "../weekDisplayPrototype/helpers";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
 import { AllUserLabel } from "./allUserLabel";
+import { assign } from "lodash";
 
 interface AllUserRowProps {
 	user: UserType;
@@ -66,10 +68,11 @@ export const AllUserRow = ({
 	const listOfCWeeks = user.assignments?.map((assignment) => {
 		return getAssignmentcWeeks(assignment.startsOn, assignment.endsOn);
 	});
-	console.log(mondays, 'mondays ')
-	console.log(user.assignments, 'user assignments')
+	// console.log(mondays, 'mondays ')
+	// console.log(user.assignments, 'user assignments')
 	// console.log(listOfCWeeks, "list of cweeks");
 	// console.log(totalWorkWeekHours, "total actual hours");
+	console.log(user, "USER ASSIGNMENTS")
 	return (
 		<div className="flex">
 			{isFirstMonth && (
@@ -77,6 +80,15 @@ export const AllUserRow = ({
 			)}
 			<div className="flex border-b ml-1 border-gray-300 justify-between w-full h-28">
 				{mondays.cweeks.map((cweek, cweekIndex) => {
+					const totalEstimatedWeeklyHours = user.assignments?.reduce(
+						(acc, assignment) => {
+							if (assignmentContainsCWeek(assignment, cweek, mondays.year)) {
+								return acc + assignment.estimatedWeeklyHours;
+							}
+							return acc;
+						},
+						0
+					);
 					const workWeekElements = totalWorkWeekHours.map(
 						(workWeek, workWeekIndex) => {
 							if (
@@ -87,7 +99,7 @@ export const AllUserRow = ({
 									return (
 										<div
 											key={`${cweek}has-actual-hours`}
-											className="bg-red-200 w-4 h-4 rounded-full"
+											className="bg-red-200 w-8 h-8 justify-center flex rounded-full"
 										>
 											{(workWeek as any).actualHours}
 										</div>
@@ -97,7 +109,7 @@ export const AllUserRow = ({
 									return (
 										<div
 											key={`${cweek}${(workWeek as any).year}no-actual-hours`}
-											className="bg-green-200 w-4 h-4 rounded-full"
+											className="bg-blue-200 w-8 h-8 justify-center flex rounded-full"
 										>
 											{(workWeek as any).estimatedHours}
 										</div>
@@ -120,11 +132,8 @@ export const AllUserRow = ({
 							{hasWorkWeek && (user.assignments ?? []).length > 0 ? (
 								workWeekElements
 							) : (
-								<div key={`${cweek}HELLO`}>cweek{cweek}</div>
+								<div className="bg-green-200 w-8 h-8 justify-center flex rounded-full" key={`${cweek}HELLO`}>{totalEstimatedWeeklyHours}</div>
 							)}
-							{!hasWorkWeek && !user.assignments?.length ? (
-								<div key={`${cweek}NOASSIGNMENTS`}>0</div>
-							) : null}
 						</div>
 					);
 				})}
