@@ -14,8 +14,9 @@ import {
 import WeekDisplay from "../components/weekDisplay";
 import { LoadingSpinner } from "../components/loadingSpinner";
 import EllipsisProjectMenu from "../components/ellipsisProjectMenu";
-import Image from "next/image";
-import ProjectSummary from "../components/allProjectsSummary";
+import ProjectSummary from "../components/projectSummary";
+import { ScrollingCalendar } from "../components/weekDisplayPrototype/scrollingCalendar";
+import { AllProjectRow } from "../components/allProjectsPrototype/allProjectRow";
 
 const ProjectsView: React.FC = () => {
 	const [projectAssignmentDataMap, setProjectAssignmentDataMap] =
@@ -88,67 +89,19 @@ const ProjectsView: React.FC = () => {
 	return (
 		<>
 			{projectList ? (
-				<WeekDisplay
-					labelContentsLeft={projectList.map((project) => (
-						<div
-							className="flex gap-x-4 gap-y-4 items-center relative"
-							key={project.id}
-						>
-							<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
-								<Image
-									src={`${project.client.avatarUrl}`}
-									alt="client avatar"
-									width={500}
-									height={500}
-								/>
-							</div>
-							<div
-								className="flex hover:cursor-pointer"
-								onClick={() => handleProjectChange(project)}
-							>
-								{project.name}
-							</div>
-							<div>
-								<EllipsisProjectMenu project={project} />
-							</div>
-							{/* svg status tag */}
-							{project.status === "unconfirmed" && (
-								<svg
-									width="375"
-									height="50"
-									viewBox="-335 0 500 100"
-									xmlns="http://www.w3.org/2000/svg"
-									className="absolute -top-5"
-								>
-									<path
-										d="M10,10 L150,10 L150,50 L20,50 Q10,50 10,40 Z"
-										fill="gray"
-									/>
-									<line
-										x1="10"
-										y1="13"
-										x2="-500"
-										y2="13"
-										stroke="gray"
-										strokeWidth="5"
-									/>
-									<text x="15" y="40" fill="white" fontSize="20">
-										Unconfirmed
-									</text>
-								</svg>
-							)}
-						</div>
-					))}
-					labelContentsRight={projectList.map((project) => (
-						<div
-							className="flex gap-x-4 gap-y-4 items-center justify-center"
-							key={project.id}
-						>
-							<ProjectSummary project={project} />
-						</div>
-					))}
-					renderCell={renderCell}
-				/>
+				<ScrollingCalendar>
+					{projectList?.map((project: ProjectType, index: number) => {
+						return (
+							<AllProjectRow
+								key={index}
+								project={project}
+								monthData={{ monthLabel: "", year: 0 }}
+								isFirstMonth={true}
+								isLastMonth={true}
+							/>
+						);
+					})}
+				</ScrollingCalendar>
 			) : (
 				<LoadingSpinner />
 			)}

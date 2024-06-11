@@ -91,34 +91,6 @@ const PeopleView: React.FC = () => {
 	return (
 		<>
 			{userList ? (
-				<>
-					{/* <WeekDisplay
-						labelContentsLeft={userList?.map((user: UserType) => (
-							<div
-								className="flex gap-x-4 gap-y-4 items-center justify-center"
-								key={user.id}
-							>
-								<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
-									<Image
-										src={`${user.avatarUrl}`}
-										alt="user avatar"
-										width={500}
-										height={500}
-									/>
-								</div>
-								<div
-									className="flex hover:cursor-pointer"
-									onClick={() => handleUserChange(user)}
-								>
-									{user.name}
-								</div>
-								<div>
-									<EllipsisPeopleMenu user={user} />
-								</div>
-							</div>
-						))}
-						renderCell={renderCell}
-					/> */}
 					<ScrollingCalendar>
 						{userList?.map((user: UserType, index: number) => {
 							return (
@@ -132,7 +104,6 @@ const PeopleView: React.FC = () => {
 							);
 						})}
 					</ScrollingCalendar>
-				</>
 			) : (
 				<LoadingSpinner />
 			)}

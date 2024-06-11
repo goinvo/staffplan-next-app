@@ -1,10 +1,34 @@
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 
 export interface AllUserLabelProps {
 	user: UserType;
 	clickHandler: (user: UserType) => void;
-  
-  }
+}
+export interface AllUserRowProps {
+	user: UserType;
+	isFirstMonth: boolean;
+	isLastMonth: boolean;
+	monthData: { monthLabel: string; year: number };
+}
+export interface AllUserAccumulatorProps {
+	[cweek: number]: {
+		cweek: number;
+		actualHours: number;
+		estimatedHours: number;
+		year: number;
+	};
+}
+export interface AllProjectLabelProps {
+	project: ProjectType;
+	clickHandler: (project: ProjectType) => void;
+}
+
+export interface AllProjectRowProps {
+	project: ProjectType;
+	isFirstMonth: boolean;
+	isLastMonth: boolean;
+	monthData: { monthLabel: string; year: number };
+}
 export interface AssignmentType {
 	assignedUser: UserType;
 	endsOn: string | null;
@@ -30,7 +54,7 @@ export interface ClientType {
 }
 
 export interface EllipsisProjectMenuProps {
-	project:Partial<ProjectType>
+	project: Partial<ProjectType>;
 }
 export interface ProjectType {
 	endsOn: string | null;
@@ -42,10 +66,10 @@ export interface ProjectType {
 	status: string;
 	users: [];
 	assignments?: [AssignmentType];
-	__typename?:string;
+	__typename?: string;
 	workWeeks?: WorkWeekType[];
-	fte:number;
-	hours:number;
+	fte: number;
+	hours: number;
 }
 
 export interface ProjectSummaryProps {
@@ -71,19 +95,19 @@ export interface ProjectDataMapType {
 }
 
 export type selectedCell = {
-    week: number;
-    year: number;
-    rowId: number;
+	week: number;
+	year: number;
+	rowId: number;
 };
 
 export interface SideLabelComponentsType {
-    labelContents: React.ReactNode[];
+	labelContents: React.ReactNode[];
 	divHeights?: number[];
 	setDivHeights: (heights: number[]) => void;
-    offset: number;
+	offset: number;
 	drawerIndex: number;
 	drawerHeight: number;
-};
+}
 
 export interface SideListItemType {
 	labelIndex: number;
@@ -91,8 +115,7 @@ export interface SideListItemType {
 	divHeight: number | null;
 	divRefs: React.MutableRefObject<(HTMLDivElement | null)[]>;
 	setDivHeights: (heights: number[]) => void;
-  }
-  
+}
 
 export interface UpsertValues {
 	actualHours: number | string;
@@ -108,7 +131,7 @@ export interface UserType {
 	id?: number;
 	name: string;
 	assignments?: AssignmentType[];
-	avatarUrl:string;
+	avatarUrl: string;
 }
 
 export interface UserAssignmentDataMapType {
@@ -121,8 +144,7 @@ export interface UserAssignmentDataMapType {
 export interface UserLabelProps {
 	assignment: AssignmentType;
 	clickHandler: (assignment: AssignmentType) => void;
-  
-  }
+}
 export interface UserOptionType {
 	value: string;
 	label: string;
@@ -132,12 +154,12 @@ export interface UserOptionType {
 export interface UserSummaryProps {
 	assignment: AssignmentType;
 }
-export interface ViewerType { 
-	name:string;
-	id:string;
+export interface ViewerType {
+	name: string;
+	id: string;
 }
 
-export interface ViewsFiltersType { 
+export interface ViewsFiltersType {
 	selectedProjectSort: string;
 	selectedUserSort: string;
 	singleUserSort: string;
@@ -150,14 +172,21 @@ export interface ViewsFiltersType {
 }
 
 export type WeekDisplayProps = {
-    labelContentsLeft: React.ReactNode[];
+	labelContentsLeft: React.ReactNode[];
 	labelContentsRight?: React.ReactNode[];
-    onMouseOverWeek?: (week: number, year: number, cellId: number) => void;
-    onMouseClickWeek?: (week: number, year: number, cellId: number) => void;
-	onCellFocus? : (week: number, year: number, cellId: number) => void;
-	onCellBlur? : (week: number, year: number, cellId: number) => void;
-    renderCell?: (week: number, year: number, cellId: number, isSelected: boolean, width?: number, height?: number) => ReactNode;
-    selectedCell?: selectedCell;
+	onMouseOverWeek?: (week: number, year: number, cellId: number) => void;
+	onMouseClickWeek?: (week: number, year: number, cellId: number) => void;
+	onCellFocus?: (week: number, year: number, cellId: number) => void;
+	onCellBlur?: (week: number, year: number, cellId: number) => void;
+	renderCell?: (
+		week: number,
+		year: number,
+		cellId: number,
+		isSelected: boolean,
+		width?: number,
+		height?: number
+	) => ReactNode;
+	selectedCell?: selectedCell;
 	drawerContents?: React.ReactNode;
 	drawerIndex?: number;
 };
@@ -193,4 +222,3 @@ export interface WorkWeekBlockMemberType {
 	consecutivePrevWeeks: number;
 	isLastConsecutiveWeek: boolean;
 }
-

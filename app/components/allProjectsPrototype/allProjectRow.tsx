@@ -1,4 +1,8 @@
-import { UserType, WorkWeekType, AllUserRowProps, AllUserAccumulatorProps } from "@/app/typeInterfaces";
+import {
+	ProjectType,
+	AllProjectRowProps,
+	WorkWeekType,
+} from "@/app/typeInterfaces";
 import { useUserDataContext } from "@/app/userDataContext";
 import React from "react";
 import {
@@ -7,14 +11,23 @@ import {
 } from "../weekDisplayPrototype/helpers";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
-import { AllUserLabel } from "./allUserLabel";
+import { AllProjectLabel } from "./allProjectLabel";
+import ProjectSummary from "../projectSummary";
 
-export const AllUserRow = ({
-	user,
+interface Accumulator {
+	[cweek: number]: {
+		cweek: number;
+		actualHours: number;
+		estimatedHours: number;
+		year: number;
+	};
+}
+export const AllProjectRow = ({
+	project,
 	isFirstMonth,
 	isLastMonth,
 	monthData,
-}: AllUserRowProps) => {
+}: AllProjectRowProps) => {
 	const router = useRouter();
 	const { dateRange } = useUserDataContext();
 	const mondays = getMondays(
@@ -22,14 +35,14 @@ export const AllUserRow = ({
 			"day"
 		)
 	);
-	const handleUserChange = (user: UserType) => {
-		if (user.id) {
-			router.push("/people/" + encodeURIComponent(user.id));
+	const handleProjectChange = (project: ProjectType) => {
+		if (project.id) {
+			router.push("/projects/" + encodeURIComponent(project.id));
 		}
 	};
 
 	const totalWorkWeekHours = Object.values(
-		(user.assignments ?? []).reduce<AllUserAccumulatorProps>((acc, assignment) => {
+		(project.assignments ?? []).reduce<Accumulator>((acc, assignment) => {
 			assignment.workWeeks.forEach((workWeek) => {
 				const cweek = workWeek.cweek;
 				const actualHours = workWeek.actualHours ?? 0;
@@ -53,11 +66,11 @@ export const AllUserRow = ({
 	return (
 		<div className="flex">
 			{isFirstMonth && (
-				<AllUserLabel clickHandler={handleUserChange} user={user} />
+				<AllProjectLabel clickHandler={handleProjectChange} project={project} />
 			)}
 			<div className="flex border-b ml-1 border-gray-300 justify-between w-full h-28">
 				{mondays.cweeks.map((cweek, cweekIndex) => {
-					const totalEstimatedWeeklyHours = user.assignments?.reduce(
+					const totalEstimatedWeeklyHours = project.assignments?.reduce(
 						(acc, assignment) => {
 							if (
 								assignmentContainsCWeek(assignment, cweek as any, mondays.year)
@@ -108,12 +121,12 @@ export const AllUserRow = ({
 							key={`cweek-${cweekIndex}`}
 							className="flex-1 flex flex-col justify-center items-center border-r border-gray-300"
 						>
-							{hasWorkWeek && (user.assignments ?? []).length > 0 ? (
+							{hasWorkWeek && (project.assignments ?? []).length > 0 ? (
 								workWeekElements
 							) : (
 								<div
 									className="bg-green-200 w-8 h-8 justify-center rounded-full items-center"
-									key={`${cweek}HELLO`}
+									key={`${cweek}total-estimated-weekly-hours`}
 								>
 									{totalEstimatedWeeklyHours}
 								</div>
@@ -122,6 +135,11 @@ export const AllUserRow = ({
 					);
 				})}
 			</div>
+			{isLastMonth && (
+				<div>
+					<ProjectSummary project={project} />
+				</div>
+			)}
 		</div>
 	);
 };
