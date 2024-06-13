@@ -1,6 +1,6 @@
 'use client';
 import { SideLabelComponentsType, SideListItemType } from './../typeInterfaces';
-import React, { useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { sideListGutterHeight } from './sideListLeft';
 
 export const SideListItemRight: React.FC<SideListItemType> = ({ labelIndex, labelContent, divHeight, divRefs, setDivHeights }) => {

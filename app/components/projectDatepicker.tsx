@@ -1,6 +1,5 @@
 import React, { FocusEventHandler } from "react";
 import { FieldProps } from "formik";
-import { useSearchParams } from "next/navigation";
 import { AssignmentType, ProjectType } from "../typeInterfaces";
 
 interface DatePickerProps extends FieldProps {

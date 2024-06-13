@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo, ReactNode } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import useInfiniteScroll, {
 	InfiniteScrollRef,
 	ScrollDirection,
@@ -7,22 +7,17 @@ import useInfiniteScroll, {
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import SideListLeft, { sideListGutterHeight } from "./sideListLeft";
 import SideListRight from "./sideListRight";
-import ProjectSummary from "./projectSummary";
-import { render } from "@testing-library/react";
 import {
 	getWeek,
 	setWeek,
-	isAfter,
 	eachWeekOfInterval,
-	addDays,
 	addWeeks,
 	format,
 	differenceInWeeks,
 } from "date-fns";
 import { useUserDataContext } from "../userDataContext";
-import { WeekDisplayProps, selectedCell } from "../typeInterfaces";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { get } from "http";
+import { WeekDisplayProps } from "../typeInterfaces";
+import { useRouter } from "next/navigation";
 import { throttle } from "lodash";
 
 type WeekEntry = {

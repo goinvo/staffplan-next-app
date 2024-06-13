@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, ReactNode } from "react";
+import { useState, ReactNode } from "react";
 import ProjectDatepicker from "./projectDatepicker";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useMutation } from "@apollo/client";
@@ -16,7 +16,7 @@ const AddAssignment = () => {
 	);
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const { userList, setUserList, projectList,refetchUserList } = useUserDataContext();
+	const { userList, projectList,refetchUserList } = useUserDataContext();
 	const modalParam = searchParams.get("assignmentmodal");
 	const projectInParam = searchParams.get("project");
 	const userInParam = searchParams.get("user");

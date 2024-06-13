@@ -20,7 +20,7 @@ const AddAssignmentSingleProject = ({
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
 		{}
 	);
-	const { userList, setUserList, projectList,refetchUserList } = useUserDataContext();
+	const { userList, projectList,refetchUserList } = useUserDataContext();
 	const initialValues = {
 		dates: { endsOn: "", startsOn: "" },
 		hours: 0,

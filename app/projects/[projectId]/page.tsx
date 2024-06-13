@@ -2,7 +2,6 @@
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import withApollo from "@/lib/withApollo";
-import { useMutation } from "@apollo/client";
 import {
 	ProjectType,
 	UserType,
