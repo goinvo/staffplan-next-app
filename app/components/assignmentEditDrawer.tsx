@@ -53,7 +53,7 @@ export const AssignmentEditDrawer = ({
 		label: string;
 		avatarUrl: string;
 	}>({ value: "", label: "Assign To...", avatarUrl: "" });
-	const { userList, setUserList } = useUserDataContext();
+	const { userList, setUserList, refetchUserList } = useUserDataContext();
 	const numberOfWeeks = (assignment: AssignmentType) => {
 		if (assignment.endsOn && assignment.startsOn) {
 			const currEndsOn = DateTime.fromISO(assignment.endsOn);
@@ -141,20 +141,7 @@ export const AssignmentEditDrawer = ({
 			},
 		}).then((response) => {
 			if (response.data.upsertAssignment) {
-				// Print the values passed into the mutation
-				const newAssignment = response.data.upsertAssignment;
-				setUserList((prevUserData: any) => {
-					const updatedUsers = prevUserData.map((user: UserType) => {
-						if (user.id === newAssignment.assignedUser.id && user.assignments) {
-							return {
-								...user,
-								assignments: [...user.assignments, newAssignment],
-							};
-						}
-						return user;
-					});
-					return updatedUsers;
-				});
+				refetchUserList();
 			}
 		});
 	};

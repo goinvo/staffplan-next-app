@@ -41,6 +41,7 @@ export interface UserDataContextType {
 	setScrollToTodayFunction: React.Dispatch<React.SetStateAction<() => void>>;
 	refetchUserList: () => void;
 	refetchProjectList: () => void;
+	refetchClientList: () => void;
 }
 
 // Initialize the context
@@ -185,7 +186,21 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 			setViewer(viewerData.viewer);
 		}
 	}, [viewerData]);
-
+	const refetchClientList = () => {
+		client
+			.query({
+				query: GET_CLIENT_DATA,
+				context: {
+					headers: {
+						cookie: clientSide ? document.cookie : null,
+					},
+				},
+				errorPolicy: "all",
+			})
+			.then((result) => {
+				setClientList(result.data.clients);
+			});
+	}
 	const refetchUserList = () => {
 		client
 			.query({
@@ -253,6 +268,7 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 				setSingleUserPage,
 				singleProjectPage,
 				setSingleProjectPage,
+				refetchClientList,
 				refetchUserList,
 				refetchProjectList,
 			}}

@@ -16,7 +16,7 @@ const AddAssignment = () => {
 	);
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const { userList, setUserList, projectList } = useUserDataContext();
+	const { userList, setUserList, projectList,refetchUserList } = useUserDataContext();
 	const modalParam = searchParams.get("assignmentmodal");
 	const projectInParam = searchParams.get("project");
 	const userInParam = searchParams.get("user");
@@ -102,22 +102,7 @@ const AddAssignment = () => {
 			variables: nullableDates(),
 		}).then((response) => {
 			if (response.data.upsertAssignment) {
-				// Print the values passed into the mutation
-				const newAssignment = response.data.upsertAssignment;
-
-				// Update the user list with the new assignment
-				setUserList((prevUserData: any) => {
-					const updatedUsers = prevUserData.map((user: UserType) => {
-						if (user.id === newAssignment.assignedUser.id && user.assignments) {
-							return {
-								...user,
-								assignments: [...user.assignments, newAssignment],
-							};
-						}
-						return user;
-					});
-					return updatedUsers;
-				});
+				refetchUserList();
 			}
 			router.back();
 		});

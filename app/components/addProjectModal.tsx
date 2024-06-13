@@ -19,7 +19,7 @@ const AddProject = () => {
 	const searchParams = useSearchParams();
 	const modalParam = searchParams.get("projectmodal");
 	const projectInParam = searchParams.get("project");
-	const { projectList, setProjectList, clientList } = useUserDataContext();
+	const { projectList, setProjectList, clientList,refetchProjectList } = useUserDataContext();
 	const decodeQuery = projectInParam
 		? Buffer.from(projectInParam, "base64").toString()
 		: "";
@@ -58,18 +58,7 @@ const AddProject = () => {
 	const [upsertProject] = useMutation(UPSERT_PROJECT, {
 		errorPolicy: "all",
 		onCompleted({ upsertProject }) {
-			const projectToUpdate = projectList.find(
-				(project) => project.id === upsertProject.id
-			);
-			if (projectToUpdate) {
-				const updatedProjectList = projectList.map((project) => {
-					if (project.id === upsertProject.id) return upsertProject;
-					return project;
-				});
-				return setProjectList(updatedProjectList);
-			}
-
-			setProjectList([...projectList, upsertProject]);
+			refetchProjectList();
 		},
 	});
 

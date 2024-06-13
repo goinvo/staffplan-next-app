@@ -1,13 +1,11 @@
 "use client";
-import { useParams, useRouter, usePathname } from "next/navigation";
-import React, { useEffect, useState, useMemo } from "react";
+import { useParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import withApollo from "@/lib/withApollo";
 import { useMutation } from "@apollo/client";
 import {
 	ProjectType,
 	UserType,
-	WorkWeekRenderDataType,
-	WorkWeekType,
 	AssignmentType,
 } from "../../typeInterfaces";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
@@ -15,6 +13,9 @@ import { useUserDataContext } from "@/app/userDataContext";
 import { sortSingleProject } from "@/app/helperFunctions";
 import { ScrollingCalendar } from "@/app/components/weekDisplayPrototype/scrollingCalendar";
 import { ProjectAssignmentRow } from "@/app/components/projectAssignmentPrototype/projectAssignmentRow";
+import AddAssignmentSingleProject from "@/app/components/addAssignmentSIngleProject";
+import { PlusIcon } from "@heroicons/react/24/solid";
+import ProjectDetails from "@/app/components/projectDetails";
 
 const ProjectPage: React.FC = () => {
 	const params = useParams();
@@ -23,13 +24,17 @@ const ProjectPage: React.FC = () => {
 	const [selectedProject, setSelectedProject] = useState<ProjectType | null>(
 		null
 	);
-
 	const [usersWithProjectAssignment, setUsersWithProjectAssignment] = useState<
 		UserType[]
 	>([]);
 
-	const { userList, projectList, viewsFilter, setSingleProjectPage } =
-		useUserDataContext();
+	const {
+		userList,
+		projectList,
+		viewsFilter,
+		setSingleProjectPage,
+		refetchProjectList,
+	} = useUserDataContext();
 
 	useEffect(() => {
 		if (projectList) {
@@ -90,6 +95,32 @@ const ProjectPage: React.FC = () => {
 			) : (
 				<LoadingSpinner />
 			)}
+			<div>
+				{selectedProject ? (
+					<ProjectDetails
+						project={selectedProject}
+						projectList={projectList}
+						refetchProjectList={refetchProjectList}
+					/>
+				) : (
+					<></>
+				)}
+			</div>
+			<div>
+				<button
+					className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center"
+					onClick={() => setAddAssignmentVisible(true)}
+				>
+					<PlusIcon className="fill-accentgreen" />
+				</button>
+				{addAssignmentVisible && (
+					<AddAssignmentSingleProject
+						project={selectedProject}
+						onClose={onClose}
+						onComplete={onComplete}
+					/>
+				)}
+			</div>
 		</div>
 	);
 };

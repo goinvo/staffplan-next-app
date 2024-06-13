@@ -1,5 +1,5 @@
 "use client";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import withApollo from "@/lib/withApollo";
 import { UserType, AssignmentType } from "../../typeInterfaces";
@@ -8,14 +8,15 @@ import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import { sortSingleUser } from "@/app/helperFunctions";
 import { ScrollingCalendar } from "@/app/components/weekDisplayPrototype/scrollingCalendar";
 import { UserAssignmentRow } from "@/app/components/userAssignmentPrototype/userAssignmentRow";
+import AddAssignmentSingleUser from "@/app/components/addAssignmentSingleUser";
+import { PlusIcon } from "@heroicons/react/24/solid";
 const UserPage: React.FC = () => {
-	const router = useRouter();
 	const params = useParams();
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
 	const [addAssignmentVisible, setAddAssignmentVisible] = useState(false);
 
-	const { setSingleUserPage, userList, setUserList, viewsFilter } =
+	const { setSingleUserPage, userList, viewsFilter } =
 		useUserDataContext();
 
 	const setSelectedUserData = (newSelectedId: number) => {
@@ -82,6 +83,21 @@ const UserPage: React.FC = () => {
 			) : (
 				<LoadingSpinner />
 			)}
+			<div>
+				<button
+					className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center"
+					onClick={() => setAddAssignmentVisible(true)}
+				>
+					<PlusIcon className="fill-accentgreen" />
+				</button>
+				{addAssignmentVisible && (
+					<AddAssignmentSingleUser
+						user={selectedUser}
+						onClose={onClose}
+						onComplete={onComplete}
+					/>
+				)}
+			</div>
 		</>
 	);
 };

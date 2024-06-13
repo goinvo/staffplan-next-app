@@ -11,7 +11,7 @@ import { ReactNode } from "react";
 import { useUserDataContext } from "../userDataContext";
 import { LoadingSpinner } from "./loadingSpinner";
 
-const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
+const ProjectDetails = ({ project, projectList, refetchProjectList }: any) => {
 	const [selectedClient, setSelectedClient] = useState<number | string>("");
 	const { clientList } = useUserDataContext();
 	const editProjectInitialValues = {
@@ -32,11 +32,7 @@ const ProjectDetails = ({ project, projectList, setProjectList }: any) => {
 	const [upsertProject] = useMutation(UPSERT_PROJECT, {
 		errorPolicy: "all",
 		onCompleted({ upsertProject }) {
-			const updatedProjectList = projectList.map((project:ProjectType) => {
-				if (project.id === upsertProject.id) return upsertProject;
-				return project;
-			});
-			setProjectList(updatedProjectList);
+			refetchProjectList();
 		},
 	});
 
