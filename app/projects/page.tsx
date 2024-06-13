@@ -1,9 +1,7 @@
 "use client";
 import React from "react";
-import { useState } from "react";
 import { ProjectType } from "../typeInterfaces";
 import { useUserDataContext } from "../userDataContext";
-import { ProjectDataMapType } from "../typeInterfaces";
 import { LoadingSpinner } from "../components/loadingSpinner";
 import { ScrollingCalendar } from "../components/weekDisplayPrototype/scrollingCalendar";
 import { AllProjectRow } from "../components/allProjectsPrototype/allProjectRow";
