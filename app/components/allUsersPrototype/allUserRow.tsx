@@ -55,7 +55,7 @@ export const AllUserRow = ({
 			{isFirstMonth && (
 				<AllUserLabel clickHandler={handleUserChange} user={user} />
 			)}
-			<div className="flex border-b ml-1 border-gray-300 justify-between w-full h-28">
+			<div className="flex border-b ml-1 border-gray-300 justify-between w-full h-32">
 				{mondays.cweeks.map((cweek, cweekIndex) => {
 					const totalEstimatedWeeklyHours = user.assignments?.reduce(
 						(acc, assignment) => {

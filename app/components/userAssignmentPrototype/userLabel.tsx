@@ -5,10 +5,10 @@ import { UserLabelProps } from "../../typeInterfaces";
 export const UserLabel = ({ assignment, clickHandler }: UserLabelProps) => {
 	return (
 		<div
-			className="hover:cursor-pointer w-64 absolute left-0  overflow-hidden"
+			className="hover:cursor-pointer w-64 absolute left-0 mt-5 overflow-hidden"
 			onClick={() => clickHandler(assignment)}
 		>
-			<div className=" flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
+			<div className=" flex w-12 h-12 timeline-grid-bg rounded-full overflow-hidden">
 				<Image
 					src={`${assignment.project.client.avatarUrl}`}
 					alt="client avatar"
@@ -24,7 +24,7 @@ export const UserLabel = ({ assignment, clickHandler }: UserLabelProps) => {
 				{assignment.project.name}
 			</div>
 			{assignment.status === "active" ? null : (
-				<div className="text-red-500"> Unconfirmed Assignment</div>
+				<div className="text-red-500 text-sm"> Unconfirmed<br/> Assignment</div>
 			)}
 		</div>
 	);

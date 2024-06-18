@@ -21,8 +21,10 @@ export const AllProjectLabel = ({
 						height={500}
 					/>
 				</div>
-				<div>{project.name}</div>
+				<div>{project.name}
+					
 				<EllipsisProjectMenu project={project} />
+				</div>
 				<div
 					className="hover:cursor-pointer"
 					onClick={() => clickHandler(project)}

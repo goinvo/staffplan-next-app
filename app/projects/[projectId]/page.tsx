@@ -13,7 +13,7 @@ import { sortSingleProject } from "@/app/helperFunctions";
 import { ScrollingCalendar } from "@/app/components/weekDisplayPrototype/scrollingCalendar";
 import { ProjectAssignmentRow } from "@/app/components/projectAssignmentPrototype/projectAssignmentRow";
 import AddAssignmentSingleProject from "@/app/components/addAssignmentSIngleProject";
-import { PlusIcon } from "@heroicons/react/24/solid";
+import { MinusIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import ProjectDetails from "@/app/components/projectDetails";
 
 const ProjectPage: React.FC = () => {
@@ -108,9 +108,9 @@ const ProjectPage: React.FC = () => {
 			<div>
 				<button
 					className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center"
-					onClick={() => setAddAssignmentVisible(true)}
+					onClick={() => setAddAssignmentVisible(!addAssignmentVisible)}
 				>
-					<PlusIcon className="fill-accentgreen" />
+					{addAssignmentVisible ? (<XMarkIcon className="fill-accentgreen" />) : (<PlusIcon className="fill-accentgreen" />)}
 				</button>
 				{addAssignmentVisible && (
 					<AddAssignmentSingleProject

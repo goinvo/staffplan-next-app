@@ -35,7 +35,7 @@ export const UserAssignmentRow = ({
 			{isFirstMonth && (
 				<UserLabel assignment={assignment} clickHandler={handleProjectChange} />
 			)}
-			<div className="flex border-b ml-1 border-gray-300 justify-center w-full h-32">
+			<div className="flex border-b ml-1 border-gray-300 justify-center items-center w-full h-40">
 				{mondays.cweeks.map((cweek, cweekIndex) => {
 					const workWeekElements = assignment.workWeeks.map(
 						(workWeek, workWeekIndex) => {

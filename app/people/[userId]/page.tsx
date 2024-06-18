@@ -9,15 +9,14 @@ import { sortSingleUser } from "@/app/helperFunctions";
 import { ScrollingCalendar } from "@/app/components/weekDisplayPrototype/scrollingCalendar";
 import { UserAssignmentRow } from "@/app/components/userAssignmentPrototype/userAssignmentRow";
 import AddAssignmentSingleUser from "@/app/components/addAssignmentSingleUser";
-import { PlusIcon } from "@heroicons/react/24/solid";
+import { MinusIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
 const UserPage: React.FC = () => {
 	const params = useParams();
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
 	const [addAssignmentVisible, setAddAssignmentVisible] = useState(false);
 
-	const { setSingleUserPage, userList, viewsFilter } =
-		useUserDataContext();
+	const { setSingleUserPage, userList, viewsFilter } = useUserDataContext();
 
 	const setSelectedUserData = (newSelectedId: number) => {
 		if (!userList) return;
@@ -64,39 +63,45 @@ const UserPage: React.FC = () => {
 	};
 	return (
 		<>
-			{selectedUser && userList ? (
-				<ScrollingCalendar>
-					{selectedUser?.assignments?.map(
-						(assignment: AssignmentType, index) => {
-							return (
-								<UserAssignmentRow
-									key={index}
-									assignment={assignment}
-									monthData={{ monthLabel: "", year: 0 }}
-									isFirstMonth={true}
-									isLastMonth={true}
-								/>
-							);
-						}
-					)}
-				</ScrollingCalendar>
-			) : (
-				<LoadingSpinner />
-			)}
 			<div>
-				<button
-					className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center"
-					onClick={() => setAddAssignmentVisible(true)}
-				>
-					<PlusIcon className="fill-accentgreen" />
-				</button>
-				{addAssignmentVisible && (
-					<AddAssignmentSingleUser
-						user={selectedUser}
-						onClose={onClose}
-						onComplete={onComplete}
-					/>
+				{selectedUser && userList ? (
+					<ScrollingCalendar>
+						{selectedUser?.assignments?.map(
+							(assignment: AssignmentType, index) => {
+								return (
+									<UserAssignmentRow
+										key={index}
+										assignment={assignment}
+										monthData={{ monthLabel: "", year: 0 }}
+										isFirstMonth={true}
+										isLastMonth={true}
+									/>
+								);
+							}
+						)}
+					</ScrollingCalendar>
+				) : (
+					<LoadingSpinner />
 				)}
+				<div className="mt-5">
+					<button
+						className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center"
+						onClick={() => setAddAssignmentVisible(!addAssignmentVisible)}
+					>
+						{addAssignmentVisible ? (
+							<XMarkIcon className="fill-accentgreen" />
+						) : (
+							<PlusIcon className="fill-accentgreen" />
+						)}
+					</button>
+					{addAssignmentVisible && (
+						<AddAssignmentSingleUser
+							user={selectedUser}
+							onClose={onClose}
+							onComplete={onComplete}
+						/>
+					)}
+				</div>
 			</div>
 		</>
 	);

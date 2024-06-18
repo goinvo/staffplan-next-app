@@ -7,7 +7,7 @@ export const AllUserLabel = ({ user, clickHandler }: AllUserLabelProps) => {
 	return (
 		<div className="hover:cursor-pointer z-1 w-64 absolute left-0">
 			<div
-				className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden"
+				className="flex w-12 h-12 timeline-grid-bg rounded-full overflow-hidden"
 				onClick={() => clickHandler(user)}
 			>
 				<Image
@@ -17,7 +17,7 @@ export const AllUserLabel = ({ user, clickHandler }: AllUserLabelProps) => {
 					height={500}
 				/>
 			</div>
-			<div>{user.name}</div>
+			<div className="text-sm">{user.name}</div>
 			<div
 				className="hover:cursor-pointer"
 				onClick={() => clickHandler(user)}
