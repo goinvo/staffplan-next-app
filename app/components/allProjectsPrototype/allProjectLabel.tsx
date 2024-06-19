@@ -9,7 +9,7 @@ export const AllProjectLabel = ({
 }: AllProjectLabelProps) => {
 	return (
 		<div>
-			<div className="hover:cursor-pointer z-60 w-48 rounded-r absolute left-0">
+			<div className="hover:cursor-pointer z-60 w-40 rounded-r absolute left-0">
 				<div
 					className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden"
 					onClick={() => clickHandler(project)}

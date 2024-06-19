@@ -5,7 +5,7 @@ import EllipsisPeopleMenu from "../ellipsisPeopleMenu";
 
 export const AllUserLabel = ({ user, clickHandler }: AllUserLabelProps) => {
 	return (
-		<div className="hover:cursor-pointer z-1 w-64 absolute left-0">
+		<div className="hover:cursor-pointer z-1 w-40 absolute left-0">
 			<div
 				className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden"
 				onClick={() => clickHandler(user)}
