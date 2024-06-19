@@ -68,7 +68,7 @@ export const AllProjectRow = ({
 			{isFirstMonth && (
 				<AllProjectLabel clickHandler={handleProjectChange} project={project} />
 			)}
-			<div className="flex border-b ml-1 border-gray-300 justify-between w-full h-28">
+			<div className="flex border-b ml-1 border-gray-300 bg-gray-100 justify-between w-full h-32">
 				{mondays.cweeks.map((cweek, cweekIndex) => {
 					const totalEstimatedWeeklyHours = project.assignments?.reduce(
 						(acc, assignment) => {
@@ -136,7 +136,7 @@ export const AllProjectRow = ({
 				})}
 			</div>
 			{isLastMonth && (
-				<div>
+				<div className="absolute right-0">
 					<ProjectSummary project={project} />
 				</div>
 			)}

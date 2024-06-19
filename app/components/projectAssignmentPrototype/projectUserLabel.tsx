@@ -24,7 +24,7 @@ export const ProjectUserLabel = ({ assignment, clickHandler }: UserLabelProps) =
 				{assignment.assignedUser.name}
 			</div>
 			{assignment.status === "active" ? null : (
-				<div className="text-red-500"> Unconfirmed Assignment</div>
+				<div className="text-red-500"> Unconfirmed</div>
 			)}
 		</div>
 	);

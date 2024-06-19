@@ -86,7 +86,7 @@ export default function EllipsisProjectMenu({ project }: any) {
 	return (
 		<Menu
 			as="div"
-			className="relative inline-block text-left z-100"
+			className="relative inline-block text-left z-40"
 			id="add-dropdown"
 			data-testid="add-dropdown"
 		>

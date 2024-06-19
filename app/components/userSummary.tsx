@@ -31,7 +31,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 					{futurePlan() ? (
 						<div className="flex justify-between items-end border-b-2 border-accentgreen bg-green-50 mb-1">
 							<label className="text-sm">future plan</label>
-							<span className="font-bold text-lg">
+							<span className="font-bold text-sm">
 								{futurePlan()}
 								<span className="text-sm font-normal">hrs</span>
 							</span>
@@ -39,7 +39,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 					) : null}
 					<div className="flex justify-between items-end  border-b-2 border-gray-500 bg-gray-100 mb-1">
 						<label className="text-sm">burned</label>
-						<span className="font-bold text-lg">
+						<span className="font-bold text-sm">
 							{burnedHours}
 							<span className="text-sm font-normal">hrs</span>
 						</span>
@@ -47,7 +47,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 					{pastPlan() ? (
 						<div className="flex justify-between items-end  border-b-2 border-gray-500 bg-gray-100 mb-1">
 							<label className="text-sm">past plan</label>
-							<span className="font-bold text-lg">
+							<span className="font-bold text-sm">
 								{pastPlan()}
 								<span className="text-sm font-normal">hrs</span>
 							</span>

@@ -9,7 +9,7 @@ export const AllProjectLabel = ({
 }: AllProjectLabelProps) => {
 	return (
 		<div>
-			<div className="hover:cursor-pointer z-1 w-64 absolute left-0">
+			<div className="hover:cursor-pointer z-60 w-48 rounded-r absolute left-0">
 				<div
 					className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden"
 					onClick={() => clickHandler(project)}
@@ -21,14 +21,15 @@ export const AllProjectLabel = ({
 						height={500}
 					/>
 				</div>
-				<div>{project.name}
-					
-				<EllipsisProjectMenu project={project} />
+				<div>
+					<span
+						className="hover:cursor-pointer"
+						onClick={() => clickHandler(project)}
+					>
+						{project.name}
+					</span>
+					<EllipsisProjectMenu project={project} />
 				</div>
-				<div
-					className="hover:cursor-pointer"
-					onClick={() => clickHandler(project)}
-				></div>
 			</div>
 		</div>
 	);
