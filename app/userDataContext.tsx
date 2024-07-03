@@ -83,7 +83,7 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 		singleProjectSort: "abcUserName",
 		assignmentSort: "slim",
 		rollupSort: "none",
-		showSummaries: false,
+		showSummaries: true,
 		showArchivedProjects: false,
 		showInactiveUsers: false,
 	});
