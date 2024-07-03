@@ -1,7 +1,13 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useQuery } from "@apollo/client";
-import { ProjectType, ClientType,UserType, ViewerType, ViewsFiltersType } from "./typeInterfaces";
+import { useApolloClient, useQuery } from "@apollo/client";
+import {
+	ProjectType,
+	ClientType,
+	UserType,
+	ViewerType,
+	ViewsFiltersType,
+} from "./typeInterfaces";
 import {
 	GET_USER_LIST,
 	GET_ALL_PROJECTS_DATA,
@@ -9,10 +15,16 @@ import {
 	GET_VIEWER,
 } from "./gqlQueries";
 import { sortProjectList, sortUserList } from "./helperFunctions";
+import {
+	currentQuarter,
+	currentYear,
+} from "./components/weekDisplayPrototype/scrollingCalendar";
 
 export interface UserDataContextType {
 	userList: any;
 	setUserList: React.Dispatch<React.SetStateAction<any>>;
+	dateRange: any;
+	setDateRange: React.Dispatch<React.SetStateAction<any>>;
 	projectList: ProjectType[];
 	setProjectList: React.Dispatch<React.SetStateAction<ProjectType[]>>;
 	clientList: ClientType[];
@@ -27,6 +39,9 @@ export interface UserDataContextType {
 	setSingleProjectPage: React.Dispatch<React.SetStateAction<ProjectType>>;
 	scrollToTodayFunction: () => void;
 	setScrollToTodayFunction: React.Dispatch<React.SetStateAction<() => void>>;
+	refetchUserList: () => void;
+	refetchProjectList: () => void;
+	refetchClientList: () => void;
 }
 
 // Initialize the context
@@ -49,7 +64,12 @@ export const useUserDataContext = () => {
 export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 	children,
 }) => {
+	const client = useApolloClient();
 	const [clientSide, setClientSide] = useState(false);
+	const [dateRange, setDateRange] = useState({
+		quarter: currentQuarter,
+		year: currentYear,
+	});
 	const [userList, setUserList] = useState<any>(null);
 	const [projectList, setProjectList] = useState<any>(null);
 	const [clientList, setClientList] = useState<any>(null);
@@ -59,15 +79,17 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 	const [viewsFilter, setViewsFilter] = useState<ViewsFiltersType>({
 		selectedProjectSort: "abcProjectName",
 		selectedUserSort: "abcUserName",
-		singleUserSort:"abcProjectName",
-		singleProjectSort:"abcUserName",
+		singleUserSort: "abcProjectName",
+		singleProjectSort: "abcUserName",
 		assignmentSort: "slim",
 		rollupSort: "none",
 		showSummaries: true,
 		showArchivedProjects: false,
 		showInactiveUsers: false,
 	});
-	const [scrollToTodayFunction, setScrollToTodayFunction] = useState<any>(() => { });
+	const [scrollToTodayFunction, setScrollToTodayFunction] = useState<any>(
+		() => {}
+	);
 	const {
 		loading: userListLoading,
 		error: userListError,
@@ -128,18 +150,28 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 
 	useEffect(() => {
 		if (userListData) {
-			const sortedUserList = sortUserList(viewsFilter.selectedUserSort, userListData.currentCompany.users);;
+			const sortedUserList = sortUserList(
+				viewsFilter.selectedUserSort,
+				userListData.currentCompany.users
+			);
 			setUserList(sortedUserList);
 		}
 	}, [userListData, viewsFilter]);
 
 	useEffect(() => {
 		if (projectData && projectData.currentCompany?.projects) {
-			const sortedProjectList = sortProjectList(viewsFilter.selectedProjectSort, projectData.currentCompany?.projects);
+			const sortedProjectList = sortProjectList(
+				viewsFilter.selectedProjectSort,
+				projectData.currentCompany?.projects
+			);
 			if (viewsFilter.showArchivedProjects) {
 				return setProjectList(sortedProjectList);
 			}
-			setProjectList(sortedProjectList?.filter((project: ProjectType) => project.status !== "archived"))
+			setProjectList(
+				sortedProjectList?.filter(
+					(project: ProjectType) => project.status !== "archived"
+				)
+			);
 		}
 	}, [projectData, viewsFilter]);
 
@@ -154,7 +186,67 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 			setViewer(viewerData.viewer);
 		}
 	}, [viewerData]);
+	const refetchClientList = () => {
+		client
+			.query({
+				query: GET_CLIENT_DATA,
+				context: {
+					headers: {
+						cookie: clientSide ? document.cookie : null,
+					},
+				},
+				errorPolicy: "all",
+			})
+			.then((result) => {
+				setClientList(result.data.clients);
+			});
+	}
+	const refetchUserList = () => {
+		client
+			.query({
+				query: GET_USER_LIST,
+				context: {
+					headers: {
+						cookie: clientSide ? document.cookie : null,
+					},
+				},
+				errorPolicy: "all",
+			})
+			.then((result) => {
+				const sortedUserList = sortUserList(
+					viewsFilter.selectedUserSort,
+					result.data.currentCompany.users
+				);
+				setUserList(sortedUserList);
+			});
+	};
 
+	const refetchProjectList = () => {
+		client
+			.query({
+				query: GET_ALL_PROJECTS_DATA,
+				context: {
+					headers: {
+						cookie: clientSide ? document.cookie : null,
+					},
+				},
+				errorPolicy: "all",
+			})
+			.then((result) => {
+				const sortedProjectList = sortProjectList(
+					viewsFilter.selectedProjectSort,
+					result.data.currentCompany.projects
+				);
+				if (viewsFilter.showArchivedProjects) {
+					return setProjectList(sortedProjectList);
+				}
+				setProjectList(
+					sortedProjectList?.filter(
+						(project: ProjectType) => project.status !== "archived"
+					)
+				);
+			});
+	};
 	return (
 		<UserDataContext.Provider
 			value={{
@@ -164,6 +256,8 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 				setProjectList,
 				clientList,
 				setClientList,
+				dateRange,
+				setDateRange,
 				viewer,
 				setViewer,
 				viewsFilter,
@@ -174,6 +268,9 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 				setSingleUserPage,
 				singleProjectPage,
 				setSingleProjectPage,
+				refetchClientList,
+				refetchUserList,
+				refetchProjectList,
 			}}
 		>
 			{children}

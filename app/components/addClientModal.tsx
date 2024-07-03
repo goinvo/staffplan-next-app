@@ -26,7 +26,7 @@ const AddClient = () => {
 		clientId: "",
 	};
 
-	const { clientList, setClientList } = useUserDataContext();
+	const { clientList, setClientList,refetchClientList } = useUserDataContext();
 
 	const [
 		upsertClient,
@@ -51,6 +51,7 @@ const AddClient = () => {
 				clientId: clientId ? clientId : "",
 			},
 		}).then((res) => {
+			refetchClientList();
 			router.back();
 		});
 	};

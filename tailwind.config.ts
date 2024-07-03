@@ -12,6 +12,7 @@ const config: Config = {
 			colors: {
 				accentlightgreen: "#72DDC3",
 				accentgreen: "#02AAA4",
+				accentgrey: "#7084A3",
 			},
 		},
 	},

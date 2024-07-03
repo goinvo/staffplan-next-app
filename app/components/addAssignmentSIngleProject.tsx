@@ -20,7 +20,7 @@ const AddAssignmentSingleProject = ({
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
 		{}
 	);
-	const { userList, setUserList, projectList } = useUserDataContext();
+	const { userList, projectList,refetchUserList, refetchProjectList } = useUserDataContext();
 	const initialValues = {
 		dates: { endsOn: "", startsOn: "" },
 		hours: 0,
@@ -66,22 +66,8 @@ const AddAssignmentSingleProject = ({
 			variables: nullableDates(),
 		}).then((response) => {
 			if (response.data.upsertAssignment) {
-				// Print the values passed into the mutation
-				const newAssignment = response.data.upsertAssignment;
-
-				// Update the user list with the new assignment
-				setUserList((prevUserData: any) => {
-					const updatedUsers = prevUserData.map((user: UserType) => {
-						if (user.id === newAssignment.assignedUser.id && user.assignments) {
-							return {
-								...user,
-								assignments: [...user.assignments, newAssignment],
-							};
-						}
-						return user;
-					});
-					return updatedUsers;
-				});
+				refetchUserList();
+				refetchProjectList();
 			}
 			onClose();
 		});
