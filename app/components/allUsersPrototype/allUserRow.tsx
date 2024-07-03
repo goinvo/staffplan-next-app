@@ -78,7 +78,7 @@ export const AllUserRow = ({
 									return (
 										<div
 											key={`${cweek}has-actual-hours`}
-											className="bg-red-200 w-8 h-8 justify-center rounded-full items-center"
+											className="bg-accentgrey w-8 h-8 justify-center rounded-full items-center"
 										>
 											{(workWeek as any).actualHours}
 										</div>
