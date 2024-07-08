@@ -3,7 +3,6 @@ import React from "react";
 import { UserLabelProps } from "@/app/typeInterfaces";
 
 export const ProjectUserLabel = ({ assignment, clickHandler }: UserLabelProps) => {
-	console.log(assignment, " ASSIGNMENT IN USER LABEL");
 	return (
 		<div
 			className="hover:cursor-pointer z-10 w-40 absolute left-0"

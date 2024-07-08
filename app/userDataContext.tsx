@@ -38,7 +38,6 @@ export interface UserDataContextType {
 	singleProjectPage: ProjectType;
 	setSingleProjectPage: React.Dispatch<React.SetStateAction<ProjectType>>;
 	scrollToTodayFunction: () => void;
-	setScrollToTodayFunction: React.Dispatch<React.SetStateAction<() => void>>;
 	refetchUserList: () => void;
 	refetchProjectList: () => void;
 	refetchClientList: () => void;
@@ -87,9 +86,12 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 		showArchivedProjects: false,
 		showInactiveUsers: false,
 	});
-	const [scrollToTodayFunction, setScrollToTodayFunction] = useState<any>(
-		() => {}
-	);
+	const scrollToTodayFunction = () => {
+		setDateRange({
+			quarter: currentQuarter,
+			year: currentYear
+		})
+	}
 	const {
 		loading: userListLoading,
 		error: userListError,
@@ -263,7 +265,6 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 				viewsFilter,
 				setViewsFilter,
 				scrollToTodayFunction,
-				setScrollToTodayFunction,
 				singleUserPage,
 				setSingleUserPage,
 				singleProjectPage,

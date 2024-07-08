@@ -122,6 +122,8 @@ export const GET_USER_LIST = gql`
 					project {
 						id
 						name
+						startsOn
+						endsOn
 						client {
 							id
 							name
