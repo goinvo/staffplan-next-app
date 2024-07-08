@@ -22,7 +22,6 @@ export default function ProjectDatepicker(props: DatePickerProps) {
 	} = props;
 
 	const handleCoverDurationClick = () => {
-		
 		if (selectedProject && selectedProject.startsOn && selectedProject.endsOn) {
 			setFieldValue(name, {
 				startsOn: selectedProject.startsOn,

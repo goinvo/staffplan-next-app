@@ -17,9 +17,6 @@ const AddAssignmentSingleProject = ({
 	onClose,
 	onComplete,
 }: AddAssignmentSingleProjectProps) => {
-	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
-		{}
-	);
 	const { userList, projectList,refetchUserList, refetchProjectList } = useUserDataContext();
 	const initialValues = {
 		dates: { endsOn: "", startsOn: "" },
@@ -107,14 +104,6 @@ const AddAssignmentSingleProject = ({
 		return errors;
 	};
 
-	const handleProjectSelection = (
-		projectId: React.ChangeEvent<HTMLInputElement>
-	) => {
-		const existingProject = projectList?.find(
-			(project: ProjectType) => project.id.toString() === projectId.target.value
-		);
-		if (existingProject) setSelectedProject(existingProject);
-	};
 	const filteredUsers = () => {
 		if (project && project.assignments) {
 			return userList?.filter((user: UserType) => {
@@ -197,7 +186,7 @@ const AddAssignmentSingleProject = ({
 								</div>
 								<div className="w-2/5">
 									<Field
-										selectedProject={selectedProject}
+										selectedProject={project}
 										handleBlur={handleBlur}
 										name="dates"
 										component={ProjectDatepicker}

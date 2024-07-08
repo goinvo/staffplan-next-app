@@ -138,7 +138,7 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 	const [sideLabelDivHeightsRight, setSideLabelDivHeightsRight] = useState<
 		number[]
 	>([]);
-	const { setScrollToTodayFunction } = useUserDataContext();
+	// const { setScrollToTodayFunction } = useUserDataContext();
 	const drawerRef = React.useRef<HTMLDivElement>(null);
 	const [drawerHeight, setDrawerHeight] = useState(0);
 	const router = useRouter();
@@ -374,9 +374,9 @@ const WeekDisplay: React.FC<WeekDisplayProps> = ({
 	}, [isDragging, onDragMove]);
 
 	// This function is called when the component is first mounted to link the scrollToToday function to the UserDataContext
-	useEffect(() => {
-		setScrollToTodayFunction(() => scrollToToday);
-	}, []);
+	// useEffect(() => {
+	// 	setScrollToTodayFunction(() => scrollToToday);
+	// }, []);
 
 	useEffect(() => {
 		// Set drawer height according to the height of the drawer contents

@@ -7,6 +7,7 @@ import { UPSERT_WORKWEEK } from "@/app/gqlQueries";
 import { useUserDataContext } from "@/app/userDataContext";
 
 interface WorkWeekInputProps {
+	withinProjectDates?: boolean;
 	workWeek?: WorkWeekType;
 	assignment?: AssignmentType;
 	cweek: number | null;
@@ -20,6 +21,7 @@ export interface WorkWeekValues {
 	assignmentId?: number;
 }
 export const WorkWeekInput = ({
+	withinProjectDates,
 	workWeek,
 	assignment,
 	cweek,
@@ -50,7 +52,7 @@ export const WorkWeekInput = ({
 			refetchUserList();
 		});
 	};
-
+	console.log(withinProjectDates, "WITHIN PROJECT DATES in input");
 	return (
 		<>
 			{workWeek ? (
@@ -79,9 +81,6 @@ export const WorkWeekInput = ({
 										className="border border-gray-300 w-10 rounded p-2 mb-1"
 										name="estHours"
 										id="estimatedHours"
-										onClick={(e) => {
-											console.log(workWeek, cweek, year, "WORK WEEK CLICKED");
-										}}
 										onChange={handleChange}
 										onBlur={(e) => {
 											handleBlur("estHours");
@@ -96,9 +95,6 @@ export const WorkWeekInput = ({
 										id="actHours"
 										className="border border-gray-300 w-10 rounded p-2 mb-1"
 										onChange={handleChange}
-										onClick={(e) => {
-											console.log(workWeek, cweek, year, "WORK WEEK CLICKED");
-										}}
 										onBlur={(e) => {
 											handleBlur("actHours");
 											if (values.estimatedHours && values.actualHours) {
@@ -134,38 +130,36 @@ export const WorkWeekInput = ({
 							>
 								<div className="flex flex-col pt-2 z-10">
 									<input
-										value={values.estimatedHours}
-										className="border border-gray-300 w-10 rounded p-2 mb-1"
+										value={withinProjectDates ? values.estimatedHours : ""}
+										className={`border border-gray-300 w-10 rounded p-2 mb-1 ${
+											!withinProjectDates ? "bg-accentgrey" : ""
+										}`}
 										name="estimatedHours"
 										id="estHours"
 										onChange={handleChange}
-										onClick={(e) => {
-											console.log(
-												assignment,
-												cweek,
-												year,
-												"ASSIGNMENT CLICKED"
-											);
-										}}
 										onBlur={(e) => {
 											handleBlur("estHours");
 											if (values.estimatedHours && values.actualHours) {
 												upsertWorkWeekValues(values);
 											}
 										}}
+										disabled={!withinProjectDates}
 									/>
 									<input
-										value={values.actualHours}
+										value={withinProjectDates ? values.actualHours : ""}
 										name="actualHours"
 										id="actHours"
 										onChange={handleChange}
-										className="border border-gray-300 w-10 rounded p-2 mb-1"
+										className={`border border-gray-300 w-10 rounded p-2 mb-1 ${
+											!withinProjectDates ? "bg-accentgrey" : ""
+										}`}
 										onBlur={(e) => {
 											handleBlur("actHours");
 											if (values.estimatedHours && values.actualHours) {
 												upsertWorkWeekValues(values);
 											}
 										}}
+										disabled={!withinProjectDates}
 									/>
 								</div>
 							</form>

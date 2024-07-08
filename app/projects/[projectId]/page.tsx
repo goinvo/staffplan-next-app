@@ -36,7 +36,7 @@ const ProjectPage: React.FC = () => {
 	} = useUserDataContext();
 
 	useEffect(() => {
-		if (projectList) {
+		if (projectList && projectList.length > 0) {
 			const foundProject = projectList.find(
 				(project: ProjectType) => project.id.toString() === selectedProjectId
 			);
@@ -45,7 +45,7 @@ const ProjectPage: React.FC = () => {
 				setSelectedProject(foundProject);
 			}
 
-			if (!userList) return;
+			if (!userList || userList.length === 0) return;
 
 			const newUsersWithProjectAssignment = userList
 				.map((user: UserType) => {
@@ -67,44 +67,42 @@ const ProjectPage: React.FC = () => {
 			);
 			setUsersWithProjectAssignment(sortedAssignments);
 		}
-	}, [projectList, userList]);
+	}, [projectList, userList, selectedProjectId, viewsFilter.singleProjectSort, setSingleProjectPage]);
 
 	const onClose = () => setAddAssignmentVisible(false);
 	const onComplete = () => {
 		setAddAssignmentVisible(false);
 	};
+
 	return (
 		<div>
 			{selectedProject && projectList ? (
-				<ScrollingCalendar>
-					{selectedProject?.assignments?.map(
-						(assignment: AssignmentType, index) => {
-							return (
-								<ProjectAssignmentRow
-									key={index}
-									assignment={assignment}
-									monthData={{ monthLabel: "", year: 0 }}
-									isFirstMonth={true}
-									isLastMonth={true}
-								/>
-							);
-						}
-					)}
-				</ScrollingCalendar>
-			) : (
-				<LoadingSpinner />
-			)}
-			<div>
-				{selectedProject ? (
+				<>
+					<ScrollingCalendar>
+						{selectedProject?.assignments?.map(
+							(assignment: AssignmentType, index) => {
+								return (
+									<ProjectAssignmentRow
+										project={selectedProject}
+										key={index}
+										assignment={assignment}
+										monthData={{ monthLabel: "", year: 0 }}
+										isFirstMonth={true}
+										isLastMonth={true}
+									/>
+								);
+							}
+						)}
+					</ScrollingCalendar>
 					<ProjectDetails
 						project={selectedProject}
 						projectList={projectList}
 						refetchProjectList={refetchProjectList}
 					/>
-				) : (
-					<></>
-				)}
-			</div>
+				</>
+			) : (
+				<LoadingSpinner />
+			)}
 			<div>
 				<button
 					className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center"
@@ -112,7 +110,7 @@ const ProjectPage: React.FC = () => {
 				>
 					{addAssignmentVisible ? (<XMarkIcon className="fill-accentgreen" />) : (<PlusIcon className="fill-accentgreen" />)}
 				</button>
-				{addAssignmentVisible && (
+				{addAssignmentVisible && selectedProject && (
 					<AddAssignmentSingleProject
 						project={selectedProject}
 						onClose={onClose}
