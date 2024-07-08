@@ -34,6 +34,18 @@ export default function ProjectDatepicker(props: DatePickerProps) {
 				endsOn: selectedAssignment.endsOn,
 			});
 		}
+		if (selectedProject && selectedProject.startsOn && !selectedProject.endsOn) {
+			setFieldValue(name, {
+				startsOn: selectedProject.startsOn,
+				endsOn: "",
+			});
+		}
+		if (selectedAssignment && selectedAssignment.startsOn && !selectedAssignment.endsOn) {
+			setFieldValue(name, {
+				startsOn: selectedAssignment.startsOn,
+				endsOn: "",
+			});
+		}
 	};
 	const handleEndDateProjectModal = () => {
 		if (projectView) {
