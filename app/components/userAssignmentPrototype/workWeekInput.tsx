@@ -52,7 +52,6 @@ export const WorkWeekInput = ({
 			refetchUserList();
 		});
 	};
-	console.log(withinProjectDates, "WITHIN PROJECT DATES in input");
 	return (
 		<>
 			{workWeek ? (

@@ -67,14 +67,13 @@ export const ProjectAssignmentRow = ({
 						weekYear: mondays.year,
 						weekday: 1,
 					}).toJSDate();
-					if (!isWeekWithinProject(mondayDate)) {
 						return (
 							<div
 								key={`cweek-${cweekIndex}`}
 								className="flex-1 flex flex-col items-center"
 							>
 								<WorkWeekInput
-									withinProjectDates={false}
+									withinProjectDates={isWeekWithinProject(mondayDate)}
 									assignment={assignment}
 									cweek={cweek}
 									year={mondays.year}
@@ -82,46 +81,6 @@ export const ProjectAssignmentRow = ({
 								/>
 							</div>
 						);
-					}
-
-					const workWeekElements = assignment.workWeeks.map(
-						(workWeek, workWeekIndex) => {
-							if (workWeek.cweek === cweek && workWeek.year === mondays.year) {
-								return (
-									<WorkWeekInput
-										key={`workWeek-${workWeekIndex}`}
-										cweek={cweek}
-										year={mondays.year}
-										workWeek={workWeek}
-										assignment={assignment}
-									/>
-								);
-							}
-							return null;
-						}
-					);
-
-					const hasWorkWeek = workWeekElements.some(
-						(element) => element !== null
-					);
-
-					return (
-						<div
-							key={`cweek-${cweekIndex}`}
-							className="flex-1 flex flex-col items-center"
-						>
-							{hasWorkWeek ? (
-								workWeekElements
-							) : (
-								<WorkWeekInput
-									assignment={assignment}
-									cweek={cweek}
-									year={mondays.year}
-									key={`input-${cweekIndex}`}
-								/>
-							)}
-						</div>
-					);
 				})}
 			</div>
 			{isLastMonth && <UserSummary assignment={assignment} />}
