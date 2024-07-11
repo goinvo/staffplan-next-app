@@ -1,7 +1,7 @@
 import { AssignmentType, ProjectType } from "@/app/typeInterfaces";
 import { useUserDataContext } from "@/app/userDataContext";
 import React from "react";
-import { getMondays } from "../weekDisplayPrototype/helpers";
+import { getMondays } from "../scrollingCalendar/helpers";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
 import UserSummary from "../userSummary";
@@ -40,7 +40,7 @@ export const ProjectAssignmentRow = ({
 
 	const isWeekWithinProject = (weekDate: Date) => {
 		const weekDateFormatted = new Date(weekDate);
-		if(project.startsOn && !project.endsOn){
+		if (project.startsOn && !project.endsOn) {
 			const startsOn = new Date(project.startsOn);
 			return weekDateFormatted >= startsOn;
 		}
@@ -67,20 +67,20 @@ export const ProjectAssignmentRow = ({
 						weekYear: mondays.year,
 						weekday: 1,
 					}).toJSDate();
-						return (
-							<div
-								key={`cweek-${cweekIndex}`}
-								className="flex-1 flex flex-col items-center"
-							>
-								<WorkWeekInput
-									withinProjectDates={isWeekWithinProject(mondayDate)}
-									assignment={assignment}
-									cweek={cweek}
-									year={mondays.year}
-									key={`input-${cweekIndex}`}
-								/>
-							</div>
-						);
+					return (
+						<div
+							key={`cweek-${cweekIndex}`}
+							className="flex-1 flex flex-col items-center"
+						>
+							<WorkWeekInput
+								withinProjectDates={isWeekWithinProject(mondayDate)}
+								assignment={assignment}
+								cweek={cweek}
+								year={mondays.year}
+								key={`input-${cweekIndex}`}
+							/>
+						</div>
+					);
 				})}
 			</div>
 			{isLastMonth && <UserSummary assignment={assignment} />}

@@ -1,10 +1,15 @@
-import { UserType, WorkWeekType, AllUserRowProps, AllUserAccumulatorProps } from "@/app/typeInterfaces";
+import {
+	UserType,
+	WorkWeekType,
+	AllUserRowProps,
+	AllUserAccumulatorProps,
+} from "@/app/typeInterfaces";
 import { useUserDataContext } from "@/app/userDataContext";
 import React from "react";
 import {
 	assignmentContainsCWeek,
 	getMondays,
-} from "../weekDisplayPrototype/helpers";
+} from "../scrollingCalendar/helpers";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
 import { AllUserLabel } from "./allUserLabel";
@@ -29,25 +34,28 @@ export const AllUserRow = ({
 	};
 
 	const totalWorkWeekHours = Object.values(
-		(user.assignments ?? []).reduce<AllUserAccumulatorProps>((acc, assignment) => {
-			assignment.workWeeks.forEach((workWeek) => {
-				const cweek = workWeek.cweek;
-				const actualHours = workWeek.actualHours ?? 0;
-				const estimatedHours = workWeek.estimatedHours ?? 0;
-				if (!acc[cweek]) {
-					acc[cweek] = {
-						cweek,
-						actualHours: 0,
-						estimatedHours: 0,
-						year: workWeek.year,
-					};
-				}
-				acc[cweek].actualHours += actualHours;
-				acc[cweek].estimatedHours += estimatedHours;
-			});
+		(user.assignments ?? []).reduce<AllUserAccumulatorProps>(
+			(acc, assignment) => {
+				assignment.workWeeks.forEach((workWeek) => {
+					const cweek = workWeek.cweek;
+					const actualHours = workWeek.actualHours ?? 0;
+					const estimatedHours = workWeek.estimatedHours ?? 0;
+					if (!acc[cweek]) {
+						acc[cweek] = {
+							cweek,
+							actualHours: 0,
+							estimatedHours: 0,
+							year: workWeek.year,
+						};
+					}
+					acc[cweek].actualHours += actualHours;
+					acc[cweek].estimatedHours += estimatedHours;
+				});
 
-			return acc;
-		}, {})
+				return acc;
+			},
+			{}
+		)
 	);
 
 	return (

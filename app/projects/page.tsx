@@ -3,8 +3,8 @@ import React from "react";
 import { ProjectType } from "../typeInterfaces";
 import { useUserDataContext } from "../userDataContext";
 import { LoadingSpinner } from "../components/loadingSpinner";
-import { ScrollingCalendar } from "../components/weekDisplayPrototype/scrollingCalendar";
-import { AllProjectRow } from "../components/allProjectsPrototype/allProjectRow";
+import { ScrollingCalendar } from "../components/scrollingCalendar/scrollingCalendar";
+import { AllProjectRow } from "../components/allProjects/allProjectRow";
 
 const ProjectsView: React.FC = () => {
 	const { projectList } = useUserDataContext();

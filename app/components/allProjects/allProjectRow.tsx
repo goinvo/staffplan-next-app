@@ -8,7 +8,7 @@ import React from "react";
 import {
 	assignmentContainsCWeek,
 	getMondays,
-} from "../weekDisplayPrototype/helpers";
+} from "../scrollingCalendar/helpers";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
 import { AllProjectLabel } from "./allProjectLabel";

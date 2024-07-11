@@ -4,8 +4,8 @@ import withApollo from "@/lib/withApollo";
 import { useUserDataContext } from "../userDataContext";
 import { UserType } from "../typeInterfaces";
 import { LoadingSpinner } from "../components/loadingSpinner";
-import { ScrollingCalendar } from "../components/weekDisplayPrototype/scrollingCalendar";
-import { AllUserRow } from "../components/allUsersPrototype/allUserRow";
+import { ScrollingCalendar } from "../components/scrollingCalendar/scrollingCalendar";
+import { AllUserRow } from "../components/allUsers/allUserRow";
 const PeopleView: React.FC = () => {
 	const { userList } = useUserDataContext();
 
