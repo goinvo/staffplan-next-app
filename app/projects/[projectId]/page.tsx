@@ -2,16 +2,12 @@
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import withApollo from "@/lib/withApollo";
-import {
-	ProjectType,
-	UserType,
-	AssignmentType,
-} from "../../typeInterfaces";
+import { ProjectType, UserType, AssignmentType } from "../../typeInterfaces";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import { useUserDataContext } from "@/app/userDataContext";
 import { sortSingleProject } from "@/app/helperFunctions";
-import { ScrollingCalendar } from "@/app/components/weekDisplayPrototype/scrollingCalendar";
-import { ProjectAssignmentRow } from "@/app/components/projectAssignmentPrototype/projectAssignmentRow";
+import { ScrollingCalendar } from "@/app/components/scrollingCalendar/scrollingCalendar";
+import { ProjectAssignmentRow } from "@/app/components/projectAssignment/projectAssignmentRow";
 import AddAssignmentSingleProject from "@/app/components/addAssignmentSIngleProject";
 import { MinusIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import ProjectDetails from "@/app/components/projectDetails";
@@ -67,7 +63,13 @@ const ProjectPage: React.FC = () => {
 			);
 			setUsersWithProjectAssignment(sortedAssignments);
 		}
-	}, [projectList, userList, selectedProjectId, viewsFilter.singleProjectSort, setSingleProjectPage]);
+	}, [
+		projectList,
+		userList,
+		selectedProjectId,
+		viewsFilter.singleProjectSort,
+		setSingleProjectPage,
+	]);
 
 	const onClose = () => setAddAssignmentVisible(false);
 	const onComplete = () => {
@@ -108,7 +110,11 @@ const ProjectPage: React.FC = () => {
 					className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center"
 					onClick={() => setAddAssignmentVisible(!addAssignmentVisible)}
 				>
-					{addAssignmentVisible ? (<XMarkIcon className="fill-accentgreen" />) : (<PlusIcon className="fill-accentgreen" />)}
+					{addAssignmentVisible ? (
+						<XMarkIcon className="fill-accentgreen" />
+					) : (
+						<PlusIcon className="fill-accentgreen" />
+					)}
 				</button>
 				{addAssignmentVisible && selectedProject && (
 					<AddAssignmentSingleProject

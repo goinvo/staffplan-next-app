@@ -6,8 +6,8 @@ import { UserType, AssignmentType } from "../../typeInterfaces";
 import { useUserDataContext } from "../../userDataContext";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import { sortSingleUser } from "@/app/helperFunctions";
-import { ScrollingCalendar } from "@/app/components/weekDisplayPrototype/scrollingCalendar";
-import { UserAssignmentRow } from "@/app/components/userAssignmentPrototype/userAssignmentRow";
+import { ScrollingCalendar } from "@/app/components/scrollingCalendar/scrollingCalendar";
+import { UserAssignmentRow } from "@/app/components/userAssignment/userAssignmentRow";
 import AddAssignmentSingleUser from "@/app/components/addAssignmentSingleUser";
 import { MinusIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
 const UserPage: React.FC = () => {

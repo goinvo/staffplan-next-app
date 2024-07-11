@@ -18,7 +18,7 @@ import { sortProjectList, sortUserList } from "./helperFunctions";
 import {
 	currentQuarter,
 	currentYear,
-} from "./components/weekDisplayPrototype/scrollingCalendar";
+} from "./components/scrollingCalendar/scrollingCalendar";
 
 export interface UserDataContextType {
 	userList: any;
@@ -89,9 +89,9 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 	const scrollToTodayFunction = () => {
 		setDateRange({
 			quarter: currentQuarter,
-			year: currentYear
-		})
-	}
+			year: currentYear,
+		});
+	};
 	const {
 		loading: userListLoading,
 		error: userListError,
@@ -202,7 +202,7 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 			.then((result) => {
 				setClientList(result.data.clients);
 			});
-	}
+	};
 	const refetchUserList = () => {
 		client
 			.query({
