@@ -93,6 +93,18 @@ export const SingleUserSortOptions = () => {
 											<label className="ml-2 text-gray-600">
 												<input
 													type="radio"
+													value="byClient"
+													checked={viewsFilter.singleUserSort === "byClient"}
+													onChange={handleSortMethodChange}
+													className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
+												/>
+												By Client
+											</label>
+										</div>
+										<div>
+											<label className="ml-2 text-gray-600">
+												<input
+													type="radio"
 													value="abcProjectName"
 													checked={
 														viewsFilter.singleUserSort === "abcProjectName"

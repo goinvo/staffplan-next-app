@@ -5,7 +5,7 @@ import { UserLabelProps } from "../../typeInterfaces";
 export const UserLabel = ({ assignment, clickHandler }: UserLabelProps) => {
 	return (
 		<div
-			className="hover:cursor-pointer w-40 absolute left-0 mt-5 overflow-hidden"
+			className="hover:cursor-pointer w-40 absolute left-10 mt-5 overflow-hidden"
 			onClick={() => clickHandler(assignment)}
 		>
 			<div className=" flex w-12 h-12 timeline-grid-bg rounded-full overflow-hidden">
@@ -16,7 +16,6 @@ export const UserLabel = ({ assignment, clickHandler }: UserLabelProps) => {
 					height={500}
 				/>
 			</div>
-			<div>{assignment.project.client.name}</div>
 			<div
 				className="hover:cursor-pointer"
 				onClick={() => clickHandler(assignment)}

@@ -67,7 +67,8 @@ const UserPage: React.FC = () => {
 				{selectedUser && userList ? (
 					<ScrollingCalendar>
 						{selectedUser?.assignments?.map(
-							(assignment: AssignmentType, index) => {
+							(assignment: AssignmentType, index,allAssignments) => {
+								const isFirstClient = index === allAssignments.findIndex((a) => a.project.client.id === assignment.project.client.id);
 								return (
 									<UserAssignmentRow
 										key={index}
@@ -75,6 +76,7 @@ const UserPage: React.FC = () => {
 										monthData={{ monthLabel: "", year: 0 }}
 										isFirstMonth={true}
 										isLastMonth={true}
+										isFirstClient={isFirstClient}
 									/>
 								);
 							}
@@ -103,6 +105,7 @@ const UserPage: React.FC = () => {
 					)}
 				</div>
 			</div>
+			
 		</>
 	);
 };

@@ -145,7 +145,63 @@ export const GET_USER_LIST = gql`
 		}
 	}
 `;
-
+export const GET_ALL_CLIENTS_DATA = gql`
+{
+  currentCompany{
+    id
+			clients {
+				description
+				id
+				name
+				status
+				avatarUrl
+				projects {
+					id
+					name
+					status
+					paymentFrequency
+					startsOn
+					endsOn
+					cost
+					rateType
+					hourlyRate
+					hours
+					fte
+					assignments {
+						assignedUser {
+							name
+							id
+							avatarUrl
+						}
+						id
+						startsOn
+						estimatedWeeklyHours
+						endsOn
+						status
+						workWeeks {
+							actualHours
+							estimatedHours
+							cweek
+							year
+							user {
+								name
+							}
+						}
+					}
+					workWeeks {
+						actualHours
+						estimatedHours
+						cweek
+						year
+						user {
+							name
+						}
+					}
+				}
+			}
+		}
+}
+`
 export const GET_ALL_PROJECTS_DATA = gql`
 	{
 		currentCompany {

@@ -7,21 +7,24 @@ import { useRouter } from "next/navigation";
 import UserSummary from "../userSummary";
 import { UserLabel } from "./userLabel";
 import { WorkWeekInput } from "./workWeekInput";
+import { ClientLabel } from "./clientLabel";
 
 interface UserAssignmentRowProps {
 	assignment: AssignmentType;
 	isFirstMonth: boolean;
 	isLastMonth: boolean;
+	isFirstClient: boolean;
 	monthData: { monthLabel: string; year: number };
 }
 export const UserAssignmentRow = ({
 	assignment,
 	isFirstMonth,
 	isLastMonth,
+	isFirstClient,
 	monthData,
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
-	const { dateRange } = useUserDataContext();
+	const { dateRange,viewsFilter } = useUserDataContext();
 	const mondays = getMondays(
 		DateTime.local(dateRange.year, parseInt(monthData.monthLabel), 1).startOf(
 			"day"
@@ -44,9 +47,9 @@ export const UserAssignmentRow = ({
 		}
 		return true;
 	};
-
 	return (
 		<div className="flex">
+			{viewsFilter.singleUserSort === 'byClient' && isFirstClient && isFirstMonth && (<ClientLabel assignment={assignment} clickHandler={handleProjectChange} />)}
 			{isFirstMonth && (
 				<UserLabel assignment={assignment} clickHandler={handleProjectChange} />
 			)}
