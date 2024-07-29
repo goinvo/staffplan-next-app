@@ -665,6 +665,20 @@ export const sortSingleUser = (sortMethod: string, user: UserType) => {
 			return 0;
 		});
 	}
+	if(sortMethod === "byClient") {
+		sortedAssignments.assignments.sort((a, b) => {
+			const clientA = a.project.client.name.toLowerCase();
+			const clientB = b.project.client.name.toLowerCase();
+			if (clientA < clientB) {
+				return -1;
+			}
+			if (clientA > clientB) {
+				return 1;
+			}
+			return 0;
+		});
+
+	}
 	if (sortMethod === "startDate") {
 		sortedAssignments.assignments.sort((a, b) => {
 			const projectA = a.startsOn;
