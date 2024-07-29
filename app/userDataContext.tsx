@@ -79,7 +79,7 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 	const [viewsFilter, setViewsFilter] = useState<ViewsFiltersType>({
 		selectedProjectSort: "abcProjectName",
 		selectedUserSort: "abcUserName",
-		singleUserSort: "abcProjectName",
+		singleUserSort: "byClient",
 		singleProjectSort: "abcUserName",
 		assignmentSort: "slim",
 		rollupSort: "none",
