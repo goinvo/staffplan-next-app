@@ -22,7 +22,7 @@ export interface WorkWeekValues {
 }
 export const WorkWeekInput = ({
 	withinProjectDates,
-	assignment,
+   	assignment,
 	cweek,
 	year,
 }: WorkWeekInputProps) => {

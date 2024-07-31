@@ -1,4 +1,4 @@
-import { AssignmentType } from "@/app/typeInterfaces";
+import { AssignmentType, ClientType } from "@/app/typeInterfaces";
 import { useUserDataContext } from "@/app/userDataContext";
 import React from "react";
 import { getMondays } from "../scrollingCalendar/helpers";
@@ -15,6 +15,7 @@ interface UserAssignmentRowProps {
 	isLastMonth: boolean;
 	isFirstClient: boolean;
 	monthData: { monthLabel: string; year: number };
+	clickHandler: (client:ClientType)=>void;
 }
 export const UserAssignmentRow = ({
 	assignment,
@@ -22,6 +23,7 @@ export const UserAssignmentRow = ({
 	isLastMonth,
 	isFirstClient,
 	monthData,
+	clickHandler
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
 	const { dateRange,viewsFilter } = useUserDataContext();
@@ -49,7 +51,7 @@ export const UserAssignmentRow = ({
 	};
 	return (
 		<div className="flex">
-			{viewsFilter.singleUserSort === 'byClient' && isFirstClient && isFirstMonth && (<ClientLabel assignment={assignment} clickHandler={handleProjectChange} />)}
+			{viewsFilter.singleUserSort === 'byClient' && isFirstClient && isFirstMonth && (<ClientLabel assignment={assignment} clickHandler={clickHandler} />)}
 			{isFirstMonth && (
 				<UserLabel assignment={assignment} clickHandler={handleProjectChange} />
 			)}
