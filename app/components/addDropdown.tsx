@@ -73,12 +73,12 @@ export default function AddDropdown() {
 						</Menu.Item>
 						<Menu.Item>
 							{({ active }) => (
-								<a
+								<Link
 									href="?addclientmodal=true"
 									className={dropdownSelectedItemClass(active)}
 								>
 									Client
-								</a>
+								</Link>
 							)}
 						</Menu.Item>
 					</div>
