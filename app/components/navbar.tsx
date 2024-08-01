@@ -63,7 +63,7 @@ const Navbar: React.FC = () => {
 			</div>
 			<div className="flex items-center space-x-4 py-4">
 				<div className="h-4 w-4">
-					<Link href="https://github.com/goinvo/staffplan-next-app/issues/new">
+					<Link href="?airTableFormModal=true">
 					<ChatBubbleBottomCenterTextIcon />
 					</Link>
 				</div>
