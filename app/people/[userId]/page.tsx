@@ -62,21 +62,22 @@ const UserPage: React.FC = () => {
 		setAddAssignmentVisible(false);
 	};
 
-	const addNewAssignment = (newAssignment: AssignmentType) => {
-		if (!selectedUser) return;
-		const updatedAssignments = [...selectedUser.assignments, newAssignment];
-		const sortedAssignments = sortSingleUser(viewsFilter.singleUserSort, {
-			...selectedUser,
-			assignments: updatedAssignments
-		});
-		setSelectedUser(sortedAssignments);
-		setSingleUserPage(sortedAssignments);
-	};
+	// const addNewAssignment = (newAssignment: AssignmentType) => {
+	// 	if (!selectedUser) return;
+	// 	const updatedAssignments = [...selectedUser.assignments, newAssignment];
+	// 	const sortedAssignments = sortSingleUser(viewsFilter.singleUserSort, {
+	// 		...selectedUser,
+	// 		assignments: updatedAssignments
+	// 	});
+	// 	setSelectedUser(sortedAssignments);
+	// 	setSingleUserPage(sortedAssignments);
+	// };
 
 	const handleClientClick = (client:ClientType) => {
 		if (!selectedUser) return;
 	
 		const newAssignment: any = {
+		
 			id: Date.now(), // Generate a unique id
 			startsOn: null,
 			endsOn: null,
@@ -98,7 +99,8 @@ const UserPage: React.FC = () => {
 				status: "",
 				users: [],
 				fte: 0,
-				hours: 0
+				hours: 0,
+				isTempProject:true,
 			},
 			workWeeks: [],
 		};
@@ -114,7 +116,6 @@ const UserPage: React.FC = () => {
 		setSingleUserPage(sortedAssignments);
 	};
 	
-console.log(selectedUser, "SELECTED USER")
 	return (
 		<>
 			<div>
@@ -146,7 +147,7 @@ console.log(selectedUser, "SELECTED USER")
 						onClick={() => setAddAssignmentVisible(!addAssignmentVisible)}
 					>
 						{addAssignmentVisible ? (
-							<XMarkIcon className="fill-accentgreen" />
+							<MinusIcon className="fill-accentgreen" />
 						) : (
 							<PlusIcon className="fill-accentgreen" />
 						)}

@@ -1,6 +1,6 @@
 import { AssignmentType, ClientType } from "@/app/typeInterfaces";
 import { useUserDataContext } from "@/app/userDataContext";
-import React from "react";
+import React, { useState } from "react";
 import { getMondays } from "../scrollingCalendar/helpers";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
@@ -8,6 +8,7 @@ import UserSummary from "../userSummary";
 import { UserLabel } from "./userLabel";
 import { WorkWeekInput } from "./workWeekInput";
 import { ClientLabel } from "./clientLabel";
+import { TempProjectLabel } from "./tempProjectLabel";
 
 interface UserAssignmentRowProps {
 	assignment: AssignmentType;
@@ -15,23 +16,24 @@ interface UserAssignmentRowProps {
 	isLastMonth: boolean;
 	isFirstClient: boolean;
 	monthData: { monthLabel: string; year: number };
-	clickHandler: (client:ClientType)=>void;
+	clickHandler: (client: ClientType) => void;
 }
+
 export const UserAssignmentRow = ({
 	assignment,
 	isFirstMonth,
 	isLastMonth,
 	isFirstClient,
 	monthData,
-	clickHandler
+	clickHandler,
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
-	const { dateRange,viewsFilter } = useUserDataContext();
+	const [tempProjectOpen, setTempProjectOpen] = useState(false)
+	const { dateRange, viewsFilter } = useUserDataContext();
 	const mondays = getMondays(
-		DateTime.local(dateRange.year, parseInt(monthData.monthLabel), 1).startOf(
-			"day"
-		)
+		DateTime.local(dateRange.year, parseInt(monthData.monthLabel), 1).startOf("day")
 	);
+
 	const handleProjectChange = (assignment: AssignmentType) => {
 		router.push("/projects/" + encodeURIComponent(assignment.project.id));
 	};
@@ -49,12 +51,22 @@ export const UserAssignmentRow = ({
 		}
 		return true;
 	};
+
+// console.log(assignment, "ASSIGNMENT IN ROW")
 	return (
 		<div className="flex">
-			{viewsFilter.singleUserSort === 'byClient' && isFirstClient && isFirstMonth && (<ClientLabel assignment={assignment} clickHandler={clickHandler} />)}
-			{isFirstMonth && (
-				<UserLabel assignment={assignment} clickHandler={handleProjectChange} />
+			{viewsFilter.singleUserSort === 'byClient' && isFirstClient && isFirstMonth && (
+				<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} />
 			)}
+
+			{isFirstMonth && (
+				assignment.project.isTempProject ? (
+					<TempProjectLabel assignment={assignment} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} /> // Render custom label
+				) : (
+					<UserLabel assignment={assignment} clickHandler={handleProjectChange} />
+				)
+			)}
+
 			<div className="flex border-b ml-1 border-gray-300 justify-center items-center w-full h-40">
 				{mondays.cweeks.map((cweek, cweekIndex) => {
 					const mondayDate = DateTime.fromObject({

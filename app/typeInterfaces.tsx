@@ -57,6 +57,7 @@ export interface EllipsisProjectMenuProps {
 	project: Partial<ProjectType>;
 }
 export interface ProjectType {
+	isTempProject?:boolean;
 	endsOn: string | null;
 	id: number;
 	name: string;
