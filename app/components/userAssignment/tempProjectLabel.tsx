@@ -8,7 +8,6 @@ interface TempLabelProps {
 	setTempProjectOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 export const TempProjectLabel = ({ assignment, tempProjectOpen, setTempProjectOpen }: TempLabelProps) => {
-	console.log(assignment, "ASSIGNEMNT IN TEMP")
 	// const newProjectInitialValues = {
 	// 	client: "",
 	// 	cost: 0,

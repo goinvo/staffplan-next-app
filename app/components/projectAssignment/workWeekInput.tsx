@@ -11,6 +11,7 @@ interface WorkWeekInputProps {
 	assignment?: AssignmentType;
 	cweek: number | null;
 	year: number | null;
+	isUserTBD:boolean;
 }
 export interface WorkWeekValues {
 	cweek: number;
@@ -21,15 +22,17 @@ export interface WorkWeekValues {
 }
 export const WorkWeekInput = ({
 	workWeek,
+	isUserTBD,
 	assignment,
 	cweek,
 	year,
 	withinProjectDates = true, // Default value to true if not provided
 }: WorkWeekInputProps) => {
-	const initialValues = {
-		actualHours: workWeek?.actualHours || "",
+	const workWeekExists = assignment?.workWeeks?.find(workWeek => workWeek.cweek === cweek && workWeek.year === year);
+		const initialValues = {
+		actualHours: workWeekExists?.actualHours || "",
 		estimatedHours:
-			workWeek?.estimatedHours || assignment?.estimatedWeeklyHours || "",
+			workWeekExists?.estimatedHours || assignment?.estimatedWeeklyHours || "",
 		assignmentId: assignment?.id,
 		cweek: cweek,
 		year: year,
@@ -51,11 +54,10 @@ export const WorkWeekInput = ({
 			refetchUserList();
 		});
 	};
-
 	return (
 		<>
 			{workWeek ? (
-				<div className="flex flex-col items-center pt-2 justify-center">
+				<div className="flex flex-col items-center pt-2 bg-red-500 justify-center">
 					<Formik
 						onSubmit={(e) => upsertWorkWeekValues(e)}
 						initialValues={initialValues}
@@ -72,6 +74,7 @@ export const WorkWeekInput = ({
 									className="border border-gray-300 w-10 rounded p-2 mb-1"
 									name="estHours"
 									id="estimatedHours"
+									disabled={isUserTBD}
 									onChange={handleChange}
 									onBlur={(e) => {
 										handleBlur("estHours");
@@ -86,6 +89,7 @@ export const WorkWeekInput = ({
 									id="actHours"
 									className="border border-gray-300 w-10 rounded p-2 mb-1"
 									onChange={handleChange}
+									disabled={isUserTBD}
 									onBlur={(e) => {
 										handleBlur("actHours");
 										if (values.estimatedHours && values.actualHours) {
@@ -99,7 +103,7 @@ export const WorkWeekInput = ({
 				</div>
 			) : null}
 			{assignment && !workWeek ? (
-				<div className="flex flex-col items-center pt-2">
+				<div className="flex flex-colitems-center pt-2">
 					<Formik
 						onSubmit={(e) => upsertWorkWeekValues(e)}
 						initialValues={initialValues}
@@ -118,13 +122,14 @@ export const WorkWeekInput = ({
 										name="estimatedHours"
 										id="estHours"
 										onChange={handleChange}
+										
 										onBlur={(e) => {
 											handleBlur("estHours");
 											if (values.estimatedHours && values.actualHours) {
 												upsertWorkWeekValues(values);
 											}
 										}}
-										disabled={!withinProjectDates}
+										disabled={!withinProjectDates || isUserTBD}
 									/>
 									<input
 										value={withinProjectDates ? values.actualHours : ""}
@@ -140,7 +145,7 @@ export const WorkWeekInput = ({
 												upsertWorkWeekValues(values);
 											}
 										}}
-										disabled={!withinProjectDates}
+										disabled={!withinProjectDates || isUserTBD}
 									/>
 								</div>
 							</form>

@@ -16,7 +16,7 @@ const AddAssignment = () => {
 	);
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const { userList, projectList,refetchUserList } = useUserDataContext();
+	const { userList, projectList, refetchUserList } = useUserDataContext();
 	const modalParam = searchParams.get("assignmentmodal");
 	const projectInParam = searchParams.get("project");
 	const userInParam = searchParams.get("user");
@@ -110,17 +110,17 @@ const AddAssignment = () => {
 	const onCancel = () => router.back();
 	const validateForm = (values: FormikValues) => {
 		const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
-		if (!values.userId) {
-			errors.userId = "User is required";
-		}
-		if (values.userId) {
-			const foundUser = userList?.find(
-				({ id }: UserType) => id === values.userId
-			);
-			if (!foundUser) {
-				errors.userId = "Must select a valid User";
-			}
-		}
+		// if (!values.userId) {
+		// 	errors.userId = "User is required";
+		// }
+		// if (values.userId) {
+		// 	const foundUser = userList?.find(
+		// 		({ id }: UserType) => id === values.userId
+		// 	);
+		// 	if (!foundUser) {
+		// 		errors.userId = "Must select a valid User";
+		// 	}
+		// }
 		if (!values.projectId) {
 			errors.projectId = "Project is required";
 		}
@@ -200,18 +200,20 @@ const AddAssignment = () => {
 																		id="userId"
 																		className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 																	>
-																		<option value={""}>SELECT</option>
-																		{userList?.map((user: UserType) => {
-																			return (
+																		{[
+																			<option key="TBD" value="">
+																				TBD
+																			</option>,
+																			...userList?.map((user: UserType) => (
 																				<option
 																					key={`${user.id} + ${user.name}`}
 																					value={user.id}
 																				>
-																					{" "}
 																					{user.name}
 																				</option>
-																			);
-																		})}
+																			)),
+																		]}
+																		``
 																	</Field>
 																</label>
 															</div>
