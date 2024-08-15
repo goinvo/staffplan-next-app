@@ -52,7 +52,6 @@ export const UserAssignmentRow = ({
 		return true;
 	};
 
-// console.log(assignment, "ASSIGNMENT IN ROW")
 	return (
 		<div className="flex">
 			{viewsFilter.singleUserSort === 'byClient' && isFirstClient && isFirstMonth && (

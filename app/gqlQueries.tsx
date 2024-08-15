@@ -353,6 +353,7 @@ export const UPSERT_PROJECT = gql`
 		$hours: Int
 		$fte: Float
 		$hourlyRate: Int
+		$assignments: [AssignmentAttributes!]
 	) {
 		upsertProject(
 			id: $id
@@ -366,6 +367,7 @@ export const UPSERT_PROJECT = gql`
 			fte: $fte
 			rateType: $rateType
 			hourlyRate: $hourlyRate
+			assignments: $assignments
 		) {
 			id
 			client {
