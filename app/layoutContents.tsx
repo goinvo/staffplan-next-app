@@ -14,12 +14,12 @@ const RootLayoutContents: React.FC<{ children: React.ReactNode }> = ({ children 
     <div className="relative z-0">
       <UserListProvider>
         <Navbar />
-        <ActionBar />
+        {/* <ActionBar /> */}
         <Suspense>
           <AddAssignment />
           <AddProject />
           <AddClient />
-          <AirTableFormModal/>
+          <AirTableFormModal />
         </Suspense>
         {children}
       </UserListProvider>

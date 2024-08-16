@@ -36,11 +36,16 @@ export const ScrollingCalendar = ({ children }: any) => {
 		setDateRange(activeQuarter(dateRange.quarter));
 	};
 
+	// month with which quarter start 
 	const startOfQuarter = DateTime.local(
 		dateRange.year,
 		3 * (dateRange.quarter - 1) + 1,
 		1
 	).startOf("day");
+
+
+
+	// month and day on end of the quarter 
 	const endOfQuarter = DateTime.local(dateRange.year, 3 * dateRange.quarter, 1)
 		.endOf("month")
 		.startOf("day");
@@ -53,7 +58,7 @@ export const ScrollingCalendar = ({ children }: any) => {
 					className="p-2 bg-white rounded-md mx-4 shadow min-h-12 min-w-10 flex items-center justify-center"
 					onClick={prevQuarter}
 				>
-					<FaChevronLeft className="timeline-text-accent" />
+					<FaChevronLeft className="timeline-text" />
 				</button>
 				<div className="flex-grow flex justify-stretch">
 					{months.map((monthData, index) => (
@@ -78,13 +83,13 @@ export const ScrollingCalendar = ({ children }: any) => {
 									));
 								})()}
 							</div>
-							{React.Children.map(children, (child) =>
+							{/* {React.Children.map(children, (child) =>
 								React.cloneElement(child as React.ReactElement<any>, {
 									monthData,
 									isFirstMonth: index === 0,
 									isLastMonth: index === months.length - 1,
 								})
-							)}
+							)} */}
 						</div>
 					))}
 				</div>

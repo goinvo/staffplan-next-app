@@ -15,7 +15,7 @@ const ActionBar: React.FC = () => {
 			<div className="flex items-center space-x-4">
 				{!params.userId && !params.projectId ? <AddDropdown /> : null}
 				{singleUserPage &&
-				params.userId ? (
+					params.userId ? (
 					<div className="flex items-center text-white text-xl">
 						<div className="flex w-8 h-8 timeline-grid-bg mr-2 rounded-full overflow-hidden">
 							<Image
@@ -29,7 +29,7 @@ const ActionBar: React.FC = () => {
 					</div>
 				) : null}
 				{singleProjectPage &&
-				params.projectId ? (
+					params.projectId ? (
 					<div className="flex items-center text-white text-xl">
 						<div className="flex w-8 h-8 timeline-grid-bg mr-2 rounded-full overflow-hidden">
 							<Image

@@ -65,7 +65,7 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 }) => {
 	const client = useApolloClient();
 	const [clientSide, setClientSide] = useState(false);
-	const [dateRange, setDateRange] = useState({
+	const [dateRange, setDateRange] = useState<>({
 		quarter: currentQuarter,
 		year: currentYear,
 	});

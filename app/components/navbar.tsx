@@ -26,27 +26,24 @@ const Navbar: React.FC = () => {
 			<div className="flex items-center space-x-4 h-full">
 				<Link
 					href={`/people/${myPlanUrl()}`}
-					className={`navbar-text-accent ${
-						myStaffPlanCheck ? activeTab : "hover:underline"
-					}`}
+					className={`navbar-text-accent ${myStaffPlanCheck ? activeTab : "hover:underline"
+						}`}
 				>
 					My StaffPlan
 				</Link>
 				<Link
 					href="/projects"
-					className={`flex h-full justify-between items-center ${
-						pathname === "projects" ? activeTab : "hover:underline"
-					}`}
+					className={`flex h-full justify-between items-center ${pathname === "projects" ? activeTab : "hover:underline"
+						}`}
 				>
 					Projects
 				</Link>
 				<Link
 					href="/people"
-					className={`flex h-full justify-between items-center ${
-						pathname === "people" && !myStaffPlanCheck
-							? activeTab
-							: "hover:underline"
-					}`}
+					className={`flex h-full justify-between items-center ${pathname === "people" && !myStaffPlanCheck
+						? activeTab
+						: "hover:underline"
+						}`}
 				>
 					People
 				</Link>
@@ -64,7 +61,7 @@ const Navbar: React.FC = () => {
 			<div className="flex items-center space-x-4 py-4">
 				<div className="h-4 w-4">
 					<Link href="?airTableFormModal=true">
-					<ChatBubbleBottomCenterTextIcon />
+						<ChatBubbleBottomCenterTextIcon />
 					</Link>
 				</div>
 				{/* <div className="h-4 w-4">

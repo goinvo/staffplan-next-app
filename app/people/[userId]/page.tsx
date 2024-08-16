@@ -6,11 +6,12 @@ import { UserType, AssignmentType } from "../../typeInterfaces";
 import { useUserDataContext } from "../../userDataContext";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import { sortSingleUser } from "@/app/helperFunctions";
-import { ScrollingCalendar } from "@/app/components/scrollingCalendar/scrollingCalendar";
+import ScrollingCalendar from "@/app/components/v2/scrollingCalendar/scrollingCalendar";
 import { UserAssignmentRow } from "@/app/components/userAssignment/userAssignmentRow";
 import AddAssignmentSingleUser from "@/app/components/addAssignmentSingleUser";
 import { MinusIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
-const UserPage: React.FC = () => {
+const UserPage: React.FC = ({ }) => {
+	// console.log(params, 'user params')
 	const params = useParams();
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
@@ -61,30 +62,14 @@ const UserPage: React.FC = () => {
 	const onComplete = () => {
 		setAddAssignmentVisible(false);
 	};
+
 	return (
 		<>
-			<div>
-				{selectedUser && userList ? (
-					<ScrollingCalendar>
-						{selectedUser?.assignments?.map(
-							(assignment: AssignmentType, index) => {
-								return (
-									<UserAssignmentRow
-										key={index}
-										assignment={assignment}
-										monthData={{ monthLabel: "", year: 0 }}
-										isFirstMonth={true}
-										isLastMonth={true}
-									/>
-								);
-							}
-						)}
-					</ScrollingCalendar>
-				) : (
-					<LoadingSpinner />
-				)}
-				<div className="mt-5">
-					<button
+			{selectedUser && userList ? (<ScrollingCalendar selectedUser={selectedUser} />
+			) : (
+				<LoadingSpinner />
+			)}
+			{/* <button
 						className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center"
 						onClick={() => setAddAssignmentVisible(!addAssignmentVisible)}
 					>
@@ -93,16 +78,14 @@ const UserPage: React.FC = () => {
 						) : (
 							<PlusIcon className="fill-accentgreen" />
 						)}
-					</button>
-					{addAssignmentVisible && (
+				</button>  */}
+			{/* {addAssignmentVisible && (
 						<AddAssignmentSingleUser
 							user={selectedUser}
 							onClose={onClose}
 							onComplete={onComplete}
 						/>
-					)}
-				</div>
-			</div>
+					)}*/}
 		</>
 	);
 };
