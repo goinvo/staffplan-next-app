@@ -110,17 +110,6 @@ const AddAssignment = () => {
 	const onCancel = () => router.back();
 	const validateForm = (values: FormikValues) => {
 		const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
-		// if (!values.userId) {
-		// 	errors.userId = "User is required";
-		// }
-		// if (values.userId) {
-		// 	const foundUser = userList?.find(
-		// 		({ id }: UserType) => id === values.userId
-		// 	);
-		// 	if (!foundUser) {
-		// 		errors.userId = "Must select a valid User";
-		// 	}
-		// }
 		if (!values.projectId) {
 			errors.projectId = "Project is required";
 		}

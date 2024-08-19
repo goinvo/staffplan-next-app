@@ -11,7 +11,7 @@ interface WorkWeekInputProps {
 	assignment?: AssignmentType;
 	cweek: number | null;
 	year: number | null;
-	isUserTBD:boolean;
+	isUserTBD: boolean;
 }
 export interface WorkWeekValues {
 	cweek: number;
