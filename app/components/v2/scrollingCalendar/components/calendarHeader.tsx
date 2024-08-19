@@ -25,6 +25,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({ selectedUser, months })
     const totalHoursPerWeek = calculateTotalHours(assignments as AssignmentType[])
     // console.log(assignments, 'assignments from header')
 
+    //@ts-ignore
     const nextQuarter = () => {
         setDateRange(prev => {
             const nextQuarter = (prev.quarter % 4) + 1;

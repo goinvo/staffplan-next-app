@@ -15,6 +15,7 @@ import { calculateTotalHoursForAssignment } from './helpers';
 import IconButton from '../iconButton/iconButton';
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { ArchiveBoxIcon } from "@heroicons/react/24/outline";
+import CustomInput from '../customInput/CustomInput';
 
 
 type ScrollingCalendarProps = {
@@ -49,14 +50,14 @@ const ScrollingCalendar = ({ selectedUser }: ScrollingCalendarProps) => {
                         <td className='pl-2 pr-0 pt-1 pb-2 font-normal align-top w-1/3 flex-none'>
                             <div className='flex flex-row justify-between items-start'>
                                 <IconButton
-                                    className={'text-contrastBlue w-24 flex items-center justify-center'}
+                                    className={'text-contrastBlue w-24 flex items-center justify-center pt-2'}
                                     Icon={PlusIcon} iconSize='h-4 w-4' text={assignment.client.name}
                                     onClick={() => console.log('Plus client click')} />
-                                <button className='w-24 pl-4 font-bold flex items-center justify-center text-contrastBlue'>
+                                <button className='w-24 pl-4 pt-2 font-bold flex items-center justify-center text-contrastBlue'>
                                     Project
                                 </button>
                                 <div className='text-contrastBlue flex flex-col space-y-3 pr-2'>
-                                    <div className='pt-1 underline'>
+                                    <div className='pt-2 underline'>
                                         Signed
                                     </div>
                                     <div className='pt-2'>
@@ -68,13 +69,13 @@ const ScrollingCalendar = ({ selectedUser }: ScrollingCalendarProps) => {
                         {months?.map((month) => {
                             return month.weeks.map((week) => (
                                 <td key={`${month.monthLabel}-${week}`} className="relative px-1 py-1 font-normal">
-                                    <div className='flex flex-col space-y-3'>
-                                        <div className='bg-white py-1 text-center rounded-sm shadow-top-shadow w-[34px] h-[25px] flex items-center justify-center'>
-                                            {assignment.workWeeks.find(w => w.cweek === week)?.actualHours || 0}
-                                        </div>
-                                        <div className='bg-white text-center rounded-sm shadow-top-shadow w-[34px] h-[25px] flex items-center justify-center'>
-                                            {assignment.workWeeks.find(w => w.cweek === week)?.actualHours || 0}
-                                        </div>
+                                    <div className='flex flex-col space-y-3 font-normal'>
+                                        <CustomInput
+                                            value={assignment.workWeeks.find(w => w.cweek === week)?.actualHours || 0}
+                                            onChange={(e) => console.log(e)} />
+                                        <CustomInput
+                                            value={assignment.workWeeks.find(w => w.cweek === week)?.actualHours || 0}
+                                            onChange={(e) => console.log(e)} />
                                     </div>
                                 </td>
                             ));
@@ -82,8 +83,8 @@ const ScrollingCalendar = ({ selectedUser }: ScrollingCalendarProps) => {
                         <td className=" font-normal py-2 w-1/6 flex-none">
                             <div className='flex flex-row justify-between pl-4'>
                                 <div className='space-y-4'>
-                                    <div className='flex flex-start items-center align-center'>{calculateTotalHoursForAssignment(assignment)}</div>
-                                    <div className='flex flex-start items-center align-center'>{calculateTotalHoursForAssignment(assignment)}</div>
+                                    <div className='flex pt-1 flex-start items-center align-center'>{calculateTotalHoursForAssignment(assignment)}</div>
+                                    <div className='flex pt-1 flex-start items-center align-center'>{calculateTotalHoursForAssignment(assignment)}</div>
                                 </div>
                                 <IconButton className='pr-6 text-black flex items-center justify-center text-transparentGrey'
                                     onClick={() => console.log('test')}
