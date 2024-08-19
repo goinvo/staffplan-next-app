@@ -10,6 +10,7 @@ import {
 } from "./typeInterfaces";
 import {
 	GET_USER_LIST,
+	GET_ALL_CLIENTS_DATA,
 	GET_ALL_PROJECTS_DATA,
 	GET_CLIENT_DATA,
 	GET_VIEWER,
@@ -78,7 +79,7 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 	const [viewsFilter, setViewsFilter] = useState<ViewsFiltersType>({
 		selectedProjectSort: "abcProjectName",
 		selectedUserSort: "abcUserName",
-		singleUserSort: "abcProjectName",
+		singleUserSort: "byClient",
 		singleProjectSort: "abcUserName",
 		assignmentSort: "slim",
 		rollupSort: "none",
@@ -123,7 +124,7 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 		loading: clientDataLoading,
 		error: clientDataError,
 		data: clientData,
-	} = useQuery(GET_CLIENT_DATA, {
+	} = useQuery(GET_ALL_CLIENTS_DATA, {
 		context: {
 			headers: {
 				cookie: clientSide ? document.cookie : null,
@@ -179,7 +180,7 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 
 	useEffect(() => {
 		if (clientData) {
-			setClientList(clientData.clients);
+			setClientList(clientData.currentCompany.clients);
 		}
 	}, [clientData]);
 

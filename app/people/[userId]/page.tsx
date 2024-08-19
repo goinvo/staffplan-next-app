@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import withApollo from "@/lib/withApollo";
-import { UserType, AssignmentType } from "../../typeInterfaces";
+import { UserType, AssignmentType, ClientType } from "../../typeInterfaces";
 import { useUserDataContext } from "../../userDataContext";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import { sortSingleUser } from "@/app/helperFunctions";
@@ -10,6 +10,7 @@ import { ScrollingCalendar } from "@/app/components/scrollingCalendar/scrollingC
 import { UserAssignmentRow } from "@/app/components/userAssignment/userAssignmentRow";
 import AddAssignmentSingleUser from "@/app/components/addAssignmentSingleUser";
 import { MinusIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
+
 const UserPage: React.FC = () => {
 	const params = useParams();
 	const [clientSide, setClientSide] = useState(false);
@@ -46,7 +47,6 @@ const UserPage: React.FC = () => {
 		setClientSide(true);
 	}, []);
 
-	// If the user list has been loaded and the user's name is in the URL, get the user's ID and load their assignments
 	useEffect(() => {
 		if (clientSide && userList) {
 			const userId = decodeURIComponent(params.userId.toString());
@@ -54,20 +54,64 @@ const UserPage: React.FC = () => {
 				setSelectedUserData(parseInt(userId));
 			}
 		}
-	}, [clientSide, userList, params.name, viewsFilter]);
+	}, [clientSide, userList, params.userId, viewsFilter]);
 
 	if (!userList) return <LoadingSpinner />;
 	const onClose = () => setAddAssignmentVisible(false);
 	const onComplete = () => {
 		setAddAssignmentVisible(false);
 	};
+	const handleClientClick = (client:ClientType) => {
+		if (!selectedUser) return;
+	
+		const newAssignment: any = {
+		
+			id: Date.now(), // Generate a unique id
+			startsOn: null,
+			endsOn: null,
+			estimatedWeeklyHours: 0,
+			status: "active",
+			project: {
+				__typename: "Project",
+				id: Date.now(), // Generate a unique id for the project
+				name: "New Project",
+				startsOn: null,
+				endsOn: null,
+				client: {
+					id: client.id,
+					name: client.name,
+					avatarUrl: "http://www.gravatar.com/avatar/newavatar",
+					description: ""
+				},
+				paymentFrequency: "",
+				status: "",
+				users: [],
+				fte: 0,
+				hours: 0,
+				isTempProject:true,
+			},
+			workWeeks: [],
+		};
+	
+		// Add new assignment and then sort
+		const updatedAssignments = [...selectedUser.assignments, newAssignment];
+		const sortedAssignments = sortSingleUser(viewsFilter.singleUserSort, {
+			...selectedUser,
+			assignments: updatedAssignments
+		});
+		
+		setSelectedUser(sortedAssignments);
+		setSingleUserPage(sortedAssignments);
+	};
+	
 	return (
 		<>
 			<div>
 				{selectedUser && userList ? (
 					<ScrollingCalendar>
 						{selectedUser?.assignments?.map(
-							(assignment: AssignmentType, index) => {
+							(assignment: AssignmentType, index, allAssignments) => {
+								const isFirstClient = index === allAssignments.findIndex((a) => a.project.client.id === assignment.project.client.id);
 								return (
 									<UserAssignmentRow
 										key={index}
@@ -75,6 +119,8 @@ const UserPage: React.FC = () => {
 										monthData={{ monthLabel: "", year: 0 }}
 										isFirstMonth={true}
 										isLastMonth={true}
+										isFirstClient={isFirstClient}
+										clickHandler={handleClientClick} 
 									/>
 								);
 							}
@@ -89,7 +135,7 @@ const UserPage: React.FC = () => {
 						onClick={() => setAddAssignmentVisible(!addAssignmentVisible)}
 					>
 						{addAssignmentVisible ? (
-							<XMarkIcon className="fill-accentgreen" />
+							<MinusIcon className="fill-accentgreen" />
 						) : (
 							<PlusIcon className="fill-accentgreen" />
 						)}

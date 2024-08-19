@@ -22,15 +22,15 @@ export interface WorkWeekValues {
 }
 export const WorkWeekInput = ({
 	withinProjectDates,
-	workWeek,
-	assignment,
+   	assignment,
 	cweek,
 	year,
 }: WorkWeekInputProps) => {
+	const existingWorkWeek = assignment?.workWeeks.find((week) => week.cweek === cweek && week.year === year);
 	const initialValues = {
-		actualHours: workWeek?.actualHours || "",
+		actualHours: existingWorkWeek?.actualHours || "",
 		estimatedHours:
-			workWeek?.estimatedHours || assignment?.estimatedWeeklyHours || "",
+			existingWorkWeek?.estimatedHours || assignment?.estimatedWeeklyHours || "",
 		assignmentId: assignment?.id,
 		cweek: cweek,
 		year: year,
@@ -54,7 +54,7 @@ export const WorkWeekInput = ({
 	};
 	return (
 		<>
-			{workWeek ? (
+			{existingWorkWeek ? (
 				<div className="flex flex-col items-center ">
 					<Formik
 						onSubmit={(e) => upsertWorkWeekValues(e)}
@@ -107,7 +107,7 @@ export const WorkWeekInput = ({
 					</Formik>
 				</div>
 			) : null}
-			{assignment && !workWeek ? (
+			{assignment && !existingWorkWeek ? (
 				<div className="flex flex-col items-center">
 					<Formik
 						onSubmit={(e) => upsertWorkWeekValues(e)}

@@ -1,12 +1,16 @@
+import { AssignmentType } from "@/app/typeInterfaces";
 import Image from "next/image";
 import React from "react";
-import { UserLabelProps } from "../../typeInterfaces";
 
-export const UserLabel = ({ assignment, clickHandler }: UserLabelProps) => {
+interface TempLabelProps {
+	assignment: AssignmentType;
+	tempProjectOpen: boolean;
+	setTempProjectOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+export const TempProjectLabel = ({ assignment, tempProjectOpen, setTempProjectOpen }: TempLabelProps) => {
 	return (
 		<div
 			className="hover:cursor-pointer w-40 absolute left-10 mt-5 overflow-hidden"
-			onClick={() => clickHandler(assignment)}
 		>
 			<div className=" flex w-12 h-12 timeline-grid-bg rounded-full overflow-hidden">
 				<Image
@@ -18,16 +22,11 @@ export const UserLabel = ({ assignment, clickHandler }: UserLabelProps) => {
 			</div>
 			<div
 				className="hover:cursor-pointer"
-				onClick={() => clickHandler(assignment)}
 			>
-				{assignment.project.name}
+				<input/>
 			</div>
 			{assignment.status === "active" ? null : (
-				<div className="text-red-500 text-sm">
-					{" "}
-					Unconfirmed
-					<br /> Assignment
-				</div>
+				<div className="text-red-500 text-sm"> Unconfirmed<br/> Assignment</div>
 			)}
 		</div>
 	);

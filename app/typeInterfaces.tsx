@@ -57,6 +57,7 @@ export interface EllipsisProjectMenuProps {
 	project: Partial<ProjectType>;
 }
 export interface ProjectType {
+	isTempProject?:boolean;
 	endsOn: string | null;
 	id: number;
 	name: string;
@@ -130,7 +131,7 @@ export interface UserAssignmentDataType {
 export interface UserType {
 	id?: number;
 	name: string;
-	assignments?: AssignmentType[];
+	assignments: AssignmentType[];
 	avatarUrl: string;
 }
 
@@ -142,8 +143,12 @@ export interface UserAssignmentDataMapType {
 	};
 }
 export interface UserLabelProps {
+	project?: ProjectType;
 	assignment: AssignmentType;
 	clickHandler: (assignment: AssignmentType) => void;
+}
+export interface ClientLabelProps {
+	assignment: AssignmentType;
 }
 export interface UserOptionType {
 	value: string;
