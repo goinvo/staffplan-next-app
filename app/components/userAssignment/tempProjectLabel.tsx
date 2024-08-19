@@ -19,7 +19,6 @@ export const TempProjectLabel = ({
 	setTempProjectOpen,
 }: TempLabelProps) => {
 	const {userId} = useParams();
-	console.log(assignment, "ASSIGNEMNT IN TEMP");
 	const { refetchProjectList,refetchUserList } = useUserDataContext();
 	const initialValues = {
 		client: assignment.project.client.id,
@@ -56,7 +55,7 @@ export const TempProjectLabel = ({
 		};
 		upsertProject({
 			variables: variables,
-		}).then(() => console.log("PROJECT CREATED"));
+		})
 	};
 	return (
 		<div className="hover:cursor-pointer w-40 absolute left-10 mt-5 overflow-hidden">

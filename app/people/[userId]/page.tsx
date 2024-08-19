@@ -61,18 +61,6 @@ const UserPage: React.FC = () => {
 	const onComplete = () => {
 		setAddAssignmentVisible(false);
 	};
-
-	// const addNewAssignment = (newAssignment: AssignmentType) => {
-	// 	if (!selectedUser) return;
-	// 	const updatedAssignments = [...selectedUser.assignments, newAssignment];
-	// 	const sortedAssignments = sortSingleUser(viewsFilter.singleUserSort, {
-	// 		...selectedUser,
-	// 		assignments: updatedAssignments
-	// 	});
-	// 	setSelectedUser(sortedAssignments);
-	// 	setSingleUserPage(sortedAssignments);
-	// };
-
 	const handleClientClick = (client:ClientType) => {
 		if (!selectedUser) return;
 	
