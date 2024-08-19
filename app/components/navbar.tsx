@@ -63,11 +63,13 @@ const Navbar: React.FC = () => {
 			</div>
 			<div className="flex items-center space-x-4 py-4">
 				<div className="h-4 w-4">
+					<Link href="?airTableFormModal=true">
 					<ChatBubbleBottomCenterTextIcon />
+					</Link>
 				</div>
-				<div className="h-4 w-4">
+				{/* <div className="h-4 w-4">
 					<BellIcon />
-				</div>
+				</div> */}
 
 				<div>{viewer.name}</div>
 			</div>

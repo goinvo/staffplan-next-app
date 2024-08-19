@@ -57,6 +57,7 @@ export const TempProjectLabel = ({
 			variables: variables,
 		})
 	};
+
 	return (
 		<div className="hover:cursor-pointer w-40 absolute left-10 mt-5 overflow-hidden">
 			<div className=" flex w-12 h-12 timeline-grid-bg rounded-full overflow-hidden">

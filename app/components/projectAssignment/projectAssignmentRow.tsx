@@ -30,7 +30,7 @@ export const ProjectAssignmentRow = ({
 			"day"
 		)
 	);
-
+	const isUserTBD = assignment.assignedUser === null;
 	const handleUserChange = (assignment: AssignmentType) => {
 		const user = assignment.assignedUser.id?.toString();
 		if (user) {
@@ -56,6 +56,7 @@ export const ProjectAssignmentRow = ({
 		<div className="flex">
 			{isFirstMonth && (
 				<ProjectUserLabel
+					project={project}
 					assignment={assignment}
 					clickHandler={handleUserChange}
 				/>
@@ -73,6 +74,8 @@ export const ProjectAssignmentRow = ({
 							className="flex-1 flex flex-col items-center"
 						>
 							<WorkWeekInput
+								
+								isUserTBD={isUserTBD}
 								withinProjectDates={isWeekWithinProject(mondayDate)}
 								assignment={assignment}
 								cweek={cweek}
