@@ -121,6 +121,69 @@ export const getMonths = (startDate: any, endDate: any) => {
   );
 };
 
+const getWeeksInMonth = (start: DateTime, end: DateTime): number[] => {
+  const weeks: number[] = [];
+
+  // Start of the first week of month
+  let currentWeek = start.startOf("week");
+
+  const endOfMonthWeek = end.endOf("week");
+  while (currentWeek <= endOfMonthWeek) {
+    if (currentWeek >= start.startOf("month") && currentWeek <= end) {
+      weeks.push(currentWeek.weekNumber);
+    }
+    currentWeek = currentWeek.plus({ weeks: 1 });
+  }
+
+  return weeks;
+};
+
+export const getMonthsWithWeeks = (
+  startDate: any,
+  endDate: any,
+  monthsCount: number
+) => {
+  const start = DateTime.fromISO(startDate);
+  const end = DateTime.fromISO(endDate);
+
+  const finalEnd = start
+    .plus({ months: monthsCount })
+    .minus({ days: 1 })
+    .endOf("month")
+    .toISO();
+  const finalEndDate = DateTime.fromISO(finalEnd as string);
+
+  return Array.from(
+    { length: finalEndDate.diff(start, "months").months + 1 },
+    (_, index) => {
+      const monthStart = start.plus({ months: index }).startOf("month");
+      const monthEnd = monthStart.endOf("month");
+      return {
+        monthLabel: monthStart.toFormat("M"),
+        year: monthStart.year,
+        weeks: getWeeksInMonth(monthStart, monthEnd),
+      };
+    }
+  );
+};
+// export const getMonthsWithWeeks = (startDate: any, endDate: any) => {
+//   const start = DateTime.fromISO(startDate);
+//   const end = DateTime.fromISO(endDate);
+
+//   return Array.from(
+//     { length: end.diff(start, "months").months + 1 },
+//     (_, index) => {
+//       const monthStart = start.plus({ months: index }).startOf("month");
+//       const monthEnd = monthStart.endOf("month");
+//       return {
+//         monthLabel: monthStart.toFormat("M"),
+//         year: start.year,
+//         weeks: getWeeksInMonth(monthStart, monthEnd),
+//       };
+//     }
+//   );
+// };
+
 export const getAssignmentcWeeks = (startDate: any, endDate: any) => {
   const start = DateTime.fromISO(startDate);
   const end = DateTime.fromISO(endDate);

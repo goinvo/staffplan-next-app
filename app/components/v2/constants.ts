@@ -1,0 +1,17 @@
+export enum MONTS_PER_SCREEN_SIZE {
+  SMALL,
+  MEDIUM,
+  LARGE,
+  X_LARGE,
+}
+
+type MonthsCount = {
+  [key in MONTS_PER_SCREEN_SIZE]: number;
+};
+
+export const MONTHS_COUNT: MonthsCount = {
+  [MONTS_PER_SCREEN_SIZE.SMALL]: 2,
+  [MONTS_PER_SCREEN_SIZE.MEDIUM]: 3,
+  [MONTS_PER_SCREEN_SIZE.LARGE]: 4,
+  [MONTS_PER_SCREEN_SIZE.X_LARGE]: 6,
+};

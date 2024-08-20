@@ -46,7 +46,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({ selectedUser, months })
     return (
         <thead>
             <tr className="px-4 border-bottom actionbar text-white flex">
-                <th className="px-0 py-2 w-1/3 flex-none">
+                <th className="px-0 py-2 w-1/3">
                     <div className='flex flex-row text-white items-center'>
                         <div className="px-0 py-2">
                             <Image src={selectedUser?.avatarUrl}
@@ -68,17 +68,17 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({ selectedUser, months })
                         </th>
                     ));
                 })}
-                <th className="px-4 py-2 w-1/6 flex-none"></th>
+                <th className="px-4 py-2 w-1/6"></th>
             </tr>
 
             <tr className="px-2 flex border-b border-gray-300">
-                <th className="pl-0 pr-0 pt-1 pb-2 font-normal align-top text-transparentGrey w-1/3 flex-none">
+                <th className="pl-0 pr-0 pt-1 pb-2 font-normal align-top text-transparentGrey w-1/3">
                     <div className='flex flex-row justify-between item-start'>
                         <IconButton
-                            className={'w-24 flex items-center justify-center'}
+                            className={'w-24 flex items-center justify-center text-start'}
                             Icon={PlusIcon} iconSize='h-4 w-4' text={'Client'}
                             onClick={() => console.log('Plus client click')} />
-                        <button className='w-24 pr-2 flex items-center justify-center'>
+                        <button className='w-24 flex items-center justify-start text-start'>
                             Project
                         </button>
                         <IconButton className='pt-2 text-black flex items-center justify-center' onClick={prevQuarter} Icon={ChevronLeftIcon} iconSize={'h6 w-6'} />
@@ -96,7 +96,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({ selectedUser, months })
 
                     ));
                 })}
-                <th className="pl-0 pr-4 pt-1 pb-2 font-normal align-top w-1/6 flex-none">
+                <th className="pl-0 pr-4 pt-1 pb-2 font-normal align-top w-1/6">
                     <IconButton className='pt-2 text-contrastBlue flex items-center justify-center'
                         onClick={nextQuarter}
                         Icon={ChevronRightIcon}
