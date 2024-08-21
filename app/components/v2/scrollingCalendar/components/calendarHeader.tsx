@@ -1,31 +1,32 @@
 import Image from 'next/image';
 import { SlPencil } from "react-icons/sl";
-import { DateTime } from 'luxon';
+
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 import ColumnChart from '../../columnChart/columnChart';
 import IconButton from '../../iconButton/iconButton';
-import { PlusIcon } from "@heroicons/react/24/outline";
+
 import { useUserDataContext } from '@/app/userDataContext';
-import { calculateTotalHours } from '../helpers';
 import { AssignmentType, MonthsDataType, UserType } from '@/app/typeInterfaces';
+import { calculateTotalHoursPerWeek, isBeforeWeek, showMonthAndYear } from '../helpers';
 import { userData } from '../../mockData';
 
 type CalendarHeaderProps = {
     selectedUser: UserType,
     months: MonthsDataType[],
+    currentWeek: number,
+    currentYear: number
 }
 
-const CalendarHeader: React.FC<CalendarHeaderProps> = ({ selectedUser, months }) => {
+const CalendarHeader: React.FC<CalendarHeaderProps> = ({ selectedUser, months, currentWeek, currentYear }) => {
     const { setDateRange } = useUserDataContext();
 
     // const { assignments } = selectedUser
     const assignments = userData
-    const totalHoursPerWeek = calculateTotalHours(assignments as AssignmentType[])
-    // console.log(assignments, 'assignments from header')
+    const totalHoursPerWeek = calculateTotalHoursPerWeek(assignments as AssignmentType[])
 
-    //@ts-ignore
     const nextQuarter = () => {
         setDateRange(prev => {
             const nextQuarter = (prev.quarter % 4) + 1;
@@ -45,7 +46,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({ selectedUser, months })
 
     return (
         <thead>
-            <tr className="px-4 border-bottom actionbar text-white flex">
+            <tr className="pl-4 border-bottom actionbar text-white flex">
                 <th className="px-0 py-2 w-1/3">
                     <div className='flex flex-row text-white items-center'>
                         <div className="px-0 py-2">
@@ -63,7 +64,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({ selectedUser, months })
                     return month.weeks.map((week) => (
                         <th key={week} className="relative px-1">
                             <div className='flex flex-col items-center w-[34px]'>
-                                <ColumnChart height={totalHoursPerWeek[week]} />
+                                <ColumnChart height={totalHoursPerWeek[`${month.year}-${week}`]} color={isBeforeWeek(week, currentWeek, currentYear, month) ? '#AEB3C0' : '#27B5B0'} />
                             </div>
                         </th>
                     ));
@@ -90,7 +91,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({ selectedUser, months })
                         <th key={`${month.monthLabel}-${index}`} className="relative py-2 px-1 font-normal text-contrastBlue">
                             <div className="flex flex-col items-center w-[34px]">
                                 <span>{`W${index + 1}`}</span>
-                                {index === 0 && <>{DateTime.local(month.year, parseInt(month.monthLabel), 1).toFormat('MMM')}</>}
+                                {index === 0 && <span>{showMonthAndYear(month.year, month.monthLabel)}</span>}
                             </div>
                         </th>
 

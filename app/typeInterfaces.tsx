@@ -225,3 +225,8 @@ export interface WorkWeekBlockMemberType {
 	consecutivePrevWeeks: number;
 	isLastConsecutiveWeek: boolean;
 }
+
+export interface DateRange {
+	quarter: number;
+	year: number;
+}

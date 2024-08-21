@@ -2,32 +2,26 @@ import React from 'react';
 
 type ChartProps = {
     height: number
+    color?: string
+    maxValue?: number
 }
 
-// to do: refactor chart to Charts.js? fix text and chart distance
-
-const ColumnChart = ({ height }: ChartProps) => {
+const ColumnChart = ({ height, color = '#27B5B0', maxValue = 50 }: ChartProps) => {
+    const validatedHeight = Math.max(0, Math.min(height, maxValue));
+    const scale = 100 / maxValue;
+    const svgHeight = validatedHeight * scale;
 
     return (
         <div className="absolute bottom-0 left-0 right-0 w-[100%]">
-            <div className='text-sm font-normal text-white pr-2'>{height || 0}</div>
-            <div>
-                {height && <svg
-                    width="90%"
-                    height="100%"
-                    viewBox="0 0 100 100"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    {height}
-                    <rect
-                        x="0"
-                        y={`${100 - height}`}
-                        width="100%"
-                        height={`${height}%`}
-                        fill="#27B5B0"
+            <span className='flex justify-center w-[34px] font-normal text-white'>{height || 0}</span>
+            {height && (
+                <svg width='34px' height={svgHeight} viewBox={`0 0 34 ${svgHeight}`} xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d={`M0 3C0 1.34315 1.34315 0 3 0H31C32.6569 0 34 1.34315 34 3V${svgHeight}H0V3Z`}
+                        fill={color}
                     />
-                </svg>}
-            </div>
+                </svg>
+            )}
         </div>
     );
 };

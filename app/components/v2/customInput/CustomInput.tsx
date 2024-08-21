@@ -1,3 +1,4 @@
+'use client'
 import React, { ChangeEvent, FocusEvent, useRef, useCallback } from 'react';
 import { ArrowLongRightIcon } from "@heroicons/react/24/outline";
 
@@ -7,6 +8,7 @@ interface CustomInputProps {
     onFocus?: (event: FocusEvent<HTMLInputElement>) => void;
     onBlur?: (event: FocusEvent<HTMLInputElement>) => void;
     className?: string;
+    disabled?: boolean;
 }
 
 const CustomInput: React.FC<CustomInputProps> = ({
@@ -15,6 +17,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
     onFocus,
     onBlur,
     className = '',
+    disabled
 }) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -54,7 +57,8 @@ const CustomInput: React.FC<CustomInputProps> = ({
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 ref={inputRef}
-                className={`bg-white text-center rounded-sm shadow-top-shadow w-[34px] h-[25px] focus:border-tiffany focus:ring-1 focus:ring-tiffany border-none focus:border-tiffany outlined-none mb-0" ${className}`}
+                disabled={disabled}
+                className={`bg-white text-center rounded-sm shadow-top-shadow w-[34px] h-[25px] focus:border-tiffany focus:ring-1 focus:ring-tiffany border-none focus:border-tiffany outlined-none mb-0 px-0 py-0" ${className}`}
             />
             <button
                 ref={buttonRef}

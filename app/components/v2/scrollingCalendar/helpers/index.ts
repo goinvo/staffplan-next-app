@@ -2,58 +2,100 @@ import { DateTime, Interval } from "luxon";
 
 import { AssignmentType, MonthsDataType } from "../../../../typeInterfaces";
 
+export const isBeforeWeek = (
+  week: number,
+  currentWeek: number,
+  currentYear: number,
+  month: MonthsDataType
+) => {
+  if (month.year < currentYear) {
+    return true;
+  }
+
+  if (month.year === currentYear) {
+    if (week === 1 && month.monthLabel === "12") {
+      return false;
+    }
+    return week < currentWeek;
+  }
+  return false;
+};
+
+export const getCurrentWeekOfYear = () => {
+  const now = DateTime.local();
+  const weekNumber = now.weekNumber;
+  return weekNumber;
+};
+
+export const showMonthAndYear = (year: number, monthLabel: string) => {
+  if (monthLabel === "1") {
+    return DateTime.local(year, parseInt(monthLabel), 1).toFormat("MMM yyyy");
+  }
+  return DateTime.local(year, parseInt(monthLabel), 1).toFormat("MMM");
+};
+
 // TO DO: REFACTOR, when chaging date range still old data
-export const calculateTotalHoursForAssignment = (
+export const calculateTotalActualHoursForAssignment = (
   assignment: AssignmentType
 ) => {
   const totalHours = assignment.workWeeks.reduce((sum, weekData) => {
     return sum + (weekData.actualHours || 0);
   }, 0);
-
   return totalHours;
 };
 
-export const calculateTotalHours = (assignments: AssignmentType[]) => {
-  const totalHours: { [week: number]: number } = {};
+export const calculateTotalEstimatedHoursForAssignment = (
+  assignment: AssignmentType
+) => {
+  const totalHours = assignment.workWeeks.reduce((sum, weekData) => {
+    return sum + (weekData.estimatedHours || 0);
+  }, 0);
+  return totalHours;
+};
+
+export const calculateTotalHoursPerWeek = (
+  assignments: AssignmentType[],
+  month?: MonthsDataType
+) => {
+  const totalHours: { [key: string]: number } = {};
 
   assignments?.forEach((assignment) => {
     assignment.workWeeks.forEach((weekData) => {
-      if (!totalHours[weekData.cweek]) {
-        totalHours[weekData.cweek] = 0;
+      const key = `${weekData.year}-${weekData.cweek}`;
+      if (!totalHours[key]) {
+        totalHours[key] = 0;
       }
-      totalHours[weekData.cweek] += weekData.actualHours || 0;
+      totalHours[key] += weekData.actualHours || 0;
     });
   });
   return totalHours;
 };
 
-export const groupWeeksByMonth = (
-  months: MonthsDataType[],
-  weeks: number[]
-) => {
-  const groupedWeeks: { [key: string]: number[] } = {};
-  // const groupedWeeks: number[][] = [];
-  months.forEach((month) => {
-    const monthKey = DateTime.local(
-      month.year,
-      parseInt(month.monthLabel),
-      1
-    ).toFormat("MMM yyyy");
-    const start = DateTime.local(month.year, parseInt(month.monthLabel), 1);
-    const end = start.endOf("month");
-    const monthWeeks = weeks.filter((week) => {
-      const date = DateTime.fromObject({
-        weekYear: month.year,
-        weekNumber: week,
-      });
-      return date >= start && date <= end;
-    });
-    // groupedWeeks.push(monthWeeks);
-    groupedWeeks[start.toFormat("MMM yyyy")] = monthWeeks;
-  });
+// export const groupWeeksByMonth = (
+//   months: MonthsDataType[],
+//   weeks: number[]
+// ) => {
+//   const groupedWeeks: { [key: string]: number[] } = {};
+//   months.forEach((month) => {
+//     const monthKey = DateTime.local(
+//       month.year,
+//       parseInt(month.monthLabel),
+//       1
+//     ).toFormat("MMM yyyy");
+//     const start = DateTime.local(month.year, parseInt(month.monthLabel), 1);
+//     const end = start.endOf("month");
+//     const monthWeeks = weeks.filter((week) => {
+//       const date = DateTime.fromObject({
+//         weekYear: month.year,
+//         weekNumber: week,
+//       });
+//       return date >= start && date <= end;
+//     });
+//     groupedWeeks[start.toFormat("MMM yyyy")] = monthWeeks;
+//   });
 
-  return groupedWeeks;
-};
+//   return groupedWeeks;
+// };
 
 // show month /// refactor
 // export const showYear = (monthData: MonthData) => {
@@ -124,19 +166,42 @@ export const getMonths = (startDate: any, endDate: any) => {
 const getWeeksInMonth = (start: DateTime, end: DateTime): number[] => {
   const weeks: number[] = [];
 
-  // Start of the first week of month
   let currentWeek = start.startOf("week");
-
   const endOfMonthWeek = end.endOf("week");
+
   while (currentWeek <= endOfMonthWeek) {
     if (currentWeek >= start.startOf("month") && currentWeek <= end) {
-      weeks.push(currentWeek.weekNumber);
+      const weekNumber = currentWeek.weekNumber;
+      if (weekNumber === 1 && currentWeek.month === 12) {
+        if (!weeks.includes(53)) {
+          weeks.push(53);
+        }
+      } else if (!weeks.includes(weekNumber)) {
+        weeks.push(weekNumber);
+      }
     }
     currentWeek = currentWeek.plus({ weeks: 1 });
   }
 
   return weeks;
 };
+
+// const getWeeksInMonth = (start: DateTime, end: DateTime): number[] => {
+//   const weeks: number[] = [];
+
+//   // Start of the first week of month
+//   let currentWeek = start.startOf("week");
+
+//   const endOfMonthWeek = end.endOf("week");
+//   while (currentWeek <= endOfMonthWeek) {
+//     if (currentWeek >= start.startOf("month") && currentWeek <= end) {
+//       weeks.push(currentWeek.weekNumber);
+//     }
+//     currentWeek = currentWeek.plus({ weeks: 1 });
+//   }
+
+//   return weeks;
+// };
 
 export const getMonthsWithWeeks = (
   startDate: any,

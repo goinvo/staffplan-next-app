@@ -83,13 +83,13 @@ export const ScrollingCalendar = ({ children }: any) => {
 									));
 								})()}
 							</div>
-							{/* {React.Children.map(children, (child) =>
+							{React.Children.map(children, (child) =>
 								React.cloneElement(child as React.ReactElement<any>, {
 									monthData,
 									isFirstMonth: index === 0,
 									isLastMonth: index === months.length - 1,
 								})
-							)} */}
+							)}
 						</div>
 					))}
 				</div>

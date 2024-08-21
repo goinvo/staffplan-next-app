@@ -182,18 +182,18 @@ export const userData = [
     workWeeks: [
       {
         id: 14,
-        actualHours: 15,
+        actualHours: 25,
         estimatedHours: 20,
         assignmentId: 4,
-        cweek: 3,
+        cweek: 31,
         year: 2024,
       },
       {
         id: 15,
-        actualHours: 18,
+        actualHours: 23,
         estimatedHours: 20,
         assignmentId: 4,
-        cweek: 4,
+        cweek: 32,
         year: 2024,
       },
       {
@@ -281,7 +281,7 @@ export const userData = [
         actualHours: 14,
         estimatedHours: 18,
         assignmentId: 6,
-        cweek: 10,
+        cweek: 30,
         year: 2024,
       },
       {
@@ -289,7 +289,7 @@ export const userData = [
         actualHours: 15,
         estimatedHours: 18,
         assignmentId: 6,
-        cweek: 11,
+        cweek: 32,
         year: 2024,
       },
       {
@@ -297,7 +297,7 @@ export const userData = [
         actualHours: 16,
         estimatedHours: 18,
         assignmentId: 6,
-        cweek: 12,
+        cweek: 33,
         year: 2024,
       },
       {
@@ -305,7 +305,7 @@ export const userData = [
         actualHours: 17,
         estimatedHours: 18,
         assignmentId: 6,
-        cweek: 13,
+        cweek: 34,
         year: 2024,
       },
     ],
@@ -337,11 +337,27 @@ export const userData = [
         year: 2024,
       },
       {
+        id: 25,
+        actualHours: 29,
+        estimatedHours: 20,
+        assignmentId: 7,
+        cweek: 15,
+        year: 2024,
+      },
+      {
+        id: 25,
+        actualHours: 29,
+        estimatedHours: 20,
+        assignmentId: 7,
+        cweek: 16,
+        year: 2024,
+      },
+      {
         id: 21,
         actualHours: 20,
         estimatedHours: 20,
         assignmentId: 7,
-        cweek: 15,
+        cweek: 17,
         year: 2024,
       },
       {
@@ -349,7 +365,7 @@ export const userData = [
         actualHours: 31,
         estimatedHours: 20,
         assignmentId: 7,
-        cweek: 16,
+        cweek: 18,
         year: 2024,
       },
     ],
@@ -496,7 +512,7 @@ export const userData = [
 //         year: 2024,
 //       },
 //       {
-//         id: 11,
+//         id: 11,assignments.map(
 //         actualHours: 22,
 //         estimatedHours: 25,
 //         assignmentId: 3,

@@ -7,6 +7,7 @@ import {
 	UserType,
 	ViewerType,
 	ViewsFiltersType,
+	DateRange
 } from "./typeInterfaces";
 import {
 	GET_USER_LIST,
@@ -24,7 +25,7 @@ export interface UserDataContextType {
 	userList: any;
 	setUserList: React.Dispatch<React.SetStateAction<any>>;
 	dateRange: any;
-	setDateRange: React.Dispatch<React.SetStateAction<any>>;
+	setDateRange: React.Dispatch<React.SetStateAction<DateRange>>;
 	projectList: ProjectType[];
 	setProjectList: React.Dispatch<React.SetStateAction<ProjectType[]>>;
 	clientList: ClientType[];
@@ -65,7 +66,7 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 }) => {
 	const client = useApolloClient();
 	const [clientSide, setClientSide] = useState(false);
-	const [dateRange, setDateRange] = useState<>({
+	const [dateRange, setDateRange] = useState<DateRange>({
 		quarter: currentQuarter,
 		year: currentYear,
 	});
