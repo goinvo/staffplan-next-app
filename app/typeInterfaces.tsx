@@ -57,7 +57,7 @@ export interface EllipsisProjectMenuProps {
 	project: Partial<ProjectType>;
 }
 export interface ProjectType {
-	isTempProject?:boolean;
+	isTempProject?: boolean;
 	endsOn: string | null;
 	id: number;
 	name: string;
@@ -226,4 +226,13 @@ export interface WorkWeekBlockMemberType {
 	itemEstHoursOffset: number;
 	consecutivePrevWeeks: number;
 	isLastConsecutiveWeek: boolean;
+}
+
+export interface MonthsDataType {
+	monthLabel: string; year: number; weeks: number[]
+}
+
+export interface DateRange {
+	quarter: number;
+	year: number;
 }
