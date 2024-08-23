@@ -2,6 +2,14 @@ import { DateTime, Interval } from "luxon";
 
 import { AssignmentType, MonthsDataType } from "../../../../typeInterfaces";
 
+export const getCurrentYear = () => DateTime.now().year;
+
+export const getCurrentWeekOfYear = () => {
+  const now = DateTime.local();
+  const weekNumber = now.weekNumber;
+  return weekNumber;
+};
+
 export const isBeforeWeek = (
   week: number,
   currentWeek: number,
@@ -19,12 +27,6 @@ export const isBeforeWeek = (
     return week < currentWeek;
   }
   return false;
-};
-
-export const getCurrentWeekOfYear = () => {
-  const now = DateTime.local();
-  const weekNumber = now.weekNumber;
-  return weekNumber;
 };
 
 export const showMonthAndYear = (year: number, monthLabel: string) => {

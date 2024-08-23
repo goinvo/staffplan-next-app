@@ -7,15 +7,19 @@ interface IconButtonProps {
     ariaLabel?: string
     text?: string
     iconSize?: string
+    style?: any
+    type?: 'button' | 'submit' | 'reset'
 }
-const IconButton: React.FC<IconButtonProps> = ({ Icon, onClick, iconSize, className, ariaLabel, text }) => {
+const IconButton: React.FC<IconButtonProps> = ({ Icon, onClick, iconSize, className, ariaLabel, text, style, type = 'button' }) => {
     return (
         <button
+            type={type}
             onClick={onClick}
             className={className}
             aria-label={ariaLabel}
+            style={style}
         >
-            {Icon && <Icon className={iconSize} />}
+            <div className='flex self-start py-0.5'>{Icon && <Icon className={iconSize} />}</div>
             {text && <span className='px-1'>
                 {text}
             </span>}

@@ -9,7 +9,7 @@ import { ArchiveBoxIcon } from "@heroicons/react/24/outline";
 import CalendarHeader from './components/calendarHeader';
 
 import IconButton from '../iconButton/iconButton';
-import CustomInput from '../customInput/CustomInput';
+import CustomWeekInput from '../customWeekInput/CustomWeekInput';
 
 import { useUserDataContext } from '@/app/userDataContext';
 import { userData } from '../mockData';
@@ -21,6 +21,7 @@ import {
 import { MONTHS_COUNT, MONTS_PER_SCREEN_SIZE } from '../constants';
 import { calculateTotalActualHoursForAssignment, calculateTotalEstimatedHoursForAssignment, getCurrentWeekOfYear, getMondays, getMonthsWithWeeks, isBeforeWeek } from './helpers';
 import useMediaQuery from '@/app/hooks/useMediaQuery';
+import ColumnChart from '../columnChart/columnChart';
 
 
 
@@ -39,7 +40,7 @@ const ScrollingCalendar = ({ selectedUser }: ScrollingCalendarProps) => {
     const isLargeScreen = useMediaQuery('(min-width: 1500px) and (max-width: 1799px)');
     const currentWeek = getCurrentWeekOfYear()
     const currentYear = DateTime.now().year;
-
+    console.log(selectedUser.assignments, 'assignments')
     const detectMonthsCountPerScreen = useCallback(() => {
         if (isSmallScreen) return MONTHS_COUNT[MONTS_PER_SCREEN_SIZE.SMALL]
         if (isMediumScreen) return MONTHS_COUNT[MONTS_PER_SCREEN_SIZE.MEDIUM]
@@ -54,20 +55,22 @@ const ScrollingCalendar = ({ selectedUser }: ScrollingCalendarProps) => {
         setMonths(monthsData)
     }, [dateRange, detectMonthsCountPerScreen]);
 
+    const columnsHeaderTitles = [{ title: 'Client', showIcon: true }, { title: 'Project', showIcon: false }]
+
     return (
         <table className="min-w-full timeline-grid-bg text-contrastBlue text-sm">
-            <CalendarHeader selectedUser={selectedUser} months={months} currentWeek={currentWeek} currentYear={currentYear} />
-            <tbody>
-                {assignments.map((assignment, index) => (
+            <CalendarHeader assignments={selectedUser.assignments} avatarUrl={selectedUser.avatarUrl} editable={true} userName={selectedUser.name} months={months} columnHeaderTitles={columnsHeaderTitles} />
+            {/* <tbody>
+                {selectedUser.assignments.map((assignment, index) => (
                     <tr key={index} className="px-2 flex border-b border-gray-300 hover:bg-hoverGrey">
                         <td className='pl-2 pr-0 pt-1 pb-2 font-normal align-top w-1/3'>
                             <div className='flex flex-row justify-between items-start'>
                                 <IconButton
                                     className={'text-contrastBlue w-24 flex items-center justify-center pt-2 text-start'}
-                                    Icon={PlusIcon} iconSize='h-4 w-4' text={assignment.client.name}
+                                    Icon={PlusIcon} iconSize='h-4 w-4' text={assignment.project.client.name}
                                     onClick={() => console.log('Plus client click')} />
-                                <button className='w-24 pl-2 pt-2 font-bold flex items-center justify-start text-contrastBlue text-start'>
-                                    Project
+                                <button className='w-24 pl-1 pt-2 font-bold flex items-center justify-start text-contrastBlue text-start'>
+                                    {assignment.project.name}
                                 </button>
                                 <div className='text-contrastBlue flex flex-col space-y-3 pr-2'>
                                     <div className='pt-2 underline'>
@@ -83,12 +86,12 @@ const ScrollingCalendar = ({ selectedUser }: ScrollingCalendarProps) => {
                             return month.weeks.map((week) => (
                                 <td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal`}>
                                     <div className='flex flex-col space-y-3 font-normal'>
-                                        <CustomInput
+                                        <CustomWeekInput
                                             value={assignment.workWeeks.find(w => w.cweek === week && w.year === month.year)?.estimatedHours || 0}
                                             onChange={(e) => console.log(e)}
                                             disabled={currentWeek !== week}
                                         />
-                                        {(isBeforeWeek(week, currentWeek, currentYear, month) || currentWeek === week && currentYear === month.year) && (<CustomInput
+                                        {(isBeforeWeek(week, currentWeek, currentYear, month) || currentWeek === week && currentYear === month.year) && (<CustomWeekInput
                                             disabled={currentWeek !== week}
                                             value={assignment.workWeeks.find(w => w.cweek === week && w.year === month.year)?.actualHours || 0}
                                             onChange={(e) => console.log(e)} />)}
@@ -111,7 +114,7 @@ const ScrollingCalendar = ({ selectedUser }: ScrollingCalendarProps) => {
                     </tr>
                 ))
                 }
-            </tbody >
+            </tbody > */}
         </table >
 
     );

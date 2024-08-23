@@ -6,7 +6,7 @@ import { isBeforeWeek, calculateTotalEstimatedHoursForAssignment, calculateTotal
 import IconButton from '../../iconButton/iconButton';
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { ArchiveBoxIcon } from "@heroicons/react/24/outline";
-import CustomInput from '../../customInput/CustomInput';
+import CustomInput from '../../customWeekInput/CustomWeekInput';
 import { AssignmentType, MonthsDataType } from '@/app/typeInterfaces';
 
 interface CalendarBodyProps {
