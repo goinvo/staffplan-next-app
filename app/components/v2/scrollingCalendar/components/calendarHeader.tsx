@@ -13,7 +13,7 @@ import IconButton from '../../iconButton/iconButton';
 import { useUserDataContext } from '@/app/userDataContext';
 import { AssignmentType, MonthsDataType } from '@/app/typeInterfaces';
 import { calculateTotalHoursPerWeek, getCurrentWeekOfYear, getCurrentYear, isBeforeWeek, showMonthAndYear } from '../helpers';
-import EditProjectForm from './editProjectForm';
+import EditUserForm from './editUserForm';
 
 interface ColumnHeaderTitle {
     title: string;
@@ -69,8 +69,8 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         <thead>
             <tr className="pl-4 border-bottom actionbar min-h-28 text-white flex">
                 <th className="px-0 flex w-1/3">
-                    {true ? (
-                        <EditProjectForm avatarUrl={avatarUrl || ''} userName={userName || ''} onClose={() => setIsEditing(!isEditing)} />
+                    {isEditing ? (
+                        <EditUserForm avatarUrl={avatarUrl || ''} userName={userName || ''} onClose={() => setIsEditing(!isEditing)} />
                     ) : (
                         <div className='flex text-white items-center'>
                             {avatarUrl && (

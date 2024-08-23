@@ -40,7 +40,7 @@ const ScrollingCalendar = ({ selectedUser }: ScrollingCalendarProps) => {
     const isLargeScreen = useMediaQuery('(min-width: 1500px) and (max-width: 1799px)');
     const currentWeek = getCurrentWeekOfYear()
     const currentYear = DateTime.now().year;
-    console.log(selectedUser.assignments, 'assignments')
+
     const detectMonthsCountPerScreen = useCallback(() => {
         if (isSmallScreen) return MONTHS_COUNT[MONTS_PER_SCREEN_SIZE.SMALL]
         if (isMediumScreen) return MONTHS_COUNT[MONTS_PER_SCREEN_SIZE.MEDIUM]
@@ -60,7 +60,7 @@ const ScrollingCalendar = ({ selectedUser }: ScrollingCalendarProps) => {
     return (
         <table className="min-w-full timeline-grid-bg text-contrastBlue text-sm">
             <CalendarHeader assignments={selectedUser.assignments} avatarUrl={selectedUser.avatarUrl} editable={true} userName={selectedUser.name} months={months} columnHeaderTitles={columnsHeaderTitles} />
-            {/* <tbody>
+            <tbody>
                 {selectedUser.assignments.map((assignment, index) => (
                     <tr key={index} className="px-2 flex border-b border-gray-300 hover:bg-hoverGrey">
                         <td className='pl-2 pr-0 pt-1 pb-2 font-normal align-top w-1/3'>
@@ -114,7 +114,7 @@ const ScrollingCalendar = ({ selectedUser }: ScrollingCalendarProps) => {
                     </tr>
                 ))
                 }
-            </tbody > */}
+            </tbody >
         </table >
 
     );
