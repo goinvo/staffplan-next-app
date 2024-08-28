@@ -15,7 +15,7 @@ const ColumnChart = ({ height, color = '#27B5B0', maxValue = 50, textColor = 'wh
     return (
         <div className='w-[34px]'>
             <div className="absolute bottom-0 left-0 right-0 w-[100%]">
-                <span className={`flex justify-center w-[34px] font-normal text-${textColor}`}>{height || 0}</span>
+                <span className={`flex justify-center text-center w-[34px] font-normal text-${textColor}`}>{height || 0}</span>
                 {!!height && (
                     <svg width='34px' height={svgHeight} viewBox={`0 0 34 ${svgHeight}`} xmlns="http://www.w3.org/2000/svg">
                         <path

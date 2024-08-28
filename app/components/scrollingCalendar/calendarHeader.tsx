@@ -85,21 +85,23 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                                     />
                                 </div>
                             )}
-                            <div className='flex flex-col items-start align-center'>
-                                <div className='flex align-start'>
-                                    <div className='text-huge px-2'>{title || userName}</div>
+                            <div className='flex flex-col items-start'>
+                                <div className='flex items-center'>
+                                    <div className='text-huge px-2 text-left overflow-wrap break-word leading-snug'>{title || userName}</div>
                                     {editable && (
                                         <IconButton
-                                            className={'py-1'}
-                                            iconSize={'w-4 h-4'}
+                                            className='py-1'
+                                            iconSize='w-4 h-4'
                                             onClick={() => setIsEditing(true)}
                                             Icon={SlPencil}
                                         />
                                     )}
                                 </div>
-                                {projectInfo &&
-                                    <div className='flex align-start px-2 py-2 font-normal'>{projectInfo}</div>}
+                                {projectInfo && (
+                                    <div className='flex items-start overflow-wrap break-word px-2 py-2 font-normal'>{projectInfo}</div>
+                                )}
                             </div>
+
                         </div>)
                     }
                 </th>
