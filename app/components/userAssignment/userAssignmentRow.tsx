@@ -1,14 +1,17 @@
-import { AssignmentType, ClientType } from "@/app/typeInterfaces";
+'use client'
+
+import { AssignmentType, ClientType, MonthsDataType } from "@/app/typeInterfaces";
 import { useUserDataContext } from "@/app/userDataContext";
 import React, { useState } from "react";
-import { getMondays } from "../scrollingCalendar/helpers";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
+
 import UserSummary from "../userSummary";
 import { UserLabel } from "./userLabel";
 import { WorkWeekInput } from "./workWeekInput";
 import { ClientLabel } from "./clientLabel";
 import { TempProjectLabel } from "./tempProjectLabel";
+
 
 interface UserAssignmentRowProps {
 	assignment: AssignmentType;
@@ -17,6 +20,7 @@ interface UserAssignmentRowProps {
 	isFirstClient: boolean;
 	monthData: { monthLabel: string; year: number };
 	clickHandler: (client: ClientType) => void;
+	months?: MonthsDataType[]
 }
 
 export const UserAssignmentRow = ({
@@ -24,22 +28,19 @@ export const UserAssignmentRow = ({
 	isFirstMonth,
 	isLastMonth,
 	isFirstClient,
-	monthData,
 	clickHandler,
+	months
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
 	const [tempProjectOpen, setTempProjectOpen] = useState(false)
-	const { dateRange, viewsFilter } = useUserDataContext();
-	const mondays = getMondays(
-		DateTime.local(dateRange.year, parseInt(monthData.monthLabel), 1).startOf("day")
-	);
+	const { viewsFilter } = useUserDataContext();
 
 	const handleProjectChange = (assignment: AssignmentType) => {
 		router.push("/projects/" + encodeURIComponent(assignment.project.id));
 	};
 
-	const isWeekWithinProject = (weekDate: Date) => {
-		const weekDateFormatted = new Date(weekDate);
+	const isWeekWithinProject = (weekNumber: number, year: number): boolean => {
+		const weekDateFormatted = DateTime.fromObject({ weekNumber, weekYear: year, weekday: 1 }).toJSDate();
 		if (assignment.project.startsOn && !assignment.project.endsOn) {
 			const startsOn = new Date(assignment.project.startsOn);
 			return weekDateFormatted >= startsOn;
@@ -51,45 +52,56 @@ export const UserAssignmentRow = ({
 		}
 		return true;
 	};
-
 	return (
-		<div className="flex">
-			{viewsFilter.singleUserSort === 'byClient' && isFirstClient && isFirstMonth && (
-				<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} />
-			)}
-
-			{isFirstMonth && (
-				assignment.project.isTempProject ? (
-					<TempProjectLabel assignment={assignment} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} /> // Render custom label
-				) : (
-					<UserLabel assignment={assignment} clickHandler={handleProjectChange} />
-				)
-			)}
-
-			<div className="flex border-b ml-1 border-gray-300 justify-center items-center w-full h-40">
-				{mondays.cweeks.map((cweek, cweekIndex) => {
-					const mondayDate = DateTime.fromObject({
-						weekNumber: cweek ? cweek : 1,
-						weekYear: mondays.year,
-						weekday: 1,
-					}).toJSDate();
-					return (
-						<div
-							key={`cweek-${cweekIndex}`}
-							className="flex-1 flex flex-col items-center"
-						>
-							<WorkWeekInput
-								withinProjectDates={isWeekWithinProject(mondayDate)}
-								assignment={assignment}
-								cweek={cweek}
-								year={mondays.year}
-								key={`input-${cweekIndex}`}
-							/>
+		<tr className={`px-2 flex ${isFirstClient ? '' : 'border-b border-gray-300'} hover:bg-hoverGrey py-2`}>
+			<td className='pl-2 pr-0 pt-1 pb-2 font-normal align-top w-1/3'>
+				<div
+					className='flex flex-row justify-between items-start space-x-2'
+				>
+					<div className={`${isFirstClient ? 'flex' : 'w-24'}`}>
+						{viewsFilter.singleUserSort === 'byClient' && isFirstClient && isFirstMonth && (
+							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} />
+						)}
+						{viewsFilter.singleUserSort !== 'byClient' && isFirstMonth && (
+							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} />
+						)}
+					</div>
+					{isFirstMonth && (
+						assignment.project.isTempProject ? (
+							<TempProjectLabel assignment={assignment} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} /> // Render custom label
+						) : (
+							<UserLabel assignment={assignment} clickHandler={handleProjectChange} />
+						)
+					)}
+					<div className='text-contrastBlue flex flex-col space-y-3 pr-2'>
+						<div className='pt-2 underline'>
+							Signed
 						</div>
-					);
-				})}
-			</div>
+						<div className='pt-2'>
+							Actual
+						</div>
+					</div>
+				</div>
+			</td>
+			{months?.map((month: MonthsDataType) => {
+				return month.weeks.map((week) => {
+					const withinProjectDates = isWeekWithinProject(week, month.year);
+					return (
+						<td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal`}>
+							<div className='flex flex-col space-y-3 font-normal'>
+								<WorkWeekInput
+									withinProjectDates={withinProjectDates}
+									assignment={assignment}
+									cweek={week}
+									year={month.year}
+									key={`input-${week}`}
+								/>
+
+							</div>
+						</td>)
+				});
+			})}
 			{isLastMonth && <UserSummary assignment={assignment} />}
-		</div>
+		</tr >
 	);
 };

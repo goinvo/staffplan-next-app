@@ -1,6 +1,8 @@
 import React from "react";
-import { AssignmentType, ClientType } from "../../typeInterfaces";
 import { PlusIcon } from "@heroicons/react/24/solid";
+
+import { AssignmentType, ClientType } from "../../typeInterfaces";
+import IconButton from "../iconButton";
 
 interface ClientLabelProps {
 	assignment: AssignmentType;
@@ -11,19 +13,14 @@ interface ClientLabelProps {
 
 export const ClientLabel = ({ assignment, clickHandler, tempProjectOpen, setTempProjectOpen }: ClientLabelProps) => {
 	return (
-		<div
-			className="hover:cursor-pointer w-40 absolute -left-0 outline mt-5 overflow-hidden"
+		<IconButton
+			className={'text-contrastBlue w-24 flex items-center justify-center pt-2 text-start'}
+			Icon={PlusIcon} iconSize='h-4 w-4' text={assignment.project.client.name}
 			onClick={() => {
-				if(tempProjectOpen === false){
+				if (tempProjectOpen === false) {
 					setTempProjectOpen(true)
 					clickHandler(assignment.project.client);
 				}
-			}}
-		>
-			<div className=" flex w-5 h-5 bg-gray-500 rounded-full overflow-hidden">
-				<PlusIcon className="fill-white" />
-			</div>
-			<div>{assignment.project.client.name} </div>
-		</div>
+			}} />
 	);
 };

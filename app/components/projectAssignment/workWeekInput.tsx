@@ -1,9 +1,13 @@
-import { AssignmentType, WorkWeekType } from "@/app/typeInterfaces";
+
 import { Formik, FormikValues } from "formik";
 import { useMutation } from "@apollo/client";
 import React from "react";
+
 import { UPSERT_WORKWEEK } from "@/app/gqlQueries";
 import { useUserDataContext } from "@/app/userDataContext";
+import { AssignmentType, WorkWeekType } from "@/app/typeInterfaces";
+import { CustomInput } from "../cutomInput";
+
 
 interface WorkWeekInputProps {
 	withinProjectDates?: boolean;
@@ -29,7 +33,7 @@ export const WorkWeekInput = ({
 	withinProjectDates = true, // Default value to true if not provided
 }: WorkWeekInputProps) => {
 	const workWeekExists = assignment?.workWeeks?.find(workWeek => workWeek.cweek === cweek && workWeek.year === year);
-		const initialValues = {
+	const initialValues = {
 		actualHours: workWeekExists?.actualHours || "",
 		estimatedHours:
 			workWeekExists?.estimatedHours || assignment?.estimatedWeeklyHours || "",
@@ -57,102 +61,82 @@ export const WorkWeekInput = ({
 	return (
 		<>
 			{workWeek ? (
-				<div className="flex flex-col items-center pt-2 bg-red-500 justify-center">
+				<Formik
+					onSubmit={(e) => upsertWorkWeekValues(e)}
+					initialValues={initialValues}
+				>
+					{({ handleChange, values, handleSubmit, handleBlur }) => (
+						<>
+							<CustomInput
+								value={values.estimatedHours}
+								name="estHours"
+								id="estimatedHours"
+								disabled={isUserTBD}
+								onChange={handleChange}
+								onBlur={(e) => {
+									handleBlur("estHours");
+									if (values.estimatedHours && values.actualHours) {
+										upsertWorkWeekValues(values);
+									}
+								}}
+							/>
+							<CustomInput
+								value={values.actualHours}
+								name="actualHours"
+								id="actHours"
+								onChange={handleChange}
+								disabled={isUserTBD}
+								onBlur={(e) => {
+									handleBlur("actHours");
+									if (values.estimatedHours && values.actualHours) {
+										upsertWorkWeekValues(values);
+									}
+								}}
+							/>
+						</>
+					)}
+				</Formik>
+			) : null}
+			{
+				assignment && !workWeek ? (
 					<Formik
 						onSubmit={(e) => upsertWorkWeekValues(e)}
 						initialValues={initialValues}
 					>
 						{({ handleChange, values, handleSubmit, handleBlur }) => (
-							<form
-								onSubmit={handleSubmit}
-								className={`flex flex-col items-center justify-center ${
-									withinProjectDates ? "" : "bg-red-200"
-								}`}
-							>
-								<input
-									value={values.estimatedHours}
-									className="border border-gray-300 w-10 rounded p-2 mb-1"
-									name="estHours"
-									id="estimatedHours"
-									disabled={isUserTBD}
+							<>
+								<CustomInput
+									value={withinProjectDates ? values.estimatedHours : ""}
+									name="estimatedHours"
+									id="estHours"
 									onChange={handleChange}
+
 									onBlur={(e) => {
 										handleBlur("estHours");
 										if (values.estimatedHours && values.actualHours) {
 											upsertWorkWeekValues(values);
 										}
 									}}
+									disabled={!withinProjectDates || isUserTBD}
 								/>
-								<input
-									value={values.actualHours}
+								<CustomInput
+									value={withinProjectDates ? values.actualHours : ""}
 									name="actualHours"
 									id="actHours"
-									className="border border-gray-300 w-10 rounded p-2 mb-1"
 									onChange={handleChange}
-									disabled={isUserTBD}
 									onBlur={(e) => {
 										handleBlur("actHours");
 										if (values.estimatedHours && values.actualHours) {
 											upsertWorkWeekValues(values);
 										}
 									}}
+									disabled={!withinProjectDates || isUserTBD}
 								/>
-							</form>
+							</>
 						)}
-					</Formik>
-				</div>
-			) : null}
-			{assignment && !workWeek ? (
-				<div className="flex flex-colitems-center pt-2">
-					<Formik
-						onSubmit={(e) => upsertWorkWeekValues(e)}
-						initialValues={initialValues}
-					>
-						{({ handleChange, values, handleSubmit, handleBlur }) => (
-							<form
-								onSubmit={handleSubmit}
-								className={`flex flex-col items-center`}
-							>
-								<div className="flex flex-col">
-									<input
-										value={withinProjectDates ? values.estimatedHours : ""}
-										className={`border border-gray-300 w-10 rounded p-2 mb-1 ${
-											!withinProjectDates ? "bg-accentgrey" : ""
-										}`}
-										name="estimatedHours"
-										id="estHours"
-										onChange={handleChange}
-										
-										onBlur={(e) => {
-											handleBlur("estHours");
-											if (values.estimatedHours && values.actualHours) {
-												upsertWorkWeekValues(values);
-											}
-										}}
-										disabled={!withinProjectDates || isUserTBD}
-									/>
-									<input
-										value={withinProjectDates ? values.actualHours : ""}
-										name="actualHours"
-										id="actHours"
-										className={`border border-gray-300 w-10 rounded p-2 mb-1 ${
-											!withinProjectDates ? "bg-accentgrey" : ""
-										}`}
-										onChange={handleChange}
-										onBlur={(e) => {
-											handleBlur("actHours");
-											if (values.estimatedHours && values.actualHours) {
-												upsertWorkWeekValues(values);
-											}
-										}}
-										disabled={!withinProjectDates || isUserTBD}
-									/>
-								</div>
-							</form>
-						)}
-					</Formik>
-				</div>
-			) : null}
+					</Formik >
+				) : null
+			}
 		</>
 	);
 };

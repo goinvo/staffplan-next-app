@@ -9,7 +9,7 @@ import { sortSingleProject } from "@/app/helperFunctions";
 import { ScrollingCalendar } from "@/app/components/scrollingCalendar/scrollingCalendar";
 import { ProjectAssignmentRow } from "@/app/components/projectAssignment/projectAssignmentRow";
 import AddAssignmentSingleProject from "@/app/components/addAssignmentSIngleProject";
-import { MinusIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import { PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import ProjectDetails from "@/app/components/projectDetails";
 
 const ProjectPage: React.FC = () => {
@@ -76,11 +76,15 @@ const ProjectPage: React.FC = () => {
 		setAddAssignmentVisible(false);
 	};
 
+	const columnHeaderTitles = [{ title: 'People', showIcon: true }]
+
+	const projectInfoSubtitle = `${selectedProject?.client.name}, budget, ${selectedProject?.hours || 0}h, ${selectedProject?.startsOn || 'Start date'}-${selectedProject?.endsOn || 'End Date'}`
+
 	return (
-		<div>
+		<>
 			{selectedProject && projectList ? (
 				<>
-					<ScrollingCalendar>
+					<ScrollingCalendar columnHeaderTitles={columnHeaderTitles} title={selectedProject.name} projectInfo={projectInfoSubtitle} assignments={selectedProject}>
 						{selectedProject?.assignments?.map(
 							(assignment: AssignmentType, index) => {
 								return (
@@ -124,7 +128,7 @@ const ProjectPage: React.FC = () => {
 					/>
 				)}
 			</div>
-		</div>
+		</>
 	);
 };
 

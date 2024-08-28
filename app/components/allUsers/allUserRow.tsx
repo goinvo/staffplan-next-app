@@ -1,32 +1,35 @@
+import { useRouter } from "next/navigation";
+
 import {
 	UserType,
-	WorkWeekType,
+	MonthsDataType,
 	AllUserRowProps,
 	AllUserAccumulatorProps,
 } from "@/app/typeInterfaces";
-import { useUserDataContext } from "@/app/userDataContext";
+
 import React from "react";
+import { ArchiveBoxIcon } from "@heroicons/react/24/outline";
+
 import {
 	assignmentContainsCWeek,
-	getMondays,
 } from "../scrollingCalendar/helpers";
-import { DateTime } from "luxon";
-import { useRouter } from "next/navigation";
+
 import { AllUserLabel } from "./allUserLabel";
+import ColumnChart from "../columnChart";
+import { getCurrentWeekOfYear, getCurrentYear, isBeforeWeek, getDisplayHours } from "../scrollingCalendar/helpers";
+import IconButton from "../iconButton";
 
 export const AllUserRow = ({
 	user,
 	isFirstMonth,
 	isLastMonth,
 	monthData,
+	months
 }: AllUserRowProps) => {
+	const currentWeek = getCurrentWeekOfYear()
+	const currentYear = getCurrentYear()
 	const router = useRouter();
-	const { dateRange } = useUserDataContext();
-	const mondays = getMondays(
-		DateTime.local(dateRange.year, parseInt(monthData.monthLabel), 1).startOf(
-			"day"
-		)
-	);
+
 	const handleUserChange = (user: UserType) => {
 		if (user.id) {
 			router.push("/people/" + encodeURIComponent(user.id));
@@ -59,16 +62,16 @@ export const AllUserRow = ({
 	);
 
 	return (
-		<div className="flex">
+		<tr className="px-2 flex border-b border-gray-300 hover:bg-hoverGrey">
 			{isFirstMonth && (
 				<AllUserLabel clickHandler={handleUserChange} user={user} />
 			)}
-			<div className="flex border-b ml-1 border-gray-300 justify-between w-full h-32">
-				{mondays.cweeks.map((cweek, cweekIndex) => {
+			{months?.map((month: MonthsDataType) => {
+				return month.weeks.map((week) => {
 					const totalEstimatedWeeklyHours = user.assignments?.reduce(
 						(acc, assignment) => {
 							if (
-								assignmentContainsCWeek(assignment, cweek as any, mondays.year)
+								assignmentContainsCWeek(assignment, week, month.year)
 							) {
 								return acc + assignment.estimatedWeeklyHours;
 							}
@@ -76,60 +79,22 @@ export const AllUserRow = ({
 						},
 						0
 					);
-					const workWeekElements = totalWorkWeekHours.map(
-						(workWeek, workWeekIndex) => {
-							if (
-								(workWeek as WorkWeekType).cweek === cweek &&
-								(workWeek as any).year === mondays.year
-							) {
-								if ((workWeek as any).actualHours > 0) {
-									return (
-										<div
-											key={`${cweek}has-actual-hours`}
-											className="bg-accentgrey w-8 h-8 justify-center rounded-full items-center"
-										>
-											{(workWeek as any).actualHours}
-										</div>
-									);
-								}
-								if ((workWeek as any).actualHours <= 0) {
-									return (
-										<div
-											key={`${cweek}${(workWeek as any).year}no-actual-hours`}
-											className="bg-blue-200 w-8 h-8 justify-center rounded-full items-center"
-										>
-											{(workWeek as any).estimatedHours}
-										</div>
-									);
-								}
-							}
-							return null;
-						}
+					const workWeek = totalWorkWeekHours.find(
+						(workWeek) => workWeek.cweek === week && workWeek.year === month.year
 					);
-
-					const hasWorkWeek = workWeekElements.some(
-						(element) => element !== null
-					);
-
+					const displayHours = getDisplayHours(workWeek, totalEstimatedWeeklyHours);
 					return (
-						<div
-							key={`cweek-${cweekIndex}`}
-							className="flex-1 flex flex-col justify-center items-center border-r border-gray-300"
-						>
-							{hasWorkWeek && (user.assignments ?? []).length > 0 ? (
-								workWeekElements
-							) : (
-								<div
-									className="bg-green-200 w-8 h-8 justify-center rounded-full items-center"
-									key={`${cweek}HELLO`}
-								>
-									{totalEstimatedWeeklyHours}
-								</div>
-							)}
-						</div>
-					);
-				})}
-			</div>
-		</div>
+						<td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal min-h-[100px]`}>
+							<ColumnChart height={displayHours} color={isBeforeWeek(week, currentWeek, currentYear, month) ? '#AEB3C0' : '#27B5B0'} maxValue={200} textColor="contrastBlue" />
+						</td>)
+				});
+			})}
+			<td className="flex items-center justify-center font-normal py-2 w-1/6">
+				<IconButton className='text-transparentGrey'
+					onClick={() => console.log('On archive box btn click')}
+					Icon={ArchiveBoxIcon}
+					iconSize={'h6 w-6'} />
+			</td>
+		</tr>
 	);
 };

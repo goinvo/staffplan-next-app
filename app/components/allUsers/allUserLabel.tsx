@@ -4,25 +4,24 @@ import { AllUserLabelProps } from "../../typeInterfaces";
 import EllipsisPeopleMenu from "../ellipsisPeopleMenu";
 
 export const AllUserLabel = ({ user, clickHandler }: AllUserLabelProps) => {
+
 	return (
-		<div className="hover:cursor-pointer z-1 w-40 absolute left-0">
-			<div
-				className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden"
-				onClick={() => clickHandler(user)}
-			>
-				<Image
-					src={`${user.avatarUrl}`}
-					alt="client avatar"
-					width={500}
-					height={500}
-				/>
-			</div>
-			<div className="flex items-center space-x-2">
-				<div className="text-sm" onClick={() => clickHandler(user)}>{user.name}</div>
+		<td className='pl-2 pr-0 pt-1 pb-2 font-normal flex align-center w-1/3'>
+			<div className="w-48 pl-1 font-bold flex items-center justify-start text-contrastBlue">
+				<div className="px-2 py-2 relative overflow-hidden w-[38px] h-[28px]">
+					<Image
+						src={`${user.avatarUrl}`}
+						alt="client avatar"
+						className="rounded-md"
+						fill
+						sizes="(max-width: 640px) 28px, (max-width: 768px) 38px, 38px"
+					/>
+				</div>
+				<button className="px-2" onClick={() => clickHandler(user)}>{user.name}</button>
 				<div className="hover:cursor-pointer">
 					<EllipsisPeopleMenu user={user} />
 				</div>
 			</div>
-		</div>
+		</td >
 	);
 };

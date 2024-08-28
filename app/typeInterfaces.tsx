@@ -9,6 +9,7 @@ export interface AllUserRowProps {
 	isFirstMonth: boolean;
 	isLastMonth: boolean;
 	monthData: { monthLabel: string; year: number };
+	months?: MonthsDataType[]
 }
 export interface AllUserAccumulatorProps {
 	[cweek: number]: {
@@ -28,6 +29,7 @@ export interface AllProjectRowProps {
 	isFirstMonth: boolean;
 	isLastMonth: boolean;
 	monthData: { monthLabel: string; year: number };
+	months?: MonthsDataType[]
 }
 export interface AssignmentType {
 	assignedUser: UserType;
