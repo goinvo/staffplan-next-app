@@ -9,7 +9,7 @@ import { sortSingleUser } from "@/app/helperFunctions";
 import { ScrollingCalendar } from "@/app/components/scrollingCalendar/scrollingCalendar";
 import { UserAssignmentRow } from "@/app/components/userAssignment/userAssignmentRow";
 import AddAssignmentSingleUser from "@/app/components/addAssignmentSingleUser";
-import { MinusIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
 
 const UserPage: React.FC = () => {
 	const params = useParams();
@@ -61,11 +61,11 @@ const UserPage: React.FC = () => {
 	const onComplete = () => {
 		setAddAssignmentVisible(false);
 	};
-	const handleClientClick = (client:ClientType) => {
+	const handleClientClick = (client: ClientType) => {
 		if (!selectedUser) return;
-	
+
 		const newAssignment: any = {
-		
+
 			id: Date.now(), // Generate a unique id
 			startsOn: null,
 			endsOn: null,
@@ -88,66 +88,65 @@ const UserPage: React.FC = () => {
 				users: [],
 				fte: 0,
 				hours: 0,
-				isTempProject:true,
+				isTempProject: true,
 			},
 			workWeeks: [],
 		};
-	
+
 		// Add new assignment and then sort
 		const updatedAssignments = [...selectedUser.assignments, newAssignment];
 		const sortedAssignments = sortSingleUser(viewsFilter.singleUserSort, {
 			...selectedUser,
 			assignments: updatedAssignments
 		});
-		
+
 		setSelectedUser(sortedAssignments);
 		setSingleUserPage(sortedAssignments);
 	};
-	
+	const columnsHeaderTitles = [{ title: 'Client', showIcon: true }, { title: 'Project', showIcon: false }]
+
 	return (
 		<>
-			<div>
-				{selectedUser && userList ? (
-					<ScrollingCalendar>
-						{selectedUser?.assignments?.map(
-							(assignment: AssignmentType, index, allAssignments) => {
-								const isFirstClient = index === allAssignments.findIndex((a) => a.project.client.id === assignment.project.client.id);
-								return (
-									<UserAssignmentRow
-										key={index}
-										assignment={assignment}
-										monthData={{ monthLabel: "", year: 0 }}
-										isFirstMonth={true}
-										isLastMonth={true}
-										isFirstClient={isFirstClient}
-										clickHandler={handleClientClick} 
-									/>
-								);
-							}
-						)}
-					</ScrollingCalendar>
-				) : (
-					<LoadingSpinner />
-				)}
-				<div className="mt-5">
-					<button
-						className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center"
-						onClick={() => setAddAssignmentVisible(!addAssignmentVisible)}
-					>
-						{addAssignmentVisible ? (
-							<MinusIcon className="fill-accentgreen" />
-						) : (
-							<PlusIcon className="fill-accentgreen" />
-						)}
-					</button>
-					{addAssignmentVisible && (
-						<AddAssignmentSingleUser
-							user={selectedUser}
-							onClose={onClose}
-							onComplete={onComplete}
-						/>
+			{selectedUser && userList ? (
+				<ScrollingCalendar columnHeaderTitles={columnsHeaderTitles} avatarUrl={selectedUser.avatarUrl} userName={selectedUser.name} assignments={selectedUser.assignments}>
+					{selectedUser?.assignments?.map(
+						(assignment: AssignmentType, index, allAssignments) => {
+							const isFirstClient = index === allAssignments.findIndex((a) => a.project.client.id === assignment.project.client.id);
+							return (
+								<UserAssignmentRow
+									key={index}
+									assignment={assignment}
+									monthData={{ monthLabel: "", year: 0 }}
+									isFirstMonth={true}
+									isLastMonth={true}
+									isFirstClient={isFirstClient}
+									clickHandler={handleClientClick}
+								/>
+							);
+						}
 					)}
-				</div>
+				</ScrollingCalendar>
+			) : (
+				<LoadingSpinner />
+			)}
+			<div className="mt-5">
+				<button
+					className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center"
+					onClick={() => setAddAssignmentVisible(!addAssignmentVisible)}
+				>
+					{addAssignmentVisible ? (
+						<MinusIcon className="fill-accentgreen" />
+					) : (
+						<PlusIcon className="fill-accentgreen" />
+					)}
+				</button>
+				{addAssignmentVisible && (
+					<AddAssignmentSingleUser
+						user={selectedUser}
+						onClose={onClose}
+						onComplete={onComplete}
+					/>
+				)}
 			</div>
 		</>
 	);

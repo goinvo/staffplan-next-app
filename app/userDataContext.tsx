@@ -20,7 +20,7 @@ import { sortProjectList, sortUserList } from "./helperFunctions";
 import {
 	currentQuarter,
 	currentYear,
-} from "./components/scrollingCalendar/scrollingCalendar";
+} from "./components/scrollingCalendar/helpers";
 
 export interface UserDataContextType {
 	userList: any;

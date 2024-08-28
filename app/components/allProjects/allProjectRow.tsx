@@ -1,18 +1,18 @@
 import {
 	ProjectType,
 	AllProjectRowProps,
-	WorkWeekType,
+	MonthsDataType,
 } from "@/app/typeInterfaces";
-import { useUserDataContext } from "@/app/userDataContext";
+
 import React from "react";
 import {
 	assignmentContainsCWeek,
-	getMondays,
 } from "../scrollingCalendar/helpers";
-import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
 import { AllProjectLabel } from "./allProjectLabel";
 import ProjectSummary from "../projectSummary";
+import ColumnChart from "../columnChart";
+import { isBeforeWeek, getCurrentWeekOfYear, getCurrentYear, getDisplayHours } from "../scrollingCalendar/helpers";
 
 interface Accumulator {
 	[cweek: number]: {
@@ -26,20 +26,18 @@ export const AllProjectRow = ({
 	project,
 	isFirstMonth,
 	isLastMonth,
-	monthData,
+	months,
 }: AllProjectRowProps) => {
 	const router = useRouter();
-	const { dateRange } = useUserDataContext();
-	const mondays = getMondays(
-		DateTime.local(dateRange.year, parseInt(monthData.monthLabel), 1).startOf(
-			"day"
-		)
-	);
+	const currentWeek = getCurrentWeekOfYear()
+	const currentYear = getCurrentYear()
+
 	const handleProjectChange = (project: ProjectType) => {
 		if (project.id) {
 			router.push("/projects/" + encodeURIComponent(project.id));
 		}
 	};
+
 
 	const totalWorkWeekHours = Object.values(
 		(project.assignments ?? []).reduce<Accumulator>((acc, assignment) => {
@@ -64,16 +62,19 @@ export const AllProjectRow = ({
 	);
 
 	return (
-		<div className="flex">
-			{isFirstMonth && (
-				<AllProjectLabel clickHandler={handleProjectChange} project={project} />
-			)}
-			<div className="flex border-b ml-1 border-gray-300 bg-gray-100 justify-between w-full h-32">
-				{mondays.cweeks.map((cweek, cweekIndex) => {
+		<tr className="px-2 flex border-b border-gray-300 hover:bg-hoverGrey">
+			<td className='pl-2 pt-1 pb-2 font-normal align-top w-1/3'>
+				{isFirstMonth && (
+					<AllProjectLabel clickHandler={handleProjectChange} project={project} />
+
+				)}
+			</td>
+			{months?.map((month: MonthsDataType) => (
+				month.weeks.map((week) => {
 					const totalEstimatedWeeklyHours = project.assignments?.reduce(
 						(acc, assignment) => {
 							if (
-								assignmentContainsCWeek(assignment, cweek as any, mondays.year)
+								assignmentContainsCWeek(assignment, week, month.year)
 							) {
 								return acc + assignment.estimatedWeeklyHours;
 							}
@@ -81,65 +82,22 @@ export const AllProjectRow = ({
 						},
 						0
 					);
-					const workWeekElements = totalWorkWeekHours.map(
-						(workWeek, workWeekIndex) => {
-							if (
-								(workWeek as WorkWeekType).cweek === cweek &&
-								(workWeek as any).year === mondays.year
-							) {
-								if ((workWeek as any).actualHours > 0) {
-									return (
-										<div
-											key={`${cweek}has-actual-hours`}
-											className="bg-accentgrey w-8 h-8 justify-center rounded-full items-center"
-										>
-											{(workWeek as any).actualHours}
-										</div>
-									);
-								}
-								if ((workWeek as any).actualHours <= 0) {
-									return (
-										<div
-											key={`${cweek}${(workWeek as any).year}no-actual-hours`}
-											className="bg-blue-200 w-8 h-8 justify-center rounded-full items-center"
-										>
-											{(workWeek as any).estimatedHours}
-										</div>
-									);
-								}
-							}
-							return null;
-						}
+					const workWeek = totalWorkWeekHours.find(
+						(workWeek) => workWeek.cweek === week && workWeek.year === month.year
 					);
-
-					const hasWorkWeek = workWeekElements.some(
-						(element) => element !== null
-					);
-
+					const displayHours = getDisplayHours(workWeek, totalEstimatedWeeklyHours as number);
 					return (
-						<div
-							key={`cweek-${cweekIndex}`}
-							className="flex-1 flex flex-col justify-center items-center border-r border-gray-300"
-						>
-							{hasWorkWeek && (project.assignments ?? []).length > 0 ? (
-								workWeekElements
-							) : (
-								<div
-									className="bg-green-200 w-8 h-8 justify-center rounded-full items-center"
-									key={`${cweek}total-estimated-weekly-hours`}
-								>
-									{totalEstimatedWeeklyHours}
-								</div>
-							)}
-						</div>
-					);
-				})}
-			</div>
+						<td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal min-h-[100px]`}>
+							<ColumnChart height={displayHours} color={isBeforeWeek(week, currentWeek, currentYear, month) ? '#AEB3C0' : '#27B5B0'} maxValue={200} textColor="contrastBlue" />
+						</td>)
+				})
+			))}
+
 			{isLastMonth && (
-				<div className="absolute right-0">
-					<ProjectSummary project={project} />
-				</div>
-			)}
-		</div>
+				<ProjectSummary project={project} />
+			)
+			}
+		</tr >
 	);
 };
+

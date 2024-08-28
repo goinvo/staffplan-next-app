@@ -1,35 +1,28 @@
-import Image from "next/image";
 import React from "react";
+import { PlusIcon } from "@heroicons/react/24/solid";
 import { AllProjectLabelProps } from "../../typeInterfaces";
 import EllipsisProjectMenu from "../ellipsisProjectMenu";
+import IconButton from "../iconButton";
 
 export const AllProjectLabel = ({
 	project,
 	clickHandler,
 }: AllProjectLabelProps) => {
 	return (
-		<div>
-			<div className="hover:cursor-pointer z-60 w-40 rounded-r absolute left-0">
-				<div
-					className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden"
-					onClick={() => clickHandler(project)}
-				>
-					<Image
-						src={`${project.client.avatarUrl}`}
-						alt="client avatar"
-						width={500}
-						height={500}
-					/>
-				</div>
-				<div>
-					<span
-						className="hover:cursor-pointer"
-						onClick={() => clickHandler(project)}
-					>
-						{project.name}
-					</span>
-					<EllipsisProjectMenu project={project} />
-				</div>
+		<div className="flex justify-between items-center">
+			<IconButton
+				className={'text-contrastBlue w-24 flex items-center justify-start pt-2 text-start'}
+				Icon={PlusIcon} iconSize='h-4 w-4' text={project.client.name}
+				onClick={() => console.log('On client click')} />
+
+			<button
+				onClick={() => clickHandler(project)}
+				className='w-24 pl-1 pt-2 font-bold flex items-center justify-start text-contrastBlue text-start'
+			>
+				{project.name}
+			</button>
+			<div className="flex items-start justify-start pt-2 hover:cursor-pointer">
+				<EllipsisProjectMenu project={project} />
 			</div>
 		</div>
 	);

@@ -1,12 +1,12 @@
-import { AssignmentType, ProjectType } from "@/app/typeInterfaces";
-import { useUserDataContext } from "@/app/userDataContext";
 import React from "react";
-import { getMondays } from "../scrollingCalendar/helpers";
-import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
+import { DateTime } from "luxon";
+
+import { AssignmentType, MonthsDataType, ProjectType } from "@/app/typeInterfaces";
 import UserSummary from "../userSummary";
 import { ProjectUserLabel } from "./projectUserLabel";
 import { WorkWeekInput } from "./workWeekInput";
+
 
 interface ProjectAssignmentRowProps {
 	project: ProjectType;
@@ -14,22 +14,18 @@ interface ProjectAssignmentRowProps {
 	isFirstMonth: boolean;
 	isLastMonth: boolean;
 	monthData: { monthLabel: string; year: number };
+	months?: MonthsDataType[]
 }
 
 export const ProjectAssignmentRow = ({
 	assignment,
 	isFirstMonth,
 	isLastMonth,
-	monthData,
 	project,
+	months
 }: ProjectAssignmentRowProps) => {
 	const router = useRouter();
-	const { dateRange } = useUserDataContext();
-	const mondays = getMondays(
-		DateTime.local(dateRange.year, parseInt(monthData.monthLabel), 1).startOf(
-			"day"
-		)
-	);
+
 	const isUserTBD = assignment.assignedUser === null;
 	const handleUserChange = (assignment: AssignmentType) => {
 		const user = assignment.assignedUser.id?.toString();
@@ -37,9 +33,8 @@ export const ProjectAssignmentRow = ({
 			router.push("/people/" + encodeURIComponent(user?.toString() || ""));
 		}
 	};
-
-	const isWeekWithinProject = (weekDate: Date) => {
-		const weekDateFormatted = new Date(weekDate);
+	const isWeekWithinProject = (weekNumber: number, year: number) => {
+		const weekDateFormatted = DateTime.fromObject({ weekNumber, weekYear: year, weekday: 1 }).toJSDate();
 		if (project.startsOn && !project.endsOn) {
 			const startsOn = new Date(project.startsOn);
 			return weekDateFormatted >= startsOn;
@@ -47,13 +42,13 @@ export const ProjectAssignmentRow = ({
 		if (project.startsOn && project.endsOn) {
 			const startsOn = new Date(project.startsOn);
 			const endsOn = new Date(project.endsOn);
-			return weekDateFormatted >= startsOn && weekDate <= endsOn;
+			return weekDateFormatted >= startsOn && weekDateFormatted <= endsOn;
 		}
 		return true;
 	};
 
 	return (
-		<div className="flex">
+		<tr className="px-2 py-2 flex border-b border-gray-300 hover:bg-hoverGrey">
 			{isFirstMonth && (
 				<ProjectUserLabel
 					project={project}
@@ -61,32 +56,26 @@ export const ProjectAssignmentRow = ({
 					clickHandler={handleUserChange}
 				/>
 			)}
-			<div className="flex border-b ml-1 border-gray-300 justify-between w-full h-32">
-				{mondays.cweeks.map((cweek, cweekIndex) => {
-					const mondayDate = DateTime.fromObject({
-						weekNumber: cweek ? cweek : 1,
-						weekYear: mondays.year,
-						weekday: 1,
-					}).toJSDate();
+			{months?.map((month: MonthsDataType) => {
+				return month.weeks.map((week) => {
+					const withinProjectDates = isWeekWithinProject(week, month.year);
 					return (
-						<div
-							key={`cweek-${cweekIndex}`}
-							className="flex-1 flex flex-col items-center"
-						>
-							<WorkWeekInput
-								
-								isUserTBD={isUserTBD}
-								withinProjectDates={isWeekWithinProject(mondayDate)}
-								assignment={assignment}
-								cweek={cweek}
-								year={mondays.year}
-								key={`input-${cweekIndex}`}
-							/>
-						</div>
-					);
-				})}
-			</div>
+						<td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal`}>
+							<div className='flex flex-col space-y-3 font-normal'>
+								<WorkWeekInput
+									isUserTBD={isUserTBD}
+									withinProjectDates={withinProjectDates}
+									assignment={assignment}
+									cweek={week}
+									year={month.year}
+									key={`input-${week}`}
+								/>
+
+							</div>
+						</td>)
+				});
+			})}
 			{isLastMonth && <UserSummary assignment={assignment} />}
-		</div>
+		</tr>
 	);
 };

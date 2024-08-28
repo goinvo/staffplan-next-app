@@ -5,8 +5,8 @@ import { useFormik } from 'formik';
 
 import { IoCheckmarkCircle } from "react-icons/io5";
 
-import ImageUploader from '../imageUploader/imageUploader';
-import IconButton from '../iconButton/iconButton';
+import ImageUploader from './imageUploader';
+import IconButton from './iconButton';
 
 interface EditFormProps {
     avatarUrl: string;

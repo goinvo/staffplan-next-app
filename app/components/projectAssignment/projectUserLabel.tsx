@@ -21,6 +21,7 @@ export const ProjectUserLabel = ({
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_ASSIGNMENT);
+
 	const onSubmitUpsert = ({ userId }: FormikValues) => {
 		const variables = {
 			id: assignment.id,
@@ -37,49 +38,49 @@ export const ProjectUserLabel = ({
 		});
 	};
 	return (
-		<div
-			className="hover:cursor-pointer z-10 w-40 absolute left-0"
-			onClick={() => (isUserTBD ? "TBD" : clickHandler(assignment))}
-		>
-			<div className="flex w-16 h-16 timeline-grid-bg rounded-full overflow-hidden">
-				<Image
-					src={`${
-						isUserTBD
-							? "http://www.gravatar.com/avatar/newavatar"
-							: assignment.assignedUser.avatarUrl
-					}`}
-					alt="user avatar"
-					width={500}
-					height={500}
-				/>
-			</div>
+		<td className='pl-2 pr-0 pt-1 pb-2 font-normal flex align-center w-1/3'>
 			<div
-				className="hover:cursor-pointer"
-				onClick={() => (isUserTBD ? null : clickHandler(assignment))}
+				className='flex flex-row justify-between items-start'
 			>
-				{isUserTBD ? (
-					<Formik
-						onSubmit={(e) => onSubmitUpsert(e)}
-						initialValues={initialValues}
-					>
-						{({
-							handleChange,
-							values,
-							setErrors,
-							handleSubmit,
-							handleBlur,
-						}) => (
-							<form className="max-w-lg mx-auto" onSubmit={handleSubmit}>
-								{/* SECTION 1 */}
-								<div className="flex mb-4 pb-2 border-b-4">
-									<div className="w-1/2 mr-4 flex flex-col">
+				<div className="w-48 pl-1 font-bold flex text-contrastBlue w-full">
+					<div className="py-2 relative overflow-hidden w-[38px] h-[28px]">
+						<Image
+							src={`${isUserTBD
+								? "http://www.gravatar.com/avatar/newavatar"
+								: assignment.assignedUser.avatarUrl
+								}`}
+							className="rounded-md"
+							alt="user avatar"
+							fill
+							sizes="(max-width: 640px) 28px, (max-width: 768px) 38px, 38px"
+						/>
+					</div>
+					<div className="flex flex-col items-center justify-center">
+						{!isUserTBD &&
+							(<button className="px-2" onClick={() => clickHandler(assignment)}>
+								{assignment.assignedUser.name}
+							</button>)}
+						{isUserTBD && (
+							<Formik
+								onSubmit={(e) => onSubmitUpsert(e)}
+								initialValues={initialValues}
+							>
+								{({
+									handleChange,
+									values,
+									setErrors,
+									handleSubmit,
+									handleBlur,
+								}) => (
+									<form className="w-30 px-2" onSubmit={handleSubmit}>
+										{/* SECTION 1 */}
 										<Field
 											onChange={handleChange}
 											onBlur={handleSubmit}
 											as="select"
 											name="userId"
 											id="userId"
-											className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
+											className="border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm pr-0"
 										>
 											{[
 												<option key="TBD" value="">
@@ -96,18 +97,30 @@ export const ProjectUserLabel = ({
 											]}
 											``
 										</Field>
-									</div>
-								</div>
-							</form>
+
+									</form>
+								)}
+							</Formik>
 						)}
-					</Formik>
-				) : (
-					assignment.assignedUser.name
-				)}
+						<div>
+							{assignment.status !== 'active' &&
+								(
+									<span className="px-2 text-red-500 font-normal">
+										Unconfirmed
+									</span>
+								)}
+						</div>
+					</div>
+				</div>
 			</div>
-			{assignment.status === "active" ? null : (
-				<div className="text-red-500"> Unconfirmed</div>
-			)}
-		</div>
+			<div className='text-contrastBlue flex flex-col space-y-3 ml-auto px-2'>
+				<div className='pt-2 underline'>
+					Signed
+				</div>
+				<div className='pt-2'>
+					Actual
+				</div>
+			</div>
+		</td >
 	);
 };

@@ -7,12 +7,13 @@ import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
-import ColumnChart from '../columnChart/columnChart';
-import IconButton from '../iconButton/iconButton';
+import ColumnChart from '../columnChart';
+import IconButton from '../iconButton';
 
 import { useUserDataContext } from '@/app/userDataContext';
-import { AssignmentType, MonthsDataType } from '@/app/typeInterfaces';
-import { calculateTotalHoursPerWeek, getCurrentWeekOfYear, getCurrentYear, isBeforeWeek, showMonthAndYear } from '../../helpers';
+import { AssignmentType, MonthsDataType, ProjectType } from '@/app/typeInterfaces';
+import { calculateTotalHoursPerWeek, getCurrentWeekOfYear, getCurrentYear, isBeforeWeek, showMonthAndYear } from './helpers';
+import ViewsMenu from '../viewsMenu/viewsMenu';
 
 interface ColumnHeaderTitle {
     title: string;
@@ -20,9 +21,8 @@ interface ColumnHeaderTitle {
 }
 
 type CalendarHeaderProps = {
-    assignments: AssignmentType[],
+    assignments: AssignmentType[] | AssignmentType | ProjectType[] | ProjectType,
     months: MonthsDataType[],
-    totalCalculatedInfo?: string,
     avatarUrl?: string,
     title?: string,
     userName?: string,
@@ -34,7 +34,6 @@ type CalendarHeaderProps = {
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     assignments,
     months,
-    totalCalculatedInfo,
     avatarUrl,
     title,
     userName,
@@ -42,7 +41,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     projectInfo,
     columnHeaderTitles }) => {
     const [isEditing, setIsEditing] = useState(false);
-    const { setDateRange } = useUserDataContext();
+    const { setDateRange, scrollToTodayFunction } = useUserDataContext();
     const currentWeek = getCurrentWeekOfYear()
     const currentYear = getCurrentYear()
     const totalHoursPerWeek = calculateTotalHoursPerWeek(assignments as AssignmentType[])
@@ -66,7 +65,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 
     return (
         <thead>
-            <tr className="pl-4 border-bottom actionbar min-h-28 text-white flex">
+            <tr className="pl-4 border-bottom bg-contrastBlue min-h-28 text-white flex">
                 <th className="px-0 flex w-1/3">
                     {isEditing ? (
                         <div className='flex items-center'>
@@ -87,37 +86,49 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                                 </div>
                             )}
                             <div className='flex flex-col items-start'>
-                                <div className='flex align-start'>
-                                    <div className='text-huge px-3'>{title || userName}</div>
+                                <div className='flex items-center'>
+                                    <div className='text-huge px-2 text-left overflow-wrap break-word leading-snug'>{title || userName}</div>
                                     {editable && (
                                         <IconButton
-                                            className={'py-1'}
-                                            iconSize={'w-4 h-4'}
+                                            className='py-1'
+                                            iconSize='w-4 h-4'
                                             onClick={() => setIsEditing(true)}
                                             Icon={SlPencil}
                                         />
                                     )}
                                 </div>
-                                {projectInfo && <p className='px-1 py-1 font-normal'>{projectInfo}</p>}
+                                {projectInfo && (
+                                    <div className='flex items-start overflow-wrap break-word px-2 py-2 font-normal'>{projectInfo}</div>
+                                )}
                             </div>
+
                         </div>)
                     }
                 </th>
                 {months?.map((month) => {
                     return month.weeks.map((week) => (
                         <th key={`month-${month.monthLabel}-week-${week}`} className="relative px-1">
-                            <ColumnChart height={totalHoursPerWeek[`${month.year}-${week}`]} color={isBeforeWeek(week, currentWeek, currentYear, month) ? '#AEB3C0' : '#27B5B0'} />
+                            <ColumnChart height={totalHoursPerWeek[`${month.year}-${week}`]} color={isBeforeWeek(week, currentWeek, currentYear, month) ? '#AEB3C0' : '#27B5B0'} maxValue={200} />
                         </th>
                     ));
                 })}
-                <th className="px-4 py-2 w-1/6">{totalCalculatedInfo}</th>
+                <th className="px-4 py-2 w-1/6">
+                    <div className="flex flex-row justify-between">
+                        <ViewsMenu />
+                        <button
+                            onClick={scrollToTodayFunction}
+                        >
+                            Today
+                        </button>
+                    </div>
+                </th>
             </tr>
             <tr className="px-2 flex border-b border-gray-300">
                 <th className="pl-1 pr-0 pt-1 pb-2 font-normal align-top text-transparentGrey w-1/3">
                     <div className='flex flex-row justify-between items-start'>
-                        {columnHeaderTitles.map((el, i) => {
+                        {columnHeaderTitles?.map((el, i) => {
                             return (
-                                <div key={el.title} className='w-24 flex items-center justify-start text-start'>
+                                <div key={el.title} className='w-24 pl-1 flex items-center justify-start text-start'>
                                     {el.showIcon && (<PlusIcon className='w-4 h-4' />)}
                                     <span className='pl-1'>{el.title}</span>
                                 </div>)
