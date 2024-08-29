@@ -188,7 +188,7 @@ export const calculateTotalHoursPerWeek = (
   assignments: AssignmentType | AssignmentType[]
 ) => {
   const totalHours: { [key: string]: number } = {};
-
+  let maxTotalHours = 0;
   const calculateAssignment = (assignment: AssignmentType) => {
     assignment.workWeeks.forEach((weekData) => {
       const key = `${weekData.year}-${weekData.cweek}`;
@@ -196,6 +196,10 @@ export const calculateTotalHoursPerWeek = (
         totalHours[key] = 0;
       }
       totalHours[key] += weekData.actualHours || 0;
+
+      if (totalHours[key] > maxTotalHours) {
+        maxTotalHours = totalHours[key];
+      }
     });
   };
 
@@ -204,7 +208,7 @@ export const calculateTotalHoursPerWeek = (
   } else {
     calculateAssignment(assignments);
   }
-
+  totalHours.maxTotalHours = maxTotalHours;
   return totalHours;
 };
 

@@ -60,6 +60,9 @@ export const AllUserRow = ({
 			{}
 		)
 	);
+	const maxHoursPerWeek = totalWorkWeekHours.reduce((max, current) => {
+		return current.actualHours > max ? current.actualHours : max;
+	}, 0);
 
 	return (
 		<tr className="px-2 flex border-b border-gray-300 hover:bg-hoverGrey">
@@ -85,7 +88,7 @@ export const AllUserRow = ({
 					const displayHours = getDisplayHours(workWeek, totalEstimatedWeeklyHours);
 					return (
 						<td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal min-h-[100px]`}>
-							<ColumnChart height={displayHours} color={isBeforeWeek(week, currentWeek, currentYear, month) ? '#AEB3C0' : '#27B5B0'} maxValue={200} textColor="contrastBlue" />
+							<ColumnChart height={displayHours} color={isBeforeWeek(week, currentWeek, currentYear, month) ? '#AEB3C0' : '#27B5B0'} maxValue={maxHoursPerWeek} textColor="contrastBlue" />
 						</td>)
 				});
 			})}

@@ -9,7 +9,7 @@ type ChartProps = {
 
 const ColumnChart = ({ height, color = '#27B5B0', maxValue = 50, textColor = 'white' }: ChartProps) => {
     const validatedHeight = Math.max(0, Math.min(height, maxValue));
-    const scale = 100 / maxValue;
+    const scale = 100 / (maxValue + 20);
     const svgHeight = validatedHeight * scale;
 
     return (

@@ -108,7 +108,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                 {months?.map((month) => {
                     return month.weeks.map((week) => (
                         <th key={`month-${month.monthLabel}-week-${week}`} className="relative px-1">
-                            <ColumnChart height={totalHoursPerWeek[`${month.year}-${week}`]} color={isBeforeWeek(week, currentWeek, currentYear, month) ? '#AEB3C0' : '#27B5B0'} maxValue={200} />
+                            <ColumnChart height={totalHoursPerWeek[`${month.year}-${week}`]} color={isBeforeWeek(week, currentWeek, currentYear, month) ? '#AEB3C0' : '#27B5B0'} maxValue={totalHoursPerWeek.maxTotalHours} />
                         </th>
                     ));
                 })}
