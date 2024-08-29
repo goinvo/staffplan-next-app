@@ -27,8 +27,9 @@ type CalendarHeaderProps = {
     title?: string,
     userName?: string,
     editable?: boolean,
-    projectInfo?: string
-    columnHeaderTitles: ColumnHeaderTitle[]
+    projectInfo?: string,
+    columnHeaderTitles: ColumnHeaderTitle[],
+    selectedColumn: string | null
 }
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
@@ -39,7 +40,8 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     userName,
     editable,
     projectInfo,
-    columnHeaderTitles }) => {
+    columnHeaderTitles,
+    selectedColumn }) => {
     const [isEditing, setIsEditing] = useState(false);
     const { setDateRange, scrollToTodayFunction } = useUserDataContext();
     const currentWeek = getCurrentWeekOfYear()
@@ -65,7 +67,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 
     return (
         <thead>
-            <tr className="pl-4 border-bottom bg-contrastBlue min-h-28 text-white flex">
+            <tr className="pl-2 border-bottom bg-contrastBlue min-h-28 text-white flex">
                 <th className="px-0 flex w-1/3">
                     {isEditing ? (
                         <div className='flex items-center'>
@@ -106,11 +108,13 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                     }
                 </th>
                 {months?.map((month) => {
-                    return month.weeks.map((week) => (
-                        <th key={`month-${month.monthLabel}-week-${week}`} className="relative px-1">
+                    return month.weeks.map((week) => {
+                        const columnIdentifier = `${month.monthLabel}-${week}`;
+                        return (<th key={`month-${month.monthLabel}-week-${week}`}
+                            className={`relative px-1 ${selectedColumn === columnIdentifier ? 'navbar font-bold' : 'font-normal'}`}>
                             <ColumnChart height={totalHoursPerWeek[`${month.year}-${week}`]} color={isBeforeWeek(week, currentWeek, currentYear, month) ? '#AEB3C0' : '#27B5B0'} maxValue={totalHoursPerWeek.maxTotalHours} />
-                        </th>
-                    ));
+                        </th>)
+                    });
                 })}
                 <th className="px-4 py-2 w-1/6">
                     <div className="flex flex-row justify-between">
@@ -123,8 +127,8 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                     </div>
                 </th>
             </tr>
-            <tr className="px-2 flex border-b border-gray-300">
-                <th className="pl-1 pr-0 pt-1 pb-2 font-normal align-top text-transparentGrey w-1/3">
+            <tr className="flex border-b border-gray-300">
+                <th className="pr-0 pt-1 pb-2 font-normal align-top text-transparentGrey w-1/3">
                     <div className='flex flex-row justify-between items-start'>
                         {columnHeaderTitles?.map((el, i) => {
                             return (
@@ -137,15 +141,19 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                     </div>
                 </th>
                 {months?.map((month) => {
-                    return month.weeks.map((week, index) => (
-                        <th key={`${month.monthLabel}-${index}`} className="relative py-2 px-1 font-normal text-contrastBlue">
-                            <div className="flex flex-col items-center w-[34px]">
-                                <span>{`W${index + 1}`}</span>
-                                {index === 0 && <span>{showMonthAndYear(month.year, month.monthLabel)}</span>}
-                            </div>
-                        </th>
+                    return month.weeks.map((week, index) => {
+                        const columnIdentifier = `${month.monthLabel}-${week}`;
+                        return (
+                            <th key={`${month.monthLabel}-${index}`} className={`relative py-2 px-1 font-normal text-contrastBlue ${selectedColumn === columnIdentifier ? 'bg-selectedColumnBg' :
 
-                    ));
+                                ''}`}>
+                                <div className={`flex flex-col items-center w-[34px] ${selectedColumn === columnIdentifier ? 'font-bold' : 'font-normal'}`}>
+                                    <span>{`W${index + 1}`}</span>
+                                    {index === 0 && <span>{showMonthAndYear(month.year, month.monthLabel)}</span>}
+                                </div>
+                            </th>)
+
+                    });
                 })}
                 <th className="pl-0 pr-4 pt-1 pb-2 font-normal align-top w-1/6">
                     <IconButton className='pt-2 text-contrastBlue flex items-center justify-center'

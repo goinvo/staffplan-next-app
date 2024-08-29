@@ -20,7 +20,9 @@ interface UserAssignmentRowProps {
 	isFirstClient: boolean;
 	monthData: { monthLabel: string; year: number };
 	clickHandler: (client: ClientType) => void;
-	months?: MonthsDataType[]
+	months?: MonthsDataType[];
+	selectedColumn?: string | null;
+	handleCellClick?: (monthLabel: string | null, week: number | null) => void
 }
 
 export const UserAssignmentRow = ({
@@ -29,7 +31,9 @@ export const UserAssignmentRow = ({
 	isLastMonth,
 	isFirstClient,
 	clickHandler,
-	months
+	months,
+	selectedColumn,
+	handleCellClick
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
 	const [tempProjectOpen, setTempProjectOpen] = useState(false)
@@ -52,8 +56,9 @@ export const UserAssignmentRow = ({
 		}
 		return true;
 	};
+
 	return (
-		<tr className={`px-2 flex ${isFirstClient ? '' : 'border-b border-gray-300'} hover:bg-hoverGrey py-2`}>
+		<tr className={`flex ${isFirstClient ? '' : 'border-b border-gray-300'} hover:bg-hoverGrey min-h-[100px]`}>
 			<td className='pl-2 pr-0 pt-1 pb-2 font-normal align-top w-1/3'>
 				<div
 					className='flex flex-row justify-between items-start space-x-2'
@@ -83,12 +88,18 @@ export const UserAssignmentRow = ({
 					</div>
 				</div>
 			</td>
-			{months?.map((month: MonthsDataType) => {
+			{months?.map((month: MonthsDataType, index) => {
 				return month.weeks.map((week) => {
 					const withinProjectDates = isWeekWithinProject(week, month.year);
+					const columnIdentifier = `${month.monthLabel}-${week}`;
 					return (
-						<td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal`}>
-							<div className='flex flex-col space-y-3 font-normal'>
+						<td key={`${month.monthLabel}-${week}`}
+							className={`relative px-1 py-1 font-normal ${selectedColumn === columnIdentifier ? 'bg-selectedColumnBg' : ''}`}
+
+						>
+							<div className={`flex flex-col space-y-3 ${selectedColumn === columnIdentifier ? 'font-bold' : 'font-normal'}`}
+								onClick={() => handleCellClick?.(month.monthLabel, week)}
+								onBlur={() => handleCellClick?.(null, null)}>
 								<WorkWeekInput
 									withinProjectDates={withinProjectDates}
 									assignment={assignment}

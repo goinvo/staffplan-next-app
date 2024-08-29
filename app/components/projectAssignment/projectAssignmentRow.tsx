@@ -14,7 +14,9 @@ interface ProjectAssignmentRowProps {
 	isFirstMonth: boolean;
 	isLastMonth: boolean;
 	monthData: { monthLabel: string; year: number };
-	months?: MonthsDataType[]
+	months?: MonthsDataType[];
+	selectedColumn?: string | null;
+	handleCellClick?: (monthLabel: string | null, week: number | null) => void;
 }
 
 export const ProjectAssignmentRow = ({
@@ -22,7 +24,9 @@ export const ProjectAssignmentRow = ({
 	isFirstMonth,
 	isLastMonth,
 	project,
-	months
+	months,
+	selectedColumn,
+	handleCellClick
 }: ProjectAssignmentRowProps) => {
 	const router = useRouter();
 
@@ -48,7 +52,7 @@ export const ProjectAssignmentRow = ({
 	};
 
 	return (
-		<tr className="px-2 py-2 flex border-b border-gray-300 hover:bg-hoverGrey">
+		<tr className="flex border-b border-gray-300 hover:bg-hoverGrey min-h-[100px]">
 			{isFirstMonth && (
 				<ProjectUserLabel
 					project={project}
@@ -59,9 +63,13 @@ export const ProjectAssignmentRow = ({
 			{months?.map((month: MonthsDataType) => {
 				return month.weeks.map((week) => {
 					const withinProjectDates = isWeekWithinProject(week, month.year);
+					const columnIdentifier = `${month.monthLabel}-${week}`;
 					return (
-						<td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal`}>
-							<div className='flex flex-col space-y-3 font-normal'>
+						<td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal ${selectedColumn === columnIdentifier ? 'bg-selectedColumnBg' : ''}`}>
+							<div
+								className={`flex flex-col space-y-3 ${selectedColumn === columnIdentifier ? 'font-bold' : 'font-normal'}`}
+								onClick={() => handleCellClick?.(month.monthLabel, week)}
+								onBlur={() => handleCellClick?.(null, null)}>
 								<WorkWeekInput
 									isUserTBD={isUserTBD}
 									withinProjectDates={withinProjectDates}

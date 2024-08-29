@@ -32,7 +32,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 	return (
 		<td className="font-normal py-2 pl-4 w-1/6 flex items-center justify-between">
 			{viewsFilter.showSummaries ? (
-				<>
+				<div>
 					{futurePlan() ? (
 						<div className='space-y-4'>
 							<label className="text-sm pr-1">future plan</label>
@@ -58,7 +58,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 							</span>
 						</div>
 					) : null}
-				</>
+				</div>
 			) : null}
 			<div className="flex items-start justify-center">
 				<IconButton className='text-black flex items-start justify-center text-transparentGrey'
