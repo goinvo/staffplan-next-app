@@ -2,26 +2,30 @@
 
 import React from 'react';
 import { useFormik } from 'formik';
+import { useParams } from "next/navigation";
 
 import { IoCheckmarkCircle } from "react-icons/io5";
 
-import ImageUploader from './imageUploader';
-import IconButton from './iconButton';
-
+import ImageUploader from '../imageUploader';
+import IconButton from '../iconButton';
+import { useUserDataContext } from '../../userDataContext';
+import { UserType } from '../../typeInterfaces'
 interface EditFormProps {
-    avatarUrl: string;
-    userName: string;
-    userEmail?: string;
     onClose?: () => void;
-    onSave?: (newValues: { avatarUrl: string; userName: string; userEmail?: string; }) => void;
 }
 
 const EditUserForm: React.FC<EditFormProps> = ({
-    avatarUrl,
-    userName,
     onClose
 }) => {
-    const [firstName, lastName] = userName.split(' ');
+    const { userList } = useUserDataContext();
+
+    const params = useParams();
+    const selectedUserId = decodeURIComponent(params.userId.toString());
+    const selectedUser = userList.find(
+        (user: UserType) => user.id?.toString() === selectedUserId.toString()
+    );
+    const { avatarUrl, name } = selectedUser
+    const [firstName, lastName] = name.split(' ');
 
     const formik = useFormik({
         initialValues: {
@@ -72,11 +76,11 @@ const EditUserForm: React.FC<EditFormProps> = ({
                         value={formik.values.firstName}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        className="h-10 px-2 rounded-md outline-none focus:outline-tiffany focus:ring-1 focus:ring-tiffany text-huge max-w-[200px]"
+                        className="h-10 px-2 rounded-md focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-huge max-w-[200px]"
                         placeholder="First name"
                     />
                     {formik.touched.firstName && formik.errors.firstName ? (
-                        <p className="text-red-500">{formik.errors.firstName}</p>
+                        <p className="text-red-500">{formik.errors.firstName as string}</p>
                     ) : null}
                     <IconButton className="text-tiffany" type='submit' Icon={IoCheckmarkCircle} iconSize='h-8 w-8 pl-1' />
                 </div>
@@ -87,7 +91,7 @@ const EditUserForm: React.FC<EditFormProps> = ({
                         value={formik.values.lastName}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        className="h-8 px-2 text-tiny font-normal rounded-md outline-none focus:outline-tiffany focus:ring-1 focus:ring-tiffany min-w-[200px]"
+                        className="h-8 px-2 text-tiny font-normal rounded-md focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none min-w-[200px]"
                         placeholder="Last name"
                     />
                 </div>
@@ -98,7 +102,7 @@ const EditUserForm: React.FC<EditFormProps> = ({
                         value={formik.values.userEmail}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        className="h-8 px-2 text-tiny font-normal rounded-md outline-none focus:outline-tiffany focus:ring-1 focus:ring-tiffany min-w-[200px]"
+                        className="h-8 px-2 text-tiny font-normal rounded-md focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none min-w-[200px]"
                         placeholder="email"
                     />
                     {formik.touched.userEmail && formik.errors.userEmail ? (

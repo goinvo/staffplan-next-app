@@ -14,6 +14,7 @@ import { useUserDataContext } from '@/app/userDataContext';
 import { AssignmentType, MonthsDataType, ProjectType } from '@/app/typeInterfaces';
 import { calculateTotalHoursPerWeek, getCurrentWeekOfYear, getCurrentYear, isBeforeWeek, showMonthAndYear } from './helpers';
 import ViewsMenu from '../viewsMenu/viewsMenu';
+import EditFormController from './editFormController';
 
 interface ColumnHeaderTitle {
     title: string;
@@ -37,7 +38,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     avatarUrl,
     title,
     userName,
-    editable,
+    editable = false,
     projectInfo,
     columnHeaderTitles }) => {
     const [isEditing, setIsEditing] = useState(false);
@@ -68,10 +69,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             <tr className="pl-4 border-bottom bg-contrastBlue min-h-28 text-white flex">
                 <th className="px-0 flex w-1/3">
                     {isEditing ? (
-                        <div className='flex items-center'>
-                            <p>Edit form will be here</p>
-                            <button className='text-white' onClick={() => setIsEditing(!isEditing)}>Back</button>
-                        </div>
+                        <EditFormController onClose={() => setIsEditing(false)} />
                     ) : (
                         <div className='flex text-white items-center'>
                             {avatarUrl && (
