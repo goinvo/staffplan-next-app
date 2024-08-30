@@ -51,8 +51,11 @@ export const ProjectAssignmentRow = ({
 		return true;
 	};
 
+
 	return (
-		<tr className="flex border-b border-gray-300 hover:bg-hoverGrey min-h-[100px]">
+		<tr className={`flex border-b border-gray-300 hover:bg-hoverGrey min-h-[100px] ${assignment.status === 'proposed' ? 'bg-diagonal-stripes' :
+			''
+			}`}>
 			{isFirstMonth && (
 				<ProjectUserLabel
 					project={project}
@@ -65,7 +68,9 @@ export const ProjectAssignmentRow = ({
 					const withinProjectDates = isWeekWithinProject(week, month.year);
 					const columnIdentifier = `${month.monthLabel}-${week}`;
 					return (
-						<td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal ${selectedColumn === columnIdentifier ? 'bg-selectedColumnBg' : ''}`}>
+						<td key={`${month.monthLabel}-${week}`}
+							className={`relative px-1 py-1 font-normal ${selectedColumn === columnIdentifier ? 'bg-selectedColumnBg' : ''}`}
+						>
 							<div
 								className={`flex flex-col space-y-3 ${selectedColumn === columnIdentifier ? 'font-bold' : 'font-normal'}`}
 								onClick={() => handleCellClick?.(month.monthLabel, week)}

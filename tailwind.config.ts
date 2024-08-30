@@ -29,7 +29,7 @@ const config: Config = {
       },
       backgroundImage: {
         "diagonal-stripes":
-          "repeating-linear-gradient(45deg, #e9eaf2, #e9eaf2 2px, #e4e5ef 2px, #e4e5ef 2px)",
+          "repeating-linear-gradient(135deg, #e9eaf2, #e9eaf2 10px, #e4e5ef 10px, #e4e5ef 20px)",
       },
     },
   },

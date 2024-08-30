@@ -66,7 +66,9 @@ export const AllProjectRow = ({
 	}, 0);
 
 	return (
-		<tr className="px-2 flex border-b border-gray-300 hover:bg-hoverGrey">
+		<tr className={`px-2 flex border-b border-gray-300 hover:bg-hoverGrey ${project.status === 'proposed' ? 'bg-diagonal-stripes' :
+			''
+			}`}>
 			<td className='pl-2 pt-1 pb-2 font-normal align-top w-1/3'>
 				{isFirstMonth && (
 					<AllProjectLabel clickHandler={handleProjectChange} project={project} />
