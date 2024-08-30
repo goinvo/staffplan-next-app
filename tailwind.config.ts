@@ -18,6 +18,7 @@ const config: Config = {
         transparentBlue: "#37455e",
         hoverGrey: "#e3e4ee",
         contrastBlue: "#23324C",
+        contrastGrey: "#aeb3c0",
         selectedColumnBg: "#dfe0ec",
       },
       fontSize: {
