@@ -188,7 +188,9 @@ export const calculateTotalHoursPerWeek = (
   assignments: AssignmentType | AssignmentType[]
 ) => {
   const totalHours: { [key: string]: number } = {};
+  const proposedHours: { [key: string]: number } = {};
   let maxTotalHours = 0;
+
   const calculateAssignment = (assignment: AssignmentType) => {
     assignment.workWeeks.forEach((weekData) => {
       const key = `${weekData.year}-${weekData.cweek}`;
@@ -197,6 +199,12 @@ export const calculateTotalHoursPerWeek = (
       }
       totalHours[key] += weekData.actualHours || 0;
 
+      if (assignment.status === "proposed") {
+        if (!proposedHours[key]) {
+          proposedHours[key] = 0;
+        }
+        proposedHours[key] += weekData.actualHours || 0;
+      }
       if (totalHours[key] > maxTotalHours) {
         maxTotalHours = totalHours[key];
       }
@@ -209,7 +217,8 @@ export const calculateTotalHoursPerWeek = (
     calculateAssignment(assignments);
   }
   totalHours.maxTotalHours = maxTotalHours;
-  return totalHours;
+
+  return { totalHours, proposedHours };
 };
 
 export const getDisplayHours = (

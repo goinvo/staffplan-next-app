@@ -46,7 +46,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     const { setDateRange, scrollToTodayFunction } = useUserDataContext();
     const currentWeek = getCurrentWeekOfYear()
     const currentYear = getCurrentYear()
-    const totalHoursPerWeek = calculateTotalHoursPerWeek(assignments as AssignmentType[])
+    const { totalHours, proposedHours } = calculateTotalHoursPerWeek(assignments as AssignmentType[])
 
     const nextQuarter = () => {
         setDateRange(prev => {
@@ -112,7 +112,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                         const columnIdentifier = `${month.monthLabel}-${week}`;
                         return (<th key={`month-${month.monthLabel}-week-${week}`}
                             className={`relative px-1 ${selectedColumn === columnIdentifier ? 'navbar font-bold' : 'font-normal'}`}>
-                            <ColumnChart height={totalHoursPerWeek[`${month.year}-${week}`]} color={isBeforeWeek(week, currentWeek, currentYear, month) ? '#AEB3C0' : '#27B5B0'} maxValue={totalHoursPerWeek.maxTotalHours} />
+                            <ColumnChart height={totalHours[`${month.year}-${week}`]} proposedHours={proposedHours[`${month.year}-${week}`]} isBeforeWeek={isBeforeWeek(week, currentWeek, currentYear, month)} maxValue={totalHours.maxTotalHours} />
                         </th>)
                     });
                 })}

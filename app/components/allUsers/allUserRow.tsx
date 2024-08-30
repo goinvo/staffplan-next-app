@@ -88,7 +88,7 @@ export const AllUserRow = ({
 					const displayHours = getDisplayHours(workWeek, totalEstimatedWeeklyHours);
 					return (
 						<td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal min-h-[100px]`}>
-							<ColumnChart height={displayHours} color={isBeforeWeek(week, currentWeek, currentYear, month) ? '#AEB3C0' : '#27B5B0'} maxValue={maxHoursPerWeek} textColor="contrastBlue" />
+							<ColumnChart height={displayHours} isBeforeWeek={isBeforeWeek(week, currentWeek, currentYear, month)} maxValue={maxHoursPerWeek} textColor="contrastBlue" />
 						</td>)
 				});
 			})}
