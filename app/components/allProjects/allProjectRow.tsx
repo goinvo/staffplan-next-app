@@ -61,8 +61,14 @@ export const AllProjectRow = ({
 		}, {})
 	);
 
+	const maxHoursPerWeek = totalWorkWeekHours.reduce((max, current) => {
+		return current.actualHours > max ? current.actualHours : max;
+	}, 0);
+
 	return (
-		<tr className="px-2 flex border-b border-gray-300 hover:bg-hoverGrey">
+		<tr className={`px-2 flex border-b border-gray-300 hover:bg-hoverGrey ${project.status === 'proposed' ? 'bg-diagonal-stripes' :
+			''
+			}`}>
 			<td className='pl-2 pt-1 pb-2 font-normal align-top w-1/3'>
 				{isFirstMonth && (
 					<AllProjectLabel clickHandler={handleProjectChange} project={project} />
@@ -88,7 +94,7 @@ export const AllProjectRow = ({
 					const displayHours = getDisplayHours(workWeek, totalEstimatedWeeklyHours as number);
 					return (
 						<td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal min-h-[100px]`}>
-							<ColumnChart height={displayHours} color={isBeforeWeek(week, currentWeek, currentYear, month) ? '#AEB3C0' : '#27B5B0'} maxValue={200} textColor="contrastBlue" />
+							<ColumnChart height={displayHours} isBeforeWeek={isBeforeWeek(week, currentWeek, currentYear, month)} maxValue={maxHoursPerWeek} textColor="contrastBlue" />
 						</td>)
 				})
 			))}
