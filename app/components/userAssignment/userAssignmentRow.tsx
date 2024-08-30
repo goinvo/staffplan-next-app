@@ -81,7 +81,7 @@ export const UserAssignmentRow = ({
 							<UserLabel assignment={assignment} clickHandler={handleProjectChange} />
 						)
 					)}
-					<div className='text-contrastBlue flex flex-col space-y-3 pr-2'>
+					<div className='text-contrastBlue flex flex-col space-y-3 ml-auto px-2 items-end max-w-[60px]'>
 						<div className='pt-2 underline'>
 							{assignment.status === 'proposed' ? 'Proposed' : 'Signed'}
 						</div>
