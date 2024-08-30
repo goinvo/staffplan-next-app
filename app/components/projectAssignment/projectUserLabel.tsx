@@ -115,7 +115,7 @@ export const ProjectUserLabel = ({
 			</div>
 			<div className='text-contrastBlue flex flex-col space-y-3 ml-auto px-2'>
 				<div className='pt-2 underline'>
-					Signed
+					{assignment.status === 'proposed' ? 'Proposed' : 'Signed'}
 				</div>
 				<div className='pt-2'>
 					Actual
