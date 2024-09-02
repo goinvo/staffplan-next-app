@@ -108,7 +108,7 @@ const UserPage: React.FC = () => {
 	return (
 		<>
 			{selectedUser && userList ? (
-				<ScrollingCalendar columnHeaderTitles={columnsHeaderTitles} avatarUrl={selectedUser.avatarUrl} userName={selectedUser.name} assignments={selectedUser.assignments}>
+				<ScrollingCalendar columnHeaderTitles={columnsHeaderTitles} avatarUrl={selectedUser.avatarUrl} userName={selectedUser.name} assignments={selectedUser.assignments} editable={true}>
 					{selectedUser?.assignments?.map(
 						(assignment: AssignmentType, index, allAssignments) => {
 							const isFirstClient = index === allAssignments.findIndex((a) => a.project.client.id === assignment.project.client.id);
