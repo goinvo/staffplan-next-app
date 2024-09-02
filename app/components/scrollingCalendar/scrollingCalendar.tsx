@@ -34,6 +34,7 @@ export const ScrollingCalendar = ({
 	editable
 }: ScrollingCalendarProps) => {
 	const [months, setMonths] = useState<MonthsDataType[]>([]);
+	const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
 	const { dateRange } = useUserDataContext();
 	const isSmallScreen = useMediaQuery('(max-width: 1299px)');
 	const isMediumScreen = useMediaQuery('(min-width: 1299px) and (max-width: 1499px)');
@@ -53,6 +54,13 @@ export const ScrollingCalendar = ({
 		setMonths(monthsData);
 	}, [dateRange, detectMonthsCountPerScreen]);
 
+	const handleCellClick = useCallback((monthLabel: string | null, week: number | null) => {
+		const columnIdentifier = `${monthLabel}-${week}`;
+		if (selectedColumn !== columnIdentifier) {
+			setSelectedColumn(columnIdentifier);
+		}
+	}, [selectedColumn]);
+
 	return (
 		<table className="min-w-full timeline-grid-bg text-contrastBlue text-sm h-screen">
 			<CalendarHeader
@@ -62,13 +70,16 @@ export const ScrollingCalendar = ({
 				avatarUrl={avatarUrl}
 				userName={userName}
 				title={title}
+				selectedColumn={selectedColumn}
 				projectInfo={projectInfo}
 				editable={editable}
 			/>
 			<tbody>
 				{React.Children.map(children, (child) =>
 					React.cloneElement(child as React.ReactElement<any>, {
-						months
+						months,
+						selectedColumn,
+						handleCellClick
 					})
 				)}
 			</tbody>
