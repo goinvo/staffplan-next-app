@@ -1,16 +1,40 @@
-import React from "react";
-import { DateTime } from "luxon";
+import React from 'react';
+import { DateTime } from 'luxon';
+import { ProjectSummaryProps } from '../typeInterfaces';
+import { useUserDataContext } from '../userDataContext';
+import IconButton from './iconButton';
+import { ArchiveBoxIcon } from '@heroicons/react/24/outline';
+import { UPSERT_PROJECT } from "@/app/gqlQueries";
+import { useMutation } from "@apollo/client";
 
-import { ProjectSummaryProps } from "../typeInterfaces";
-import { useUserDataContext } from "../userDataContext";
-
-import IconButton from "./iconButton";
-import { ArchiveBoxIcon } from "@heroicons/react/24/outline";
 
 const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
-	const { viewsFilter } = useUserDataContext();
+	const { viewsFilter, refetchProjectList } = useUserDataContext();
+
+	const [upsertProject] = useMutation(UPSERT_PROJECT, {
+		errorPolicy: "all",
+		onCompleted({ upsertProject }) {
+			refetchProjectList();
+		},
+	});
+
+	const handleArchiveItemClick = () => {
+		if (project.status !== 'archived') {
+			const variables = {
+				id: project.id,
+				name: project.name,
+				clientId: project.client.id,
+				status: 'archived'
+			};
+			upsertProject({
+				variables
+			})
+		}
+	}
+
+
 	const plannedHours = project.assignments?.reduce((acc, curr) => {
-		if (curr.status === "active") {
+		if (curr.status === 'active') {
 			return acc + curr.estimatedWeeklyHours;
 		}
 		return acc;
@@ -20,7 +44,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 		if (project.startsOn && project.endsOn) {
 			const startsOn = DateTime.fromISO(project.startsOn);
 			const endsOn = DateTime.fromISO(project.endsOn);
-			return Math.round(endsOn.diff(startsOn, "weeks").weeks);
+			return Math.round(endsOn.diff(startsOn, 'weeks').weeks);
 		}
 		return 0;
 	};
@@ -41,10 +65,12 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 			{viewsFilter.showSummaries ? (
 				<div className="flex flex-col items-start">
 					<div className="ml-auto">
-						<IconButton className='text-black text-transparentGrey'
-							onClick={() => console.log('On archive box btn click')}
+						<IconButton
+							className="text-black text-transparentGrey"
+							onClick={() => handleArchiveItemClick()}
 							Icon={ArchiveBoxIcon}
-							iconSize={'h6 w-6'} />
+							iconSize="h6 w-6"
+						/>
 					</div>
 					{project.fte ? (
 						<span className="text-sm flex items-center">
@@ -94,5 +120,6 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 			) : null}
 		</td>
 	);
-}
+};
+
 export default ProjectSummary;

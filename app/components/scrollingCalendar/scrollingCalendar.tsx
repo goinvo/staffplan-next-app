@@ -20,6 +20,7 @@ interface ScrollingCalendarProps {
 	avatarUrl?: string;
 	userName?: string;
 	projectInfo?: string;
+	editable?: boolean;
 }
 
 export const ScrollingCalendar = ({
@@ -29,7 +30,8 @@ export const ScrollingCalendar = ({
 	title,
 	avatarUrl,
 	userName,
-	projectInfo
+	projectInfo,
+	editable
 }: ScrollingCalendarProps) => {
 	const [months, setMonths] = useState<MonthsDataType[]>([]);
 	const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
@@ -70,6 +72,7 @@ export const ScrollingCalendar = ({
 				title={title}
 				selectedColumn={selectedColumn}
 				projectInfo={projectInfo}
+				editable={editable}
 			/>
 			<tbody>
 				{React.Children.map(children, (child) =>

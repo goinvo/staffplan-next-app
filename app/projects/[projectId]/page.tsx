@@ -11,6 +11,7 @@ import { ProjectAssignmentRow } from "@/app/components/projectAssignment/project
 import AddAssignmentSingleProject from "@/app/components/addAssignmentSIngleProject";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import ProjectDetails from "@/app/components/projectDetails";
+import { DateTime } from "luxon";
 
 const ProjectPage: React.FC = () => {
 	const params = useParams();
@@ -76,15 +77,34 @@ const ProjectPage: React.FC = () => {
 		setAddAssignmentVisible(false);
 	};
 
+
+	const selectedProjectDates = () => {
+		const startDate = selectedProject?.startsOn ? DateTime.fromISO(selectedProject.startsOn) : null;
+		const endDate = selectedProject?.endsOn ? DateTime.fromISO(selectedProject.endsOn) : null;
+
+		if (!startDate || !endDate) {
+			return 'Start Date - End Date';
+		}
+		const formattedStartDate = startDate.toFormat('d.MMM');
+		const formattedEndDate = endDate.toFormat('d.MMM');
+		const startYear = startDate.year;
+		const endYear = endDate.year;
+		if (startYear === endYear) {
+			return `${formattedStartDate}-${formattedEndDate}.${endYear}`;
+		} else {
+			return `${formattedStartDate}.${startYear}-${formattedEndDate} ${endYear}`;
+		}
+	}
+
 	const columnHeaderTitles = [{ title: 'People', showIcon: true }]
 
-	const projectInfoSubtitle = `${selectedProject?.client.name}, budget, ${selectedProject?.hours || 0}h, ${selectedProject?.startsOn || 'Start date'}-${selectedProject?.endsOn || 'End Date'}`
+	const projectInfoSubtitle = `${selectedProject?.client.name}, budget, ${selectedProject?.hours || 0}h, ${selectedProjectDates()}`
 
 	return (
 		<>
 			{selectedProject && projectList ? (
 				<>
-					<ScrollingCalendar columnHeaderTitles={columnHeaderTitles} title={selectedProject.name} projectInfo={projectInfoSubtitle} assignments={selectedProject}>
+					<ScrollingCalendar columnHeaderTitles={columnHeaderTitles} title={selectedProject.name} projectInfo={projectInfoSubtitle} assignments={selectedProject} editable={true}>
 						{selectedProject?.assignments?.map(
 							(assignment: AssignmentType, index) => {
 								return (
