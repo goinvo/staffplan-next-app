@@ -1,43 +1,38 @@
 
 import React, { useState } from 'react';
-import { Dialog } from '@headlessui/react';
 import NewPersonForm from './newPersonForm';
 import NewProjectForm from './newProjectForm';
 
 
 interface ModalProps {
-    view?: 'project' | 'person'
-    openModal: boolean
+    closeModal: () => void
 }
 
-const NewPersonAndProjectModal = ({ view = 'person', openModal }: ModalProps) => {
-    const [selectedView, setSelectedView] = useState<'project' | 'person'>(view);
-    const [showModal, setShowModal] = useState<boolean>(openModal)
+const NewPersonAndProjectModal = ({ closeModal }: ModalProps) => {
+    const [selectedView, setSelectedView] = useState<'project' | 'person'>('project');
 
     return (
-        <Dialog open={showModal} onClose={() => setShowModal(false)}>
-            <div className="fixed inset-0 bg-black bg-opacity-30" aria-hidden="true" />
-            <div className="fixed inset-0 flex items-center justify-center p-4">
-                <Dialog.Panel className="timeline-grid-bg rounded-lg p-6 text-contrastBlue max-w-md mx-auto">
-                    <div className='flex flex-row justify-center'>
-                        <button
-                            className={`h-10 w-[170px] rounded-sm ml-auto mr-3 text-tiny border border-contrastGrey ${selectedView === 'project' ? 'bg-contrastGrey font-bold' : ''}`}
-                            onClick={() => setSelectedView('project')}
-                        >New project
-                        </button>
-                        <button
-                            className={`h-10 w-[170px] rounded-sm mr-auto ml-3 text-tiny border border-contrastGrey ${selectedView === 'person' ? 'bg-contrastGrey font-bold' : ''}`}
-                            onClick={() => setSelectedView('person')}
-                        >
-                            New person
-                        </button>
-                    </div>
-                    {selectedView === 'person' && <NewPersonForm closeModal={() => setShowModal(false)} />}
-                    {selectedView === 'project' && <NewProjectForm closeModal={() => setShowModal(false)} />}
-                </Dialog.Panel>
+        <>
+            <div className='flex flex-row justify-center'>
+                <button
+                    className={`h-10 w-[170px] rounded-sm m-auto text-tiny border border-lightGrey ${selectedView === 'project' ? 'bg-lightGrey font-bold' : ''}`}
+                    onClick={() => setSelectedView('project')}
+                >New project
+                </button>
+                {/* <button
+                    className={`h-10 w-[170px] rounded-sm mr-auto ml-3 text-tiny border border-contrastGrey ${selectedView === 'person' ? 'bg-contrastGrey font-bold' : ''}`}
+                    onClick={() => setSelectedView('person')}
+                >
+                    New person
+                </button> */}
             </div>
-        </Dialog >
+
+            {/* {selectedView === 'person' && <NewPersonForm closeModal={closeModal} />} */}
+            {selectedView === 'project' && <NewProjectForm closeModal={closeModal} />}
+        </>
     );
 };
+
+// uncomment commented codebase when backend will be done for creating new user
 
 export default NewPersonAndProjectModal;

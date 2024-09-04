@@ -7,19 +7,24 @@ import AddClient from "./components/addClientModal";
 import { UserListProvider } from "./userDataContext";
 import { withApollo } from "@/lib/withApollo";
 import AirTableFormModal from "./components/airTableFormModal";
+import { ModalProvider } from "./modalContext";
+import ModalController from "./components/modalController";
 
 const RootLayoutContents: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="relative z-0">
       <UserListProvider>
-        <Navbar />
-        <Suspense>
-          <AddAssignment />
-          <AddProject />
-          <AddClient />
-          <AirTableFormModal />
-        </Suspense>
-        {children}
+        <ModalProvider>
+          <Navbar />
+          <Suspense>
+            <AddAssignment />
+            <AddProject />
+            <AddClient />
+            <AirTableFormModal />
+            <ModalController />
+          </Suspense>
+          {children}
+        </ModalProvider>
       </UserListProvider>
     </div>
   );

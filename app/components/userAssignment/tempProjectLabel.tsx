@@ -58,7 +58,7 @@ export const TempProjectLabel = ({
 	};
 
 	return (
-		<div className="ml-auto">
+		<div className="w-24 pl-4 pt-2">
 			<Formik
 				onSubmit={(e) => onSubmitUpsert(e)}
 				initialValues={initialValues}
@@ -73,7 +73,7 @@ export const TempProjectLabel = ({
 					touched,
 					isValid,
 				}) => (
-					<form className="flex items-center justify-start" onSubmit={handleSubmit}>
+					<form onSubmit={handleSubmit}>
 						<input
 							autoComplete="off"
 							id="projectName"
@@ -86,7 +86,7 @@ export const TempProjectLabel = ({
 							onChange={(e) => {
 								handleChange(e);
 							}}
-							className="w-40 rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm text-contrastBlue"
+							className="max-w-[150px] px-2 h-7 rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm text-contrastBlue"
 							placeholder="Enter Project Name"
 						/>
 					</form>
