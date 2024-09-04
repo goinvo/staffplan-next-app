@@ -72,7 +72,7 @@ export const ProjectUserLabel = ({
 									handleSubmit,
 									handleBlur,
 								}) => (
-									<form className="w-30 px-2" onSubmit={handleSubmit}>
+									<form className="px-2" onSubmit={handleSubmit}>
 										{/* SECTION 1 */}
 										<Field
 											onChange={handleChange}
@@ -80,7 +80,7 @@ export const ProjectUserLabel = ({
 											as="select"
 											name="userId"
 											id="userId"
-											className="border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm pr-0"
+											className="min-w-[90px] pt-1 timeline-grid-bg rounded-sm border-none focus:ring-tiffany focus:border-tiffany text-sm outlined-none"
 										>
 											{[
 												<option key="TBD" value="">
