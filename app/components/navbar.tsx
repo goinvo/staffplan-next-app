@@ -1,77 +1,86 @@
 "use client";
 import React from "react";
 import Link from "next/link";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { FaSquarePlus } from "react-icons/fa6";
 import {
 	ChatBubbleBottomCenterTextIcon,
-	BellIcon,
 } from "@heroicons/react/24/outline";
+
 import { usePathname } from "next/navigation";
 import { useUserDataContext } from "../userDataContext";
 import { LoadingSpinner } from "./loadingSpinner";
-import { FaSearch } from "react-icons/fa";
+
+import IconButton from "./iconButton";
+import NewPersonAndProjectModal from "./newPersonAndProjectModal";
+import { useModal } from "../modalContext";
 
 const Navbar: React.FC = () => {
 	const { viewer } = useUserDataContext();
 	const fullPathName = usePathname();
 	const pathname = usePathname().split("/")[1];
-	const activeTab = "navbar-border-accent border-b-2";
+	const { openModal, closeModal } = useModal()
+
 	if (!viewer) return <LoadingSpinner />;
+
 	const myPlanUrl = () => {
 		return encodeURIComponent(viewer.id);
 	};
 	const myStaffPlanURL = new RegExp(`^\\/people\\/${viewer.id}$`);
 	const myStaffPlanCheck = fullPathName.match(myStaffPlanURL);
+
+	const links = [
+		{ href: `/people/${myPlanUrl()}`, label: "My StaffPlan", isActive: myStaffPlanCheck },
+		{ href: "/people", label: "People", isActive: pathname === "people" && !myStaffPlanCheck },
+		{ href: "/projects", label: "Projects", isActive: pathname === "projects" },
+	];
+
+	const additionalLinks = [
+		{ label: 'Open Source' },
+		{ label: 'Feedback' },
+		{ label: 'Sign Out' }
+
+	]
 	return (
 		<nav className="navbar bg-gray-100 px-4 h-14 flex justify-between items-center">
 			<div className="flex items-center space-x-4 h-full">
-				<Link
-					href={`/people/${myPlanUrl()}`}
-					className={`navbar-text-accent ${
-						myStaffPlanCheck ? activeTab : "hover:underline"
-					}`}
-				>
-					My StaffPlan
-				</Link>
-				<Link
-					href="/projects"
-					className={`flex h-full justify-between items-center ${
-						pathname === "projects" ? activeTab : "hover:underline"
-					}`}
-				>
-					Projects
-				</Link>
-				<Link
-					href="/people"
-					className={`flex h-full justify-between items-center ${
-						pathname === "people" && !myStaffPlanCheck
-							? activeTab
-							: "hover:underline"
-					}`}
-				>
-					People
-				</Link>
+				{links.map((link) => (
+					<Link
+						key={link.href}
+						href={link.href}
+						className={`inline-flex items-center text-base px-4 py-2 rounded-md ${link.isActive ? 'bg-contrastBlue font-semibold' : "hover:bg-contrastBlue"}`}
+					>
+						{link.label}
+					</Link>
+				))}
+				<IconButton Icon={FaSquarePlus} onClick={() => openModal(<NewPersonAndProjectModal closeModal={closeModal} />)} iconSize="h-8 w-8 rounded-md text-contrastGrey" className="px-8" />
 			</div>
-			<div className="flex justify-center items-center actionbar-text-search">
-				<div className="w-4 h-4 flex mr-2" aria-label="search">
-					<FaSearch />
+
+			<div className="flex ml-auto items-center bg-contrastBlue rounded-2xl overflow-hidden min-w-[225px] h-8">
+				<div className="flex ml-3 items-center">
+					<MagnifyingGlassIcon className="h-4 w-4 text-contrastGrey" />
 				</div>
 				<input
 					type="text"
 					placeholder="Search"
-					className="flex bg-transparent py-1 border-none border-gray-300"
+					className="flex py-1 pl-2 bg-contrastBlue text-white text-sm border-none outline-none focus:ring-0 focus:border-none"
 				/>
 			</div>
-			<div className="flex items-center space-x-4 py-4">
+			<div className="flex items-center space-x-4 py-4 ml-2">
+				{additionalLinks.map((link) => (
+					<button
+						key={link.label}
+						className="inline-flex items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue cursor-pointer"
+					>
+						{link.label}
+					</button>
+				)
+				)}
 				<div className="h-4 w-4">
 					<Link href="?airTableFormModal=true">
-					<ChatBubbleBottomCenterTextIcon />
+						<ChatBubbleBottomCenterTextIcon />
 					</Link>
 				</div>
-				{/* <div className="h-4 w-4">
-					<BellIcon />
-				</div> */}
-
-				<div>{viewer.name}</div>
 			</div>
 		</nav>
 	);
