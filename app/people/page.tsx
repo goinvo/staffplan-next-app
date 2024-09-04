@@ -7,6 +7,7 @@ import { AssignmentType, UserType } from "../typeInterfaces";
 import { LoadingSpinner } from "../components/loadingSpinner";
 import { ScrollingCalendar } from "../components/scrollingCalendar/scrollingCalendar";
 import { AllUserRow } from "../components/allUsers/allUserRow";
+import { AddPersonInline } from "../components/addPersonInline";
 
 const PeopleView: React.FC = () => {
 	const { userList } = useUserDataContext();
@@ -33,6 +34,7 @@ const PeopleView: React.FC = () => {
 							/>
 						);
 					})}
+					<AddPersonInline />
 				</ScrollingCalendar>
 			) : (
 				<LoadingSpinner />

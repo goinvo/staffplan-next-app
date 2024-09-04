@@ -60,7 +60,7 @@ export const ProjectUserLabel = ({
 							(<button className="px-2" onClick={() => clickHandler(assignment)}>
 								{assignment.assignedUser.name}
 							</button>)}
-						{isUserTBD && (
+						{true && (
 							<Formik
 								onSubmit={(e) => onSubmitUpsert(e)}
 								initialValues={initialValues}
@@ -80,7 +80,7 @@ export const ProjectUserLabel = ({
 											as="select"
 											name="userId"
 											id="userId"
-											className="border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm pr-0"
+											className="timeline-grid-bg border-none shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm pr-0"
 										>
 											{[
 												<option key="TBD" value="">

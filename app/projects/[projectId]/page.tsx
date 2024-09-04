@@ -11,6 +11,7 @@ import { ProjectAssignmentRow } from "@/app/components/projectAssignment/project
 import AddAssignmentSingleProject from "@/app/components/addAssignmentSIngleProject";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import ProjectDetails from "@/app/components/projectDetails";
+import { AddPersonInline } from "@/app/components/addPersonInline";
 
 const ProjectPage: React.FC = () => {
 	const params = useParams();
@@ -99,6 +100,7 @@ const ProjectPage: React.FC = () => {
 								);
 							}
 						)}
+						<AddPersonInline />
 					</ScrollingCalendar>
 					<ProjectDetails
 						project={selectedProject}
