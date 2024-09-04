@@ -43,7 +43,7 @@ export const WorkWeekInput = ({
 	};
 
 	const [upsertWorkweek] = useMutation(UPSERT_WORKWEEK);
-	const { refetchUserList } = useUserDataContext();
+	const { refetchUserList, refetchProjectList } = useUserDataContext();
 
 	const upsertWorkWeekValues = (values: FormikValues) => {
 		upsertWorkweek({
@@ -56,6 +56,7 @@ export const WorkWeekInput = ({
 			},
 		}).then((res) => {
 			refetchUserList();
+			refetchProjectList();
 		});
 	};
 	return (
