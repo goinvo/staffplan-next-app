@@ -43,31 +43,20 @@ const NewPersonForm = ({ closeModal }: NewProjectFormProps) => {
 
     const validateForm = (values: FormikValues) => {
         const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
-        if (!values.clientName) {
-            errors.clientName = "Client is required";
-        }
+        if (!values.clientName) errors.clientName = "Client is required";
+        if (!values.projectName) errors.projectName = "Project name is required";
 
-        if (!values.projectName) {
-            errors.projectName = "Project name is required";
-        }
-        if (values.projectName) {
-            const currentClient = clientList.find((client: ClientType) => {
-                if (client.name === values.clientName) return client;
-            });
-            const projectNameExists = projectList?.find((project: ProjectType) => {
-                if (
-                    project.name === values.projectName &&
-                    currentClient?.id === project.client.id
-                ) {
-                    return project;
-                }
-            });
+        const currentClient = clientList.find((client: ClientType) => client.name === values.clientName);
+        if (values.projectName && currentClient) {
+            const projectNameExists = projectList.find((project: ProjectType) =>
+                project.name === values.projectName && currentClient.id === project.client.id);
             if (projectNameExists) {
                 errors.projectName = "Project name already in use";
             }
         }
+
         return errors;
-    };
+    }
 
     const formik = useFormik({
         initialValues: {
@@ -209,8 +198,8 @@ const NewPersonForm = ({ closeModal }: NewProjectFormProps) => {
                         className="h-6 px-2 text-tiny shadow-top-input-shadow rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-contrastBlue max-w-[370px] appearance-none"
                         placeholder="Client"
                     />
-                    {showDropdown && (
-                        <ul className="absolute bg-white border border-gray-300 max-h-40 overflow-y-auto w-full z-10 left-0 top-full mt-1">
+                    {showDropdown && !!filteredClients.length && (
+                        <ul className="absolute bg-white rounded-md border border-gray-300 max-h-40 overflow-y-auto w-full z-10 left-0 top-full mt-1">
                             {filteredClients.map((client: ClientType) => (
                                 <li
                                     key={client.id}

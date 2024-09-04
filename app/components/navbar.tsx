@@ -31,8 +31,8 @@ const Navbar: React.FC = () => {
 
 	const links = [
 		{ href: `/people/${myPlanUrl()}`, label: "My StaffPlan", isActive: myStaffPlanCheck },
-		{ href: "/projects", label: "Projects", isActive: pathname === "projects" },
 		{ href: "/people", label: "People", isActive: pathname === "people" && !myStaffPlanCheck },
+		{ href: "/projects", label: "Projects", isActive: pathname === "projects" },
 	];
 
 	const additionalLinks = [
