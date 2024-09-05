@@ -12,7 +12,7 @@ export const ProjectUserLabel = ({
 	clickHandler,
 }: UserLabelProps) => {
 	const isUserTBD = assignment.assignedUser === null;
-	const { userList, refetchUserList } = useUserDataContext();
+	const { userList,refetchProjectList, refetchUserList } = useUserDataContext();
 	const initialValues = {
 		id: assignment.id,
 		userId: "",
@@ -34,6 +34,7 @@ export const ProjectUserLabel = ({
 		}).then((response) => {
 			if (response.data.upsertAssignment) {
 				refetchUserList();
+				refetchProjectList();
 			}
 		});
 	};
