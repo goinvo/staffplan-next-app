@@ -75,12 +75,12 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                     ) : (
                         <div className='flex text-white items-center'>
                             {avatarUrl && (
-                                <div className="px-2 py-2 relative overflow-hidden w-[92px] h-[67px] mr-4">
+                                <div className="px-2 py-2 relative overflow-hidden w-[92px] h-[67px] aspect-[92/67] mr-4">
                                     <Image
                                         src={avatarUrl}
                                         fill
                                         sizes="(max-width: 640px) 80px, (max-width: 768px) 92px, 92px"
-                                        className='rounded-lg'
+                                        className='rounded-lg object-cover'
                                         alt='Avatar'
                                     />
                                 </div>

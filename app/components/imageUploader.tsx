@@ -31,12 +31,12 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ imageUrl, onImageChange }
     };
 
     return (
-        <div className="relative w-24 h-16 my-2 mr-2">
+        <div className="relative w-24 h-16 my-2 mr-2 aspect-[92/67]">
             <Image
                 src={imageUrl}
                 fill
                 sizes="(max-width: 640px) 80px, (max-width: 768px) 92px, 92px"
-                className="rounded-md"
+                className="rounded-md object-cover"
                 alt="Avatar"
             />
             <button
