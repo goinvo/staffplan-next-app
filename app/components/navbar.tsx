@@ -42,7 +42,7 @@ const Navbar: React.FC = () => {
 
 	]
 	return (
-		<nav className="navbar bg-gray-100 px-4 h-14 flex justify-between items-center">
+		<nav className="navbar bg-gray-100 px-5 h-14 flex justify-between items-center">
 			<div className="flex items-center space-x-4 h-full">
 				{links.map((link) => (
 					<Link

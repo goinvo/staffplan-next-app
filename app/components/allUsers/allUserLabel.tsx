@@ -6,7 +6,7 @@ import EllipsisPeopleMenu from "../ellipsisPeopleMenu";
 export const AllUserLabel = ({ user, clickHandler }: AllUserLabelProps) => {
 
 	return (
-		<td className='pl-2 pr-0 pt-1 pb-2 font-normal flex align-center w-1/3'>
+		<td className='px-0 pr-0 pt-1 pb-2 font-normal flex align-center w-1/3'>
 			<div className="w-48 pl-1 font-bold flex items-center justify-start text-contrastBlue">
 				<div className="px-2 py-2 relative overflow-hidden w-[38px] h-[28px]">
 					<Image

@@ -17,7 +17,7 @@ export const AllProjectLabel = ({
 
 			<button
 				onClick={() => clickHandler(project)}
-				className='w-24 pl-1 pt-2 font-bold flex items-center justify-start text-contrastBlue text-start'
+				className='w-24 mr-2 pt-2 font-bold flex items-center justify-start text-contrastBlue text-start'
 			>
 				{project.name}
 			</button>
