@@ -68,14 +68,14 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 
     return (
         <thead>
-            <tr className="pl-2 border-bottom bg-contrastBlue min-h-28 text-white flex">
-                <th className="px-0 flex w-1/3">
+            <tr className="pl-5 border-bottom bg-contrastBlue min-h-28 text-white flex">
+                <th className="flex w-1/3 mr-1 px-0 py-5">
                     {isEditing ? (
                         <EditFormController onClose={() => setIsEditing(false)} />
                     ) : (
                         <div className='flex text-white items-center'>
                             {avatarUrl && (
-                                <div className="px-2 py-2 relative overflow-hidden w-[92px] h-[67px] aspect-[92/67]">
+                                <div className="px-2 py-2 relative overflow-hidden w-[92px] h-[67px] aspect-[92/67] mr-4">
                                     <Image
                                         src={avatarUrl}
                                         fill
@@ -87,10 +87,10 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                             )}
                             <div className='flex flex-col items-start'>
                                 <div className='flex items-center'>
-                                    <div className='text-huge px-2 text-left overflow-wrap break-word leading-snug'>{title || userName}</div>
+                                    <div className='text-huge text-left overflow-wrap break-word leading-snug'>{title || userName}</div>
                                     {editable && (
                                         <IconButton
-                                            className='py-1'
+                                            className='py-1 pl-4'
                                             iconSize='w-4 h-4'
                                             onClick={() => setIsEditing(true)}
                                             Icon={SlPencil}
@@ -98,7 +98,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                                     )}
                                 </div>
                                 {projectInfo && (
-                                    <div className='flex items-start overflow-wrap break-word px-2 py-2 font-normal'>{projectInfo}</div>
+                                    <div className='text-left overflow-wrap break-word py-2 font-normal'>{projectInfo}</div>
                                 )}
                             </div>
 
@@ -114,7 +114,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                         </th>)
                     });
                 })}
-                <th className="px-4 py-2 w-1/6">
+                <th className="pr-4 pl-2 py-2 w-1/6">
                     <div className="flex flex-row justify-between">
                         <ViewsMenu />
                         <button
@@ -125,14 +125,14 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                     </div>
                 </th>
             </tr>
-            <tr className="flex border-b border-gray-300">
-                <th className="pr-0 pt-1 pb-2 font-normal align-top text-transparentGrey w-1/3">
+            <tr className="flex border-b border-gray-300 pl-5">
+                <th className="px-0 pt-1 pb-2 font-normal align-top text-transparentGrey w-1/3">
                     <div className='flex flex-row justify-between items-start'>
                         {columnHeaderTitles?.map((el, i) => {
                             return (
-                                <div key={el.title} className='w-24 pl-1 flex items-center justify-start text-start'>
-                                    {el.showIcon && (<PlusIcon className='w-4 h-4' />)}
-                                    <span className='pl-1'>{el.title}</span>
+                                <div key={el.title} className='w-24 flex items-center justify-start text-start'>
+                                    {el.showIcon && (<PlusIcon className='w-4 h-4 mr-1' />)}
+                                    <span>{el.title}</span>
                                 </div>)
                         })}
                         <IconButton className='pt-2 text-black flex items-center justify-center' onClick={prevQuarter} Icon={ChevronLeftIcon} iconSize={'h6 w-6'} />

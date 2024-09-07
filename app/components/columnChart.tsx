@@ -25,7 +25,7 @@ const ColumnChart = ({
 
     return (
         <div className='w-[34px]'>
-            <div className="absolute bottom-0 left-0 right-0 w-[100%] pl-1">
+            <div className="absolute bottom-0 left-0 right-0 max-w-[34px] px-1">
                 <span className={`flex justify-center text-center w-[34px] text-${textColor}`}>
                     {height || 0}
                 </span>

@@ -65,7 +65,7 @@ export const AllUserRow = ({
 	}, 0);
 
 	return (
-		<tr className="px-2 flex border-b border-gray-300 hover:bg-hoverGrey">
+		<tr className="pl-5 flex border-b border-gray-300 hover:bg-hoverGrey">
 			{isFirstMonth && (
 				<AllUserLabel clickHandler={handleUserChange} user={user} />
 			)}
