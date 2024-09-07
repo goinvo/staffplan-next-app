@@ -16,8 +16,11 @@ const NewPersonForm = ({ closeModal }: NewProjectFormProps) => {
     const {
         projectList,
         clientList,
+        viewer,
         setClientList,
         refetchProjectList,
+        refetchUserList
+
     } = useUserDataContext();
     const [filteredClients, setFilteredClients] = useState<ClientType[]>(clientList);
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
@@ -38,6 +41,7 @@ const NewPersonForm = ({ closeModal }: NewProjectFormProps) => {
         errorPolicy: "all",
         onCompleted({ upsertProject }) {
             refetchProjectList();
+            refetchUserList();
         },
     });
 
@@ -83,6 +87,7 @@ const NewPersonForm = ({ closeModal }: NewProjectFormProps) => {
                 clientId,
                 name: values.projectName,
                 hours: +values.hours,
+                assignments: [{ userId: viewer.id }]
             };
 
             const nullableDates = () => {
