@@ -96,7 +96,7 @@ export const UserAssignmentRow = ({
 					const withinProjectDates = isWeekWithinProject(week, month.year);
 					const columnIdentifier = `${month.monthLabel}-${week}`;
 					return (
-						<td key={`${month.monthLabel}-${week}`}
+						<td key={`${assignment.id}-${month.monthLabel}-${week}`}
 							className={`relative px-1 py-1 font-normal ${selectedColumn === columnIdentifier ? 'bg-selectedColumnBg' : ''}`}
 
 						>
@@ -108,7 +108,7 @@ export const UserAssignmentRow = ({
 									assignment={assignment}
 									cweek={week}
 									year={month.year}
-									key={`input-${week}`}
+									key={`input-${assignment.id}-${month.monthLabel}-${week}`}
 								/>
 
 							</div>
