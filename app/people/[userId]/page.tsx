@@ -10,6 +10,7 @@ import { ScrollingCalendar } from "@/app/components/scrollingCalendar/scrollingC
 import { UserAssignmentRow } from "@/app/components/userAssignment/userAssignmentRow";
 import AddAssignmentSingleUser from "@/app/components/addAssignmentSingleUser";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
+import AddInlineProject from "@/app/components/addInlineProject";
 
 const UserPage: React.FC = () => {
 	const params = useParams();
@@ -125,6 +126,7 @@ const UserPage: React.FC = () => {
 							);
 						}
 					)}
+					{selectedUser && <AddInlineProject userId={selectedUser.id} />}
 				</ScrollingCalendar>
 			) : (
 				<LoadingSpinner />

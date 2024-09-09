@@ -12,6 +12,7 @@ import IconButton from '../iconButton';
 import { useUserDataContext } from '../../userDataContext';
 import { ProjectType, ClientType } from "../../typeInterfaces";
 import { UPSERT_PROJECT, UPSERT_CLIENT } from "@/app/gqlQueries";
+import { AutocompleteInput } from '../autocompleteInput';
 
 interface EditFormProps {
     onClose?: () => void;
@@ -37,8 +38,6 @@ const EditProjectForm: React.FC<EditFormProps> = ({
     const { name, startsOn, endsOn, hours, client: { name: clientName, id: clientId }, id, status } = selectedProject as ProjectType
     const [archivedStatus, setArchivedStatus] = useState(status === 'archived');
     const [previousStatus] = useState(status);
-    const [filteredClients, setFilteredClients] = useState<ClientType[]>(clientList);
-    const [showDropdown, setShowDropdown] = useState<boolean>(false);
     const [showNewClientModal, setShowNewClientModal] = useState<boolean>(false);
     const clientInputRef = useRef<HTMLInputElement>(null);
 
@@ -116,30 +115,13 @@ const EditProjectForm: React.FC<EditFormProps> = ({
         formik.setFieldValue('projectStatus', newStatus);
     };
 
-    const handleClientSelect = (clientName: string) => {
-        formik.setFieldValue("clientName", clientName);
-        setShowDropdown(false);
+    const handleClientSelect = (client: ClientType) => {
+        formik.setFieldValue("clientName", client.name);
     };
 
 
     const handleClientChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const inputValue = e.target.value.toLowerCase();
         formik.handleChange(e);
-
-        if (inputValue) {
-            const filtered = clientList.filter(client =>
-                client.name.toLowerCase().includes(inputValue)
-            );
-            setFilteredClients(filtered);
-            setShowDropdown(true);
-        } else {
-            setFilteredClients(clientList);
-            setShowDropdown(false);
-        }
-    };
-
-    const handleClientFocus = () => {
-        setShowDropdown(true);
     };
 
     const handleClientBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,9 +138,6 @@ const EditProjectForm: React.FC<EditFormProps> = ({
         }
     };
 
-    const onAutocompleteClientInputBlur = () => {
-        setTimeout(() => setShowDropdown(false), 100)
-    };
 
     const handleNewClientCancel = () => {
         setShowNewClientModal(false)
@@ -183,37 +162,24 @@ const EditProjectForm: React.FC<EditFormProps> = ({
                 {formik.touched.projectName && formik.errors.projectName ? (
                     <p className="text-red-500">{formik.errors.projectName}</p>
                 ) : null}
-                <IconButton className="text-tiffany" type='submit' Icon={IoCheckmarkCircle} iconSize='h-7 w-7 ml-1' />
+                <IconButton className="text-tiffany" type='submit' Icon={IoCheckmarkCircle} iconSize='h-7 w-7 ml-1 ' />
             </div>
-            <div className='flex flex-row justify-between'>
-                <div className="relative flex items-center" onBlur={onAutocompleteClientInputBlur}>
+            <div className='flex flex-row justify-between h-6'>
+                <div className="relative flex items-center py-0 my-0 w-full">
                     <label htmlFor="clientName" className="pr-2 text-white font-normal text-tiny w-[55px] text-right">Client</label>
-                    <input
+                    <AutocompleteInput
                         ref={clientInputRef}
-                        type="text"
-                        name="clientName"
+                        items={clientList}
+                        inputName="clientName"
                         value={formik.values.clientName}
+                        onItemSelect={handleClientSelect}
                         onChange={handleClientChange}
                         onBlur={handleClientBlur}
-                        onFocus={handleClientFocus}
-                        id="clientName"
-                        autoComplete="off"
-                        className="h-6 px-2 text-tiny shadow-top-input-shadow font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none max-w-[100px]"
+                        inputClassName="h-6 px-2 py-0 rounded-sm font-normal text-tiny max-w-[100px] w-full"
+                        dropdownClassName="w-[155px] font-normal rounded-sm"
+                        displayKey="name"
                         placeholder="Client"
                     />
-                    {showDropdown && !!filteredClients.length && (
-                        <ul className="absolute font-normal px-1 bg-white rounded-sm border border-gray-300 max-h-40 overflow-y-auto w-full z-10 left-0 top-full mt-1">
-                            {filteredClients.map((client: ClientType) => (
-                                <li
-                                    key={client.id}
-                                    className="hover:bg-gray-200 cursor-pointer"
-                                    onMouseDown={() => handleClientSelect(client.name)}
-                                >
-                                    {client.name}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
                     {formik.touched.clientName && formik.errors.clientName ? (
                         <p className="text-red-500 ml-2">{formik.errors.clientName}</p>
                     ) : null}

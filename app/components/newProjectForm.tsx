@@ -7,20 +7,19 @@ import { useMutation } from "@apollo/client";
 import { UPSERT_PROJECT, UPSERT_CLIENT } from "@/app/gqlQueries";
 import { useUserDataContext } from '../userDataContext';
 import { ClientType, ProjectType } from "../typeInterfaces";
+import { AutocompleteInput } from './autocompleteInput';
 
 interface NewProjectFormProps {
     closeModal: () => void
 }
 
-const NewPersonForm = ({ closeModal }: NewProjectFormProps) => {
+const NewProjectForm = ({ closeModal }: NewProjectFormProps) => {
     const {
         projectList,
         clientList,
         setClientList,
         refetchProjectList,
     } = useUserDataContext();
-    const [filteredClients, setFilteredClients] = useState<ClientType[]>(clientList);
-    const [showDropdown, setShowDropdown] = useState<boolean>(false);
     const [showNewClientModal, setShowNewClientModal] = useState<boolean>(false);
     const clientInputRef = useRef<HTMLInputElement>(null);
 
@@ -116,33 +115,17 @@ const NewPersonForm = ({ closeModal }: NewProjectFormProps) => {
     };
 
     const handleClientChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const inputValue = e.target.value.toLowerCase();
         formik.handleChange(e);
-
-        if (inputValue) {
-            const filtered = clientList.filter(client =>
-                client.name.toLowerCase().includes(inputValue)
-            );
-            setFilteredClients(filtered);
-            setShowDropdown(true);
-        } else {
-            setFilteredClients(clientList);
-            setShowDropdown(false);
-        }
     };
 
-    const handleClientSelect = (clientName: string) => {
-        formik.setFieldValue("clientName", clientName);
-        setShowDropdown(false);
-    };
-
-    const handleClientFocus = () => {
-        setShowDropdown(true);
+    const handleClientSelect = (client: ClientType) => {
+        formik.setFieldValue("clientName", client.name);
     };
 
     const handleClientBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
         formik.handleBlur(e)
         const inputValue = e.target.value
+
         if (inputValue) {
             const existedClient = clientList?.find(
                 ({ name }: ClientType) => name === inputValue
@@ -154,9 +137,6 @@ const NewPersonForm = ({ closeModal }: NewProjectFormProps) => {
         }
     };
 
-    const onAutocompleteClientInputBlur = () => {
-        setShowDropdown(false)
-    };
 
     const handleNewClientCancel = () => {
         setShowNewClientModal(false)
@@ -184,38 +164,24 @@ const NewPersonForm = ({ closeModal }: NewProjectFormProps) => {
                 ) : null}
             </div>
             <div className='flex flex-col mt-1 mb-1'>
-                <div className='relative flex flex-col' onBlur={onAutocompleteClientInputBlur}>
-                    <label className='py-1 text-tiny'>Client</label>
-                    <input
-                        ref={clientInputRef}
-                        type="text"
-                        name="clientName"
-                        value={formik.values.clientName}
-                        onChange={handleClientChange}
-                        onBlur={handleClientBlur}
-                        onFocus={handleClientFocus}
-                        autoComplete='off'
-                        className="h-6 px-2 text-tiny shadow-top-input-shadow rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-contrastBlue max-w-[370px] appearance-none"
-                        placeholder="Client"
-                    />
-                    {showDropdown && !!filteredClients.length && (
-                        <ul className="absolute bg-white rounded-md border border-gray-300 max-h-40 overflow-y-auto w-full z-10 left-0 top-full mt-1">
-                            {filteredClients.map((client: ClientType) => (
-                                <li
-                                    key={client.id}
-                                    className="p-2 hover:bg-gray-200 cursor-pointer"
-                                    onMouseDown={() => handleClientSelect(client.name)}
-                                >
-                                    {client.name}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
-                {formik.touched.clientName && formik.errors.clientName ? (
-                    <p className="text-tiny px-2 text-red-500">{formik.errors.clientName}</p>
-                ) : null}
+                <label className='py-1 text-tiny'>Client</label>
+                <AutocompleteInput
+                    ref={clientInputRef}
+                    items={clientList}
+                    inputName="clientName"
+                    value={formik.values.clientName}
+                    onItemSelect={handleClientSelect}
+                    onChange={handleClientChange}
+                    onBlur={handleClientBlur}
+                    inputClassName="h-8 px-2 rounded-sm max-w-[370px]"
+                    listClassName='p-2'
+                    displayKey="name"
+                    placeholder="Client"
+                />
             </div>
+            {formik.touched.clientName && formik.errors.clientName ? (
+                <p className="text-tiny px-2 text-red-500">{formik.errors.clientName}</p>
+            ) : null}
             {showNewClientModal && (
                 <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded-md shadow-md">
@@ -312,4 +278,4 @@ const NewPersonForm = ({ closeModal }: NewProjectFormProps) => {
     );
 };
 
-export default NewPersonForm;
+export default NewProjectForm;
