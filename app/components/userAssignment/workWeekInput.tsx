@@ -17,12 +17,11 @@ interface WorkWeekInputProps {
 export interface WorkWeekValues {
 	cweek: number;
 	year: number;
-	estimatedHours: number;
-	actualHours: number;
+	estHours?: number;
+	actHours?: number;
 	assignmentId?: number;
 }
 export const WorkWeekInput = ({
-	withinProjectDates,
 	assignment,
 	cweek,
 	year,
@@ -41,115 +40,62 @@ export const WorkWeekInput = ({
 	const { refetchUserList, refetchProjectList } = useUserDataContext();
 
 	const upsertWorkWeekValues = (values: FormikValues) => {
+		const variables: WorkWeekValues = {
+			assignmentId: values.assignmentId,
+			cweek: values.cweek,
+			year: values.year,
+		};
+		if (values.estimatedHours !== "") {
+			variables.estHours = parseInt(values.estimatedHours);
+		}
+
+		if (values.actualHours !== "") {
+			variables.actHours = parseInt(values.actualHours);
+		}
 		upsertWorkweek({
-			variables: {
-				assignmentId: values.assignmentId,
-				cweek: values.cweek,
-				year: values.year,
-				estHours: parseInt(values.estimatedHours),
-				actHours: parseInt(values.actualHours),
-			},
+			variables
 		}).then((res) => {
 			refetchUserList();
 			refetchProjectList();
 		});
 	};
 	return (
-		<>
-			{existingWorkWeek ? (
-				<Formik
-					onSubmit={(e) => upsertWorkWeekValues(e)}
-					initialValues={initialValues}
-				>
-					{({
-						handleChange,
-						values,
-						setErrors,
-						handleSubmit,
-						handleBlur,
-						errors,
-						touched,
-						isValid,
-					}) => (
-						<>
-							<CustomInput
-								value={values.estimatedHours}
-								name="estHours"
-								id="estimatedHours"
-								onChange={handleChange}
-								onBlur={(e) => {
-									handleBlur("estHours");
-									if (values.estimatedHours && values.actualHours) {
-										upsertWorkWeekValues(values);
-									}
-								}}
-							/>
-							<CustomInput
-								value={values.actualHours}
-								name="actualHours"
-								id="actHours"
-								onChange={handleChange}
-								onBlur={(e) => {
-									handleBlur("actHours");
-									if (values.estimatedHours && values.actualHours) {
-										upsertWorkWeekValues(values);
-									}
-								}}
-							/>
-						</>
-					)}
-
-				</Formik>
-			) : null}
-			{
-				assignment && !existingWorkWeek ? (
-					<Formik
-						onSubmit={(e) => upsertWorkWeekValues(e)}
-						initialValues={initialValues}
-					>
-						{({
-							handleChange,
-							values,
-							setErrors,
-							handleSubmit,
-							handleBlur,
-							errors,
-							touched,
-							isValid,
-						}) => (
-							<>
-								<CustomInput
-									value={withinProjectDates ? values.estimatedHours : ""}
-									name="estimatedHours"
-									id="estHours"
-									onChange={handleChange}
-									onBlur={(e) => {
-										handleBlur("estHours");
-										if (values.estimatedHours && values.actualHours) {
-											upsertWorkWeekValues(values);
-										}
-									}}
-									disabled={!withinProjectDates}
-								/>
-								<CustomInput
-									value={withinProjectDates ? values.actualHours : ""}
-									name="actualHours"
-									id="actHours"
-									onChange={handleChange}
-									onBlur={(e) => {
-										handleBlur("actHours");
-										if (values.estimatedHours && values.actualHours) {
-											upsertWorkWeekValues(values);
-										}
-									}}
-									disabled={!withinProjectDates}
-								/>
-							</>
-						)}
-					</Formik >
-				) : null
-			}
-		</>
+		<Formik
+			onSubmit={(e) => upsertWorkWeekValues(e)}
+			initialValues={initialValues}
+		>
+			{({
+				handleChange,
+				values,
+				handleBlur,
+			}) => (
+				<>
+					<CustomInput
+						value={values.estimatedHours}
+						name="estimatedHours"
+						id={`estHours-${assignment?.id}-${cweek}-${year}`}
+						onChange={handleChange}
+						onBlur={(e) => {
+							handleBlur("estimatedHours");
+							if (values.estimatedHours) {
+								upsertWorkWeekValues(values);
+							}
+						}}
+					/>
+					<CustomInput
+						value={values.actualHours}
+						name="actualHours"
+						id={`actHours-${assignment?.id}-${cweek}-${year}`}
+						onChange={handleChange}
+						onBlur={(e) => {
+							handleBlur("actualHours");
+							if (values.actualHours) {
+								upsertWorkWeekValues(values);
+							}
+						}}
+					/>
+				</>
+			)}
+		</Formik>
 	);
 };
-
