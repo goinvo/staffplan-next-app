@@ -62,7 +62,7 @@ export const ScrollingCalendar = ({
 	}, [selectedColumn]);
 
 	return (
-		<table className="min-w-full timeline-grid-bg text-contrastBlue text-sm h-screen">
+		<table className="min-w-full timeline-grid-bg text-contrastBlue text-sm h-screen border-none">
 			<CalendarHeader
 				months={months}
 				assignments={assignments}

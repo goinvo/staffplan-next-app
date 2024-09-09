@@ -12,7 +12,7 @@ export const ProjectUserLabel = ({
 	clickHandler,
 }: UserLabelProps) => {
 	const isUserTBD = assignment.assignedUser === null;
-	const { userList,refetchProjectList, refetchUserList } = useUserDataContext();
+	const { userList, refetchProjectList, refetchUserList } = useUserDataContext();
 	const initialValues = {
 		id: assignment.id,
 		userId: "",
@@ -39,7 +39,7 @@ export const ProjectUserLabel = ({
 		});
 	};
 	return (
-		<td className='pl-2 pr-0 pt-1 pb-2 font-normal flex align-center w-1/3'>
+		<td className='px-0 pr-0 pt-2 pb-2 font-normal flex align-center w-1/3'>
 			<div
 				className='flex flex-row justify-between items-start'
 			>
@@ -115,7 +115,7 @@ export const ProjectUserLabel = ({
 				</div>
 			</div>
 			<div className='text-contrastBlue flex flex-col space-y-3 ml-auto px-2 items-end max-w-[60px]'>
-				<div className='pt-2 underline'>
+				<div className='pt-1 underline'>
 					{assignment.status === 'proposed' ? 'Proposed' : 'Signed'}
 				</div>
 				<div className='pt-2'>

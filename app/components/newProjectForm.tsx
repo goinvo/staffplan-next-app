@@ -17,8 +17,11 @@ const NewProjectForm = ({ closeModal }: NewProjectFormProps) => {
     const {
         projectList,
         clientList,
+        viewer,
         setClientList,
         refetchProjectList,
+        refetchUserList
+
     } = useUserDataContext();
     const [showNewClientModal, setShowNewClientModal] = useState<boolean>(false);
     const clientInputRef = useRef<HTMLInputElement>(null);
@@ -37,6 +40,7 @@ const NewProjectForm = ({ closeModal }: NewProjectFormProps) => {
         errorPolicy: "all",
         onCompleted({ upsertProject }) {
             refetchProjectList();
+            refetchUserList();
         },
     });
 
@@ -82,6 +86,7 @@ const NewProjectForm = ({ closeModal }: NewProjectFormProps) => {
                 clientId,
                 name: values.projectName,
                 hours: +values.hours,
+                assignments: [{ userId: viewer.id }]
             };
 
             const nullableDates = () => {

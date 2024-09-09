@@ -61,8 +61,8 @@ export const UserAssignmentRow = ({
 		<tr
 			className={`flex ${isFirstClient ? '' : 'border-b border-gray-300'} ${assignment.status === 'proposed' ? 'bg-diagonal-stripes' :
 				''
-				} hover:bg-hoverGrey min-h-[100px]`}>
-			<td className='pl-2 pr-0 pt-1 pb-2 font-normal align-top w-1/3'>
+				} hover:bg-hoverGrey min-h-[100px] pl-5`}>
+			<td className='px-0 pt-1 pb-2 font-normal align-top w-1/3'>
 				<div
 					className='flex flex-row justify-between items-start space-x-2'
 				>
