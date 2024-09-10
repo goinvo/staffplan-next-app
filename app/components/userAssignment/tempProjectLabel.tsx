@@ -86,8 +86,8 @@ export const TempProjectLabel = ({
 							onChange={(e) => {
 								handleChange(e);
 							}}
-							className="max-w-[150px] px-2 h-7 rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm text-contrastBlue"
-							placeholder="Enter Project Name"
+							className="max-w-[150px] px-2 h-7 rounded-md shadow-sm focus:ring-tiffany focus:border-tiffany font-bold text-tiny text-contrastBlue"
+							placeholder="Project Name"
 						/>
 					</form>
 				)}
