@@ -36,11 +36,14 @@ const Navbar: React.FC = () => {
 	];
 
 	const additionalLinks = [
-		{ label: 'Open Source' },
-		{ label: 'Feedback' },
-		{ label: 'Sign Out' }
+		{href:"https://github.com/goinvo/staffplan-next-app", label: 'Open Source' },
+		{ href:"mailto:staffplan@goinvo.com",label: 'Feedback' },
+		{href:"https://staffplan.com/settings", label: 'Settings' },
+		{ href:"",label: 'Sign Out' }
 
 	]
+	const cookies = document.cookie.split(';');
+	console.log(cookies, "COOKIES")
 	return (
 		<nav className="navbar bg-gray-100 px-5 h-14 flex justify-between items-center">
 			<div className="flex items-center space-x-4 h-full">
@@ -68,12 +71,13 @@ const Navbar: React.FC = () => {
 			</div>
 			<div className="flex items-center space-x-4 py-4 ml-2">
 				{additionalLinks.map((link) => (
-					<button
-						key={link.label}
-						className="inline-flex items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue cursor-pointer"
-					>
-						{link.label}
-					</button>
+					<Link
+					key={link.href}
+					href={link.href}
+					className={`inline-flex items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue`}
+				>
+					{link.label}
+				</Link>
 				)
 				)}
 				<div className="h-4 w-4">
