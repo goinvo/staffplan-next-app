@@ -238,3 +238,10 @@ export const getDisplayHours = (
 
 export const currentQuarter = Math.floor((DateTime.now().month - 1) / 3) + 1;
 export const currentYear = DateTime.now().year;
+
+export const isPastOrCurrentWeek = (cweek: number, year: number) => {
+  const currentDate = DateTime.now();
+  const currentWeek = currentDate.weekNumber;
+
+  return year === currentYear && cweek <= currentWeek;
+};
