@@ -43,7 +43,6 @@ const Navbar: React.FC = () => {
 
 	]
 	const cookies = document.cookie.split(';');
-	console.log(cookies, "COOKIES")
 	return (
 		<nav className="navbar bg-gray-100 px-5 h-14 flex justify-between items-center">
 			<div className="flex items-center space-x-4 h-full">
