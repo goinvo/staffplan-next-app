@@ -15,6 +15,7 @@ interface ScrollingCalendarProps {
 	columnHeaderTitles: {
 		title: string;
 		showIcon: boolean;
+		onClick?: () => void;
 	}[];
 	title?: string;
 	avatarUrl?: string;

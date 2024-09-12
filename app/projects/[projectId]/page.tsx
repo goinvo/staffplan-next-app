@@ -1,7 +1,10 @@
 "use client";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import withApollo from "@/lib/withApollo";
+
+import { useMutation } from "@apollo/client";
+import { UPSERT_ASSIGNMENT } from "../../gqlQueries";
 import { ProjectType, UserType, AssignmentType } from "../../typeInterfaces";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import { useUserDataContext } from "@/app/userDataContext";
@@ -24,13 +27,34 @@ const ProjectPage: React.FC = () => {
 		UserType[]
 	>([]);
 
+	const [
+		upsertAssignment,
+		{ data: mutationData, loading: mutationLoading, error: mutationError },
+	] = useMutation(UPSERT_ASSIGNMENT, {
+		onCompleted({ upsertAssignment }) {
+			refetchUserList()
+			refetchProjectList()
+		}
+	});
 	const {
 		userList,
 		projectList,
 		viewsFilter,
 		setSingleProjectPage,
 		refetchProjectList,
+		refetchUserList,
 	} = useUserDataContext();
+
+	const addNewAssignmentRow = useCallback(async () => {
+		const variables = {
+			projectId: selectedProjectId,
+			userId: '',
+			status: 'proposed',
+		};
+		upsertAssignment({
+			variables,
+		});
+	}, [selectedProjectId, upsertAssignment]);
 
 	useEffect(() => {
 		if (projectList && projectList.length > 0) {
@@ -96,28 +120,26 @@ const ProjectPage: React.FC = () => {
 		}
 	}
 
-	const columnHeaderTitles = [{ title: 'People', showIcon: true }]
+	const columnHeaderTitles = [{ title: 'People', showIcon: true, onClick: () => addNewAssignmentRow() }]
 
 	const projectInfoSubtitle = `${selectedProject?.client.name}, budget, ${selectedProject?.hours || 0}h, ${selectedProjectDates()}`
-
 	return (
 		<>
 			{selectedProject && projectList ? (
 				<>
 					<ScrollingCalendar columnHeaderTitles={columnHeaderTitles} title={selectedProject.name} projectInfo={projectInfoSubtitle} assignments={selectedProject} editable={true}>
-						{selectedProject?.assignments?.map(
-							(assignment: AssignmentType, index) => {
-								return (
-									<ProjectAssignmentRow
-										project={selectedProject}
-										key={index}
-										assignment={assignment}
-										monthData={{ monthLabel: "", year: 0 }}
-										isFirstMonth={true}
-										isLastMonth={true}
-									/>
-								);
-							}
+						{selectedProject?.assignments?.map((assignment: AssignmentType, index) => {
+							return (
+								<ProjectAssignmentRow
+									project={selectedProject}
+									key={`${assignment.id}-${index}`}
+									assignment={assignment}
+									monthData={{ monthLabel: "", year: 0 }}
+									isFirstMonth={true}
+									isLastMonth={true}
+								/>
+							);
+						}
 						)}
 					</ScrollingCalendar>
 					<ProjectDetails
