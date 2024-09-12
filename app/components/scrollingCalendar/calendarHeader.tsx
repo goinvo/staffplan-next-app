@@ -19,6 +19,7 @@ import EditFormController from './editFormController';
 interface ColumnHeaderTitle {
     title: string;
     showIcon: boolean;
+    onClick?: () => void;
 }
 
 type CalendarHeaderProps = {
@@ -136,7 +137,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                     <div className='flex flex-row justify-between items-start'>
                         {columnHeaderTitles?.map((el, i) => {
                             return (
-                                <div key={el.title} className='w-24 flex items-center justify-start text-start'>
+                                <div key={el.title} className={`w-24 flex items-center justify-start text-start ${el.onClick ? 'cursor-pointer' : ''}`} onClick={el?.onClick}>
                                     {el.showIcon && (<PlusIcon className='w-4 h-4 mr-1' />)}
                                     <span>{el.title}</span>
                                 </div>)

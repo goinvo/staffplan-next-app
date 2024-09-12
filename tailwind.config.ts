@@ -18,6 +18,7 @@ const config: Config = {
         transparentBlue: "#37455e",
         hoverGrey: "#e3e4ee",
         lightGrey: "#dddeeb",
+        blueGreyLight: "#ced0dd",
         contrastBlue: "#23324C",
         contrastGrey: "#aeb3c0",
         selectedColumnBg: "#dfe0ec",

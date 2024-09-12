@@ -1,10 +1,7 @@
 import Image from "next/image";
 import React from "react";
-import { UserLabelProps, UserType } from "@/app/typeInterfaces";
-import { Field, Formik, FormikValues } from "formik";
-import { useUserDataContext } from "@/app/userDataContext";
-import { useMutation } from "@apollo/client";
-import { UPSERT_ASSIGNMENT } from "@/app/gqlQueries";
+import { UserLabelProps } from "@/app/typeInterfaces";
+import { AddPersonInline } from "../addPersonInline";
 
 export const ProjectUserLabel = ({
 	project,
@@ -12,99 +9,33 @@ export const ProjectUserLabel = ({
 	clickHandler,
 }: UserLabelProps) => {
 	const isUserTBD = assignment.assignedUser === null;
-	const { userList, refetchProjectList, refetchUserList } = useUserDataContext();
-	const initialValues = {
-		id: assignment.id,
-		userId: "",
-	};
-	const [
-		upsertAssignment,
-		{ data: mutationData, loading: mutationLoading, error: mutationError },
-	] = useMutation(UPSERT_ASSIGNMENT);
 
-	const onSubmitUpsert = ({ userId }: FormikValues) => {
-		const variables = {
-			id: assignment.id,
-			userId: userId,
-			projectId: project ? project.id : "",
-			status: "proposed",
-		};
-		upsertAssignment({
-			variables: variables,
-		}).then((response) => {
-			if (response.data.upsertAssignment) {
-				refetchUserList();
-				refetchProjectList();
-			}
-		});
-	};
 	return (
 		<td className='px-0 pr-0 pt-2 pb-2 font-normal flex align-center w-1/3'>
 			<div
 				className='flex flex-row justify-between items-start'
 			>
-				<div className="w-48 pl-1 font-bold flex text-contrastBlue w-full">
-					<div className="py-2 relative overflow-hidden w-[38px] h-[28px]">
+				{isUserTBD &&
+					<AddPersonInline project={project} assignment={assignment} />
+				}
+				<div className="w-48 font-bold flex text-contrastBlue w-full">
+
+					{!isUserTBD && (<div className="py-2 relative overflow-hidden w-[38px] h-[28px]  aspect-w-38 aspect-h-28">
 						<Image
-							src={`${isUserTBD
-								? "http://www.gravatar.com/avatar/newavatar"
-								: assignment.assignedUser.avatarUrl
-								}`}
-							className="rounded-md"
+							src={assignment.assignedUser.avatarUrl}
+							className="rounded-md object-cover"
 							alt="user avatar"
 							fill
 							sizes="(max-width: 640px) 28px, (max-width: 768px) 38px, 38px"
 						/>
-					</div>
+					</div>)}
 					<div className="flex flex-col items-center justify-center">
 						{!isUserTBD &&
 							(<button className="px-2" onClick={() => clickHandler(assignment)}>
 								{assignment.assignedUser.name}
 							</button>)}
-						{isUserTBD && (
-							<Formik
-								onSubmit={(e) => onSubmitUpsert(e)}
-								initialValues={initialValues}
-							>
-								{({
-									handleChange,
-									values,
-									setErrors,
-									handleSubmit,
-									handleBlur,
-								}) => (
-									<form className="px-2" onSubmit={handleSubmit}>
-										{/* SECTION 1 */}
-										<Field
-											onChange={handleChange}
-											onBlur={handleSubmit}
-											as="select"
-											name="userId"
-											id="userId"
-											className="min-w-[90px] pt-1 timeline-grid-bg rounded-sm border-none focus:ring-tiffany focus:border-tiffany text-sm outlined-none"
-										>
-											{[
-												<option key="TBD" value="">
-													TBD
-												</option>,
-												...userList?.map((user: UserType) => (
-													<option
-														key={`${user.id} + ${user.name}`}
-														value={user.id}
-													>
-														{user.name}
-													</option>
-												)),
-											]}
-											``
-										</Field>
-
-									</form>
-								)}
-							</Formik>
-						)}
 						<div>
-							{assignment.status !== 'active' &&
+							{assignment.status !== 'active' && !isUserTBD &&
 								(
 									<span className="px-2 text-red-500 font-normal">
 										Unconfirmed
