@@ -2,26 +2,19 @@ import {
 	ProjectType,
 	AllProjectRowProps,
 	MonthsDataType,
+	AssignmentType,
 } from "@/app/typeInterfaces";
 
 import React from "react";
 import {
-	assignmentContainsCWeek,
+	calculateTotalHoursPerWeek,
+	isBeforeWeek,
 } from "../scrollingCalendar/helpers";
 import { useRouter } from "next/navigation";
 import { AllProjectLabel } from "./allProjectLabel";
 import ProjectSummary from "../projectSummary";
 import ColumnChart from "../columnChart";
-import { isBeforeWeek, getCurrentWeekOfYear, getCurrentYear, getDisplayHours } from "../scrollingCalendar/helpers";
 
-interface Accumulator {
-	[cweek: number]: {
-		cweek: number;
-		actualHours: number;
-		estimatedHours: number;
-		year: number;
-	};
-}
 export const AllProjectRow = ({
 	project,
 	isFirstMonth,
@@ -29,41 +22,17 @@ export const AllProjectRow = ({
 	months,
 }: AllProjectRowProps) => {
 	const router = useRouter();
-	const currentWeek = getCurrentWeekOfYear()
-	const currentYear = getCurrentYear()
+	const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } =
+		calculateTotalHoursPerWeek(project.assignments as AssignmentType[], months as MonthsDataType[]);
 
 	const handleProjectChange = (project: ProjectType) => {
 		if (project.id) {
 			router.push("/projects/" + encodeURIComponent(project.id));
 		}
 	};
-
-
-	const totalWorkWeekHours = Object.values(
-		(project.assignments ?? []).reduce<Accumulator>((acc, assignment) => {
-			assignment.workWeeks.forEach((workWeek) => {
-				const cweek = workWeek.cweek;
-				const actualHours = workWeek.actualHours ?? 0;
-				const estimatedHours = workWeek.estimatedHours ?? 0;
-				if (!acc[cweek]) {
-					acc[cweek] = {
-						cweek,
-						actualHours: 0,
-						estimatedHours: 0,
-						year: workWeek.year,
-					};
-				}
-				acc[cweek].actualHours += actualHours;
-				acc[cweek].estimatedHours += estimatedHours;
-			});
-
-			return acc;
-		}, {})
-	);
-
-	const maxHoursPerWeek = totalWorkWeekHours.reduce((max, current) => {
-		return current.actualHours > max ? current.actualHours : max;
-	}, 0);
+	const hasActualHoursForWeek = (year: number, week: number) => {
+		return !!totalActualHours[`${year}-${week}`];
+	};
 
 	return (
 		<tr className={`pl-5 flex border-b border-gray-300 hover:bg-hoverGrey ${project.status === 'proposed' ? 'bg-diagonal-stripes' :
@@ -77,24 +46,20 @@ export const AllProjectRow = ({
 			</td>
 			{months?.map((month: MonthsDataType) => (
 				month.weeks.map((week) => {
-					const totalEstimatedWeeklyHours = project.assignments?.reduce(
-						(acc, assignment) => {
-							if (
-								assignmentContainsCWeek(assignment, week, month.year)
-							) {
-								return acc + assignment.estimatedWeeklyHours;
-							}
-							return acc;
-						},
-						0
-					);
-					const workWeek = totalWorkWeekHours.find(
-						(workWeek) => workWeek.cweek === week && workWeek.year === month.year
-					);
-					const displayHours = getDisplayHours(workWeek, totalEstimatedWeeklyHours as number);
 					return (
 						<td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal min-h-[100px]`}>
-							<ColumnChart height={displayHours} isBeforeWeek={isBeforeWeek(week, currentWeek, currentYear, month)} maxValue={maxHoursPerWeek} textColor="contrastBlue" />
+							<ColumnChart
+								hasActualHoursForWeek={hasActualHoursForWeek(month.year, week)}
+								height={
+									hasActualHoursForWeek(month.year, week)
+										? totalActualHours[`${month.year}-${week}`]
+										: totalEstimatedHours[`${month.year}-${week}`]
+								}
+								proposedHours={proposedEstimatedHours[`${month.year}-${week}`]}
+								maxValue={maxTotalHours}
+								textColor="contrastBlue"
+								isBeforeWeek={isBeforeWeek(week, month)}
+							/>
 						</td>)
 				})
 			))}

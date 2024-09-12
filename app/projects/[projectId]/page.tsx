@@ -127,7 +127,7 @@ const ProjectPage: React.FC = () => {
 		<>
 			{selectedProject && projectList ? (
 				<>
-					<ScrollingCalendar columnHeaderTitles={columnHeaderTitles} title={selectedProject.name} projectInfo={projectInfoSubtitle} assignments={selectedProject} editable={true}>
+					<ScrollingCalendar columnHeaderTitles={columnHeaderTitles} title={selectedProject.name} projectInfo={projectInfoSubtitle} assignments={selectedProject?.assignments || []} editable={true}>
 						{selectedProject?.assignments?.map((assignment: AssignmentType, index) => {
 							return (
 								<ProjectAssignmentRow
