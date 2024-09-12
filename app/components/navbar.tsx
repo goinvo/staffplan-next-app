@@ -38,11 +38,21 @@ const Navbar: React.FC = () => {
 	const additionalLinks = [
 		{href:"https://github.com/goinvo/staffplan-next-app", label: 'Open Source' },
 		{ href:"mailto:staffplan@goinvo.com",label: 'Feedback' },
-		{href:"https://staffplan.com/settings", label: 'Settings' },
-		{ href:"",label: 'Sign Out' }
+		{href:"https://staffplan.com/settings", label: 'Settings' }
 
 	]
-	const cookies = document.cookie.split(';');
+	const signOut = async () => {
+		try {
+		  await fetch(`/sign_out`, {
+			method: 'DELETE',
+		  });
+		} catch (error) {
+		  console.error('Failed to Sign Out', error);
+		} finally {
+			window.location.reload();
+		}
+	  };
+
 	return (
 		<nav className="navbar bg-gray-100 px-5 h-14 flex justify-between items-center">
 			<div className="flex items-center space-x-4 h-full">
@@ -79,6 +89,7 @@ const Navbar: React.FC = () => {
 				</Link>
 				)
 				)}
+				<button onClick={signOut} className="inline-flex items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue">Sign Out</button>
 				<div className="h-4 w-4">
 					<Link href="?airTableFormModal=true">
 						<ChatBubbleBottomCenterTextIcon />
