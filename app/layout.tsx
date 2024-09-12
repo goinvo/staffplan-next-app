@@ -6,8 +6,8 @@ import RootLayoutContents from "./layoutContents";
 const open_sans = Open_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-	title: "Staff Plan",
-	description: "Staff Plan App",
+	title: "StaffPlan",
+	description: "StaffPlan",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
