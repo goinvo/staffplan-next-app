@@ -1,9 +1,10 @@
 import Image from "next/image";
 import React from "react";
 import { UserLabelProps } from "@/app/typeInterfaces";
-import { MdQuestionMark } from "react-icons/md";
+import { AddPersonInline } from "../addPersonInline";
 
 export const ProjectUserLabel = ({
+	project,
 	assignment,
 	clickHandler,
 }: UserLabelProps) => {
@@ -14,19 +15,11 @@ export const ProjectUserLabel = ({
 			<div
 				className='flex flex-row justify-between items-start'
 			>
+				{isUserTBD &&
+					<AddPersonInline project={project} assignment={assignment} />
+				}
 				<div className="w-48 font-bold flex text-contrastBlue w-full">
-					{isUserTBD &&
 
-						(
-							<div className="flex flex-row items-center">
-								<div className="h-[28px] w-[38px] rounded-md bg-blueGreyLight flex items-center justify-center rounded mr-2">
-									<MdQuestionMark className="text-black h-4 w-3" />
-
-								</div>
-								<div className="text-start">
-									<span>TBD</span>
-								</div>
-							</div>)}
 					{!isUserTBD && (<div className="py-2 relative overflow-hidden w-[38px] h-[28px]  aspect-w-38 aspect-h-28">
 						<Image
 							src={assignment.assignedUser.avatarUrl}

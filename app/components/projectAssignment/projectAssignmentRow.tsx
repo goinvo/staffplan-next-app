@@ -6,7 +6,6 @@ import { AssignmentType, MonthsDataType, ProjectType } from "@/app/typeInterface
 import UserSummary from "../userSummary";
 import { ProjectUserLabel } from "./projectUserLabel";
 import { WorkWeekInput } from "./workWeekInput";
-import { AddPersonInline } from "../addPersonInline";
 
 
 interface ProjectAssignmentRowProps {
@@ -92,8 +91,6 @@ export const ProjectAssignmentRow = ({
 				})}
 				{isLastMonth && <UserSummary assignment={assignment} />}
 			</tr >
-			{isUserTBD && <AddPersonInline project={project} assignment={assignment} />
-			}
 		</>
 	);
 };
