@@ -4,31 +4,29 @@ import {
 	UserType,
 	MonthsDataType,
 	AllUserRowProps,
-	AllUserAccumulatorProps,
 } from "@/app/typeInterfaces";
 
 import React from "react";
 import { ArchiveBoxIcon } from "@heroicons/react/24/outline";
 
 import {
-	assignmentContainsCWeek,
+	calculateTotalHoursPerWeek,
 } from "../scrollingCalendar/helpers";
 
 import { AllUserLabel } from "./allUserLabel";
 import ColumnChart from "../columnChart";
-import { getCurrentWeekOfYear, getCurrentYear, isBeforeWeek, getDisplayHours } from "../scrollingCalendar/helpers";
+import { isBeforeWeek } from "../scrollingCalendar/helpers";
 import IconButton from "../iconButton";
 
 export const AllUserRow = ({
 	user,
 	isFirstMonth,
-	isLastMonth,
-	monthData,
 	months
 }: AllUserRowProps) => {
-	const currentWeek = getCurrentWeekOfYear()
-	const currentYear = getCurrentYear()
 	const router = useRouter();
+
+	const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } =
+		calculateTotalHoursPerWeek(user.assignments, months as MonthsDataType[]);
 
 	const handleUserChange = (user: UserType) => {
 		if (user.id) {
@@ -36,33 +34,9 @@ export const AllUserRow = ({
 		}
 	};
 
-	const totalWorkWeekHours = Object.values(
-		(user.assignments ?? []).reduce<AllUserAccumulatorProps>(
-			(acc, assignment) => {
-				assignment.workWeeks.forEach((workWeek) => {
-					const cweek = workWeek.cweek;
-					const actualHours = workWeek.actualHours ?? 0;
-					const estimatedHours = workWeek.estimatedHours ?? 0;
-					if (!acc[cweek]) {
-						acc[cweek] = {
-							cweek,
-							actualHours: 0,
-							estimatedHours: 0,
-							year: workWeek.year,
-						};
-					}
-					acc[cweek].actualHours += actualHours;
-					acc[cweek].estimatedHours += estimatedHours;
-				});
-
-				return acc;
-			},
-			{}
-		)
-	);
-	const maxHoursPerWeek = totalWorkWeekHours.reduce((max, current) => {
-		return current.actualHours > max ? current.actualHours : max;
-	}, 0);
+	const hasActualHoursForWeek = (year: number, week: number) => {
+		return !!totalActualHours[`${year}-${week}`];
+	};
 
 	return (
 		<tr className="pl-5 flex border-b border-gray-300 hover:bg-hoverGrey">
@@ -71,25 +45,22 @@ export const AllUserRow = ({
 			)}
 			{months?.map((month: MonthsDataType) => {
 				return month.weeks.map((week) => {
-					const totalEstimatedWeeklyHours = user.assignments?.reduce(
-						(acc, assignment) => {
-							if (
-								assignmentContainsCWeek(assignment, week, month.year)
-							) {
-								return acc + assignment.estimatedWeeklyHours;
-							}
-							return acc;
-						},
-						0
-					);
-					const workWeek = totalWorkWeekHours.find(
-						(workWeek) => workWeek.cweek === week && workWeek.year === month.year
-					);
-					const displayHours = getDisplayHours(workWeek, totalEstimatedWeeklyHours);
 					return (
 						<td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal min-h-[100px]`}>
-							<ColumnChart height={displayHours} isBeforeWeek={isBeforeWeek(week, currentWeek, currentYear, month)} maxValue={maxHoursPerWeek} textColor="contrastBlue" />
-						</td>)
+							<ColumnChart
+								hasActualHoursForWeek={hasActualHoursForWeek(month.year, week)}
+								height={
+									hasActualHoursForWeek(month.year, week)
+										? totalActualHours[`${month.year}-${week}`]
+										: totalEstimatedHours[`${month.year}-${week}`]
+								}
+								proposedHours={proposedEstimatedHours[`${month.year}-${week}`]}
+								maxValue={maxTotalHours}
+								textColor="contrastBlue"
+								isBeforeWeek={isBeforeWeek(week, month)}
+							/>
+						</td>
+					);
 				});
 			})}
 			<td className="flex items-center justify-center font-normal py-2 w-1/6">

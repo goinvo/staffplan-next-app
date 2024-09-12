@@ -12,10 +12,13 @@ const ProjectsView: React.FC = () => {
 	const { projectList } = useUserDataContext();
 
 	const columnHeaderTitles = [{ title: 'Clients', showIcon: true }, { title: 'Projects', showIcon: false }]
+
+	const assignments = projectList?.flatMap((project: ProjectType) => project.assignments || []);
+
 	return (
 		<>
 			{projectList ? (
-				<ScrollingCalendar title='Projects' columnHeaderTitles={columnHeaderTitles} assignments={projectList}>
+				<ScrollingCalendar title='Projects' columnHeaderTitles={columnHeaderTitles} assignments={assignments}>
 					{projectList?.map((project: ProjectType, index: number) => {
 						return (
 							<AllProjectRow

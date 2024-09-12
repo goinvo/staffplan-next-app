@@ -12,7 +12,7 @@ import IconButton from '../iconButton';
 
 import { useUserDataContext } from '@/app/userDataContext';
 import { AssignmentType, MonthsDataType, ProjectType } from '@/app/typeInterfaces';
-import { calculateTotalHoursPerWeek, getCurrentWeekOfYear, getCurrentYear, isBeforeWeek, showMonthAndYear } from './helpers';
+import { calculateTotalHoursPerWeek, isBeforeWeek, showMonthAndYear } from './helpers';
 import ViewsMenu from '../viewsMenu/viewsMenu';
 import EditFormController from './editFormController';
 
@@ -45,9 +45,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     selectedColumn }) => {
     const [isEditing, setIsEditing] = useState(false);
     const { setDateRange, scrollToTodayFunction } = useUserDataContext();
-    const currentWeek = getCurrentWeekOfYear()
-    const currentYear = getCurrentYear()
-    const { totalHours, proposedHours } = calculateTotalHoursPerWeek(assignments as AssignmentType[])
+    const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } = calculateTotalHoursPerWeek(assignments as AssignmentType[], months)
 
     const nextQuarter = () => {
         setDateRange(prev => {
@@ -57,13 +55,15 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         });
     };
 
-
     const prevQuarter = () => {
         setDateRange(prev => {
             const prevQuarter = prev.quarter === 1 ? 4 : prev.quarter - 1;
             const prevYear = prevQuarter === 4 ? prev.year - 1 : prev.year;
             return { quarter: prevQuarter, year: prevYear };
         });
+    };
+    const hasActualHoursForWeek = (year: number, week: number) => {
+        return !!totalActualHours[`${year}-${week}`];
     };
 
     return (
@@ -110,7 +110,13 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                         const columnIdentifier = `${month.monthLabel}-${week}`;
                         return (<th key={`month-${month.monthLabel}-week-${week}`}
                             className={`relative px-1 ${selectedColumn === columnIdentifier ? 'navbar font-bold' : 'font-normal'}`}>
-                            <ColumnChart height={totalHours[`${month.year}-${week}`]} proposedHours={proposedHours[`${month.year}-${week}`]} isBeforeWeek={isBeforeWeek(week, currentWeek, currentYear, month)} maxValue={totalHours.maxTotalHours} />
+                            <ColumnChart
+                                hasActualHoursForWeek={hasActualHoursForWeek(month.year, week)}
+                                height={hasActualHoursForWeek(month.year, week) ? totalActualHours[`${month.year}-${week}`] : totalEstimatedHours[`${month.year}-${week}`]}
+                                proposedHours={proposedEstimatedHours[`${month.year}-${week}`]}
+                                maxValue={maxTotalHours}
+                                isBeforeWeek={isBeforeWeek(week, month)}
+                            />
                         </th>)
                     });
                 })}

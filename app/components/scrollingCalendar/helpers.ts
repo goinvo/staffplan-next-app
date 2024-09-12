@@ -158,12 +158,10 @@ export const getCurrentWeekOfYear = () => {
   return weekNumber;
 };
 
-export const isBeforeWeek = (
-  week: number,
-  currentWeek: number,
-  currentYear: number,
-  month: MonthsDataType
-) => {
+export const isBeforeWeek = (week: number, month: MonthsDataType) => {
+  const currentWeek = getCurrentWeekOfYear();
+  const currentYear = getCurrentYear();
+
   if (month.year < currentYear) {
     return true;
   }
@@ -185,28 +183,78 @@ export const showMonthAndYear = (year: number, monthLabel: string) => {
 };
 
 export const calculateTotalHoursPerWeek = (
-  assignments: AssignmentType | AssignmentType[]
+  assignments: AssignmentType | AssignmentType[],
+  months: MonthsDataType[]
 ) => {
-  const totalHours: { [key: string]: number } = {};
-  const proposedHours: { [key: string]: number } = {};
-  let maxTotalHours = 0;
+  const totalActualHours: { [key: string]: number } = {};
+  const totalEstimatedHours: { [key: string]: number } = {};
+  const proposedActualHours: { [key: string]: number } = {};
+  const proposedEstimatedHours: { [key: string]: number } = {};
 
+  let maxTotalActualHours = 0;
+  let maxTotalEstimatedHours = 0;
+  let maxProposedActualHours = 0;
+  let maxProposedEstimatedHours = 0;
+
+  months.forEach((month) => {
+    month.weeks.forEach((week) => {
+      const key = `${month.year}-${week}`;
+      totalActualHours[key] = totalActualHours[key] || 0;
+      totalEstimatedHours[key] = totalEstimatedHours[key] || 0;
+      proposedActualHours[key] = proposedActualHours[key] || 0;
+      proposedEstimatedHours[key] = proposedEstimatedHours[key] || 0;
+    });
+  });
   const calculateAssignment = (assignment: AssignmentType) => {
+    if (assignment.estimatedWeeklyHours) {
+      months.forEach((month) => {
+        month.weeks.forEach((week) => {
+          const key = `${month.year}-${week}`;
+          totalEstimatedHours[key] += assignment.estimatedWeeklyHours;
+          if (assignment.status === "proposed") {
+            proposedEstimatedHours[key] += assignment.estimatedWeeklyHours;
+          }
+        });
+      });
+    }
     assignment.workWeeks.forEach((weekData) => {
       const key = `${weekData.year}-${weekData.cweek}`;
-      if (!totalHours[key]) {
-        totalHours[key] = 0;
+      if (!totalActualHours[key]) {
+        totalActualHours[key] = 0;
       }
-      totalHours[key] += weekData.actualHours || 0;
+      totalActualHours[key] += weekData.actualHours || 0;
+
+      if (!totalEstimatedHours[key]) {
+        totalEstimatedHours[key] = 0;
+      }
+      totalEstimatedHours[key] += weekData.estimatedHours || 0;
 
       if (assignment.status === "proposed") {
-        if (!proposedHours[key]) {
-          proposedHours[key] = 0;
+        if (!proposedActualHours[key]) {
+          proposedActualHours[key] = 0;
         }
-        proposedHours[key] += weekData.actualHours || 0;
+        proposedActualHours[key] += weekData.actualHours || 0;
+
+        if (!proposedEstimatedHours[key]) {
+          proposedEstimatedHours[key] = 0;
+        }
+        proposedEstimatedHours[key] += weekData.estimatedHours || 0;
       }
-      if (totalHours[key] > maxTotalHours) {
-        maxTotalHours = totalHours[key];
+
+      if (totalActualHours[key] > maxTotalActualHours) {
+        maxTotalActualHours = totalActualHours[key];
+      }
+
+      if (totalEstimatedHours[key] > maxTotalEstimatedHours) {
+        maxTotalEstimatedHours = totalEstimatedHours[key];
+      }
+
+      if (proposedActualHours[key] > maxProposedActualHours) {
+        maxProposedActualHours = proposedActualHours[key];
+      }
+
+      if (proposedEstimatedHours[key] > maxProposedEstimatedHours) {
+        maxProposedEstimatedHours = proposedEstimatedHours[key];
       }
     });
   };
@@ -216,9 +264,24 @@ export const calculateTotalHoursPerWeek = (
   } else {
     calculateAssignment(assignments);
   }
-  totalHours.maxTotalHours = maxTotalHours;
 
-  return { totalHours, proposedHours };
+  const maxTotalHours = Math.max(
+    maxTotalActualHours,
+    maxTotalEstimatedHours,
+    maxProposedActualHours,
+    maxProposedEstimatedHours
+  );
+
+  totalActualHours.maxTotalActualHours = maxTotalActualHours;
+  totalEstimatedHours.maxTotalEstimatedHours = maxTotalEstimatedHours;
+
+  return {
+    totalActualHours,
+    totalEstimatedHours,
+    proposedActualHours,
+    proposedEstimatedHours,
+    maxTotalHours,
+  };
 };
 
 export const getDisplayHours = (
