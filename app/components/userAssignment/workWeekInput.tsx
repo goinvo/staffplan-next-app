@@ -6,7 +6,7 @@ import { AssignmentType, WorkWeekType } from "@/app/typeInterfaces";
 import { UPSERT_WORKWEEK } from "@/app/gqlQueries";
 import { useUserDataContext } from "@/app/userDataContext";
 import { CustomInput } from "../cutomInput";
-import { isPastOrCurrentWeek } from "../scrollingCalendar/helpers";
+import { assignmentContainsCWeek, isPastOrCurrentWeek } from "../scrollingCalendar/helpers";
 
 interface WorkWeekInputProps {
 	withinProjectDates?: boolean;
@@ -27,11 +27,12 @@ export const WorkWeekInput = ({
 	cweek,
 	year,
 }: WorkWeekInputProps) => {
+	const weekWithinAssignmentDates = assignmentContainsCWeek(assignment, cweek, year)
 	const existingWorkWeek = assignment?.workWeeks.find((week) => week.cweek === cweek && week.year === year);
 	const initialValues = {
 		actualHours: existingWorkWeek?.actualHours || "",
 		estimatedHours:
-			existingWorkWeek?.estimatedHours || assignment?.estimatedWeeklyHours || "",
+			existingWorkWeek?.estimatedHours || weekWithinAssignmentDates && assignment?.estimatedWeeklyHours || "",
 		assignmentId: assignment?.id,
 		cweek: cweek,
 		year: year,
@@ -60,7 +61,6 @@ export const WorkWeekInput = ({
 			refetchProjectList();
 		});
 	};
-
 
 	return (
 		<Formik
