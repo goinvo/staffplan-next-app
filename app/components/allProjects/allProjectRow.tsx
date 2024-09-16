@@ -6,14 +6,11 @@ import {
 } from "@/app/typeInterfaces";
 
 import React from "react";
-import {
-	calculateTotalHoursPerWeek,
-	isBeforeWeek,
-} from "../scrollingCalendar/helpers";
 import { useRouter } from "next/navigation";
 import { AllProjectLabel } from "./allProjectLabel";
 import ProjectSummary from "../projectSummary";
 import ColumnChart from "../columnChart";
+import { calculateTotalHoursPerWeek, isBeforeWeek, currentWeek, currentYear } from "../scrollingCalendar/helpers";
 
 export const AllProjectRow = ({
 	project,
@@ -47,18 +44,18 @@ export const AllProjectRow = ({
 			{months?.map((month: MonthsDataType) => (
 				month.weeks.map((week) => {
 					return (
-						<td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal min-h-[100px]`}>
+						<td key={`${month.monthLabel}-${week.weekNumberOfTheYear}`} className={`relative px-1 py-1 font-normal min-h-[100px] ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year && 'bg-selectedColumnBg'}`}>
 							<ColumnChart
-								hasActualHoursForWeek={hasActualHoursForWeek(month.year, week)}
+								hasActualHoursForWeek={hasActualHoursForWeek(month.year, week.weekNumberOfTheYear)}
 								height={
-									hasActualHoursForWeek(month.year, week)
-										? totalActualHours[`${month.year}-${week}`]
-										: totalEstimatedHours[`${month.year}-${week}`]
+									hasActualHoursForWeek(month.year, week.weekNumberOfTheYear)
+										? totalActualHours[`${month.year}-${week.weekNumberOfTheYear}`]
+										: totalEstimatedHours[`${month.year}-${week.weekNumberOfTheYear}`]
 								}
-								proposedHours={proposedEstimatedHours[`${month.year}-${week}`]}
+								proposedHours={proposedEstimatedHours[`${month.year}-${week.weekNumberOfTheYear}`]}
 								maxValue={maxTotalHours}
 								textColor="contrastBlue"
-								isBeforeWeek={isBeforeWeek(week, month)}
+								isBeforeWeek={isBeforeWeek(week.weekNumberOfTheYear, month)}
 							/>
 						</td>)
 				})

@@ -231,10 +231,15 @@ export interface WorkWeekBlockMemberType {
 }
 
 export interface MonthsDataType {
-	monthLabel: string; year: number; weeks: number[]
+	monthLabel: string;
+	year: number;
+	weeks: {
+		weekNumberOfTheYear: number,
+		weekNumberOfTheMonth: number,
+	}[]
 }
 
 export interface DateRange {
-	quarter: number;
+	week: number;
 	year: number;
 }

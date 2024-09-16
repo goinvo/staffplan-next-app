@@ -12,7 +12,7 @@ import IconButton from '../iconButton';
 
 import { useUserDataContext } from '@/app/userDataContext';
 import { AssignmentType, MonthsDataType, ProjectType } from '@/app/typeInterfaces';
-import { calculateTotalHoursPerWeek, isBeforeWeek, showMonthAndYear } from './helpers';
+import { calculateTotalHoursPerWeek, isBeforeWeek, showMonthAndYear, getDateOneWeekAfter, getDateOneWeekEarlier, currentWeek, currentYear } from './helpers';
 import ViewsMenu from '../viewsMenu/viewsMenu';
 import EditFormController from './editFormController';
 
@@ -31,7 +31,6 @@ type CalendarHeaderProps = {
     editable?: boolean,
     projectInfo?: string,
     columnHeaderTitles: ColumnHeaderTitle[],
-    selectedColumn: string | null
 }
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
@@ -42,26 +41,17 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     userName,
     editable = false,
     projectInfo,
-    columnHeaderTitles,
-    selectedColumn }) => {
+    columnHeaderTitles }) => {
     const [isEditing, setIsEditing] = useState(false);
-    const { setDateRange, scrollToTodayFunction } = useUserDataContext();
+    const { dateRange, setDateRange, scrollToTodayFunction } = useUserDataContext();
     const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } = calculateTotalHoursPerWeek(assignments as AssignmentType[], months)
 
-    const nextQuarter = () => {
-        setDateRange(prev => {
-            const nextQuarter = (prev.quarter % 4) + 1;
-            const nextYear = nextQuarter === 1 ? prev.year + 1 : prev.year;
-            return { quarter: nextQuarter, year: nextYear };
-        });
+    const nextWeek = () => {
+        setDateRange(getDateOneWeekAfter(dateRange));
     };
 
-    const prevQuarter = () => {
-        setDateRange(prev => {
-            const prevQuarter = prev.quarter === 1 ? 4 : prev.quarter - 1;
-            const prevYear = prevQuarter === 4 ? prev.year - 1 : prev.year;
-            return { quarter: prevQuarter, year: prevYear };
-        });
+    const prevWeek = () => {
+        setDateRange(getDateOneWeekEarlier(dateRange));
     };
     const hasActualHoursForWeek = (year: number, week: number) => {
         return !!totalActualHours[`${year}-${week}`];
@@ -70,7 +60,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     return (
         <thead>
             <tr className="pl-5 border-bottom bg-contrastBlue min-h-28 text-white flex">
-                <th className="flex w-1/3 mr-1 px-0 py-5">
+                <th className="flex w-1/3 px-0 py-5">
                     {isEditing ? (
                         <EditFormController onClose={() => setIsEditing(false)} />
                     ) : (
@@ -108,16 +98,14 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                 </th>
                 {months?.map((month) => {
                     return month.weeks.map((week) => {
-                        const columnIdentifier = `${month.monthLabel}-${week}`;
-                        return (<th key={`month-${month.monthLabel}-week-${week}`}
-                            className={`relative px-1 ${selectedColumn === columnIdentifier ? 'navbar font-bold' : 'font-normal'}`}>
+                        return (<th key={`month-${month.monthLabel}-week-${week.weekNumberOfTheYear}`}
+                            className={`relative px-1 ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year ? 'navbar font-bold' : 'font-normal'}`}>
                             <ColumnChart
-                                hasActualHoursForWeek={hasActualHoursForWeek(month.year, week)}
-                                height={hasActualHoursForWeek(month.year, week) ? totalActualHours[`${month.year}-${week}`] : totalEstimatedHours[`${month.year}-${week}`]}
-                                proposedHours={proposedEstimatedHours[`${month.year}-${week}`]}
+                                hasActualHoursForWeek={hasActualHoursForWeek(month.year, week.weekNumberOfTheYear)}
+                                height={hasActualHoursForWeek(month.year, week.weekNumberOfTheYear) ? totalActualHours[`${month.year}-${week.weekNumberOfTheYear}`] : totalEstimatedHours[`${month.year}-${week.weekNumberOfTheYear}`]}
+                                proposedHours={proposedEstimatedHours[`${month.year}-${week.weekNumberOfTheYear}`]}
                                 maxValue={maxTotalHours}
-                                isBeforeWeek={isBeforeWeek(week, month)}
-                            />
+                                isBeforeWeek={isBeforeWeek(week.weekNumberOfTheYear, month)} />
                         </th>)
                     });
                 })}
@@ -142,19 +130,19 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                                     <span>{el.title}</span>
                                 </div>)
                         })}
-                        <IconButton className='pt-2 text-black flex items-center justify-center' onClick={prevQuarter} Icon={ChevronLeftIcon} iconSize={'h6 w-6'} />
+                        <IconButton className='pt-2 text-black flex items-center justify-center' onClick={prevWeek} Icon={ChevronLeftIcon} iconSize={'h6 w-6'} />
                     </div>
                 </th>
                 {months?.map((month) => {
                     return month.weeks.map((week, index) => {
-                        const columnIdentifier = `${month.monthLabel}-${week}`;
                         return (
-                            <th key={`${month.monthLabel}-${index}`} className={`relative py-2 px-1 font-normal text-contrastBlue ${selectedColumn === columnIdentifier ? 'bg-selectedColumnBg' :
-
-                                ''}`}>
-                                <div className={`flex flex-col items-center w-[34px] ${selectedColumn === columnIdentifier ? 'font-bold' : 'font-normal'}`}>
-                                    <span>{`W${index + 1}`}</span>
-                                    {index === 0 && <span>{showMonthAndYear(month.year, month.monthLabel)}</span>}
+                            <th key={`${month.monthLabel}-${index}`} className={`relative py-2 px-1 font-normal text-contrastBlue ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year && 'bg-selectedColumnBg'
+                                }`}>
+                                <div className={`flex flex-col items-center w-[34px] ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year ? 'font-bold' : 'font-normal'}`}>
+                                    <span>{`W${week.weekNumberOfTheMonth}`}</span>
+                                    {week.weekNumberOfTheMonth === 1 && <span>
+                                        {showMonthAndYear(month.year, month.monthLabel)}
+                                    </span>}
                                 </div>
                             </th>)
 
@@ -162,7 +150,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                 })}
                 <th className="pl-0 pr-4 pt-1 pb-2 font-normal align-top w-1/6">
                     <IconButton className='pt-2 text-contrastBlue flex items-center justify-center'
-                        onClick={nextQuarter}
+                        onClick={nextWeek}
                         Icon={ChevronRightIcon}
                         iconSize={'h6 w-6'} />
                 </th>

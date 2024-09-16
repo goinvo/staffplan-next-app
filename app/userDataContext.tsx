@@ -18,15 +18,14 @@ import {
 } from "./gqlQueries";
 import { sortProjectList, sortUserList } from "./helperFunctions";
 import {
-	currentQuarter,
-	currentYear,
+	getStartOfPreviousWeek
 } from "./components/scrollingCalendar/helpers";
 
 export interface UserDataContextType {
 	userList: any;
 	setUserList: React.Dispatch<React.SetStateAction<any>>;
 	dateRange: any;
-	setDateRange: React.Dispatch<React.SetStateAction<DateRange>>;
+	setDateRange: React.Dispatch<React.SetStateAction<string>>;
 	projectList: ProjectType[];
 	setProjectList: React.Dispatch<React.SetStateAction<ProjectType[]>>;
 	clientList: ClientType[];
@@ -60,17 +59,15 @@ export const useUserDataContext = () => {
 	}
 	return context;
 };
-
 // Create a context provider component
 export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 	children,
 }) => {
 	const client = useApolloClient();
 	const [clientSide, setClientSide] = useState(false);
-	const [dateRange, setDateRange] = useState<DateRange>({
-		quarter: currentQuarter,
-		year: currentYear,
-	});
+	const [dateRange, setDateRange] = useState<string>(
+		getStartOfPreviousWeek()
+	);
 	const [userList, setUserList] = useState<any>(null);
 	const [projectList, setProjectList] = useState<any>(null);
 	const [clientList, setClientList] = useState<any>(null);
@@ -89,10 +86,9 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 		showInactiveUsers: false,
 	});
 	const scrollToTodayFunction = () => {
-		setDateRange({
-			quarter: currentQuarter,
-			year: currentYear,
-		});
+		setDateRange(
+			getStartOfPreviousWeek()
+		);
 	};
 	const {
 		loading: userListLoading,
