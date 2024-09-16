@@ -19,6 +19,7 @@ import EditFormController from './editFormController';
 interface ColumnHeaderTitle {
     title: string;
     showIcon: boolean;
+    onClick?: () => void;
 }
 
 type CalendarHeaderProps = {
@@ -43,15 +44,17 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     columnHeaderTitles }) => {
     const [isEditing, setIsEditing] = useState(false);
     const { dateRange, setDateRange, scrollToTodayFunction } = useUserDataContext();
-    const { totalHours, proposedHours } = calculateTotalHoursPerWeek(assignments as AssignmentType[])
+    const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } = calculateTotalHoursPerWeek(assignments as AssignmentType[], months)
 
     const nextQuarter = () => {
         setDateRange(getDateOneWeekAfter(dateRange));
     };
 
-
     const prevQuarter = () => {
         setDateRange(getDateOneWeekEarlier(dateRange));
+    };
+    const hasActualHoursForWeek = (year: number, week: number) => {
+        return !!totalActualHours[`${year}-${week}`];
     };
 
     return (
@@ -97,7 +100,12 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                     return month.weeks.map((week) => {
                         return (<th key={`month-${month.monthLabel}-week-${week.weekNumberOfTheYear}`}
                             className={`relative px-1 ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year ? 'navbar font-bold' : 'font-normal'}`}>
-                            <ColumnChart height={totalHours[`${month.year}-${week.weekNumberOfTheYear}`]} proposedHours={proposedHours[`${month.year}-${week.weekNumberOfTheYear}`]} isBeforeWeek={isBeforeWeek(week.weekNumberOfTheYear, currentWeek, currentYear, month)} maxValue={totalHours.maxTotalHours} />
+                            <ColumnChart
+                                hasActualHoursForWeek={hasActualHoursForWeek(month.year, week.weekNumberOfTheYear)}
+                                height={hasActualHoursForWeek(month.year, week.weekNumberOfTheYear) ? totalActualHours[`${month.year}-${week.weekNumberOfTheYear}`] : totalEstimatedHours[`${month.year}-${week.weekNumberOfTheYear}`]}
+                                proposedHours={proposedEstimatedHours[`${month.year}-${week.weekNumberOfTheYear}`]}
+                                maxValue={maxTotalHours}
+                                isBeforeWeek={isBeforeWeek(week.weekNumberOfTheYear, month)} />
                         </th>)
                     });
                 })}
@@ -117,7 +125,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                     <div className='flex flex-row justify-between items-start'>
                         {columnHeaderTitles?.map((el, i) => {
                             return (
-                                <div key={el.title} className='w-24 flex items-center justify-start text-start'>
+                                <div key={el.title} className={`w-24 flex items-center justify-start text-start ${el.onClick ? 'cursor-pointer' : ''}`} onClick={el?.onClick}>
                                     {el.showIcon && (<PlusIcon className='w-4 h-4 mr-1' />)}
                                     <span>{el.title}</span>
                                 </div>)

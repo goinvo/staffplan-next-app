@@ -63,6 +63,7 @@ export const ProjectAssignmentRow = ({
 			{months?.map((month: MonthsDataType) => {
 				return month.weeks.map((week) => {
 					const withinProjectDates = isWeekWithinProject(week.weekNumberOfTheYear, month.year);
+					const columnIdentifier = `${month.monthLabel}-${week}`;
 					return (
 						<td key={`${month.monthLabel}-${week.weekNumberOfTheYear}`}
 							className={`relative px-1 py-1 font-normal ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year && 'bg-selectedColumnBg'}`}
@@ -75,7 +76,7 @@ export const ProjectAssignmentRow = ({
 									assignment={assignment}
 									cweek={week.weekNumberOfTheYear}
 									year={month.year}
-									key={`input-${week}`}
+									key={`input-${week.weekNumberOfTheYear}`}
 								/>
 
 							</div>
@@ -83,6 +84,6 @@ export const ProjectAssignmentRow = ({
 				});
 			})}
 			{isLastMonth && <UserSummary assignment={assignment} />}
-		</tr>
+		</tr >
 	);
 };

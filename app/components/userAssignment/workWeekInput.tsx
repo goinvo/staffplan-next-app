@@ -1,18 +1,19 @@
 import React from "react";
 import { Formik, FormikValues } from "formik";
-import { useMutation } from "@apollo/client";
 
+import { useMutation } from "@apollo/client";
 import { AssignmentType, WorkWeekType } from "@/app/typeInterfaces";
 import { UPSERT_WORKWEEK } from "@/app/gqlQueries";
 import { useUserDataContext } from "@/app/userDataContext";
 import { CustomInput } from "../cutomInput";
+import { isPastOrCurrentWeek } from "../scrollingCalendar/helpers";
 
 interface WorkWeekInputProps {
 	withinProjectDates?: boolean;
 	workWeek?: WorkWeekType;
 	assignment?: AssignmentType;
-	cweek: number | null;
-	year: number | null;
+	cweek: number;
+	year: number;
 }
 export interface WorkWeekValues {
 	cweek: number;
@@ -59,6 +60,8 @@ export const WorkWeekInput = ({
 			refetchProjectList();
 		});
 	};
+
+
 	return (
 		<Formik
 			onSubmit={(e) => upsertWorkWeekValues(e)}
@@ -82,18 +85,20 @@ export const WorkWeekInput = ({
 							}
 						}}
 					/>
-					<CustomInput
-						value={values.actualHours}
-						name="actualHours"
-						id={`actHours-${assignment?.id}-${cweek}-${year}`}
-						onChange={handleChange}
-						onBlur={(e) => {
-							handleBlur("actualHours");
-							if (values.actualHours) {
-								upsertWorkWeekValues(values);
-							}
-						}}
-					/>
+					{isPastOrCurrentWeek(cweek, year) && (
+						<CustomInput
+							value={values.actualHours}
+							name="actualHours"
+							id={`actHours-${assignment?.id}-${cweek}-${year}`}
+							onChange={handleChange}
+							onBlur={(e) => {
+								handleBlur("actualHours");
+								if (values.actualHours) {
+									upsertWorkWeekValues(values);
+								}
+							}}
+						/>
+					)}
 				</>
 			)}
 		</Formik>
