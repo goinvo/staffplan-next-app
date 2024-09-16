@@ -255,7 +255,7 @@ export const isPastOrCurrentWeek = (cweek: number, year: number) => {
   const currentDate = DateTime.now();
   const currentWeek = currentDate.weekNumber;
 
-  return year === currentYear && cweek <= currentWeek;
+  return year < currentYear || (year === currentYear && cweek <= currentWeek);
 };
 
 export const getStartOfPreviousWeek = (): string => {
