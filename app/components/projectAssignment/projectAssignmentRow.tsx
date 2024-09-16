@@ -6,6 +6,7 @@ import { AssignmentType, MonthsDataType, ProjectType } from "@/app/typeInterface
 import UserSummary from "../userSummary";
 import { ProjectUserLabel } from "./projectUserLabel";
 import { WorkWeekInput } from "./workWeekInput";
+import { currentWeek, currentYear } from "../scrollingCalendar/helpers";
 
 
 interface ProjectAssignmentRowProps {
@@ -15,8 +16,6 @@ interface ProjectAssignmentRowProps {
 	isLastMonth: boolean;
 	monthData: { monthLabel: string; year: number };
 	months?: MonthsDataType[];
-	selectedColumn?: string | null;
-	handleCellClick?: (monthLabel: string | null, week: number | null) => void;
 }
 
 export const ProjectAssignmentRow = ({
@@ -25,8 +24,6 @@ export const ProjectAssignmentRow = ({
 	isLastMonth,
 	project,
 	months,
-	selectedColumn,
-	handleCellClick
 }: ProjectAssignmentRowProps) => {
 	const router = useRouter();
 
@@ -65,21 +62,18 @@ export const ProjectAssignmentRow = ({
 			)}
 			{months?.map((month: MonthsDataType) => {
 				return month.weeks.map((week) => {
-					const withinProjectDates = isWeekWithinProject(week, month.year);
-					const columnIdentifier = `${month.monthLabel}-${week}`;
+					const withinProjectDates = isWeekWithinProject(week.weekNumberOfTheYear, month.year);
 					return (
-						<td key={`${month.monthLabel}-${week}`}
-							className={`relative px-1 py-1 font-normal ${selectedColumn === columnIdentifier ? 'bg-selectedColumnBg' : ''}`}
+						<td key={`${month.monthLabel}-${week.weekNumberOfTheYear}`}
+							className={`relative px-1 py-1 font-normal ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year && 'bg-selectedColumnBg'}`}
 						>
 							<div
-								className={`flex flex-col space-y-3 ${selectedColumn === columnIdentifier ? 'font-bold' : 'font-normal'}`}
-								onClick={() => handleCellClick?.(month.monthLabel, week)}
-								onBlur={() => handleCellClick?.(null, null)}>
+								className={`flex flex-col space-y-3 ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year ? 'font-bold' : 'font-normal'}`}>
 								<WorkWeekInput
 									isUserTBD={isUserTBD}
 									withinProjectDates={withinProjectDates}
 									assignment={assignment}
-									cweek={week}
+									cweek={week.weekNumberOfTheYear}
 									year={month.year}
 									key={`input-${week}`}
 								/>

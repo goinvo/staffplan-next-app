@@ -16,7 +16,7 @@ import {
 
 import { AllUserLabel } from "./allUserLabel";
 import ColumnChart from "../columnChart";
-import { getCurrentWeekOfYear, getCurrentYear, isBeforeWeek, getDisplayHours } from "../scrollingCalendar/helpers";
+import { currentWeek, currentYear, isBeforeWeek, getDisplayHours } from "../scrollingCalendar/helpers";
 import IconButton from "../iconButton";
 
 export const AllUserRow = ({
@@ -26,8 +26,6 @@ export const AllUserRow = ({
 	monthData,
 	months
 }: AllUserRowProps) => {
-	const currentWeek = getCurrentWeekOfYear()
-	const currentYear = getCurrentYear()
 	const router = useRouter();
 
 	const handleUserChange = (user: UserType) => {
@@ -74,7 +72,7 @@ export const AllUserRow = ({
 					const totalEstimatedWeeklyHours = user.assignments?.reduce(
 						(acc, assignment) => {
 							if (
-								assignmentContainsCWeek(assignment, week, month.year)
+								assignmentContainsCWeek(assignment, week.weekNumberOfTheYear, month.year)
 							) {
 								return acc + assignment.estimatedWeeklyHours;
 							}
@@ -83,16 +81,16 @@ export const AllUserRow = ({
 						0
 					);
 					const workWeek = totalWorkWeekHours.find(
-						(workWeek) => workWeek.cweek === week && workWeek.year === month.year
+						(workWeek) => workWeek.cweek === week.weekNumberOfTheYear && workWeek.year === month.year
 					);
 					const displayHours = getDisplayHours(workWeek, totalEstimatedWeeklyHours);
 					return (
-						<td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal min-h-[100px]`}>
-							<ColumnChart height={displayHours} isBeforeWeek={isBeforeWeek(week, currentWeek, currentYear, month)} maxValue={maxHoursPerWeek} textColor="contrastBlue" />
+						<td key={`${month.monthLabel}-${week.weekNumberOfTheYear}`} className={`relative px-1 py-1 font-normal min-h-[100px] ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year ? 'bg-selectedColumnBg font-bold' : 'font-normal'}}`}>
+							<ColumnChart height={displayHours} isBeforeWeek={isBeforeWeek(week.weekNumberOfTheYear, currentWeek, currentYear, month)} maxValue={maxHoursPerWeek} textColor="contrastBlue" />
 						</td>)
 				});
 			})}
-			<td className="flex items-center justify-center font-normal py-2 w-1/6">
+			<td className="flex items-center justify-center font-normal py-2 pr-4 pl-0 w-1/6">
 				<IconButton className='text-transparentGrey'
 					onClick={() => console.log('On archive box btn click')}
 					Icon={ArchiveBoxIcon}

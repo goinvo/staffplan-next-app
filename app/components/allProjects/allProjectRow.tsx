@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { AllProjectLabel } from "./allProjectLabel";
 import ProjectSummary from "../projectSummary";
 import ColumnChart from "../columnChart";
-import { isBeforeWeek, getCurrentWeekOfYear, getCurrentYear, getDisplayHours } from "../scrollingCalendar/helpers";
+import { isBeforeWeek, currentWeek, currentYear, getDisplayHours } from "../scrollingCalendar/helpers";
 
 interface Accumulator {
 	[cweek: number]: {
@@ -29,8 +29,6 @@ export const AllProjectRow = ({
 	months,
 }: AllProjectRowProps) => {
 	const router = useRouter();
-	const currentWeek = getCurrentWeekOfYear()
-	const currentYear = getCurrentYear()
 
 	const handleProjectChange = (project: ProjectType) => {
 		if (project.id) {
@@ -80,7 +78,7 @@ export const AllProjectRow = ({
 					const totalEstimatedWeeklyHours = project.assignments?.reduce(
 						(acc, assignment) => {
 							if (
-								assignmentContainsCWeek(assignment, week, month.year)
+								assignmentContainsCWeek(assignment, week.weekNumberOfTheYear, month.year)
 							) {
 								return acc + assignment.estimatedWeeklyHours;
 							}
@@ -89,12 +87,12 @@ export const AllProjectRow = ({
 						0
 					);
 					const workWeek = totalWorkWeekHours.find(
-						(workWeek) => workWeek.cweek === week && workWeek.year === month.year
+						(workWeek) => workWeek.cweek === week.weekNumberOfTheYear && workWeek.year === month.year
 					);
 					const displayHours = getDisplayHours(workWeek, totalEstimatedWeeklyHours as number);
 					return (
-						<td key={`${month.monthLabel}-${week}`} className={`relative px-1 py-1 font-normal min-h-[100px]`}>
-							<ColumnChart height={displayHours} isBeforeWeek={isBeforeWeek(week, currentWeek, currentYear, month)} maxValue={maxHoursPerWeek} textColor="contrastBlue" />
+						<td key={`${month.monthLabel}-${week.weekNumberOfTheYear}`} className={`relative px-1 py-1 font-normal min-h-[100px] ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year && 'bg-selectedColumnBg'}`}>
+							<ColumnChart height={displayHours} isBeforeWeek={isBeforeWeek(week.weekNumberOfTheYear, currentWeek, currentYear, month)} maxValue={maxHoursPerWeek} textColor="contrastBlue" />
 						</td>)
 				})
 			))}

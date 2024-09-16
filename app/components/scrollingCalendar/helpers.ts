@@ -98,58 +98,6 @@ export const assignmentContainsCWeek = (
   return false;
 };
 
-const getWeeksInMonth = (start: DateTime, end: DateTime): number[] => {
-  const weeks: number[] = [];
-
-  let currentWeek = start.startOf("week");
-  const endOfMonthWeek = end.endOf("week");
-
-  while (currentWeek <= endOfMonthWeek) {
-    if (currentWeek >= start.startOf("month") && currentWeek <= end) {
-      const weekNumber = currentWeek.weekNumber;
-      if (weekNumber === 1 && currentWeek.month === 12) {
-        if (!weeks.includes(53)) {
-          weeks.push(53);
-        }
-      } else if (!weeks.includes(weekNumber)) {
-        weeks.push(weekNumber);
-      }
-    }
-    currentWeek = currentWeek.plus({ weeks: 1 });
-  }
-
-  return weeks;
-};
-
-export const getMonthsWithWeeks = (
-  startDate: any,
-  endDate: any,
-  monthsCount: number
-) => {
-  const start = DateTime.fromISO(startDate);
-  const end = DateTime.fromISO(endDate);
-
-  const finalEnd = start
-    .plus({ months: monthsCount })
-    .minus({ days: 1 })
-    .endOf("month")
-    .toISO();
-  const finalEndDate = DateTime.fromISO(finalEnd as string);
-
-  return Array.from(
-    { length: finalEndDate.diff(start, "months").months + 1 },
-    (_, index) => {
-      const monthStart = start.plus({ months: index }).startOf("month");
-      const monthEnd = monthStart.endOf("month");
-      return {
-        monthLabel: monthStart.toFormat("M"),
-        year: monthStart.year,
-        weeks: getWeeksInMonth(monthStart, monthEnd),
-      };
-    }
-  );
-};
-
 export const getCurrentYear = () => DateTime.now().year;
 
 export const getCurrentWeekOfYear = () => {
@@ -238,3 +186,105 @@ export const getDisplayHours = (
 
 export const currentQuarter = Math.floor((DateTime.now().month - 1) / 3) + 1;
 export const currentYear = DateTime.now().year;
+export const currentWeek = getCurrentWeekOfYear();
+
+export const getStartOfPreviousWeek = (): string => {
+  const inputDate = DateTime.now();
+
+  if (!inputDate.isValid) {
+    throw new Error("Invalid ISO date provided");
+  }
+  const startOfWeek = inputDate.startOf("week");
+  const oneWeekBefore = startOfWeek.minus({ weeks: 1 });
+
+  return oneWeekBefore.toISODate();
+};
+
+export const getEndDateInterval = (
+  startDate: string,
+  weeks: number
+): string => {
+  const start = DateTime.fromISO(startDate);
+
+  if (!start.isValid) {
+    throw new Error("Invalid ISO date provided");
+  }
+
+  const futureDate = start.plus({ weeks });
+
+  return futureDate.toISODate();
+};
+
+export const getWeeksPerScreen = (startDate: string, amountOfWeeks: number) => {
+  if (!startDate) return [];
+  const start = DateTime.fromISO(startDate);
+  const endDateString = getEndDateInterval(startDate, amountOfWeeks);
+  if (!endDateString) return [];
+
+  const end = DateTime.fromISO(endDateString);
+
+  const weeksByMonthMap: {
+    [key: string]: {
+      weekNumberOfTheYear: number;
+      weekNumberOfTheMonth: number;
+    }[];
+  } = {};
+
+  for (let day = start; day <= end; day = day.plus({ days: 1 })) {
+    if (day.weekday === 1) {
+      const month = day.toFormat("M yyyy");
+      if (!weeksByMonthMap[month]) weeksByMonthMap[month] = [];
+
+      const weekNumberOfTheYear = day.weekNumber;
+      const weekNumberOfTheMonth = Math.ceil(day.day / 7);
+
+      if (day.month === 12 && weekNumberOfTheYear === 1) {
+        weeksByMonthMap[month].push({
+          weekNumberOfTheYear: 53,
+          weekNumberOfTheMonth,
+        });
+      } else {
+        weeksByMonthMap[month].push({
+          weekNumberOfTheYear,
+          weekNumberOfTheMonth,
+        });
+      }
+    }
+  }
+  const weeksByMonth = Object.keys(weeksByMonthMap).map((month) => {
+    const [monthName, year] = month.split(" ");
+    return {
+      monthLabel: monthName,
+      year: parseInt(year, 10),
+      weeks: weeksByMonthMap[month],
+    };
+  });
+
+  return weeksByMonth;
+};
+
+export const getDateOneWeekEarlier = (isoDate: string): string => {
+  const date = DateTime.fromISO(isoDate);
+
+  if (!date.isValid) {
+    throw new Error("Invalid ISO date provided");
+  }
+
+  const oneWeekEarlier = date.minus({ weeks: 1 });
+  const isoDateOneWeekEarlier = oneWeekEarlier.toISODate();
+
+  return isoDateOneWeekEarlier;
+};
+
+export const getDateOneWeekAfter = (isoDate: string): string => {
+  const date = DateTime.fromISO(isoDate);
+
+  if (!date.isValid) {
+    throw new Error("Invalid ISO date provided");
+  }
+
+  const oneWeekAfter = date.plus({ weeks: 1 });
+  const isoDateOneWeekAfter = oneWeekAfter.toISODate();
+
+  return isoDateOneWeekAfter;
+};

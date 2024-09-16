@@ -12,7 +12,7 @@ import IconButton from '../iconButton';
 
 import { useUserDataContext } from '@/app/userDataContext';
 import { AssignmentType, MonthsDataType, ProjectType } from '@/app/typeInterfaces';
-import { calculateTotalHoursPerWeek, getCurrentWeekOfYear, getCurrentYear, isBeforeWeek, showMonthAndYear } from './helpers';
+import { calculateTotalHoursPerWeek, isBeforeWeek, showMonthAndYear, getDateOneWeekAfter, getDateOneWeekEarlier, currentWeek, currentYear } from './helpers';
 import ViewsMenu from '../viewsMenu/viewsMenu';
 import EditFormController from './editFormController';
 
@@ -30,7 +30,6 @@ type CalendarHeaderProps = {
     editable?: boolean,
     projectInfo?: string,
     columnHeaderTitles: ColumnHeaderTitle[],
-    selectedColumn: string | null
 }
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
@@ -41,35 +40,24 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     userName,
     editable = false,
     projectInfo,
-    columnHeaderTitles,
-    selectedColumn }) => {
+    columnHeaderTitles }) => {
     const [isEditing, setIsEditing] = useState(false);
-    const { setDateRange, scrollToTodayFunction } = useUserDataContext();
-    const currentWeek = getCurrentWeekOfYear()
-    const currentYear = getCurrentYear()
+    const { dateRange, setDateRange, scrollToTodayFunction } = useUserDataContext();
     const { totalHours, proposedHours } = calculateTotalHoursPerWeek(assignments as AssignmentType[])
 
     const nextQuarter = () => {
-        setDateRange(prev => {
-            const nextQuarter = (prev.quarter % 4) + 1;
-            const nextYear = nextQuarter === 1 ? prev.year + 1 : prev.year;
-            return { quarter: nextQuarter, year: nextYear };
-        });
+        setDateRange(getDateOneWeekAfter(dateRange));
     };
 
 
     const prevQuarter = () => {
-        setDateRange(prev => {
-            const prevQuarter = prev.quarter === 1 ? 4 : prev.quarter - 1;
-            const prevYear = prevQuarter === 4 ? prev.year - 1 : prev.year;
-            return { quarter: prevQuarter, year: prevYear };
-        });
+        setDateRange(getDateOneWeekEarlier(dateRange));
     };
 
     return (
         <thead>
             <tr className="pl-5 border-bottom bg-contrastBlue min-h-28 text-white flex">
-                <th className="flex w-1/3 mr-1 px-0 py-5">
+                <th className="flex w-1/3 px-0 py-5">
                     {isEditing ? (
                         <EditFormController onClose={() => setIsEditing(false)} />
                     ) : (
@@ -107,10 +95,9 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                 </th>
                 {months?.map((month) => {
                     return month.weeks.map((week) => {
-                        const columnIdentifier = `${month.monthLabel}-${week}`;
-                        return (<th key={`month-${month.monthLabel}-week-${week}`}
-                            className={`relative px-1 ${selectedColumn === columnIdentifier ? 'navbar font-bold' : 'font-normal'}`}>
-                            <ColumnChart height={totalHours[`${month.year}-${week}`]} proposedHours={proposedHours[`${month.year}-${week}`]} isBeforeWeek={isBeforeWeek(week, currentWeek, currentYear, month)} maxValue={totalHours.maxTotalHours} />
+                        return (<th key={`month-${month.monthLabel}-week-${week.weekNumberOfTheYear}`}
+                            className={`relative px-1 ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year ? 'navbar font-bold' : 'font-normal'}`}>
+                            <ColumnChart height={totalHours[`${month.year}-${week.weekNumberOfTheYear}`]} proposedHours={proposedHours[`${month.year}-${week.weekNumberOfTheYear}`]} isBeforeWeek={isBeforeWeek(week.weekNumberOfTheYear, currentWeek, currentYear, month)} maxValue={totalHours.maxTotalHours} />
                         </th>)
                     });
                 })}
@@ -140,14 +127,14 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                 </th>
                 {months?.map((month) => {
                     return month.weeks.map((week, index) => {
-                        const columnIdentifier = `${month.monthLabel}-${week}`;
                         return (
-                            <th key={`${month.monthLabel}-${index}`} className={`relative py-2 px-1 font-normal text-contrastBlue ${selectedColumn === columnIdentifier ? 'bg-selectedColumnBg' :
-
-                                ''}`}>
-                                <div className={`flex flex-col items-center w-[34px] ${selectedColumn === columnIdentifier ? 'font-bold' : 'font-normal'}`}>
-                                    <span>{`W${index + 1}`}</span>
-                                    {index === 0 && <span>{showMonthAndYear(month.year, month.monthLabel)}</span>}
+                            <th key={`${month.monthLabel}-${index}`} className={`relative py-2 px-1 font-normal text-contrastBlue ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year && 'bg-selectedColumnBg'
+                                }`}>
+                                <div className={`flex flex-col items-center w-[34px] ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year ? 'font-bold' : 'font-normal'}`}>
+                                    <span>{`W${week.weekNumberOfTheMonth}`}</span>
+                                    {week.weekNumberOfTheMonth === 1 && <span>
+                                        {showMonthAndYear(month.year, month.monthLabel)}
+                                    </span>}
                                 </div>
                             </th>)
 

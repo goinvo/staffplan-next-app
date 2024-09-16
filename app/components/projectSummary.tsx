@@ -61,7 +61,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 	};
 
 	return (
-		<td className="font-normal py-2 w-1/6 flex justify-center items-center">
+		<td className="font-normal py-2 pr-4 pl-0 w-1/6 flex justify-center items-center">
 			{viewsFilter.showSummaries ? (
 				<div className="flex flex-col items-start">
 					<div className="ml-auto">
