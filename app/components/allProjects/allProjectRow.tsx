@@ -10,16 +10,8 @@ import { useRouter } from "next/navigation";
 import { AllProjectLabel } from "./allProjectLabel";
 import ProjectSummary from "../projectSummary";
 import ColumnChart from "../columnChart";
-import { calculateTotalHoursPerWeek, isBeforeWeek, currentWeek, currentYear, getDisplayHours } from "../scrollingCalendar/helpers";
+import { calculateTotalHoursPerWeek, isBeforeWeek, currentWeek, currentYear } from "../scrollingCalendar/helpers";
 
-interface Accumulator {
-	[cweek: number]: {
-		cweek: number;
-		actualHours: number;
-		estimatedHours: number;
-		year: number;
-	};
-}
 export const AllProjectRow = ({
 	project,
 	isFirstMonth,

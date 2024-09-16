@@ -46,11 +46,11 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     const { dateRange, setDateRange, scrollToTodayFunction } = useUserDataContext();
     const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } = calculateTotalHoursPerWeek(assignments as AssignmentType[], months)
 
-    const nextQuarter = () => {
+    const nextWeek = () => {
         setDateRange(getDateOneWeekAfter(dateRange));
     };
 
-    const prevQuarter = () => {
+    const prevWeek = () => {
         setDateRange(getDateOneWeekEarlier(dateRange));
     };
     const hasActualHoursForWeek = (year: number, week: number) => {
@@ -130,7 +130,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                                     <span>{el.title}</span>
                                 </div>)
                         })}
-                        <IconButton className='pt-2 text-black flex items-center justify-center' onClick={prevQuarter} Icon={ChevronLeftIcon} iconSize={'h6 w-6'} />
+                        <IconButton className='pt-2 text-black flex items-center justify-center' onClick={prevWeek} Icon={ChevronLeftIcon} iconSize={'h6 w-6'} />
                     </div>
                 </th>
                 {months?.map((month) => {
@@ -150,7 +150,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                 })}
                 <th className="pl-0 pr-4 pt-1 pb-2 font-normal align-top w-1/6">
                     <IconButton className='pt-2 text-contrastBlue flex items-center justify-center'
-                        onClick={nextQuarter}
+                        onClick={nextWeek}
                         Icon={ChevronRightIcon}
                         iconSize={'h6 w-6'} />
                 </th>
