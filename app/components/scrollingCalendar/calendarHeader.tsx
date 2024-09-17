@@ -12,7 +12,7 @@ import IconButton from '../iconButton';
 
 import { useUserDataContext } from '@/app/userDataContext';
 import { AssignmentType, MonthsDataType, ProjectType } from '@/app/typeInterfaces';
-import { calculateTotalHoursPerWeek, isBeforeWeek, showMonthAndYear, getDateOneWeekAfter, getDateOneWeekEarlier, currentWeek, currentYear } from './helpers';
+import { calculateTotalHoursPerWeek, isBeforeWeek, showMonthAndYear, getNextWeeksPerView, getPrevWeeksPerView, currentWeek, currentYear } from './helpers';
 import ViewsMenu from '../viewsMenu/viewsMenu';
 import EditFormController from './editFormController';
 
@@ -43,16 +43,17 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     projectInfo,
     columnHeaderTitles }) => {
     const [isEditing, setIsEditing] = useState(false);
-    const { dateRange, setDateRange, scrollToTodayFunction } = useUserDataContext();
+    const { setDateRange, scrollToTodayFunction } = useUserDataContext();
     const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } = calculateTotalHoursPerWeek(assignments as AssignmentType[], months)
 
     const nextWeek = () => {
-        setDateRange(getDateOneWeekAfter(dateRange));
+        setDateRange(getNextWeeksPerView(months));
     };
 
     const prevWeek = () => {
-        setDateRange(getDateOneWeekEarlier(dateRange));
+        setDateRange(getPrevWeeksPerView(months));
     };
+
     const hasActualHoursForWeek = (year: number, week: number) => {
         return !!totalActualHours[`${year}-${week}`];
     };

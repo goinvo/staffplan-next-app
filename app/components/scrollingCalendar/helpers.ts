@@ -333,28 +333,59 @@ export const getWeeksPerScreen = (startDate: string, amountOfWeeks: number) => {
   return weeksByMonth;
 };
 
-export const getDateOneWeekEarlier = (isoDate: string): string => {
-  const date = DateTime.fromISO(isoDate);
+export const getPrevWeeksPerView = (months: MonthsDataType[]): string => {
+  let amountOfWeeks = 0;
+
+  months.forEach((month) => {
+    amountOfWeeks += month.weeks.length;
+  });
+
+  const firstMonthPerView = months[0];
+  const firstWeekPerView = firstMonthPerView.weeks[0];
+  const firstISODate = getISODateFromWeek(
+    firstMonthPerView.year,
+    firstWeekPerView.weekNumberOfTheYear
+  );
+
+  const date = DateTime.fromISO(firstISODate);
 
   if (!date.isValid) {
     throw new Error("Invalid ISO date provided");
   }
 
-  const oneWeekEarlier = date.minus({ weeks: 1 });
-  const isoDateOneWeekEarlier = oneWeekEarlier.toISODate();
+  const prevView = date.minus({ weeks: amountOfWeeks });
 
-  return isoDateOneWeekEarlier;
+  return prevView.toISODate();
 };
 
-export const getDateOneWeekAfter = (isoDate: string): string => {
-  const date = DateTime.fromISO(isoDate);
+export const getNextWeeksPerView = (months: MonthsDataType[]): string => {
+  const lastMonthPerView = months[months.length - 1];
+  const lastWeekPerView =
+    lastMonthPerView.weeks[lastMonthPerView.weeks.length - 1];
+  const lastISODate = getISODateFromWeek(
+    lastMonthPerView.year,
+    lastWeekPerView.weekNumberOfTheYear
+  );
+
+  const date = DateTime.fromISO(lastISODate);
 
   if (!date.isValid) {
     throw new Error("Invalid ISO date provided");
   }
 
-  const oneWeekAfter = date.plus({ weeks: 1 });
-  const isoDateOneWeekAfter = oneWeekAfter.toISODate();
+  const nextView = date.plus({ weeks: 1 });
 
-  return isoDateOneWeekAfter;
+  return nextView.toISODate();
+};
+
+export const getISODateFromWeek = (
+  year: number,
+  weekNumber: number
+): string => {
+  const date = DateTime.fromObject({ weekYear: year, weekNumber });
+  if (!date.isValid) {
+    throw new Error("Invalid ISO date provided");
+  }
+
+  return date.toISODate();
 };
