@@ -92,15 +92,6 @@ export const TempProjectLabel = ({
 					</form>
 				)}
 			</Formik>
-			{
-				assignment.status === "active" ? null : (
-					<span className="text-red-500 text-sm">
-						{" "}
-						Unconfirmed
-						<br /> Assignment
-					</span>
-				)
-			}
 		</div >
 	);
 };
