@@ -23,6 +23,7 @@ interface UserAssignmentRowProps {
 	clickHandler: (client: ClientType) => void;
 	months?: MonthsDataType[];
 	selectedUser: UserType;
+	setSelectedUser: React.Dispatch<React.SetStateAction<UserType | null>>;
 }
 
 export const UserAssignmentRow = ({
@@ -32,10 +33,12 @@ export const UserAssignmentRow = ({
 	isFirstClient,
 	clickHandler,
 	months,
-	selectedUser
+	selectedUser,
+	setSelectedUser
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
 	const [tempProjectOpen, setTempProjectOpen] = useState(false)
+
 	const { viewsFilter, refetchUserList } = useUserDataContext();
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
 		errorPolicy: "all",
@@ -84,10 +87,10 @@ export const UserAssignmentRow = ({
 				>
 					<div className={`${isFirstClient ? 'flex' : 'w-24'}`}>
 						{viewsFilter.singleUserSort === 'byClient' && isFirstClient && isFirstMonth && (
-							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} />
+							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} selectedUser={selectedUser} />
 						)}
 						{viewsFilter.singleUserSort !== 'byClient' && isFirstMonth && (
-							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} />
+							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} selectedUser={selectedUser}  />
 						)}
 					</div>
 					{isFirstMonth && (
@@ -128,7 +131,7 @@ export const UserAssignmentRow = ({
 						</td>)
 				});
 			})}
-			{isLastMonth && <UserSummary assignment={assignment} />}
+			{isLastMonth && <UserSummary assignment={assignment} selectedUser={selectedUser} setSelectedUser={setSelectedUser} setTempProjectOpen={setTempProjectOpen} tempProjectOpen={tempProjectOpen}/>}
 		</tr >
 	);
 };

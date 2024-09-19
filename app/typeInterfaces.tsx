@@ -160,6 +160,10 @@ export interface UserOptionType {
 
 export interface UserSummaryProps {
 	assignment: AssignmentType;
+	selectedUser: UserType;
+	setSelectedUser: (user: UserType) => void;
+	setTempProjectOpen: (tempProjectOpen: boolean) => void;
+	tempProjectOpen: boolean;
 }
 export interface ViewerType {
 	name: string;
