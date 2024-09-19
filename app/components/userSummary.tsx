@@ -40,16 +40,22 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment,selectedUser, setS
 	});
 	const handleArchiveItemClick = () => {
 		if(assignment.project.isTempProject){
-			const removedTempAssignment = selectedUser.assignments.filter((a:AssignmentType) => a.id !== assignment.id);
+			const removedTempAssignment = selectedUser?.assignments.filter((a:AssignmentType) => a.id !== assignment.id);
 			const selectedUserData = {
-			...selectedUser,
-			assignments: removedTempAssignment
-		};
+				...selectedUser,
+				assignments: removedTempAssignment || [],
+				name: selectedUser?.name || "Default Name",
+				avatarUrl: selectedUser?.avatarUrl || "defaultAvatarUrl.png",
+			};
+		if (setTempProjectOpen) {
 			setTempProjectOpen(false);
+		}	
+		if (setSelectedUser) {
 			setSelectedUser(selectedUserData);
+		}
 			return;
 		}
-		if (assignment.status !== 'archived') {
+			if (assignment.status !== 'archived') {
 			const variables = {
 				id: assignment.id,
 				projectId: assignment.project.id,
