@@ -117,11 +117,11 @@ const UserPage: React.FC = () => {
 								<UserAssignmentRow
 									key={index}
 									assignment={assignment}
-									monthData={{ monthLabel: "", year: 0 }}
 									isFirstMonth={true}
 									isLastMonth={true}
 									isFirstClient={isFirstClient}
 									clickHandler={handleClientClick}
+									selectedUser={selectedUser}
 								/>
 							);
 						}
