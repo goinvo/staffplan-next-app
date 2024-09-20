@@ -6,7 +6,6 @@ import { Suspense } from "react";
 import AddClient from "./components/addClientModal";
 import { UserListProvider } from "./userDataContext";
 import { withApollo } from "@/lib/withApollo";
-import AirTableFormModal from "./components/airTableFormModal";
 import { ModalProvider } from "./modalContext";
 import ModalController from "./components/modalController";
 
@@ -20,7 +19,6 @@ const RootLayoutContents: React.FC<{ children: React.ReactNode }> = ({ children 
             <AddAssignment />
             <AddProject />
             <AddClient />
-            <AirTableFormModal />
             <ModalController />
           </Suspense>
           {children}
