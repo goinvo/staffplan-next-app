@@ -119,6 +119,9 @@ export const GET_USER_LIST = gql`
 					endsOn
 					estimatedWeeklyHours
 					status
+					assignedUser {
+						id
+					}
 					project {
 						id
 						name

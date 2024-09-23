@@ -42,6 +42,7 @@ export const TempProjectLabel = ({
 	});
 
 	const onSubmitUpsert = (values: FormikValues) => {
+		if (!values.name) return;
 		const variables = {
 			clientId: values.client,
 			name: values.name,

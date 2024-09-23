@@ -105,7 +105,6 @@ const UserPage: React.FC = () => {
 		setSingleUserPage(sortedAssignments);
 	};
 	const columnsHeaderTitles = [{ title: 'Client', showIcon: true }, { title: 'Project', showIcon: false }]
-
 	return (
 		<>
 			{selectedUser && userList ? (
@@ -122,6 +121,7 @@ const UserPage: React.FC = () => {
 									isFirstClient={isFirstClient}
 									clickHandler={handleClientClick}
 									selectedUser={selectedUser}
+									setSelectedUser={setSelectedUser}
 								/>
 							);
 						}
