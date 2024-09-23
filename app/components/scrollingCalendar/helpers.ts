@@ -146,7 +146,7 @@ export const calculateTotalHoursPerWeek = (
 
   months.forEach((month) => {
     month.weeks.forEach((week) => {
-      const key = `${month.year}-${week}`;
+      const key = `${month.year}-${week.weekNumberOfTheYear}`;
       totalActualHours[key] = totalActualHours[key] || 0;
       totalEstimatedHours[key] = totalEstimatedHours[key] || 0;
       proposedActualHours[key] = proposedActualHours[key] || 0;
@@ -157,10 +157,17 @@ export const calculateTotalHoursPerWeek = (
     if (assignment.estimatedWeeklyHours) {
       months.forEach((month) => {
         month.weeks.forEach((week) => {
-          const key = `${month.year}-${week}`;
-          totalEstimatedHours[key] += assignment.estimatedWeeklyHours;
-          if (assignment.status === "proposed") {
-            proposedEstimatedHours[key] += assignment.estimatedWeeklyHours;
+          const weekWithinAssignmentDates = assignmentContainsCWeek(
+            assignment,
+            week.weekNumberOfTheYear,
+            month.year
+          );
+          const key = `${month.year}-${week.weekNumberOfTheYear}`;
+          if (weekWithinAssignmentDates) {
+            totalEstimatedHours[key] += assignment.estimatedWeeklyHours;
+            if (assignment.status === "proposed") {
+              proposedEstimatedHours[key] += assignment.estimatedWeeklyHours;
+            }
           }
         });
       });
@@ -174,6 +181,9 @@ export const calculateTotalHoursPerWeek = (
 
       if (!totalEstimatedHours[key]) {
         totalEstimatedHours[key] = 0;
+      }
+      if (assignment.estimatedWeeklyHours && weekData.estimatedHours) {
+        totalEstimatedHours[key] -= assignment.estimatedWeeklyHours;
       }
       totalEstimatedHours[key] += weekData.estimatedHours || 0;
 
