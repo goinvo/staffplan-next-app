@@ -418,3 +418,22 @@ export const UPSERT_WORKWEEK = gql`
 		}
 	}
 `;
+
+export const UPSERT_WORKWEEKS = gql`
+    mutation UpsertWorkWeeks(
+	   $assignmentId: ID!
+	   $workWeeks: [WorkWeeksInputObject!]!
+) {
+	upsertWorkWeeks(
+		assignmentId: $assignmentId
+	    workWeeks: $workWeeks
+	) {
+		id
+	  workWeeks {
+			cweek
+			year
+			estimatedHours
+			actualHours
+		}
+	}
+}`

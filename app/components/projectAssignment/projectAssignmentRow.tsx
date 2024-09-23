@@ -76,6 +76,7 @@ export const ProjectAssignmentRow = ({
 									cweek={week.weekNumberOfTheYear}
 									year={month.year}
 									key={`input-${week.weekNumberOfTheYear}`}
+									months={months}
 								/>
 
 							</div>
