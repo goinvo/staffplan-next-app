@@ -126,7 +126,7 @@ const UserPage: React.FC = () => {
 							);
 						}
 					)}
-					{selectedUser && <AddInlineProject userId={selectedUser.id} />}
+					{selectedUser && <AddInlineProject user={selectedUser} />}
 				</ScrollingCalendar>
 			) : (
 				<LoadingSpinner />

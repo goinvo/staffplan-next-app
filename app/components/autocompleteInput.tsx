@@ -51,9 +51,8 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<
                 setShowDropdown(true);
             } else {
                 setFilteredItems(items);
-                setShowDropdown(false);
             }
-
+            setShowDropdown(true);
         };
 
         const handleItemSelect = (item: any) => {

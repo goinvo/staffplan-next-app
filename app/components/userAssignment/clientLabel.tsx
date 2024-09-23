@@ -20,7 +20,7 @@ export const ClientLabel = ({ assignment, clickHandler, tempProjectOpen, setTemp
 	);
 	return (
 		<IconButton
-			className={'text-contrastBlue w-24 flex items-center justify-center pt-2 pl-0 text-start'}
+			className={'text-contrastBlue w-24 flex items-center justify-start pt-2 pl-0 text-start'}
 			Icon={PlusIcon} iconSize='h-4 w-4' text={assignment.project.client.name}
 			onClick={() => {
 				if (!activeTempProject) {
