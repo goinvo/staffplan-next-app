@@ -51,24 +51,26 @@ export const ScrollingCalendar = ({
 	}, [dateRange, detectWeeksAmountPerScreen]);
 
 	return (
-		<table className="min-w-full timeline-grid-bg text-contrastBlue text-sm h-screen border-none">
-			<CalendarHeader
-				months={months}
-				assignments={assignments}
-				columnHeaderTitles={columnHeaderTitles}
-				avatarUrl={avatarUrl}
-				userName={userName}
-				title={title}
-				projectInfo={projectInfo}
-				editable={editable}
-			/>
-			<tbody>
-				{React.Children.map(children, (child) =>
-					React.cloneElement(child as React.ReactElement<any>, {
-						months,
-					})
-				)}
-			</tbody>
-		</table>
+		<div className="min-h-screen h-auto timeline-grid-bg">
+			<table className="min-w-full timeline-grid-bg text-contrastBlue text-sm border-none">
+				<CalendarHeader
+					months={months}
+					assignments={assignments}
+					columnHeaderTitles={columnHeaderTitles}
+					avatarUrl={avatarUrl}
+					userName={userName}
+					title={title}
+					projectInfo={projectInfo}
+					editable={editable}
+				/>
+				<tbody>
+					{React.Children.map(children, (child) =>
+						React.cloneElement(child as React.ReactElement<any>, {
+							months,
+						})
+					)}
+				</tbody>
+			</table>
+		</div>
 	);
 };
