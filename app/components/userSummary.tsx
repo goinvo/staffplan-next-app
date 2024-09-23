@@ -3,16 +3,19 @@ import { DateTime } from "luxon";
 
 import { ArchiveBoxIcon } from "@heroicons/react/24/outline";
 
-import { UserSummaryProps } from "../typeInterfaces";
+import { AssignmentType, UserSummaryProps } from "../typeInterfaces";
 import { useUserDataContext } from "../userDataContext";
 import IconButton from "./iconButton";
+import { UPSERT_ASSIGNMENT } from "../gqlQueries";
+import { useMutation } from "@apollo/client";
 
-const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
+const UserSummary: React.FC<UserSummaryProps> = ({ assignment,selectedUser, setSelectedUser, setTempProjectOpen }) => {
 	const { viewsFilter } = useUserDataContext();
 	const burnedHours = assignment.workWeeks.reduce(
 		(acc, curr) => acc + (curr.actualHours ?? 0),
 		0
 	);
+	const {refetchUserList} = useUserDataContext();
 	const pastPlan = () => {
 		const now = DateTime.now();
 		const startOfAssignment = DateTime.fromISO(assignment.startsOn ?? "");
@@ -29,6 +32,42 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 			return assignment.estimatedWeeklyHours * Math.ceil(timeBetween.weeks);
 		}
 	};
+	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
+		errorPolicy: "all",
+		onCompleted({ upsertAssignment }) {
+			refetchUserList();
+		},
+	});
+	const handleArchiveItemClick = () => {
+		if(assignment.project.isTempProject){
+			const removedTempAssignment = selectedUser?.assignments.filter((a:AssignmentType) => a.id !== assignment.id);
+			const selectedUserData = {
+				...selectedUser,
+				assignments: removedTempAssignment || [],
+				name: selectedUser?.name || "Default Name",
+				avatarUrl: selectedUser?.avatarUrl || "defaultAvatarUrl.png",
+			};
+		if (setTempProjectOpen) {
+			setTempProjectOpen(false);
+		}	
+		if (setSelectedUser) {
+			setSelectedUser(selectedUserData);
+		}
+			return;
+		}
+			if (assignment.status !== 'archived') {
+			const variables = {
+				id: assignment.id,
+				projectId: assignment.project.id,
+				userId: assignment.assignedUser.id,
+				status: 'archived'
+			};
+			upsertAssignment({
+				variables
+			})
+		}
+	}
+
 	return (
 		<td className="font-normal py-2 pl-4 w-1/6 flex items-center justify-between">
 			{viewsFilter.showSummaries ? (
@@ -62,7 +101,8 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 			) : null}
 			<div className="flex items-start justify-center">
 				<IconButton className='text-black flex items-start justify-center text-transparentGrey'
-					onClick={() => console.log('On archive box btn click')}
+					onClick={() => {
+						handleArchiveItemClick()}}
 					Icon={ArchiveBoxIcon}
 					iconSize={'h6 w-6'} />
 			</div>
