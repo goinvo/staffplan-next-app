@@ -1,7 +1,5 @@
 'use client'
 
-import { AssignmentType, ClientType, MonthsDataType } from "@/app/typeInterfaces";
-import { useUserDataContext } from "@/app/userDataContext";
 import React, { useState } from "react";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
@@ -12,16 +10,19 @@ import { WorkWeekInput } from "./workWeekInput";
 import { ClientLabel } from "./clientLabel";
 import { TempProjectLabel } from "./tempProjectLabel";
 import { currentWeek, currentYear } from "../scrollingCalendar/helpers";
-
+import { AssignmentType, ClientType, MonthsDataType, UserType } from "@/app/typeInterfaces";
+import { useUserDataContext } from "@/app/userDataContext";
+import { useMutation } from "@apollo/client";
+import { UPSERT_ASSIGNMENT } from "../../gqlQueries";
 
 interface UserAssignmentRowProps {
 	assignment: AssignmentType;
 	isFirstMonth: boolean;
 	isLastMonth: boolean;
 	isFirstClient: boolean;
-	monthData: { monthLabel: string; year: number };
 	clickHandler: (client: ClientType) => void;
 	months?: MonthsDataType[];
+	selectedUser: UserType;
 }
 
 export const UserAssignmentRow = ({
@@ -31,11 +32,17 @@ export const UserAssignmentRow = ({
 	isFirstClient,
 	clickHandler,
 	months,
+	selectedUser
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
 	const [tempProjectOpen, setTempProjectOpen] = useState(false)
-	const { viewsFilter } = useUserDataContext();
-
+	const { viewsFilter, refetchUserList } = useUserDataContext();
+	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
+		errorPolicy: "all",
+		onCompleted() {
+			refetchUserList();
+		},
+	});
 	const handleProjectChange = (assignment: AssignmentType) => {
 		router.push("/projects/" + encodeURIComponent(assignment.project.id));
 	};
@@ -54,6 +61,18 @@ export const UserAssignmentRow = ({
 		return true;
 	};
 
+
+	const onChangeStatusButtonClick = async () => {
+		const variables = {
+			id: assignment.id,
+			projectId: assignment?.project.id,
+			userId: selectedUser.id,
+			status: assignment.status === "active" ? "proposed" : "active",
+		};
+		await upsertAssignment({
+			variables
+		})
+	}
 	return (
 		<tr
 			className={`flex ${isFirstClient ? '' : 'border-b border-gray-300'} ${assignment.status === 'proposed' ? 'bg-diagonal-stripes' :
@@ -79,9 +98,9 @@ export const UserAssignmentRow = ({
 						)
 					)}
 					<div className='text-contrastBlue flex flex-col space-y-3 ml-auto px-2 items-end max-w-[60px]'>
-						<div className='pt-2 underline'>
+						<button className='pt-2 underline' onClick={onChangeStatusButtonClick}>
 							{assignment.status === 'proposed' ? 'Proposed' : 'Signed'}
-						</div>
+						</button>
 						<div className='pt-2'>
 							Actual
 						</div>
