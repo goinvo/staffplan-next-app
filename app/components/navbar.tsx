@@ -54,11 +54,10 @@ const Navbar: React.FC = () => {
 					<Link
 						key={link.href}
 						href={link.href}
-						className={`inline-flex items-center text-base px-4 py-2 rounded-md ${
-							link.isActive
-								? "bg-contrastBlue font-semibold"
-								: "hover:bg-contrastBlue"
-						}`}
+						className={`inline-flex items-center text-base px-4 py-2 rounded-md ${link.isActive
+							? "bg-contrastBlue font-semibold"
+							: "hover:bg-contrastBlue"
+							}`}
 					>
 						{link.label}
 					</Link>
@@ -72,8 +71,8 @@ const Navbar: React.FC = () => {
 					className="px-8"
 				/>
 			</div>
-
-			<div className="flex ml-auto items-center bg-contrastBlue rounded-2xl overflow-hidden min-w-[225px] h-8">
+			{/* Temporary commented */}
+			{/* <div className="flex ml-auto items-center bg-contrastBlue rounded-2xl overflow-hidden min-w-[225px] h-8">
 				<div className="flex ml-3 items-center">
 					<MagnifyingGlassIcon className="h-4 w-4 text-contrastGrey" />
 				</div>
@@ -82,7 +81,7 @@ const Navbar: React.FC = () => {
 					placeholder="Search"
 					className="flex py-1 pl-2 bg-contrastBlue text-white text-sm border-none outline-none focus:ring-0 focus:border-none"
 				/>
-			</div>
+			</div> */}
 			<div className="flex items-center space-x-4 py-4 ml-2">
 				{additionalLinks.map((link) => (
 					<Link
