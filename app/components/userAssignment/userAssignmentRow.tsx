@@ -125,6 +125,7 @@ export const UserAssignmentRow = ({
 									cweek={week.weekNumberOfTheYear}
 									year={month.year}
 									key={`input-${assignment.id}-${month.monthLabel}-${week.weekNumberOfTheYear}`}
+									months={months}
 								/>
 
 							</div>

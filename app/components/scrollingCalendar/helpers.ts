@@ -4,6 +4,8 @@ import {
   AssignmentType,
   MonthsDataType,
 } from "@/app/typeInterfaces";
+import { ACTUAL_HOURS } from "./constants";
+
 interface MonthData {
   monthLabel: string;
   year: number;
@@ -398,4 +400,39 @@ export const getISODateFromWeek = (
   }
 
   return date.toISODate();
+};
+
+export const filterWeeksForFillForward = (
+  allWeeks: { cweek: number; year: number }[],
+  targetCweek: number,
+  inputName: string
+) => {
+  const currentYear = getCurrentYear();
+  const currentWeek = getCurrentWeekOfYear();
+
+  if (inputName === ACTUAL_HOURS) {
+    return allWeeks.filter(
+      (week) =>
+        week.cweek >= targetCweek &&
+        week.year <= currentYear &&
+        (week.year < currentYear || week.cweek <= currentWeek)
+    );
+  }
+
+  return allWeeks.filter((week) => {
+    if (week.year > currentYear) return true;
+    if (week.year === currentYear && week.cweek >= targetCweek) return true;
+    return false;
+  });
+};
+
+export const getWeekNumbersPerScreen = (
+  months: { weeks: { weekNumberOfTheYear: number }[]; year: number }[]
+) => {
+  return months.flatMap((month) =>
+    month.weeks.map((week) => ({
+      cweek: week.weekNumberOfTheYear,
+      year: month.year,
+    }))
+  );
 };
