@@ -238,3 +238,21 @@ export const getDisplayHours = (
 
 export const currentQuarter = Math.floor((DateTime.now().month - 1) / 3) + 1;
 export const currentYear = DateTime.now().year;
+
+export const weekNumberToDateRange = (
+  weekNumber: number,
+  year: number
+): string => {
+  const firstDayOfYear = DateTime.fromObject({ year: year, month: 1, day: 1 });
+
+  const startOfWeek = firstDayOfYear
+    .plus({ weeks: weekNumber - 1 })
+    .startOf("week");
+
+  const endOfWeek = startOfWeek.plus({ days: 6 });
+
+  const formattedStart = startOfWeek.toFormat("dd.LL");
+  const formattedEnd = endOfWeek.toFormat("dd.LL");
+
+  return `${formattedStart} - ${formattedEnd}`;
+};

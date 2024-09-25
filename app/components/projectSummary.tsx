@@ -4,8 +4,10 @@ import { ProjectSummaryProps } from '../typeInterfaces';
 import { useUserDataContext } from '../userDataContext';
 import IconButton from './iconButton';
 import { ArchiveBoxIcon } from '@heroicons/react/24/outline';
+import { IoDownloadOutline } from "react-icons/io5";
 import { UPSERT_PROJECT } from "@/app/gqlQueries";
 import { useMutation } from "@apollo/client";
+import { convertToCSV } from '../helperFunctions';
 
 
 const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
@@ -17,6 +19,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 			refetchProjectList();
 		},
 	});
+
 
 	const handleArchiveItemClick = () => {
 		if (project.status !== 'archived') {
@@ -52,12 +55,25 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 	const burnedHours = project.workWeeks?.reduce(
 		(acc, curr) => acc + (curr.actualHours ?? 0),
 		0
-	);
+	) || 0;
 
 	const shortHours = () => {
 		if (project.hours) {
 			return project.hours - ((burnedHours ?? 0) + (plannedHours ?? 0));
 		}
+	};
+
+	const downloadCSV = () => {
+		const csv = convertToCSV(project);
+		console.log(project, 'project')
+		const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.setAttribute('download', `${project.name}.csv`);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
 	};
 
 	return (
@@ -118,6 +134,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 					) : null}
 				</div>
 			) : null}
+			<IconButton Icon={IoDownloadOutline} className="text-transparentGrey ml-6" iconSize='h-7 w-7' onClick={downloadCSV} />
 		</td>
 	);
 };
