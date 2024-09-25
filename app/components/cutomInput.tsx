@@ -1,8 +1,5 @@
-'use client'
-import React, { FocusEvent, useRef, useCallback } from 'react';
-
+import React, { FocusEvent, forwardRef, useCallback, KeyboardEvent } from 'react';
 import { ArrowLongRightIcon } from "@heroicons/react/24/outline";
-import { Field } from 'formik';
 
 interface CustomInputProps {
     value: number | string;
@@ -11,12 +8,12 @@ interface CustomInputProps {
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     onFocus?: (event: FocusEvent<HTMLInputElement>) => void;
     onBlur?: (event: FocusEvent<HTMLInputElement>) => void;
-    onSubmit?: (values: any) => void;
+    onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
     onFillForwardClick?: () => void;
     disabled?: boolean;
 }
 
-export const CustomInput: React.FC<CustomInputProps> = ({
+export const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(({
     value,
     name,
     id,
@@ -24,9 +21,10 @@ export const CustomInput: React.FC<CustomInputProps> = ({
     onFocus,
     onBlur,
     onFillForwardClick,
-    disabled
-}) => {
-    const buttonRef = useRef<HTMLButtonElement>(null);
+    onKeyDown,
+    disabled,
+}, ref) => {
+    const buttonRef = React.useRef<HTMLButtonElement>(null);
 
     const handleFocus = useCallback((event: FocusEvent<HTMLInputElement>) => {
         if (buttonRef.current) {
@@ -50,7 +48,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
     const handleBlur = useCallback((event: FocusEvent<HTMLInputElement>) => {
         // If clicked on arrow button
         if (event.relatedTarget === buttonRef.current) {
-            onFillForwardClick?.()
+            onFillForwardClick?.();
             resetButtonStyles();
             return;
         }
@@ -61,7 +59,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
 
     return (
         <div className="relative my-1">
-            <Field
+            <input
                 name={name}
                 value={value}
                 id={id}
@@ -70,9 +68,11 @@ export const CustomInput: React.FC<CustomInputProps> = ({
                 onBlur={(e: FocusEvent<HTMLInputElement>) => {
                     handleBlur(e);
                 }}
+                onKeyDown={onKeyDown}
                 disabled={disabled}
-                className={`bg-white text-center rounded-sm shadow-top-input-shadow w-[34px] h-[25px] focus:border-tiffany focus:ring-1 focus:ring-tiffany border-none focus:border-tiffany outlined-none mb-0 px-0 py-0`}
+                className="bg-white text-center rounded-sm shadow-top-input-shadow w-[34px] h-[25px] focus:border-tiffany focus:ring-1 focus:ring-tiffany border-none focus:border-tiffany outlined-none mb-0 px-0 py-0"
                 autoComplete="off"
+                ref={ref}
             />
             <button
                 ref={buttonRef}
@@ -83,4 +83,6 @@ export const CustomInput: React.FC<CustomInputProps> = ({
             </button>
         </div>
     );
-};
+});
+
+CustomInput.displayName = "CustomInput";
