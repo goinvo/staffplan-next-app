@@ -1,7 +1,5 @@
 'use client'
 
-import { AssignmentType, ClientType, MonthsDataType } from "@/app/typeInterfaces";
-import { useUserDataContext } from "@/app/userDataContext";
 import React, { useState } from "react";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
@@ -11,18 +9,21 @@ import { UserLabel } from "./userLabel";
 import { WorkWeekInput } from "./workWeekInput";
 import { ClientLabel } from "./clientLabel";
 import { TempProjectLabel } from "./tempProjectLabel";
-
+import { currentWeek, currentYear } from "../scrollingCalendar/helpers";
+import { AssignmentType, ClientType, MonthsDataType, UserType } from "@/app/typeInterfaces";
+import { useUserDataContext } from "@/app/userDataContext";
+import { useMutation } from "@apollo/client";
+import { UPSERT_ASSIGNMENT } from "../../gqlQueries";
 
 interface UserAssignmentRowProps {
 	assignment: AssignmentType;
 	isFirstMonth: boolean;
 	isLastMonth: boolean;
 	isFirstClient: boolean;
-	monthData: { monthLabel: string; year: number };
 	clickHandler: (client: ClientType) => void;
 	months?: MonthsDataType[];
-	selectedColumn?: string | null;
-	handleCellClick?: (monthLabel: string | null, week: number | null) => void
+	selectedUser: UserType;
+	setSelectedUser: React.Dispatch<React.SetStateAction<UserType | null>>;
 }
 
 export const UserAssignmentRow = ({
@@ -32,13 +33,19 @@ export const UserAssignmentRow = ({
 	isFirstClient,
 	clickHandler,
 	months,
-	selectedColumn,
-	handleCellClick
+	selectedUser,
+	setSelectedUser
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
 	const [tempProjectOpen, setTempProjectOpen] = useState(false)
-	const { viewsFilter } = useUserDataContext();
 
+	const { viewsFilter, refetchUserList } = useUserDataContext();
+	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
+		errorPolicy: "all",
+		onCompleted() {
+			refetchUserList();
+		},
+	});
 	const handleProjectChange = (assignment: AssignmentType) => {
 		router.push("/projects/" + encodeURIComponent(assignment.project.id));
 	};
@@ -57,21 +64,33 @@ export const UserAssignmentRow = ({
 		return true;
 	};
 
+
+	const onChangeStatusButtonClick = async () => {
+		const variables = {
+			id: assignment.id,
+			projectId: assignment?.project.id,
+			userId: selectedUser.id,
+			status: assignment.status === "active" ? "proposed" : "active",
+		};
+		await upsertAssignment({
+			variables
+		})
+	}
 	return (
 		<tr
 			className={`flex ${isFirstClient ? '' : 'border-b border-gray-300'} ${assignment.status === 'proposed' ? 'bg-diagonal-stripes' :
 				''
-				} hover:bg-hoverGrey min-h-[100px]`}>
-			<td className='pl-2 pr-0 pt-1 pb-2 font-normal align-top w-1/3'>
+				} hover:bg-hoverGrey min-h-[100px] pl-5`}>
+			<td className='px-0 pt-1 pb-2 font-normal align-top w-1/3'>
 				<div
 					className='flex flex-row justify-between items-start space-x-2'
 				>
 					<div className={`${isFirstClient ? 'flex' : 'w-24'}`}>
 						{viewsFilter.singleUserSort === 'byClient' && isFirstClient && isFirstMonth && (
-							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} />
+							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} selectedUser={selectedUser} />
 						)}
 						{viewsFilter.singleUserSort !== 'byClient' && isFirstMonth && (
-							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} />
+							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} selectedUser={selectedUser}  />
 						)}
 					</div>
 					{isFirstMonth && (
@@ -82,9 +101,9 @@ export const UserAssignmentRow = ({
 						)
 					)}
 					<div className='text-contrastBlue flex flex-col space-y-3 ml-auto px-2 items-end max-w-[60px]'>
-						<div className='pt-2 underline'>
+						<button className='pt-2 underline' onClick={onChangeStatusButtonClick}>
 							{assignment.status === 'proposed' ? 'Proposed' : 'Signed'}
-						</div>
+						</button>
 						<div className='pt-2'>
 							Actual
 						</div>
@@ -93,29 +112,27 @@ export const UserAssignmentRow = ({
 			</td>
 			{months?.map((month: MonthsDataType, index) => {
 				return month.weeks.map((week) => {
-					const withinProjectDates = isWeekWithinProject(week, month.year);
-					const columnIdentifier = `${month.monthLabel}-${week}`;
+					const withinProjectDates = isWeekWithinProject(week.weekNumberOfTheYear, month.year);
 					return (
-						<td key={`${month.monthLabel}-${week}`}
-							className={`relative px-1 py-1 font-normal ${selectedColumn === columnIdentifier ? 'bg-selectedColumnBg' : ''}`}
+						<td key={`${assignment.id}-${month.monthLabel}-${week.weekNumberOfTheYear}`}
+							className={`relative px-1 py-1 font-normal ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year && 'bg-selectedColumnBg'}`}
 
 						>
-							<div className={`flex flex-col space-y-3 ${selectedColumn === columnIdentifier ? 'font-bold' : 'font-normal'}`}
-								onClick={() => handleCellClick?.(month.monthLabel, week)}
-								onBlur={() => handleCellClick?.(null, null)}>
+							<div className={`flex flex-col space-y-3 ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year ? 'font-bold' : 'font-normal'}`}>
 								<WorkWeekInput
 									withinProjectDates={withinProjectDates}
 									assignment={assignment}
-									cweek={week}
+									cweek={week.weekNumberOfTheYear}
 									year={month.year}
-									key={`input-${week}`}
+									key={`input-${assignment.id}-${month.monthLabel}-${week.weekNumberOfTheYear}`}
+									months={months}
 								/>
 
 							</div>
 						</td>)
 				});
 			})}
-			{isLastMonth && <UserSummary assignment={assignment} />}
+			{isLastMonth && <UserSummary assignment={assignment} selectedUser={selectedUser} setSelectedUser={setSelectedUser} setTempProjectOpen={setTempProjectOpen} tempProjectOpen={tempProjectOpen}/>}
 		</tr >
 	);
 };
