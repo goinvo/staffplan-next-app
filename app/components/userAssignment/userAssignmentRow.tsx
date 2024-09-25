@@ -24,6 +24,9 @@ interface UserAssignmentRowProps {
 	months?: MonthsDataType[];
 	selectedUser: UserType;
 	setSelectedUser: React.Dispatch<React.SetStateAction<UserType | null>>;
+	rowIndex: number;
+	totalRows: number;
+	inputRefs: React.MutableRefObject<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>;
 }
 
 export const UserAssignmentRow = ({
@@ -34,7 +37,10 @@ export const UserAssignmentRow = ({
 	clickHandler,
 	months,
 	selectedUser,
-	setSelectedUser
+	setSelectedUser,
+	rowIndex,
+	inputRefs,
+	totalRows
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
 	const [tempProjectOpen, setTempProjectOpen] = useState(false)
@@ -90,7 +96,7 @@ export const UserAssignmentRow = ({
 							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} selectedUser={selectedUser} />
 						)}
 						{viewsFilter.singleUserSort !== 'byClient' && isFirstMonth && (
-							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} selectedUser={selectedUser}  />
+							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} selectedUser={selectedUser} />
 						)}
 					</div>
 					{isFirstMonth && (
@@ -110,9 +116,14 @@ export const UserAssignmentRow = ({
 					</div>
 				</div>
 			</td>
-			{months?.map((month: MonthsDataType, index) => {
-				return month.weeks.map((week) => {
+			{months?.map((month: MonthsDataType, monthIndex) => {
+				const previousWeeksCount = months.slice(0, monthIndex).reduce((acc, month) => acc + month.weeks.length, 1);
+				return month.weeks.map((week, weekIndex) => {
 					const withinProjectDates = isWeekWithinProject(week.weekNumberOfTheYear, month.year);
+					const cellIndex = previousWeeksCount + weekIndex;
+					if (!inputRefs.current[rowIndex]) {
+						inputRefs.current[rowIndex] = [[], []];
+					}
 					return (
 						<td key={`${assignment.id}-${month.monthLabel}-${week.weekNumberOfTheYear}`}
 							className={`relative px-1 py-1 font-normal ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year && 'bg-selectedColumnBg'}`}
@@ -126,13 +137,17 @@ export const UserAssignmentRow = ({
 									year={month.year}
 									key={`input-${assignment.id}-${month.monthLabel}-${week.weekNumberOfTheYear}`}
 									months={months}
+									rowIndex={rowIndex}
+									cellIndex={cellIndex}
+									inputRefs={inputRefs}
+									totalRows={totalRows}
 								/>
 
 							</div>
 						</td>)
 				});
 			})}
-			{isLastMonth && <UserSummary assignment={assignment} selectedUser={selectedUser} setSelectedUser={setSelectedUser} setTempProjectOpen={setTempProjectOpen} tempProjectOpen={tempProjectOpen}/>}
+			{isLastMonth && <UserSummary assignment={assignment} selectedUser={selectedUser} setSelectedUser={setSelectedUser} setTempProjectOpen={setTempProjectOpen} tempProjectOpen={tempProjectOpen} />}
 		</tr >
 	);
 };
