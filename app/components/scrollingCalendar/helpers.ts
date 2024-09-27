@@ -164,11 +164,26 @@ export const calculateTotalHoursPerWeek = (
             week.weekNumberOfTheYear,
             month.year
           );
-          const key = `${month.year}-${week.weekNumberOfTheYear}`;
-          if (weekWithinAssignmentDates) {
+          const weekExistsWithEstimatedHours = assignment.workWeeks?.some(
+            (w) =>
+              w.cweek === week.weekNumberOfTheYear &&
+              w.year === month.year &&
+              w.estimatedHours !== undefined &&
+              w.estimatedHours !== null
+          );
+          if (weekWithinAssignmentDates && !weekExistsWithEstimatedHours) {
+            const key = `${month.year}-${week.weekNumberOfTheYear}`;
             totalEstimatedHours[key] += assignment.estimatedWeeklyHours;
+
             if (assignment.status === "proposed") {
               proposedEstimatedHours[key] += assignment.estimatedWeeklyHours;
+            }
+            if (totalEstimatedHours[key] > maxTotalEstimatedHours) {
+              maxTotalEstimatedHours = totalEstimatedHours[key];
+            }
+
+            if (proposedEstimatedHours[key] > maxProposedEstimatedHours) {
+              maxProposedEstimatedHours = proposedEstimatedHours[key];
             }
           }
         });
@@ -183,9 +198,6 @@ export const calculateTotalHoursPerWeek = (
 
       if (!totalEstimatedHours[key]) {
         totalEstimatedHours[key] = 0;
-      }
-      if (assignment.estimatedWeeklyHours && weekData.estimatedHours) {
-        totalEstimatedHours[key] -= assignment.estimatedWeeklyHours;
       }
       totalEstimatedHours[key] += weekData.estimatedHours || 0;
 

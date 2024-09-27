@@ -51,7 +51,7 @@ export const WorkWeekInput = ({
 	const initialValues = {
 		actualHours: existingWorkWeek?.actualHours || "",
 		estimatedHours:
-			existingWorkWeek?.estimatedHours || weekWithinAssignmentDates && assignment?.estimatedWeeklyHours || "",
+			existingWorkWeek?.estimatedHours ?? (weekWithinAssignmentDates && assignment?.estimatedWeeklyHours || ""),
 		assignmentId: assignment?.id,
 		cweek: cweek,
 		year: year,
@@ -182,7 +182,7 @@ export const WorkWeekInput = ({
 			}) => (
 				<>
 					<CustomInput
-						value={values.estimatedHours}
+						value={values.estimatedHours || ''}
 						name="estimatedHours"
 						id={`estHours-${assignment?.id}-${cweek}-${year}`}
 						onChange={handleChange}
@@ -198,7 +198,7 @@ export const WorkWeekInput = ({
 					/>
 					{isPastOrCurrentWeek(cweek, year) && (
 						<CustomInput
-							value={values.actualHours}
+							value={values.actualHours || ''}
 							name="actualHours"
 							id={`actHours-${assignment?.id}-${cweek}-${year}`}
 							onChange={handleChange}

@@ -52,7 +52,7 @@ export const WorkWeekInput = ({
 	const initialValues = {
 		actualHours: existingWorkWeek?.actualHours || "",
 		estimatedHours:
-			existingWorkWeek?.estimatedHours || weekWithinAssignmentDates && assignment?.estimatedWeeklyHours || "",
+			existingWorkWeek?.estimatedHours ?? (weekWithinAssignmentDates && assignment?.estimatedWeeklyHours || ""),
 		assignmentId: assignment?.id,
 		cweek: cweek,
 		year: year,
