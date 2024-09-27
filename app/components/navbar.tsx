@@ -87,7 +87,7 @@ const Navbar: React.FC = () => {
 			</div> */}
 			<div className="flex items-center space-x-4 py-4 ml-2">
 				{additionalLinks.map((link) => (
-					<>
+					<div key={link.label}>
 						{
 							link.href ? (
 								<Link
@@ -106,7 +106,7 @@ const Navbar: React.FC = () => {
 								</button>
 							)
 						}
-					</>
+					</div>
 				))}
 				{/* Temporary commented */}
 				{/* <div className="h-4 w-4">
