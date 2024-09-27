@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import withApollo from "@/lib/withApollo";
 import { UserType, AssignmentType, ClientType } from "../../typeInterfaces";
 import { useUserDataContext } from "../../userDataContext";
@@ -17,6 +17,7 @@ const UserPage: React.FC = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
 	const [addAssignmentVisible, setAddAssignmentVisible] = useState(false);
+	const inputRefs = useRef<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>([]);
 
 	const { setSingleUserPage, userList, viewsFilter } = useUserDataContext();
 
@@ -110,11 +111,11 @@ const UserPage: React.FC = () => {
 			{selectedUser && userList ? (
 				<ScrollingCalendar columnHeaderTitles={columnsHeaderTitles} avatarUrl={selectedUser.avatarUrl} userName={selectedUser.name} assignments={selectedUser.assignments}>
 					{selectedUser?.assignments?.map(
-						(assignment: AssignmentType, index, allAssignments) => {
-							const isFirstClient = index === allAssignments.findIndex((a) => a.project.client.id === assignment.project.client.id);
+						(assignment: AssignmentType, rowIndex, allAssignments) => {
+							const isFirstClient = rowIndex === allAssignments.findIndex((a) => a.project.client.id === assignment.project.client.id);
 							return (
 								<UserAssignmentRow
-									key={index}
+									key={rowIndex}
 									assignment={assignment}
 									isFirstMonth={true}
 									isLastMonth={true}
@@ -122,6 +123,9 @@ const UserPage: React.FC = () => {
 									clickHandler={handleClientClick}
 									selectedUser={selectedUser}
 									setSelectedUser={setSelectedUser}
+									rowIndex={rowIndex}
+									totalRows={selectedUser?.assignments?.length || 0}
+									inputRefs={inputRefs}
 								/>
 							);
 						}

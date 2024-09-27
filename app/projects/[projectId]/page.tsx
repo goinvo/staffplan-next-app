@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import withApollo from "@/lib/withApollo";
 
 import { useMutation } from "@apollo/client";
@@ -26,7 +26,7 @@ const ProjectPage: React.FC = () => {
 	const [usersWithProjectAssignment, setUsersWithProjectAssignment] = useState<
 		UserType[]
 	>([]);
-
+	const inputRefs = useRef<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>([]);
 	const [
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
@@ -128,15 +128,18 @@ const ProjectPage: React.FC = () => {
 			{selectedProject && projectList ? (
 				<>
 					<ScrollingCalendar columnHeaderTitles={columnHeaderTitles} title={selectedProject.name} projectInfo={projectInfoSubtitle} assignments={selectedProject?.assignments || []} editable={true}>
-						{selectedProject?.assignments?.map((assignment: AssignmentType, index) => {
+						{selectedProject?.assignments?.map((assignment: AssignmentType, rowIndex) => {
 							return (
 								<ProjectAssignmentRow
 									project={selectedProject}
-									key={`${assignment.id}-${index}`}
+									key={`${assignment.id}-${rowIndex}`}
 									assignment={assignment}
 									monthData={{ monthLabel: "", year: 0 }}
 									isFirstMonth={true}
 									isLastMonth={true}
+									rowIndex={rowIndex}
+									totalRows={selectedProject?.assignments?.length || 0}
+									inputRefs={inputRefs}
 								/>
 							);
 						}

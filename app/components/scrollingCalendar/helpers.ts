@@ -452,7 +452,6 @@ export const getWeekNumbersPerScreen = (
     }))
   );
 };
-
 export const weekNumberToDateRange = (
   weekNumber: number,
   year: number
@@ -700,4 +699,114 @@ export const groupAndSumWeeksByMonthForUsers = (
   });
 
   return usersByMonth;
+};
+export const tabbingAndArrowNavigation = (
+  event: React.KeyboardEvent<HTMLInputElement>,
+  rowIndex: number,
+  cellIndex: number,
+  inputRefs: React.MutableRefObject<
+    Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>
+  >,
+  totalRows: number,
+  isActual: boolean
+) => {
+  const estimatedArray = inputRefs.current[rowIndex][0];
+  const actualArray = inputRefs.current[rowIndex][1];
+  const totalInputsInRow = estimatedArray.length;
+
+  const moveToNextInput = () => {
+    if (!isActual) {
+      if (cellIndex < totalInputsInRow - 1) {
+        estimatedArray[cellIndex + 1]?.focus();
+      }
+    } else {
+      if (cellIndex < totalInputsInRow - 1) {
+        actualArray[cellIndex + 1]?.focus();
+      }
+    }
+  };
+
+  const moveToPrevInput = () => {
+    if (!isActual) {
+      if (cellIndex > 0) {
+        estimatedArray[cellIndex - 1]?.focus();
+      } else if (rowIndex > 0) {
+        const lastActualPrevRow =
+          inputRefs.current[rowIndex - 1][1][totalInputsInRow - 1];
+        lastActualPrevRow?.focus();
+      }
+    } else {
+      if (cellIndex > 0) {
+        actualArray[cellIndex - 1]?.focus();
+      } else if (rowIndex > 0) {
+        const lastEstimatedPrevRow =
+          inputRefs.current[rowIndex - 1][0][totalInputsInRow - 1];
+        lastEstimatedPrevRow?.focus();
+      }
+    }
+  };
+
+  const moveDown = () => {
+    if (isActual) {
+      if (rowIndex < totalRows - 1) {
+        const nextEstimatedInput =
+          inputRefs.current[rowIndex + 1][0][cellIndex];
+        nextEstimatedInput?.focus();
+      }
+    } else {
+      const nextActualInput =
+        actualArray[cellIndex] ||
+        inputRefs.current[rowIndex + 1]?.[0]?.[cellIndex];
+      nextActualInput?.focus();
+    }
+  };
+
+  const moveUp = () => {
+    const prevEstimatedInput = isActual
+      ? estimatedArray[cellIndex]
+      : inputRefs.current[rowIndex - 1]?.[1]?.[cellIndex] ||
+        inputRefs.current[rowIndex - 1]?.[0]?.[cellIndex];
+    prevEstimatedInput?.focus();
+  };
+
+  const cursorPosition = event.currentTarget.selectionStart;
+  const inputLength = event.currentTarget.value.length;
+
+  switch (event.key) {
+    case "ArrowRight": {
+      if (cursorPosition === inputLength) {
+        event.preventDefault();
+        moveToNextInput();
+      }
+      break;
+    }
+
+    case "ArrowLeft": {
+      if (cursorPosition === 0) {
+        event.preventDefault();
+        moveToPrevInput();
+      }
+      break;
+    }
+    case "Tab": {
+      event.preventDefault();
+      moveToNextInput();
+      break;
+    }
+
+    case "ArrowDown": {
+      event.preventDefault();
+      moveDown();
+      break;
+    }
+
+    case "ArrowUp": {
+      event.preventDefault();
+      moveUp();
+      break;
+    }
+
+    default:
+      break;
+  }
 };

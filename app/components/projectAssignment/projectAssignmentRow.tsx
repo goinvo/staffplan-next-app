@@ -16,6 +16,9 @@ interface ProjectAssignmentRowProps {
 	isLastMonth: boolean;
 	monthData: { monthLabel: string; year: number };
 	months?: MonthsDataType[];
+	rowIndex: number;
+	totalRows: number;
+	inputRefs: React.MutableRefObject<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>;
 }
 
 export const ProjectAssignmentRow = ({
@@ -24,6 +27,9 @@ export const ProjectAssignmentRow = ({
 	isLastMonth,
 	project,
 	months,
+	rowIndex,
+	inputRefs,
+	totalRows
 }: ProjectAssignmentRowProps) => {
 	const router = useRouter();
 
@@ -48,7 +54,6 @@ export const ProjectAssignmentRow = ({
 		return true;
 	};
 
-
 	return (
 		<tr className={`flex border-b border-gray-300 hover:bg-hoverGrey min-h-[100px] ${assignment.status === 'proposed' ? 'bg-diagonal-stripes' :
 			''
@@ -60,11 +65,16 @@ export const ProjectAssignmentRow = ({
 					clickHandler={handleUserChange}
 				/>
 			)}
-			{months?.map((month: MonthsDataType) => {
-				return month.weeks.map((week) => {
+			{months?.map((month: MonthsDataType, monthIndex) => {
+				const previousWeeksCount = months.slice(0, monthIndex).reduce((acc, month) => acc + month.weeks.length, 1);
+				return month.weeks.map((week, weekIndex) => {
 					const withinProjectDates = isWeekWithinProject(week.weekNumberOfTheYear, month.year);
+					const cellIndex = previousWeeksCount + weekIndex;
+					if (!inputRefs.current[rowIndex]) {
+						inputRefs.current[rowIndex] = [[], []];
+					}
 					return (
-						<td key={`${month.monthLabel}-${week.weekNumberOfTheYear}`}
+						<td key={`${month.monthLabel}-${week.weekNumberOfTheYear}-${monthIndex}`}
 							className={`relative px-1 py-1 font-normal ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year && 'bg-selectedColumnBg'}`}
 						>
 							<div
@@ -77,6 +87,10 @@ export const ProjectAssignmentRow = ({
 									year={month.year}
 									key={`input-${week.weekNumberOfTheYear}`}
 									months={months}
+									rowIndex={rowIndex}
+									cellIndex={cellIndex}
+									inputRefs={inputRefs}
+									totalRows={totalRows}
 								/>
 
 							</div>
