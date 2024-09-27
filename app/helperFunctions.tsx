@@ -8,6 +8,7 @@ import {
 } from "./typeInterfaces";
 import _ from "lodash";
 import { DateTime, Interval } from "luxon";
+import { calculateWeeklyHoursForCSV, calculateWeeklyHoursPerProjectForCSV, groupAndSumWeeksByMonthForUsers, sortWeeklyHoursByDate, weekNumberToDateRange } from "./components/scrollingCalendar/helpers";
 export function matchWorkWeeks(
 	prevWeeks: WorkWeekBlockMemberType[],
 	currWeeks: WorkWeekBlockMemberType[]
@@ -467,12 +468,12 @@ export const drawFTELabels = (
 									{hasSameProject
 										? ""
 										: workWeekBlock.workWeek.project &&
-										  workWeekBlock.workWeek.project.name
-										? workWeekBlock.workWeek.project.name
-										: workWeekBlock.workWeek.user &&
-										  workWeekBlock.workWeek.user.name
-										? workWeekBlock.workWeek.user.name
-										: ""}
+											workWeekBlock.workWeek.project.name
+											? workWeekBlock.workWeek.project.name
+											: workWeekBlock.workWeek.user &&
+												workWeekBlock.workWeek.user.name
+												? workWeekBlock.workWeek.user.name
+												: ""}
 								</div>
 							</div>
 						);
@@ -665,7 +666,7 @@ export const sortSingleUser = (sortMethod: string, user: UserType) => {
 			return 0;
 		});
 	}
-	if(sortMethod === "byClient") {
+	if (sortMethod === "byClient") {
 		sortedAssignments.assignments.sort((a, b) => {
 			const clientA = a.project.client.name.toLowerCase();
 			const clientB = b.project.client.name.toLowerCase();
@@ -816,3 +817,52 @@ export const sortUserList = (sortMethod: string, userList: UserType[]) => {
 	}
 	return userList;
 };
+
+export const convertProjectToCSV = (data: ProjectType): string => {
+	const assignments = data.assignments || []
+	const sortedWorkWeeks = sortWeeklyHoursByDate(calculateWeeklyHoursForCSV(assignments))
+	const { totalEstimatedHoursPerProject, totalActualHoursPerProject } = calculateWeeklyHoursPerProjectForCSV(sortedWorkWeeks)
+	const deltaHours = (totalActualHoursPerProject - totalEstimatedHoursPerProject);
+	const headers = [
+		'Project Name',
+		'Starts date',
+		'Ends date',
+		'Work week',
+		'Actual Hours',
+		'Planned Hours',
+		'Total Hours'
+	].join(';');
+
+	const projectRows = sortedWorkWeeks.map((week, index) => [
+		index === 0 ? data.name : '',
+		index === 0 ? data.startsOn || '' : '',
+		index === 0 ? data.endsOn || '' : '',
+		weekNumberToDateRange(week.week, week.year),
+		week.totalActualHours || '0',
+		week.totalEstimatedHours || '0'
+	].join(';')).join('\n');
+
+	const summaryRows = [
+		`Burned;;;;;;${totalActualHoursPerProject}`,
+		`Planned;;;;;;${totalEstimatedHoursPerProject}`,
+		`Delta;;;;;;${deltaHours}`,
+		`Targeted;;;;;;${data.hours || ''}`
+	].join('\n');
+
+	const usersByMonth = groupAndSumWeeksByMonthForUsers(assignments);
+
+	const userRows = usersByMonth.map(user => {
+		const userMonths = user.months.map(month => `${month.monthLabel}`);
+
+		const userNameRow = `${user.userName};${userMonths.join(';')}`;
+
+		const burnedHoursRow = `Burned Hours;${user.months.map(month => `${month.totalActualHours || 0}`).join(';')}`;
+
+		const estimatedHoursRow = `Planned Hours;${user.months.map(month => `${month.totalEstimatedHours || 0}`).join(';')}`;
+
+		return `${userNameRow}\n${burnedHoursRow}\n${estimatedHoursRow}`;
+	}).join('\n\n');
+
+	return `${headers}\n${projectRows}\n${summaryRows}\n\n${userRows}`;
+};
+
