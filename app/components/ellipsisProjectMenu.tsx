@@ -6,6 +6,7 @@ import React from "react";
 import { UPSERT_PROJECT } from "../gqlQueries";
 import { useMutation } from "@apollo/client";
 import { useRouter, usePathname } from "next/navigation";
+import { convertProjectToCSV } from "../helperFunctions";
 
 export default function EllipsisProjectMenu({ project }: any) {
 	const router = useRouter();
@@ -26,7 +27,7 @@ export default function EllipsisProjectMenu({ project }: any) {
 	const [confirmed, setConfirmed] = useState(
 		status === "confirmed" ? true : false
 	);
-	
+
 	const dropdownSelectedItemClass = (isActive: boolean) =>
 		isActive
 			? "px-4 py-2 block hover:text-accentgreen hover:cursor-pointer text-sm"
@@ -76,13 +77,26 @@ export default function EllipsisProjectMenu({ project }: any) {
 			status: statusCheck(),
 			startsOn: startsOn,
 			cost: cost,
-			fte:fte,
-			hours:hours,
+			fte: fte,
+			hours: hours,
 		};
 		upsertProject({
 			variables: endsOn ? { ...variables, endsOn: endsOn } : variables,
 		});
 	};
+
+	const downloadCSV = () => {
+		const csv = convertProjectToCSV(project);
+		const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.setAttribute('download', `${project.name}.csv`);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	};
+
 	return (
 		<Menu
 			as="div"
@@ -131,24 +145,28 @@ export default function EllipsisProjectMenu({ project }: any) {
 						<Menu.Item>
 							{({ active }) => (
 								<Link
-								href={`?projectmodal=true&project=${base64Query}`}
-								className={dropdownSelectedItemClass(active)}
+									href={`?projectmodal=true&project=${base64Query}`}
+									className={dropdownSelectedItemClass(active)}
 								>
 									Edit Project
 								</Link>
 							)}
 						</Menu.Item>
-									<Menu.Item>
-										{({ active }) => (
-											<a
-												href={`?assignmentmodal=true&project=${base64Query}`}
-												className={dropdownSelectedItemClass(active)}
-											>
-												Add Person
-											</a>
-										)}
-									</Menu.Item>
+						<Menu.Item>
+							{({ active }) => (
+								<a
+									href={`?assignmentmodal=true&project=${base64Query}`}
+									className={dropdownSelectedItemClass(active)}
+								>
+									Add Person
+								</a>
+							)}
+						</Menu.Item>
+						<button className="px-4 py-2 text-sm hover:text-accentgreen border-none" onClick={downloadCSV}>
+							Export CSV
+						</button>
 					</div>
+
 					<div
 						id={`${project.status}`}
 						onClick={onSubmitUpsert}

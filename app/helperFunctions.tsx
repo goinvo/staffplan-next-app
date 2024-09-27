@@ -5,11 +5,10 @@ import {
 	UserAssignmentDataMapType,
 	UserType,
 	WorkWeekBlockMemberType,
-	WorkWeekType
 } from "./typeInterfaces";
 import _ from "lodash";
 import { DateTime, Interval } from "luxon";
-import { weekNumberToDateRange } from "./components/scrollingCalendar/helpers";
+import { calculateWeeklyHoursForCSV, calculateWeeklyHoursPerProjectForCSV, groupAndSumWeeksByMonthForUsers, sortWeeklyHoursByDate, weekNumberToDateRange } from "./components/scrollingCalendar/helpers";
 
 export function matchWorkWeeks(
 	prevWeeks: WorkWeekBlockMemberType[],
@@ -820,41 +819,11 @@ export const sortUserList = (sortMethod: string, userList: UserType[]) => {
 	return userList;
 };
 
-const groupWeeksByMonth = (workWeeks: WorkWeekType[]) => {
-	const weeksByMonth: { [key: string]: { weeks: WorkWeekType[], year: number, date: DateTime } } = {};
-
-	workWeeks.forEach((week) => {
-		const startOfWeek = DateTime.fromObject({ weekNumber: week.cweek, weekYear: week.year }).startOf('week');
-		const month = startOfWeek.toFormat('MMMM');
-		const year = startOfWeek.year;
-
-		const key = `${month} ${year}`;
-
-		if (!weeksByMonth[key]) {
-			weeksByMonth[key] = { weeks: [], year, date: startOfWeek };
-		}
-		weeksByMonth[key].weeks.push(week);
-	});
-
-	return weeksByMonth;
-};
-
-
-export const convertToCSV = (data: ProjectType): string => {
-
-	const totalBurnedHours = (data: ProjectType): number => {
-		return data.workWeeks
-			? data.workWeeks.reduce((total, w) => total + (w.actualHours || 0), 0)
-			: 0;
-	};
-
-	const totalPlannedHours = (data: ProjectType): number => {
-		return data.workWeeks
-			? data.workWeeks.reduce((total, w) => total + (w.estimatedHours || 0), 0)
-			: 0;
-	};
-
-
+export const convertProjectToCSV = (data: ProjectType): string => {
+	const assignments = data.assignments || []
+	const sortedWorkWeeks = sortWeeklyHoursByDate(calculateWeeklyHoursForCSV(assignments))
+	const { totalEstimatedHoursPerProject, totalActualHoursPerProject } = calculateWeeklyHoursPerProjectForCSV(sortedWorkWeeks)
+	const deltaHours = (totalActualHoursPerProject - totalEstimatedHoursPerProject);
 	const headers = [
 		'Project Name',
 		'Starts date',
@@ -865,58 +834,35 @@ export const convertToCSV = (data: ProjectType): string => {
 		'Total Hours'
 	].join(';');
 
-	const rows = data.workWeeks?.map((w, index) => [
+	const projectRows = sortedWorkWeeks.map((week, index) => [
 		index === 0 ? data.name : '',
 		index === 0 ? data.startsOn || '' : '',
 		index === 0 ? data.endsOn || '' : '',
-		weekNumberToDateRange(w.cweek, w.year),
-		w.actualHours || '0',
-		w.estimatedHours || '0'
-	].join(';')).join('\n') || '';
-
-	const deltaHours = (totalBurnedHours(data) - totalPlannedHours(data))
+		weekNumberToDateRange(week.week, week.year),
+		week.totalActualHours || '0',
+		week.totalEstimatedHours || '0'
+	].join(';')).join('\n');
 
 	const summaryRows = [
-		['Burned', '', '', '', '', '', totalBurnedHours(data)],
-		['Planned', '', '', '', '', '', totalPlannedHours(data)],
-		['Delta', '', '', '', '', '', deltaHours],
-		['Targeted', '', '', '', '', '', data.hours],
+		`Burned;;;;;;${totalActualHoursPerProject}`,
+		`Planned;;;;;;${totalEstimatedHoursPerProject}`,
+		`Delta;;;;;;${deltaHours}`,
+		`Targeted;;;;;;${data.hours || ''}`
+	].join('\n');
 
-	]
-		.map(row => row.join(';'))
-		.join('\n');
+	const usersByMonth = groupAndSumWeeksByMonthForUsers(assignments);
 
-	let allMonths = data.assignments?.reduce((acc, assignment) => {
-		const groupedWeeks = groupWeeksByMonth(assignment.workWeeks);
-		return { ...acc, ...groupedWeeks };
-	}, {} as { [key: string]: { weeks: WorkWeekType[], year: number, date: DateTime } }) || {};
+	const userRows = usersByMonth.map(user => {
+		const userMonths = user.months.map(month => `${month.monthLabel}`);
 
-	// Сортируем месяцы по возрастанию
-	const sortedMonths = Object.keys(allMonths)
-		.sort((a, b) => allMonths[a].date.toMillis() - allMonths[b].date.toMillis()); // Сортировка по миллисекундам даты
+		const userNameRow = `${user.userName};${userMonths.join(';')}`;
 
-	// Первая строка заголовков: "Assigned Users", затем "September 2024", "October 2024", и т.д.
-	const userListHeader = ['Assigned Users', ...sortedMonths.flatMap(month => [month, ''])].join(';'); // Добавляем пустую ячейку после каждого месяца
+		const burnedHoursRow = `Burned Hours;${user.months.map(month => `${month.totalActualHours || 0}`).join(';')}`;
 
-	// Вторая строка подзаголовков: под каждым месяцем два столбца — "Planned Hours" и "Burned Hours"
-	const subHeaders = [' ', ...sortedMonths.flatMap(() => ['Planned Hours', 'Burned Hours'])].join(';'); // Пустая ячейка после каждого подзаголовка
+		const estimatedHoursRow = `Planned Hours;${user.months.map(month => `${month.totalEstimatedHours || 0}`).join(';')}`;
 
-	// Формируем строки с данными пользователей
-	const userRows = data.assignments?.map((assignment) => {
-		const groupedWeeks = groupWeeksByMonth(assignment.workWeeks);
+		return `${userNameRow}\n${burnedHoursRow}\n${estimatedHoursRow}`;
+	}).join('\n\n');
 
-		const weeksByMonth = sortedMonths.map((monthKey) => {
-			const userWeeksInMonth = groupedWeeks[monthKey]?.weeks || [];
-
-			const plannedHours = userWeeksInMonth.reduce((total, week) => total + (week.estimatedHours || 0), 0);
-			const burnedHours = userWeeksInMonth.reduce((total, week) => total + (week.actualHours || 0), 0);
-
-			return [plannedHours.toString(), burnedHours.toString()].join(';'); // Пустая ячейка после каждого месяца
-		}).join(';');
-
-		return `${assignment.assignedUser.name};${weeksByMonth}`;
-	}).join('\n') || '';
-
-	// Возвращаем финальный CSV
-	return `${headers}\n${rows}\n${summaryRows}\n\n${userListHeader}\n${subHeaders}\n${userRows}`;
+	return `${headers}\n${projectRows}\n${summaryRows}\n\n${userRows}`;
 };

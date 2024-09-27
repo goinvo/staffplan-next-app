@@ -390,10 +390,26 @@ export const getNextWeeksPerView = (months: MonthsDataType[]): string => {
   return nextView.toISODate();
 };
 
+export const checkIfWeekExists = (
+  year: number,
+  weekNumber: number
+): boolean => {
+  const date = DateTime.fromObject({ weekYear: year, weekNumber });
+  return date.isValid;
+};
+
 export const getISODateFromWeek = (
   year: number,
   weekNumber: number
 ): string => {
+  if (!checkIfWeekExists(year, weekNumber)) {
+    const lastWeekOfYear = DateTime.local(year, 12, 31).weekNumber;
+
+    if (weekNumber > lastWeekOfYear) {
+      weekNumber = lastWeekOfYear;
+    }
+  }
+
   const date = DateTime.fromObject({ weekYear: year, weekNumber });
   if (!date.isValid) {
     throw new Error("Invalid ISO date provided");
@@ -449,8 +465,239 @@ export const weekNumberToDateRange = (
 
   const endOfWeek = startOfWeek.plus({ days: 6 });
 
-  const formattedStart = startOfWeek.toFormat("dd.LL");
-  const formattedEnd = endOfWeek.toFormat("dd.LL");
+  const formattedStart = startOfWeek.toFormat("dd.LL.yyyy");
+  const formattedEnd = endOfWeek.toFormat("dd.LL.yyyy");
 
   return `${formattedStart} - ${formattedEnd}`;
+};
+
+export const getWeeksBetweenDates = (startDate: string, endDate: string) => {
+  let start = DateTime.fromISO(startDate);
+  const end = DateTime.fromISO(endDate);
+  const weeks = [];
+
+  if (start.weekday !== 1) {
+    start = start.plus({ days: 8 - start.weekday });
+  }
+
+  let current = start;
+  while (current <= end) {
+    let weekNumber = current.weekNumber;
+    const year = current.year;
+
+    if (current.month === 12 && weekNumber === 1) {
+      const lastDayOfDecember = DateTime.fromObject({
+        year: current.year,
+        month: 12,
+        day: 31,
+      });
+      const lastWeekOfDecember = lastDayOfDecember.weekNumber;
+      if (weekNumber === lastWeekOfDecember) {
+        weekNumber = 53;
+      }
+    }
+
+    weeks.push({ cweek: weekNumber, year });
+    current = current.plus({ weeks: 1 });
+  }
+
+  return weeks;
+};
+
+interface WeeklyHoursSummary {
+  week: number;
+  year: number;
+  totalActualHours: number;
+  totalEstimatedHours: number;
+}
+
+export const sortWeeklyHoursByDate = (
+  weeklyHours: WeeklyHoursSummary[]
+): WeeklyHoursSummary[] => {
+  return weeklyHours.sort((a, b) => {
+    if (a.year !== b.year) {
+      return a.year - b.year;
+    }
+
+    return a.week - b.week;
+  });
+};
+
+export const calculateWeeklyHoursForCSV = (assignments: AssignmentType[]) => {
+  const weeklyHoursMap: { [key: string]: WeeklyHoursSummary } = {};
+
+  assignments.forEach((assignment) => {
+    if (
+      assignment.startsOn &&
+      assignment.endsOn &&
+      assignment.estimatedWeeklyHours
+    ) {
+      const weeksBetween = getWeeksBetweenDates(
+        assignment.startsOn,
+        assignment.endsOn
+      );
+
+      weeksBetween.forEach((week) => {
+        const key = `${week.year}-${week.cweek}`;
+
+        const isWeekInWorkWeeks = assignment.workWeeks.some(
+          (w) =>
+            w.cweek === week.cweek && w.year === week.year && w.estimatedHours
+        );
+
+        if (!isWeekInWorkWeeks) {
+          if (!weeklyHoursMap[key]) {
+            weeklyHoursMap[key] = {
+              week: week.cweek,
+              year: week.year,
+              totalActualHours: 0,
+              totalEstimatedHours: 0,
+            };
+          }
+
+          weeklyHoursMap[key].totalEstimatedHours +=
+            assignment.estimatedWeeklyHours;
+        }
+      });
+    }
+    assignment.workWeeks.forEach((week) => {
+      const key = `${week.year}-${week.cweek}`;
+
+      if (!weeklyHoursMap[key]) {
+        weeklyHoursMap[key] = {
+          week: week.cweek,
+          year: week.year,
+          totalActualHours: 0,
+          totalEstimatedHours: 0,
+        };
+      }
+
+      weeklyHoursMap[key].totalActualHours += week.actualHours || 0;
+      weeklyHoursMap[key].totalEstimatedHours += week.estimatedHours || 0;
+    });
+  });
+
+  return Object.values(weeklyHoursMap);
+};
+
+export const calculateWeeklyHoursPerProjectForCSV = (
+  weeklyHours: WeeklyHoursSummary[]
+) => {
+  return weeklyHours.reduce(
+    (acc, week) => {
+      acc.totalEstimatedHoursPerProject += week.totalEstimatedHours || 0;
+      acc.totalActualHoursPerProject += week.totalActualHours || 0;
+      return acc;
+    },
+    { totalEstimatedHoursPerProject: 0, totalActualHoursPerProject: 0 }
+  );
+};
+
+export const groupAndSumWeeksByMonthForUsers = (
+  assignments: AssignmentType[]
+) => {
+  const usersByMonth: {
+    userId: string | number;
+    userName: string;
+    months: {
+      monthLabel: string;
+      monthNumber: number;
+      year: number;
+      totalActualHours: number;
+      totalEstimatedHours: number;
+    }[];
+  }[] = [];
+
+  assignments.forEach((assignment) => {
+    const userId = assignment?.assignedUser?.id || "";
+    const userName = assignment?.assignedUser?.name || "TBD user";
+    let userGroup = usersByMonth.find((user) => user.userId === userId);
+    if (!userGroup) {
+      userGroup = {
+        userId,
+        userName,
+        months: [],
+      };
+      usersByMonth.push(userGroup);
+    }
+
+    assignment.workWeeks.forEach((week) => {
+      const startOfWeek = DateTime.fromObject({ year: week.year })
+        .plus({ weeks: week.cweek - 1 })
+        .startOf("week");
+      const month = startOfWeek.monthLong;
+      const monthNumber = startOfWeek.month;
+      const year = startOfWeek.year;
+      const key = `${month} ${year}`;
+
+      let monthGroup = userGroup.months.find(
+        (group) => group.monthLabel === key
+      );
+
+      if (!monthGroup) {
+        monthGroup = {
+          monthLabel: key,
+          monthNumber,
+          year,
+          totalActualHours: 0,
+          totalEstimatedHours: 0,
+        };
+        userGroup.months.push(monthGroup);
+      }
+
+      monthGroup.totalActualHours += week.actualHours || 0;
+      monthGroup.totalEstimatedHours += week.estimatedHours || 0;
+    });
+
+    if (
+      assignment.startsOn &&
+      assignment.endsOn &&
+      assignment.estimatedWeeklyHours
+    ) {
+      const weeksBetween = getWeeksBetweenDates(
+        assignment.startsOn,
+        assignment.endsOn
+      );
+
+      weeksBetween.forEach((week) => {
+        const startOfWeek = DateTime.fromObject({ year: week.year })
+          .plus({ weeks: week.cweek - 1 })
+          .startOf("week");
+        const month = startOfWeek.monthLong;
+        const monthNumber = startOfWeek.month;
+        const year = startOfWeek.year;
+        const key = `${month} ${year}`;
+        const isWeekInWorkWeeks = assignment.workWeeks.some(
+          (w) =>
+            w.cweek === week.cweek && w.year === week.year && w.estimatedHours
+        );
+
+        if (!isWeekInWorkWeeks) {
+          let monthGroup = userGroup.months.find(
+            (group) => group.monthLabel === key
+          );
+          if (!monthGroup) {
+            monthGroup = {
+              monthLabel: key,
+              monthNumber,
+              year,
+              totalActualHours: 0,
+              totalEstimatedHours: 0,
+            };
+            userGroup.months.push(monthGroup);
+          }
+          monthGroup.totalEstimatedHours += assignment.estimatedWeeklyHours;
+        }
+      });
+    }
+  });
+
+  usersByMonth.forEach((userGroup) => {
+    userGroup.months.sort((a, b) => {
+      if (a.year !== b.year) return a.year - b.year;
+      return a.monthNumber - b.monthNumber;
+    });
+  });
+
+  return usersByMonth;
 };
