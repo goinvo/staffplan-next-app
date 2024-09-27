@@ -73,6 +73,9 @@ export interface ProjectType {
 	workWeeks?: WorkWeekType[];
 	fte: number;
 	hours: number;
+	rateType?:string,
+	hourlyRate?:number,
+	cost?:number
 }
 
 export interface ProjectSummaryProps {
