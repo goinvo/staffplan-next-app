@@ -714,13 +714,12 @@ export const groupAndSumWeeksByMonthForUsers = (
   assignments.forEach((assignment) => {
     const userId = assignment?.assignedUser?.id || "";
     const userName = assignment?.assignedUser?.name || "TBD user";
-    let userGroup = usersByMonth.find((user) => user.userId === userId);
-    if (!userGroup) {
-      userGroup = {
-        userId,
-        userName,
-        months: [],
-      };
+    let userGroup = usersByMonth.find((user) => user.userId === userId) || {
+      userId,
+      userName,
+      months: [],
+    };
+    if (!usersByMonth.some((user) => user.userId === userId)) {
       usersByMonth.push(userGroup);
     }
 
