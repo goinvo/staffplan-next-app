@@ -120,7 +120,7 @@ export const WorkWeekInput = ({
 	};
 
 	const onFillForwardClick = async (inputName: string,
-		targetCweek: number, values: FormikValues) => {
+		targetCweek: number, targetYear: number, values: FormikValues) => {
 		const variables: FillForwardVariablesType = {
 			assignmentId: values.assignmentId,
 		};
@@ -131,7 +131,7 @@ export const WorkWeekInput = ({
 		}
 
 		const weekNumbersPerScreen = getWeekNumbersPerScreen(months)
-		let filteredWeeks = filterWeeksForFillForward(weekNumbersPerScreen, targetCweek, inputName);
+		let filteredWeeks = filterWeeksForFillForward(weekNumbersPerScreen, targetCweek, targetYear, inputName);
 		if (assignment.endsOn || assignment.startsOn) {
 			filteredWeeks = filteredWeeks.filter(week =>
 				assignmentContainsCWeek(assignment, week.cweek, week.year))
@@ -189,7 +189,7 @@ export const WorkWeekInput = ({
 									upsertWorkWeekValues(values);
 								}
 							}}
-							onFillForwardClick={() => onFillForwardClick(ESTIMATED_HOURS, cweek, values)}
+							onFillForwardClick={() => onFillForwardClick(ESTIMATED_HOURS, cweek, year, values)}
 							disabled={isUserTBD}
 							ref={(el: HTMLInputElement) => createEstimatedRef(el, rowIndex, cellIndex)}
 							onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => tabbingAndArrowNavigation(e, rowIndex, cellIndex, inputRefs, totalRows, false)}
@@ -205,7 +205,7 @@ export const WorkWeekInput = ({
 									upsertWorkWeekValues(values);
 								}
 							}}
-							onFillForwardClick={() => onFillForwardClick(ACTUAL_HOURS, cweek, values)}
+							onFillForwardClick={() => onFillForwardClick(ACTUAL_HOURS, cweek, year, values)}
 							disabled={isUserTBD}
 							ref={(el: HTMLInputElement) => createActualRef(el, rowIndex, cellIndex)}
 							onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => tabbingAndArrowNavigation(e, rowIndex, cellIndex, inputRefs, totalRows, true)}

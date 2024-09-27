@@ -417,6 +417,7 @@ export const getISODateFromWeek = (
 export const filterWeeksForFillForward = (
   allWeeks: { cweek: number; year: number }[],
   targetCweek: number,
+  targetYear: number,
   inputName: string
 ) => {
   const currentYear = getCurrentYear();
@@ -425,15 +426,16 @@ export const filterWeeksForFillForward = (
   if (inputName === ACTUAL_HOURS) {
     return allWeeks.filter(
       (week) =>
-        week.cweek >= targetCweek &&
+        (week.year > targetYear ||
+          (week.year === targetYear && week.cweek >= targetCweek)) &&
         week.year <= currentYear &&
         (week.year < currentYear || week.cweek <= currentWeek)
     );
   }
 
   return allWeeks.filter((week) => {
-    if (week.year > currentYear) return true;
-    if (week.year === currentYear && week.cweek >= targetCweek) return true;
+    if (week.year > targetYear) return true;
+    if (week.year === targetYear && week.cweek >= targetCweek) return true;
     return false;
   });
 };
