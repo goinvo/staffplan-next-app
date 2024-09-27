@@ -145,34 +145,10 @@ const ProjectPage: React.FC = () => {
 						}
 						)}
 					</ScrollingCalendar>
-					<ProjectDetails
-						project={selectedProject}
-						projectList={projectList}
-						refetchProjectList={refetchProjectList}
-					/>
 				</>
 			) : (
 				<LoadingSpinner />
 			)}
-			<div>
-				<button
-					className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center"
-					onClick={() => setAddAssignmentVisible(!addAssignmentVisible)}
-				>
-					{addAssignmentVisible ? (
-						<XMarkIcon className="fill-accentgreen" />
-					) : (
-						<PlusIcon className="fill-accentgreen" />
-					)}
-				</button>
-				{addAssignmentVisible && selectedProject && (
-					<AddAssignmentSingleProject
-						project={selectedProject}
-						onClose={onClose}
-						onComplete={onComplete}
-					/>
-				)}
-			</div>
 		</>
 	);
 };
