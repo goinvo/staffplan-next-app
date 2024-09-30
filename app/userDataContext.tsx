@@ -83,6 +83,7 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 		rollupSort: "none",
 		showSummaries: true,
 		showArchivedProjects: false,
+		showArchivedAssignments:false,
 		showInactiveUsers: false,
 	});
 	const scrollToTodayFunction = () => {
@@ -213,6 +214,7 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 				errorPolicy: "all",
 			})
 			.then((result) => {
+				
 				const sortedUserList = sortUserList(
 					viewsFilter.selectedUserSort,
 					result.data.currentCompany.users

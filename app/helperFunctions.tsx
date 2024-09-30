@@ -532,12 +532,12 @@ export const drawBar = (
 		/>
 	);
 };
-export const sortSingleProject = (sortMethod: string, users: UserType[]) => {
-	const arrayToSort = users?.length ? [...users] : [];
+export const sortSingleProject = (sortMethod: string, assignments: AssignmentType[]) => {
+	const arrayToSort = assignments?.length ? [...assignments] : [];
 	if (sortMethod === "abcUserName") {
 		return arrayToSort.sort((a, b) => {
-			const userA = a.name.toLowerCase();
-			const userB = b.name.toLowerCase();
+			const userA = a.assignedUser? a.assignedUser.name.toLowerCase() : "";
+			const userB = b.assignedUser? b.assignedUser.name.toLowerCase(): "";
 			if (userA < userB) {
 				return -1;
 			}
@@ -550,12 +550,12 @@ export const sortSingleProject = (sortMethod: string, users: UserType[]) => {
 	if (sortMethod === "startDate") {
 		return arrayToSort.sort((a, b) => {
 			const userA =
-				a.assignments && a.assignments[0].startsOn
-					? a.assignments[0].startsOn
+				a.startsOn
+					? a.startsOn
 					: "";
 			const userB =
-				b.assignments && b.assignments[0].startsOn
-					? b.assignments[0].startsOn
+				b.startsOn
+					? b.startsOn
 					: "";
 			if (userA < userB) {
 				return -1;
@@ -569,9 +569,9 @@ export const sortSingleProject = (sortMethod: string, users: UserType[]) => {
 	if (sortMethod === "status") {
 		return arrayToSort.sort((a, b) => {
 			const userA =
-				a.assignments && a.assignments[0].status ? a.assignments[0].status : "";
+				a.status ? a.status : "";
 			const userB =
-				b.assignments && b.assignments[0].status ? b.assignments[0].status : "";
+				b.status ? b.status : "";
 			if (userA < userB) {
 				return -1;
 			}
@@ -581,8 +581,9 @@ export const sortSingleProject = (sortMethod: string, users: UserType[]) => {
 			return 0;
 		});
 	}
-	return users;
+	return assignments;
 };
+
 export const sortProjectList = (
 	sortMethod: string,
 	projectList: ProjectType[]

@@ -101,7 +101,7 @@ export const SingleProjectSortOptions = () => {
 												Status
 											</label>
 										</div>
-										<div>
+										<div className="pb-2">
 											<label className="ml-2 text-gray-600">
 												<input
 													type="radio"
@@ -115,6 +115,24 @@ export const SingleProjectSortOptions = () => {
 												A - Z
 											</label>
 										</div>
+										<div className="border-t-2 border-gray-200">
+									<label className="block px-4 py-2 text-sm text-gray-600">
+										<input
+											id="showArchivedProjects"
+											type="checkbox"
+											defaultChecked={viewsFilter.showArchivedAssignments}
+											className="w-4 h-4 text-accentgreen bg-gray-100 border-gray-300 rounded focus:accentgreen dark:focus:ring-accentgreen dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-200 dark:border-gray-600 mr-3"
+											onClick={() =>
+												setViewsFilter({
+													...viewsFilter,
+													showArchivedAssignments:
+														!viewsFilter.showArchivedAssignments,
+												})
+											}
+										/>
+										Show Archived Assignments
+									</label>
+								</div>
 									</div>
 								</div>
 							</Menu.Items>
