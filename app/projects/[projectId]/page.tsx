@@ -22,15 +22,17 @@ const ProjectPage: React.FC = () => {
 	const [projectAssignments, setProjectAssignments] = useState<
 		AssignmentType[]
 	>([]);
-	const inputRefs = useRef<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>([]);
+	const inputRefs = useRef<
+		Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>
+	>([]);
 	const [
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_ASSIGNMENT, {
 		onCompleted({ upsertAssignment }) {
-			refetchUserList()
-			refetchProjectList()
-		}
+			refetchUserList();
+			refetchProjectList();
+		},
 	});
 	const {
 		userList,
@@ -44,8 +46,8 @@ const ProjectPage: React.FC = () => {
 	const addNewAssignmentRow = useCallback(async () => {
 		const variables = {
 			projectId: selectedProjectId,
-			userId: '',
-			status: 'proposed',
+			userId: "",
+			status: "proposed",
 		};
 		upsertAssignment({
 			variables,
@@ -63,29 +65,42 @@ const ProjectPage: React.FC = () => {
 			}
 
 			if (!userList || userList.length === 0) return;
-			const sortedAssignments = sortSingleProject(
-				viewsFilter.singleProjectSort,
-				selectedProject?.assignments || []
-			);
-			setProjectAssignments(sortedAssignments);
+			const sortedAssignments = viewsFilter.showArchivedAssignments
+				? sortSingleProject(
+						viewsFilter.singleProjectSort,
+						selectedProject?.assignments || []
+				  )
+				: sortSingleProject(
+						viewsFilter.singleProjectSort,
+						selectedProject?.assignments?.filter(
+							(assignment: AssignmentType) => assignment.status !== "archived"
+						) || []
+				  );
+				  
+				setProjectAssignments(sortedAssignments);
 		}
 	}, [
 		projectList,
 		userList,
 		selectedProjectId,
 		viewsFilter.singleProjectSort,
+		viewsFilter.showArchivedAssignments,
 		setSingleProjectPage,
 	]);
 
 	const selectedProjectDates = () => {
-		const startDate = selectedProject?.startsOn ? DateTime.fromISO(selectedProject.startsOn) : null;
-		const endDate = selectedProject?.endsOn ? DateTime.fromISO(selectedProject.endsOn) : null;
+		const startDate = selectedProject?.startsOn
+			? DateTime.fromISO(selectedProject.startsOn)
+			: null;
+		const endDate = selectedProject?.endsOn
+			? DateTime.fromISO(selectedProject.endsOn)
+			: null;
 
 		if (!startDate || !endDate) {
-			return 'Start Date - End Date';
+			return "Start Date - End Date";
 		}
-		const formattedStartDate = startDate.toFormat('d.MMM');
-		const formattedEndDate = endDate.toFormat('d.MMM');
+		const formattedStartDate = startDate.toFormat("d.MMM");
+		const formattedEndDate = endDate.toFormat("d.MMM");
 		const startYear = startDate.year;
 		const endYear = endDate.year;
 		if (startYear === endYear) {
@@ -93,23 +108,28 @@ const ProjectPage: React.FC = () => {
 		} else {
 			return `${formattedStartDate}.${startYear}-${formattedEndDate} ${endYear}`;
 		}
-	}
+	};
 
-	const columnHeaderTitles = [{ title: 'People', showIcon: true, onClick: () => addNewAssignmentRow() }]
+	const columnHeaderTitles = [
+		{ title: "People", showIcon: true, onClick: () => addNewAssignmentRow() },
+	];
 
-	const projectInfoSubtitle = `${selectedProject?.client.name}, budget, ${selectedProject?.hours || 0}h, ${selectedProjectDates()}`
+	const projectInfoSubtitle = `${selectedProject?.client.name}, budget, ${
+		selectedProject?.hours || 0
+	}h, ${selectedProjectDates()}`;
 
-	const sortedAssignments = viewsFilter.showArchivedAssignments ? sortSingleProject(
-		viewsFilter.singleProjectSort,
-		selectedProject?.assignments || []
-	) : sortSingleProject(viewsFilter.singleProjectSort,selectedProject?.assignments?.filter((assignment: AssignmentType) => assignment.status !== 'archived') || []);
-	
 	return (
 		<>
-			{selectedProject && projectList && sortedAssignments ? (
+			{selectedProject && projectList && projectAssignments ? (
 				<>
-					<ScrollingCalendar columnHeaderTitles={columnHeaderTitles} title={selectedProject.name} projectInfo={projectInfoSubtitle} assignments={sortedAssignments || []} editable={true}>
-						{sortedAssignments.map((assignment: AssignmentType, rowIndex) => {
+					<ScrollingCalendar
+						columnHeaderTitles={columnHeaderTitles}
+						title={selectedProject.name}
+						projectInfo={projectInfoSubtitle}
+						assignments={projectAssignments || []}
+						editable={true}
+					>
+						{projectAssignments.map((assignment: AssignmentType, rowIndex) => {
 							return (
 								<ProjectAssignmentRow
 									project={selectedProject}
@@ -123,8 +143,7 @@ const ProjectPage: React.FC = () => {
 									inputRefs={inputRefs}
 								/>
 							);
-						}
-						)}
+						})}
 					</ScrollingCalendar>
 				</>
 			) : (
