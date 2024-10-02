@@ -8,7 +8,7 @@ import { AssignmentType, WorkWeekType, MonthsDataType } from "@/app/typeInterfac
 import { UPSERT_WORKWEEKS, UPSERT_WORKWEEK } from "@/app/gqlQueries";
 import { useUserDataContext } from "@/app/userDataContext";
 import { CustomInput } from "../cutomInput";
-import { assignmentContainsCWeek, isPastOrCurrentWeek, filterWeeksForFillForward, getWeekNumbersPerScreen, currentWeek, currentYear, tabbingAndArrowNavigation } from "../scrollingCalendar/helpers";
+import { assignmentContainsCWeek, isPastOrCurrentWeek, filterWeeksForFillForward, getWeekNumbersPerScreen, currentWeek, currentYear, tabbingAndArrowNavigation, updateOrInsertWorkWeek, updateOrInsertWorkWeekInProject, updateProjectAssignments, updateUserAssignments } from "../scrollingCalendar/helpers";
 import { ACTUAL_HOURS, ESTIMATED_HOURS } from "../scrollingCalendar/constants";
 
 interface WorkWeekInputProps {
@@ -56,22 +56,49 @@ export const WorkWeekInput = ({
 		cweek: cweek,
 		year: year,
 	};
+	const { project: { id: projectId } } = assignment;
+	const { assignedUser: { id: userId } } = assignment;
+	const [upsertWorkWeek] = useMutation(UPSERT_WORKWEEK, {
+		onCompleted: async ({ upsertWorkWeek }) => {
+			const { assignmentId, id, ...workWeek } = upsertWorkWeek
+			const updatedUserList = updateOrInsertWorkWeek(
+				userList,
+				userId!,
+				assignmentId,
+				workWeek
+			);
 
-	const [upsertWorkweek] = useMutation(UPSERT_WORKWEEK, {
-		onCompleted() {
-			refetchUserList()
-			refetchProjectList()
+			const updatedProjectList = updateOrInsertWorkWeekInProject(
+				projectList,
+				projectId,
+				assignmentId,
+				workWeek
+			);
+			setUserList(updatedUserList);
+			setProjectList(updatedProjectList)
 		}
 	});
-
 	const [upsertWorkWeeks] = useMutation(UPSERT_WORKWEEKS, {
-		onCompleted() {
-			refetchUserList()
-			refetchProjectList()
+		onCompleted: async ({ upsertWorkWeeks }) => {
+			const updatedProjectList = updateProjectAssignments(
+				projectList,
+				projectId,
+				upsertWorkWeeks.id,
+				upsertWorkWeeks.workWeeks
+			);
+
+			const updatedUserList = updateUserAssignments(
+				userList,
+				userId!,
+				upsertWorkWeeks.id,
+				upsertWorkWeeks.workWeeks
+			);
+			setProjectList(updatedProjectList)
+			setUserList(updatedUserList)
 		}
 	});
 
-	const { refetchUserList, refetchProjectList } = useUserDataContext();
+	const { userList, setUserList, projectList, setProjectList } = useUserDataContext();
 
 	useEffect(() => {
 		const currentWeekExists = months?.some(month =>
@@ -111,7 +138,7 @@ export const WorkWeekInput = ({
 		if (values.actualHours !== "") {
 			variables.actHours = parseInt(values.actualHours);
 		}
-		upsertWorkweek({
+		upsertWorkWeek({
 			variables
 		})
 	};

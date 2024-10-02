@@ -68,14 +68,14 @@ export interface ProjectType {
 	startsOn: string | null;
 	status: string;
 	users: [];
-	assignments?: [AssignmentType];
+	assignments?: AssignmentType[];
 	__typename?: string;
 	workWeeks?: WorkWeekType[];
 	fte: number;
 	hours: number;
-	rateType?:string,
-	hourlyRate?:number,
-	cost?:number
+	rateType?: string,
+	hourlyRate?: number,
+	cost?: number
 }
 
 export interface ProjectSummaryProps {

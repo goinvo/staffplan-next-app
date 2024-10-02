@@ -6,9 +6,9 @@ import { Formik, FormikValues } from "formik";
 import { useMutation } from "@apollo/client";
 import { UPSERT_WORKWEEKS, UPSERT_WORKWEEK } from "@/app/gqlQueries";
 import { useUserDataContext } from "@/app/userDataContext";
-import { AssignmentType, MonthsDataType, WorkWeekType } from "@/app/typeInterfaces";
+import { AssignmentType, MonthsDataType, ProjectType, WorkWeekType } from "@/app/typeInterfaces";
 import { CustomInput } from "../cutomInput";
-import { assignmentContainsCWeek, isPastOrCurrentWeek, filterWeeksForFillForward, getWeekNumbersPerScreen, currentWeek, currentYear, tabbingAndArrowNavigation } from "../scrollingCalendar/helpers";
+import { assignmentContainsCWeek, isPastOrCurrentWeek, filterWeeksForFillForward, getWeekNumbersPerScreen, currentWeek, currentYear, tabbingAndArrowNavigation, updateProjectAssignments, updateUserAssignments, updateOrInsertWorkWeek, updateOrInsertWorkWeekInProject } from "../scrollingCalendar/helpers";
 import { ACTUAL_HOURS, ESTIMATED_HOURS } from "../scrollingCalendar/constants";
 
 interface WorkWeekInputProps {
@@ -23,6 +23,7 @@ interface WorkWeekInputProps {
 	cellIndex: number,
 	totalRows: number,
 	inputRefs: React.MutableRefObject<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>;
+	project: ProjectType
 }
 export interface WorkWeekValues {
 	cweek: number;
@@ -45,7 +46,8 @@ export const WorkWeekInput = ({
 	inputRefs,
 	rowIndex,
 	cellIndex,
-	totalRows
+	totalRows,
+	project
 }: WorkWeekInputProps) => {
 	const weekWithinAssignmentDates = assignmentContainsCWeek(assignment, cweek, year)
 	const existingWorkWeek = assignment?.workWeeks.find((week) => week.cweek === cweek && week.year === year);
@@ -57,22 +59,52 @@ export const WorkWeekInput = ({
 		cweek: cweek,
 		year: year,
 	};
+	const { id: projectId } = project;
+	const { assignedUser: { id: userId } } = assignment;
 
 	const [upsertWorkweek] = useMutation(UPSERT_WORKWEEK, {
-		onCompleted() {
-			refetchUserList()
-			refetchProjectList()
+		onCompleted({ upsertWorkWeek }) {
+			const { assignmentId, id, ...workWeek } = upsertWorkWeek
+			const updatedUserList = updateOrInsertWorkWeek(
+				userList,
+				userId!,
+				assignmentId,
+				workWeek
+			);
+
+			const updatedProjectList = updateOrInsertWorkWeekInProject(
+				projectList,
+				projectId,
+				assignmentId,
+				workWeek
+			);
+			setUserList(updatedUserList);
+			setProjectList(updatedProjectList)
 		}
+
 	});
 
 	const [upsertWorkWeeks] = useMutation(UPSERT_WORKWEEKS, {
-		onCompleted() {
-			refetchUserList()
-			refetchProjectList()
+		onCompleted({ upsertWorkWeeks }) {
+			const updatedProjectList = updateProjectAssignments(
+				projectList,
+				projectId,
+				upsertWorkWeeks.id,
+				upsertWorkWeeks.workWeeks
+			);
+
+			const updatedUserList = updateUserAssignments(
+				userList,
+				userId!,
+				upsertWorkWeeks.id,
+				upsertWorkWeeks.workWeeks
+			);
+			setProjectList(updatedProjectList)
+			setUserList(updatedUserList)
 		}
 	});
 
-	const { refetchUserList, refetchProjectList } = useUserDataContext();
+	const { projectList, userList, setProjectList, setUserList } = useUserDataContext();
 
 	useEffect(() => {
 		const currentWeekExists = months?.some(month =>

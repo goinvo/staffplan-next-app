@@ -83,6 +83,7 @@ export const ProjectAssignmentRow = ({
 									isUserTBD={isUserTBD}
 									withinProjectDates={withinProjectDates}
 									assignment={assignment}
+									project={project}
 									cweek={week.weekNumberOfTheYear}
 									year={month.year}
 									key={`input-${week.weekNumberOfTheYear}`}
