@@ -1,18 +1,24 @@
 "use client";
 import { BaseSyntheticEvent, Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import Link from "next/link";
 import React from "react";
 import { UPSERT_PROJECT } from "../gqlQueries";
 import { useMutation } from "@apollo/client";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { convertProjectToCSV } from "../helperFunctions";
+import { useModal } from "../modalContext";
+import AddAssignmentModal from "./addAssignmentModal";
+import AddProjectModal from "./addProjectModal";
+import { ProjectType } from "../typeInterfaces";
+interface EllipsisProjectMenuProps {
+	project: ProjectType
+}
 
-export default function EllipsisProjectMenu({ project }: any) {
+export default function EllipsisProjectMenu({ project }: EllipsisProjectMenuProps) {
+	const { openModal, closeModal } = useModal();
 	const router = useRouter();
-	const pathname = usePathname();
 	const {
-		client: { name: clientName, id: clientId },
+		client: { id: clientId },
 		name,
 		endsOn,
 		id,
@@ -32,28 +38,12 @@ export default function EllipsisProjectMenu({ project }: any) {
 		isActive
 			? "px-4 py-2 block hover:text-accentgreen hover:cursor-pointer text-sm"
 			: "text-gray-900 block px-4 py-2 text-sm";
-	const query = {
-		clientName: clientName,
-		clientId: clientId,
-		name,
-		endsOn,
-		id,
-		startsOn,
-		status,
-		cost,
-		fte,
-		hours,
-		rateType,
-		hourlyRate
-	};
-	const queryJSONString = JSON.stringify(query);
-	const base64Query = Buffer.from(queryJSONString).toString("base64");
 	const [
 		upsertProject,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_PROJECT, { errorPolicy: "all" });
 	const handleProjectChange = () => {
-		router.push(pathname + "/" + encodeURIComponent(id));
+		router.push(`projects/${id}`);
 	};
 	const onSubmitUpsert = (e: BaseSyntheticEvent) => {
 		const statusCheck = () => {
@@ -144,23 +134,26 @@ export default function EllipsisProjectMenu({ project }: any) {
 						</Menu.Item>
 						<Menu.Item>
 							{({ active }) => (
-								<Link
-									href={`?projectmodal=true&project=${base64Query}`}
+								<button
+									onClick={() => openModal(<AddProjectModal project={project} closeModal={closeModal} />)}
 									className={dropdownSelectedItemClass(active)}
 								>
 									Edit Project
-								</Link>
+								</button>
 							)}
 						</Menu.Item>
 						<Menu.Item>
 							{({ active }) => (
-								<a
-									href={`?assignmentmodal=true&project=${base64Query}`}
+								<button
 									className={dropdownSelectedItemClass(active)}
+									onClick={() =>
+										openModal(<AddAssignmentModal project={project} closeModal={closeModal} />)
+									}
 								>
 									Add Person
-								</a>
+								</button>
 							)}
+
 						</Menu.Item>
 						<button className="px-4 py-2 text-sm hover:text-accentgreen border-none" onClick={downloadCSV}>
 							Export CSV

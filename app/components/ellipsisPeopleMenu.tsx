@@ -2,32 +2,31 @@
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import React from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useModal } from "../modalContext";
+import { UserType } from "../typeInterfaces";
+import AddAssignmentModal from "./addAssignmentModal";
 
-export default function EllipsisPeopleMenu({ user }: any) {
+interface EllipsisPeopleMenuProps {
+	user: UserType
+}
+export default function EllipsisPeopleMenu({ user }: EllipsisPeopleMenuProps) {
+	const { openModal, closeModal } = useModal();
 	const router = useRouter();
-	const pathname = usePathname();
-	const { name, id, avatarUrl } = user;
+
 	const dropdownSelectedItemClass = (isActive: boolean) =>
 		isActive
 			? "px-4 py-2 block hover:text-accentgreen hover:cursor-pointer text-sm"
 			: "text-gray-900 block px-4 py-2 text-sm";
-	const query = {
-		name,
-		avatarUrl,
-		id,
-	};
-	const queryJSONString = JSON.stringify(query);
-	const base64Query = Buffer.from(queryJSONString).toString("base64");
+
 	const handleUserChange = () => {
-		router.push(pathname + "/" + encodeURIComponent(user.id));
+		router.push(`people/${user.id}`);
 	};
 	return (
 		<Menu
 			as="div"
 			className="relative inline-block text-left z-100"
-			id="add-dropdown"
-			data-testid="add-dropdown"
+			id="add-dropdown" data-testid="add-dropdown"
 		>
 			<Menu.Button className="relative z-1 actionbar-text-accent w-full h-full rounded-full flex justify-center items-center ellipsismenu text-2xl"></Menu.Button>
 
@@ -54,13 +53,16 @@ export default function EllipsisPeopleMenu({ user }: any) {
 						</Menu.Item>
 						<Menu.Item>
 							{({ active }) => (
-								<a
-									href={`?assignmentmodal=true&user=${base64Query}`}
+								<button
 									className={dropdownSelectedItemClass(active)}
+									onClick={() =>
+										openModal(<AddAssignmentModal user={user} closeModal={closeModal} />)
+									}
 								>
 									Add Person
-								</a>
+								</button>
 							)}
+
 						</Menu.Item>
 					</div>
 				</Menu.Items>
