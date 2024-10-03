@@ -149,9 +149,9 @@ export const GET_USER_LIST = gql`
 	}
 `;
 export const GET_ALL_CLIENTS_DATA = gql`
-{
-  currentCompany{
-    id
+	{
+		currentCompany {
+			id
 			clients {
 				description
 				id
@@ -203,8 +203,8 @@ export const GET_ALL_CLIENTS_DATA = gql`
 				}
 			}
 		}
-}
-`
+	}
+`;
 export const GET_ALL_PROJECTS_DATA = gql`
 	{
 		currentCompany {
@@ -221,8 +221,8 @@ export const GET_ALL_PROJECTS_DATA = gql`
 				hourlyRate
 				hours
 				fte
-				assignments{
-					assignedUser{
+				assignments {
+					assignedUser {
 						name
 						id
 						avatarUrl
@@ -232,7 +232,7 @@ export const GET_ALL_PROJECTS_DATA = gql`
 					estimatedWeeklyHours
 					endsOn
 					status
-					workWeeks{
+					workWeeks {
 						actualHours
 						estimatedHours
 						cweek
@@ -241,7 +241,7 @@ export const GET_ALL_PROJECTS_DATA = gql`
 							name
 						}
 					}
-				  }
+				}
 				client {
 					id
 					name
@@ -271,6 +271,13 @@ export const GET_VIEWER = gql`
 `;
 
 //mutations
+export const DELETE_ASSIGNMENT = gql`
+	mutation DeleteAssignment($assignmentId: ID!) {
+		deleteAssignment(assignmentId: $assignmentId) {
+			id
+		}
+	}
+`;
 export const UPSERT_ASSIGNMENT = gql`
 	mutation UpsertAssignment(
 		$id: ID
@@ -423,20 +430,18 @@ export const UPSERT_WORKWEEK = gql`
 `;
 
 export const UPSERT_WORKWEEKS = gql`
-    mutation UpsertWorkWeeks(
-	   $assignmentId: ID!
-	   $workWeeks: [WorkWeeksInputObject!]!
-) {
-	upsertWorkWeeks(
-		assignmentId: $assignmentId
-	    workWeeks: $workWeeks
+	mutation UpsertWorkWeeks(
+		$assignmentId: ID!
+		$workWeeks: [WorkWeeksInputObject!]!
 	) {
-		id
-	  workWeeks {
-			cweek
-			year
-			estimatedHours
-			actualHours
+		upsertWorkWeeks(assignmentId: $assignmentId, workWeeks: $workWeeks) {
+			id
+			workWeeks {
+				cweek
+				year
+				estimatedHours
+				actualHours
+			}
 		}
 	}
-}`
+`;

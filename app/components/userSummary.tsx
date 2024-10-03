@@ -6,16 +6,16 @@ import { ArchiveBoxIcon } from "@heroicons/react/24/outline";
 import { AssignmentType, UserSummaryProps } from "../typeInterfaces";
 import { useUserDataContext } from "../userDataContext";
 import IconButton from "./iconButton";
-import { UPSERT_ASSIGNMENT } from "../gqlQueries";
+import { DELETE_ASSIGNMENT, UPSERT_ASSIGNMENT } from "../gqlQueries";
 import { useMutation } from "@apollo/client";
 
-const UserSummary: React.FC<UserSummaryProps> = ({ assignment,selectedUser, setSelectedUser, setTempProjectOpen }) => {
+const UserSummary: React.FC<UserSummaryProps> = ({ assignment,selectedUser, setSelectedUser, setTempProjectOpen, project }) => {
 	const { viewsFilter } = useUserDataContext();
 	const burnedHours = assignment.workWeeks.reduce(
 		(acc, curr) => acc + (curr.actualHours ?? 0),
 		0
 	);
-	const {refetchUserList} = useUserDataContext();
+	const {refetchUserList, refetchProjectList} = useUserDataContext();
 	const pastPlan = () => {
 		const now = DateTime.now();
 		const startOfAssignment = DateTime.fromISO(assignment.startsOn ?? "");
@@ -36,37 +36,56 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment,selectedUser, setS
 		errorPolicy: "all",
 		onCompleted({ upsertAssignment }) {
 			refetchUserList();
+			refetchProjectList();
 		},
 	});
-	const handleArchiveItemClick = () => {
-		if(assignment.project.isTempProject){
-			const removedTempAssignment = selectedUser?.assignments.filter((a:AssignmentType) => a.id !== assignment.id);
-			const selectedUserData = {
-				...selectedUser,
-				assignments: removedTempAssignment || [],
-				name: selectedUser?.name || "Default Name",
-				avatarUrl: selectedUser?.avatarUrl || "defaultAvatarUrl.png",
-			};
-		if (setTempProjectOpen) {
-			setTempProjectOpen(false);
-		}	
-		if (setSelectedUser) {
-			setSelectedUser(selectedUserData);
-		}
-			return;
-		}
-			if (assignment.status !== 'archived') {
-			const variables = {
-				id: assignment.id,
-				projectId: assignment.project.id,
-				userId: assignment.assignedUser.id,
-				status: 'archived'
-			};
-			upsertAssignment({
-				variables
-			})
-		}
-	}
+	const [deleteAssignment] = useMutation(DELETE_ASSIGNMENT, {
+        errorPolicy: "all",
+        onCompleted({ deleteAssignment }) {
+            refetchUserList();
+            refetchProjectList();
+        },
+    })
+    const handleArchiveItemClick = () => {
+        if(assignment.project && assignment.project.isTempProject){
+            const removedTempAssignment = selectedUser?.assignments.filter((a:AssignmentType) => a.id !== assignment.id);
+            const selectedUserData = {
+                ...selectedUser,
+                assignments: removedTempAssignment || [],
+                name: selectedUser?.name || "Default Name",
+                avatarUrl: selectedUser?.avatarUrl || "defaultAvatarUrl.png",
+            };
+        if (setTempProjectOpen) {
+            setTempProjectOpen(false);
+        }   
+        if (setSelectedUser) {
+            setSelectedUser(selectedUserData);
+        }
+            return;
+        }
+        if (assignment.assignedUser === null) {
+            const variables = {
+                assignmentId: assignment.id,
+            };
+            deleteAssignment({
+                variables
+            })
+            return 
+        }
+            if (assignment.status !== 'archived') {
+            const projectId = project ? project.id : assignment.project.id;
+            const variables = {
+                id: assignment.id,
+                projectId: projectId,
+                userId: assignment.assignedUser.id,
+                status: 'archived'
+            };
+            upsertAssignment({
+                variables
+            })
+        }
+    }
+
 
 	return (
 		<td className="font-normal py-2 pl-4 w-1/6 flex items-center justify-between">

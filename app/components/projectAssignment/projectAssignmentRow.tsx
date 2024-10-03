@@ -98,7 +98,7 @@ export const ProjectAssignmentRow = ({
 						</td>)
 				});
 			})}
-			{isLastMonth && <UserSummary assignment={assignment} />}
+			{isLastMonth && <UserSummary assignment={assignment} project={project}/>}
 		</tr >
 	);
 };

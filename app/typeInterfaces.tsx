@@ -167,6 +167,7 @@ export interface UserSummaryProps {
 	setSelectedUser?: (user: UserType) => void;
 	setTempProjectOpen?: (tempProjectOpen: boolean) => void;
 	tempProjectOpen?: boolean;
+	project?: ProjectType;
 }
 export interface ViewerType {
 	name: string;
@@ -182,6 +183,7 @@ export interface ViewsFiltersType {
 	rollupSort: string;
 	showSummaries: boolean;
 	showArchivedProjects: boolean;
+	showArchivedAssignments: boolean;
 	showInactiveUsers: boolean;
 }
 
