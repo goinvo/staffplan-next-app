@@ -20,6 +20,7 @@ import { sortProjectList, sortUserList } from "./helperFunctions";
 import {
 	getStartOfPreviousWeek
 } from "./components/scrollingCalendar/helpers";
+import { isEqual } from "lodash";
 
 export interface UserDataContextType {
 	userList: any;
@@ -174,8 +175,32 @@ export const UserListProvider: React.FC<React.PropsWithChildren<{}>> = ({
 				)
 			);
 		}
-	}, [projectData, viewsFilter]);
+	}, [projectData]);
 
+	useEffect(() => {
+		if (projectList) {
+	
+		  const sortedProjectList = sortProjectList(
+			viewsFilter.selectedProjectSort,
+			projectList
+		  );
+		  if (viewsFilter.showArchivedProjects) {
+			if (JSON.stringify(sortedProjectList) !== JSON.stringify(projectList)) {
+			  setUserList(sortedProjectList);
+			}
+	
+		  }
+	
+		  if (!isEqual(sortedProjectList, projectList)) {
+			setProjectList(
+			  sortedProjectList?.filter(
+				(project: ProjectType) => project.status !== "archived"
+			  )
+			);
+		  }
+		}
+	  }, [projectList, viewsFilter])
+	  
 	useEffect(() => {
 		if (clientData) {
 			setClientList(clientData.currentCompany.clients);
