@@ -830,12 +830,12 @@ export const checkIfWeekExists = (
 
 export const updateUserAssignments = (
   userList: UserType[],
-  selectedUserId: number,
+  selectedUserId: number | string,
   assignmentId: number,
   updatedWorkWeeks: WorkWeekType[]
 ): UserType[] => {
   return userList.map((user) => {
-    if (user.id === selectedUserId) {
+    if (user.id?.toString() === selectedUserId.toString()) {
       const updatedAssignments = user.assignments.map((assignment) => {
         if (assignment.id === assignmentId) {
           return {
@@ -944,12 +944,12 @@ export const updateOrInsertWorkWeekInProject = (
 
 export const updateOrInsertWorkWeek = (
   userList: UserType[],
-  userId: number,
+  userId: string | number,
   assignmentId: number,
   workWeek: WorkWeekType
 ): UserType[] => {
   return userList.map((user) => {
-    if (user.id === userId) {
+    if (user.id?.toString() === userId.toString()) {
       const updatedAssignments = user.assignments.map((assignment) => {
         if (assignment.id.toString() === assignmentId.toString()) {
           const workWeekIndex = assignment.workWeeks.findIndex(
