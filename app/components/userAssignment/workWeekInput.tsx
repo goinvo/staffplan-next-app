@@ -57,13 +57,15 @@ export const WorkWeekInput = ({
 		year: year,
 	};
 	const { project: { id: projectId } } = assignment;
-	const { assignedUser: { id: userId } } = assignment;
+	const { assignedUser } = assignment || {};
+	const userId = assignedUser?.id || '';
+
 	const [upsertWorkWeek] = useMutation(UPSERT_WORKWEEK, {
 		onCompleted: async ({ upsertWorkWeek }) => {
 			const { assignmentId, id, ...workWeek } = upsertWorkWeek
 			const updatedUserList = updateOrInsertWorkWeek(
 				userList,
-				userId!,
+				userId,
 				assignmentId,
 				workWeek
 			);
@@ -89,7 +91,7 @@ export const WorkWeekInput = ({
 
 			const updatedUserList = updateUserAssignments(
 				userList,
-				userId!,
+				userId,
 				upsertWorkWeeks.id,
 				upsertWorkWeeks.workWeeks
 			);
