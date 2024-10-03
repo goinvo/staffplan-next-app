@@ -28,7 +28,7 @@ const AirTableFormModal = ({ closeModal }: AirTableModalProps) => {
 							{!iframeLoaded && <LoadingSpinner />}
 							<iframe
 								className="airtable-embed w-full h-133 bg-transparent border border-gray-300"
-								src={"https://airtable.com/embed/appE6EvqnfyQTmfcG/paggYwwsljwfF9Jdm/form"} // iframe уже предзагружен
+								src={"https://airtable.com/embed/appE6EvqnfyQTmfcG/paggYwwsljwfF9Jdm/form"}
 								width="100%"
 								height="533"
 								style={{ background: "transparent" }}

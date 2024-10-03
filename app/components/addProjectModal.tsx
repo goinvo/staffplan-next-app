@@ -1,43 +1,41 @@
 "use client";
 import { useState } from "react";
-import ProjectDatepicker from "./projectDatepicker";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useMutation } from "@apollo/client";
-import withApollo from "@/lib/withApollo";
 import { Field, Formik, FormikValues } from "formik";
+
+import ProjectDatepicker from "./projectDatepicker";
+import { useMutation } from "@apollo/client";
 import { ClientType, ProjectType } from "../typeInterfaces";
 import { UPSERT_PROJECT } from "../gqlQueries";
 import { differenceInBusinessDays } from "date-fns";
-import { Dialog } from "@headlessui/react";
 import { ReactNode } from "react";
 import { useUserDataContext } from "../userDataContext";
 import { LoadingSpinner } from "./loadingSpinner";
-
-const AddProject = () => {
+interface AddProjectModalProps {
+	project: ProjectType;
+	closeModal: () => void;
+}
+const AddProjectModal = ({ project, closeModal }: AddProjectModalProps) => {
 	const [selectedClient, setSelectedClient] = useState<number | string>("");
-	const router = useRouter();
-	const searchParams = useSearchParams();
-	const modalParam = searchParams.get("projectmodal");
-	const projectInParam = searchParams.get("project");
-	const { projectList, setProjectList, clientList,refetchProjectList } = useUserDataContext();
-	const decodeQuery = projectInParam
-		? Buffer.from(projectInParam, "base64").toString()
-		: "";
-	const parsedProject = decodeQuery ? JSON.parse(decodeQuery) : "";
+	const {
+		client: { id: clientId },
+	} = project;
+
+	const { projectList, clientList, refetchProjectList, refetchUserList } = useUserDataContext();
+
 	const editProjectInitialValues = {
-		id: parsedProject.id,
-		client: parsedProject.clientId,
+		id: project.id,
+		client: clientId,
 		dates: {
-			endsOn: parsedProject.endsOn ? parsedProject.endsOn : "",
-			startsOn: parsedProject.startsOn,
+			endsOn: project.endsOn || "",
+			startsOn: project.startsOn,
 		},
-		hours: parsedProject.hours ? parsedProject.hours : 0,
-		name: parsedProject.name,
-		numOfFTE: parsedProject.fte ? parsedProject.fte : 0,
-		rateType: parsedProject.rateType ? parsedProject.rateType : "fixed",
-		cost: parsedProject.cost,
-		status: parsedProject.status === "confirmed" ? true : false,
-		hourlyRate: parsedProject.hourlyRate > 0 ? parsedProject.hourlyRate : 0,
+		hours: project.hours || 0,
+		name: project.name,
+		numOfFTE: project.fte || 0,
+		rateType: project.rateType || "fixed",
+		cost: project.cost,
+		status: project.status === "confirmed" ? true : false,
+		hourlyRate: project?.hourlyRate ?? 0,
 	};
 	const newProjectInitialValues = {
 		client: "",
@@ -50,15 +48,16 @@ const AddProject = () => {
 		rateType: "fixed",
 		status: false,
 	};
-	const initialValues = parsedProject
+	const initialValues = project
 		? editProjectInitialValues
 		: newProjectInitialValues;
 
-	const showModal = modalParam ? true : false;
 	const [upsertProject] = useMutation(UPSERT_PROJECT, {
 		errorPolicy: "all",
-		onCompleted({ upsertProject }) {
+		onCompleted() {
 			refetchProjectList();
+			refetchUserList();
+			closeModal()
 		},
 	});
 
@@ -92,9 +91,9 @@ const AddProject = () => {
 		};
 		upsertProject({
 			variables: nullableDates(),
-		}).then(() => router.back());
+		})
 	};
-	const onCancel = () => router.back();
+
 	const validateForm = (values: FormikValues) => {
 		const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
 		if (!values.client) {
@@ -199,328 +198,317 @@ const AddProject = () => {
 	if (!clientList || !projectList) return <LoadingSpinner />;
 	return (
 		<>
-			{showModal && (
-				<Dialog
-					open={showModal}
-					onClose={onCancel}
-					className="relative z-50"
-					aria-labelledby="project-modal"
-					aria-modal="true"
-				>
-					<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-					<div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-						<div className="flex min-h-full p-4 text-center justify-center sm:items-center sm:p-0">
-							<div className="relative transform overflow-hidden w-1/2 rounded-xl bg-white text-left shadow-xl transition-all">
-								<div className="bg-white p-10">
-									<div className="sm:flex-auto">
-										<div>
-											<Formik
-												onSubmit={(e) => {
-													onSubmitUpsert(e);
-												}}
-												initialValues={initialValues}
-												validate={validateForm}
+			<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+			<div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+				<div className="flex min-h-full p-4 text-center justify-center sm:items-center sm:p-0">
+					<div className="relative transform overflow-hidden w-1/2 rounded-xl bg-white text-left shadow-xl transition-all">
+						<div className="bg-white p-10">
+							<div className="sm:flex-auto">
+								<div>
+									<Formik
+										onSubmit={(e) => {
+											onSubmitUpsert(e);
+										}}
+										initialValues={initialValues}
+										validate={validateForm}
+									>
+										{({
+											handleSubmit,
+											handleChange,
+											values,
+											setErrors,
+											handleBlur,
+											errors,
+											touched,
+											isValid,
+											setFieldValue,
+										}) => (
+											<form
+												onSubmit={handleSubmit}
+												className="max-w-lg mx-auto"
 											>
-												{({
-													handleSubmit,
-													handleChange,
-													values,
-													setErrors,
-													handleBlur,
-													errors,
-													touched,
-													isValid,
-													setFieldValue,
-												}) => (
-													<form
-														onSubmit={handleSubmit}
-														className="max-w-lg mx-auto"
-													>
-														{/* section 1 */}
-														<div className="flex mb-4 pb-2 border-b-4">
-															<div className="w-1/2 -mr-1 flex flex-col">
-																<label htmlFor="projectName">
-																	Name(*required)
-																	<input
-																		autoComplete="off"
-																		id="projectName"
-																		name="name"
-																		value={values.name}
-																		onBlur={handleBlur}
-																		onChange={handleChange}
-																		className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
-																		placeholder="Enter Name"
-																	/>
-																</label>
-															</div>
-															<div className="w-1/4 mr-4 flex flex-col">
-																<label>Client(*required)</label>
+												{/* section 1 */}
+												<div className="flex mb-4 pb-2 border-b-4">
+													<div className="w-1/2 -mr-1 flex flex-col">
+														<label htmlFor="projectName">
+															Name(*required)
+															<input
+																autoComplete="off"
+																id="projectName"
+																name="name"
+																value={values.name}
+																onBlur={handleBlur}
+																onChange={handleChange}
+																className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
+																placeholder="Enter Name"
+															/>
+														</label>
+													</div>
+													<div className="w-1/4 mr-4 flex flex-col">
+														<label>Client(*required)</label>
+														<Field
+															onChange={(
+																e: React.ChangeEvent<HTMLInputElement>
+															) => {
+																handleChange(e);
+																setSelectedClient(e.target.value);
+															}}
+															as="select"
+															name="client"
+															id="client"
+															className="block mt-1 px-2 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
+														>
+															<option value={""}>SELECT</option>
+															{clientList?.map((client: ClientType) => {
+																return (
+																	<option
+																		key={`${client.id} + ${client.name}`}
+																		value={client.id}
+																	>
+																		{" "}
+																		{client.name}
+																	</option>
+																);
+															})}
+														</Field>
+													</div>
+													<div className="mr-2 pt-5 flex items-center">
+														<label className="inline-block pl-[0.15rem] hover:cursor-pointer w-[1px]">
+															<Field
+																className="mr-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-neutral-300 
+																		hover:checked:bg-accentgreen
+																		before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-neutral-100 after:shadow-[0_0px_3px_0_rgb(0_0_0_/_7%),_0_2px_2px_0_rgb(0_0_0_/_4%)] after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-accentgreen checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ml-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-accentgreen checked:after:shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),_0_2px_2px_0_rgba(0,0,0,0.14),_0_1px_5px_0_rgba(0,0,0,0.12)] checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[3px_-1px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:border-accentgreen checked:focus:bg-accentgreen checked:focus:before:ml-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-neutral-600 dark:after:bg-neutral-400 dark:checked:bg-accentgreen dark:checked:after:bg-accentgreen dark:focus:before:shadow-[3px_-1px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca]"
+																type="checkbox"
+																name="status"
+															/>
+															{values.status ? "confirmed" : "unconfirmed"}
+														</label>
+													</div>
+												</div>
+												{/* section 2 */}
+												<div className="flex mb-4 pb-2 border-b-4">
+													<div className="w-1/5 mr-4 flex flex-col">
+														<Field
+															name="dates"
+															handleBlur={handleBlur}
+															component={ProjectDatepicker}
+															projectView={false}
+														/>
+													</div>
+												</div>
+												{/* section 3 */}
+												<div className="flex mb-4 pb-2 border-b-4 space-x-10">
+													<div className="w-1/4 mr-4 flex flex-col">
+														<label className="block font-medium text-gray-900">
+															FTE
+															<input
+																type="number"
+																min="0"
+																max="100"
+																step="0.5"
+																name="numOfFTE"
+																id="numOfFTE"
+																autoComplete="numOfFTE"
+																className="block w-full mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
+																placeholder="1.0"
+																onBlur={handleBlur}
+																onChange={(e) => {
+																	handleChange(e);
+																	calculateHours(e, values, setFieldValue);
+																}}
+																value={values.numOfFTE}
+															/>
+														</label>
+													</div>
+													<div className="w-1/4 flex flex-col">
+														<label
+															htmlFor="hours"
+															className="block font-medium text-gray-900"
+														>
+															Hours
+														</label>
+														<input
+															type="number"
+															name="hours"
+															id="hours"
+															min={0}
+															autoComplete="hours"
+															className="block w-full mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
+															placeholder=""
+															value={values.hours}
+															onChange={(e) => {
+																handleChange(e);
+																handleManualHours(e, values, setFieldValue);
+															}}
+															readOnly={values.dates.endsOn ? true : false}
+														/>
+													</div>
+												</div>
+												{/* Section 4 */}
+												<div className="flex mb-4 pb-2 border-b-4">
+													<div className="w-1/3 -mr-1 flex flex-col">
+														<div className="block">
+															<label>
 																<Field
+																	type="radio"
+																	name="rateType"
+																	value="fixed"
+																	id="fixed"
 																	onChange={(
 																		e: React.ChangeEvent<HTMLInputElement>
 																	) => {
 																		handleChange(e);
-																		setSelectedClient(e.target.value);
+																		setFieldValue("hourlyRate", 0);
+																		setFieldValue("cost", 0);
 																	}}
-																	as="select"
-																	name="client"
-																	id="client"
-																	className="block mt-1 px-2 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
-																>
-																	<option value={""}>SELECT</option>
-																	{clientList?.map((client: ClientType) => {
-																		return (
-																			<option
-																				key={`${client.id} + ${client.name}`}
-																				value={client.id}
-																			>
-																				{" "}
-																				{client.name}
-																			</option>
-																		);
-																	})}
-																</Field>
-															</div>
-															<div className="mr-2 pt-5 flex items-center">
-																<label className="inline-block pl-[0.15rem] hover:cursor-pointer w-[1px]">
-																	<Field
-																		className="mr-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-neutral-300 
-																		hover:checked:bg-accentgreen
-																		before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-neutral-100 after:shadow-[0_0px_3px_0_rgb(0_0_0_/_7%),_0_2px_2px_0_rgb(0_0_0_/_4%)] after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-accentgreen checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ml-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-accentgreen checked:after:shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),_0_2px_2px_0_rgba(0,0,0,0.14),_0_1px_5px_0_rgba(0,0,0,0.12)] checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[3px_-1px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:border-accentgreen checked:focus:bg-accentgreen checked:focus:before:ml-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-neutral-600 dark:after:bg-neutral-400 dark:checked:bg-accentgreen dark:checked:after:bg-accentgreen dark:focus:before:shadow-[3px_-1px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca]"
-																		type="checkbox"
-																		name="status"
-																	/>
-																	{values.status ? "confirmed" : "unconfirmed"}
-																</label>
-															</div>
-														</div>
-														{/* section 2 */}
-														<div className="flex mb-4 pb-2 border-b-4">
-															<div className="w-1/5 mr-4 flex flex-col">
-																<Field
-																	name="dates"
-																	handleBlur={handleBlur}
-																	component={ProjectDatepicker}
-																	projectView={false}
+																	className="form-radio text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent mr-1"
 																/>
-															</div>
+																Fixed Rate
+															</label>
 														</div>
-														{/* section 3 */}
-														<div className="flex mb-4 pb-2 border-b-4 space-x-10">
-															<div className="w-1/4 mr-4 flex flex-col">
-																<label className="block font-medium text-gray-900">
-																	FTE
-																	<input
-																		type="number"
-																		min="0"
-																		max="100"
-																		step="0.5"
-																		name="numOfFTE"
-																		id="numOfFTE"
-																		autoComplete="numOfFTE"
-																		className="block w-full mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
-																		placeholder="1.0"
-																		onBlur={handleBlur}
-																		onChange={(e) => {
-																			handleChange(e);
-																			calculateHours(e, values, setFieldValue);
-																		}}
-																		value={values.numOfFTE}
-																	/>
-																</label>
-															</div>
-															<div className="w-1/4 flex flex-col">
-																<label
-																	htmlFor="hours"
-																	className="block font-medium text-gray-900"
-																>
-																	Hours
-																</label>
+														<div className="block">
+															<label>
+																<Field
+																	type="radio"
+																	name="rateType"
+																	value="hourly"
+																	id="hourly"
+																	onChange={(
+																		e: React.ChangeEvent<HTMLInputElement>
+																	) => {
+																		handleChange(e);
+																		setFieldValue("cost", 0);
+																	}}
+																	className="form-radio text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent mr-1"
+																/>
+																Hourly Rate
+															</label>
+														</div>
+													</div>
+													<div className="w-1/2 mr-4 flex">
+														<label className="mr-3">
+															<span className="relative">
+																<span className="absolute inset-y-0 left-0 pl-3 pb-5 flex items-center pointer-events-none">
+																	$
+																</span>
 																<input
+																	disabled={
+																		values.rateType === "fixed" ||
+																		values.hours === 0
+																	}
 																	type="number"
-																	name="hours"
-																	id="hours"
-																	min={0}
-																	autoComplete="hours"
-																	className="block w-full mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
-																	placeholder=""
-																	value={values.hours}
+																	min="0"
+																	value={values.hourlyRate}
+																	name="hourlyRate"
+																	id="hourlyRate"
+																	autoComplete="hourlyRate"
+																	onBlur={handleBlur}
 																	onChange={(e) => {
 																		handleChange(e);
-																		handleManualHours(e, values, setFieldValue);
+																		setTotalCost(e, values, setFieldValue);
 																	}}
-																	readOnly={values.dates.endsOn ? true : false}
+																	className={
+																		values.rateType === "fixed"
+																			? "bg-slate-500 w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
+																			: "w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
+																	}
+																	placeholder="0"
 																/>
-															</div>
-														</div>
-														{/* Section 4 */}
-														<div className="flex mb-4 pb-2 border-b-4">
-															<div className="w-1/3 -mr-1 flex flex-col">
-																<div className="block">
-																	<label>
-																		<Field
-																			type="radio"
-																			name="rateType"
-																			value="fixed"
-																			id="fixed"
-																			onChange={(
-																				e: React.ChangeEvent<HTMLInputElement>
-																			) => {
-																				handleChange(e);
-																				setFieldValue("hourlyRate", 0);
-																				setFieldValue("cost", 0);
-																			}}
-																			className="form-radio text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent mr-1"
-																		/>
-																		Fixed Rate
-																	</label>
-																</div>
-																<div className="block">
-																	<label>
-																		<Field
-																			type="radio"
-																			name="rateType"
-																			value="hourly"
-																			id="hourly"
-																			onChange={(
-																				e: React.ChangeEvent<HTMLInputElement>
-																			) => {
-																				handleChange(e);
-																				setFieldValue("cost", 0);
-																			}}
-																			className="form-radio text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent mr-1"
-																		/>
-																		Hourly Rate
-																	</label>
-																</div>
-															</div>
-															<div className="w-1/2 mr-4 flex">
-																<label className="mr-3">
-																	<span className="relative">
-																		<span className="absolute inset-y-0 left-0 pl-3 pb-5 flex items-center pointer-events-none">
-																			$
-																		</span>
-																		<input
-																			disabled={
-																				values.rateType === "fixed" ||
-																				values.hours === 0
-																			}
-																			type="number"
-																			min="0"
-																			value={values.hourlyRate}
-																			name="hourlyRate"
-																			id="hourlyRate"
-																			autoComplete="hourlyRate"
-																			onBlur={handleBlur}
-																			onChange={(e) => {
-																				handleChange(e);
-																				setTotalCost(e, values, setFieldValue);
-																			}}
-																			className={
-																				values.rateType === "fixed"
-																					? "bg-slate-500 w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
-																					: "w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
-																			}
-																			placeholder="0"
-																		/>
-																	</span>
-																	Rate($/hr)
-																</label>
-																<label>
-																	<span className="relative">
-																		<span className="absolute inset-y-0 left-0 pl-3 pb-5 flex items-center pointer-events-none">
-																			$
-																		</span>
-																		<input
-																			disabled={values.rateType === "hourly"}
-																			type="number"
-																			min="0"
-																			name="cost"
-																			value={values.cost}
-																			id="cost"
-																			autoComplete="cost"
-																			onBlur={handleBlur}
-																			onChange={(e) => {
-																				handleChange(e);
-																				setTotalCost(e, values, setFieldValue);
-																			}}
-																			className="w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
-																			placeholder="0"
-																		/>
-																	</span>
-																	Value(k$)
-																</label>
-															</div>
-														</div>
-														{/* section 5 */}
-														<div className="flex mb-4 justify-between">
-															<div className="mr-2">
-																<button
-																	type="button"
-																	className="p-2 text-sm font-semibold leading-6 text-gray-900"
-																	onClick={() => {
-																		onCancel();
-																		setErrors({});
+															</span>
+															Rate($/hr)
+														</label>
+														<label>
+															<span className="relative">
+																<span className="absolute inset-y-0 left-0 pl-3 pb-5 flex items-center pointer-events-none">
+																	$
+																</span>
+																<input
+																	disabled={values.rateType === "hourly"}
+																	type="number"
+																	min="0"
+																	name="cost"
+																	value={values.cost}
+																	id="cost"
+																	autoComplete="cost"
+																	onBlur={handleBlur}
+																	onChange={(e) => {
+																		handleChange(e);
+																		setTotalCost(e, values, setFieldValue);
 																	}}
-																>
-																	Cancel
-																</button>
-																<button
-																	type="submit"
-																	disabled={!isValid}
-																	className={`rounded-md bg-${
-																		isValid ? "accentgreen" : "slate-500"
-																	} px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accentgreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accentgreen`}
-																>
-																	Save
-																</button>
+																	className="w-full max-w-xs block mt-1 mr-3 pl-6 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
+																	placeholder="0"
+																/>
+															</span>
+															Value(k$)
+														</label>
+													</div>
+												</div>
+												{/* section 5 */}
+												<div className="flex mb-4 justify-between">
+													<div className="mr-2">
+														<button
+															type="button"
+															className="p-2 text-sm font-semibold leading-6 text-gray-900"
+															onClick={() => {
+																closeModal()
+																setErrors({});
+															}}
+														>
+															Cancel
+														</button>
+														<button
+															type="submit"
+															disabled={!isValid}
+															className={`rounded-md bg-${isValid ? "accentgreen" : "slate-500"
+																} px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accentgreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accentgreen`}
+														>
+															Save
+														</button>
 
-																{errors.dates &&
-																	(touched.dates?.startsOn ||
-																		touched.dates?.endsOn) && (
-																		<div className="text-red-500">
-																			{errors.dates?.endsOn as ReactNode}
-																		</div>
-																	)}
-																{errors.name && touched.name && (
-																	<div className="text-red-500">
-																		{errors.name as ReactNode}
-																	</div>
-																)}
-																{errors.client && touched.client && (
-																	<div className="text-red-500">
-																		{errors.client as ReactNode}
-																	</div>
-																)}
-																{errors.cost && (
-																	<div className="text-red-500">
-																		{errors.cost as ReactNode}
-																	</div>
-																)}
-																{errors.rateType && touched.rateType && (
-																	<div className="text-red-500">
-																		{errors.rateType as ReactNode}
-																	</div>
-																)}
-																{errors.numOfFTE && touched.numOfFTE && (
-																	<div className="text-red-500">
-																		{errors.numOfFTE as ReactNode}
-																	</div>
-																)}
+														{errors.dates &&
+															(touched.dates?.startsOn ||
+																touched.dates?.endsOn) && (
+																<div className="text-red-500">
+																	{errors.dates?.endsOn as ReactNode}
+																</div>
+															)}
+														{errors.name && touched.name && (
+															<div className="text-red-500">
+																{errors.name as ReactNode}
 															</div>
-														</div>
-													</form>
-												)}
-											</Formik>
-										</div>
-									</div>
+														)}
+														{errors.client && touched.client && (
+															<div className="text-red-500">
+																{errors.client as ReactNode}
+															</div>
+														)}
+														{errors.cost && (
+															<div className="text-red-500">
+																{errors.cost as ReactNode}
+															</div>
+														)}
+														{errors.rateType && touched.rateType && (
+															<div className="text-red-500">
+																{errors.rateType as ReactNode}
+															</div>
+														)}
+														{errors.numOfFTE && touched.numOfFTE && (
+															<div className="text-red-500">
+																{errors.numOfFTE as ReactNode}
+															</div>
+														)}
+													</div>
+												</div>
+											</form>
+										)}
+									</Formik>
 								</div>
 							</div>
 						</div>
 					</div>
-				</Dialog>
-			)}
+				</div>
+			</div>
 		</>
 	);
 };
-export default withApollo(AddProject);
+export default AddProjectModal;
