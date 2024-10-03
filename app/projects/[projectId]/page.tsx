@@ -61,13 +61,6 @@ const ProjectPage: React.FC = () => {
 			if (foundProject) {
 				setSingleProjectPage(foundProject);
 				setSelectedProject(foundProject);
-				
-				// // Use foundProject instead of selectedProject
-				// const sortedAssignments = viewsFilter.showArchivedAssignments 
-				// 	? sortSingleProject(viewsFilter.singleProjectSort, foundProject.assignments || [])
-				// 	: sortSingleProject(viewsFilter.singleProjectSort, 
-				// 		foundProject.assignments?.filter((assignment: AssignmentType) => assignment.status !== 'archived') || []);
-				// setProjectAssignments(sortedAssignments);
 			}
 		}
 	}, [
