@@ -106,9 +106,6 @@ const ProjectPage: React.FC = () => {
 		viewsFilter.singleProjectSort,
 		selectedProject?.assignments || []
 	) : sortSingleProject(viewsFilter.singleProjectSort,selectedProject?.assignments?.filter((assignment: AssignmentType) => assignment.status !== 'archived') || []);
-	console.log(projectAssignments, "PROJECT ASSIGNMENTS")
-	console.log(projectList, "PROJECT LIST")
-	console.log(selectedProject, "SELECTED PROJECT")
 	return (
 		<>
 			{selectedProject && projectList && sortedAssignments ? (
