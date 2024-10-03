@@ -57,7 +57,8 @@ const ColumnChart = ({
                     {height || 0}
                 </span>
                 {!!height && (
-                    <svg width='34px' height={svgHeight} viewBox={`0 0 34 ${svgHeight}`} xmlns="http://www.w3.org/2000/svg">
+                    <svg width='34px' height={svgHeight} viewBox={`0 0 34 ${svgHeight}`} xmlns="http://www.w3.org/2000/svg" className="transition-height duration-200 ease"
+                    >
                         {drawPath()}
                     </svg>
                 )}

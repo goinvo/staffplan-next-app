@@ -3,6 +3,8 @@ import {
   WorkWeekType,
   AssignmentType,
   MonthsDataType,
+  UserType,
+  ProjectType,
 } from "@/app/typeInterfaces";
 import { ACTUAL_HOURS } from "./constants";
 
@@ -824,4 +826,161 @@ export const checkIfWeekExists = (
 ): boolean => {
   const date = DateTime.fromObject({ weekYear: year, weekNumber });
   return date.isValid;
+};
+
+export const updateUserAssignments = (
+  userList: UserType[],
+  selectedUserId: number,
+  assignmentId: number,
+  updatedWorkWeeks: WorkWeekType[]
+): UserType[] => {
+  return userList.map((user) => {
+    if (user.id === selectedUserId) {
+      const updatedAssignments = user.assignments.map((assignment) => {
+        if (assignment.id === assignmentId) {
+          return {
+            ...assignment,
+            workWeeks: updatedWorkWeeks,
+          };
+        }
+        return assignment;
+      });
+
+      return {
+        ...user,
+        assignments: updatedAssignments,
+      };
+    }
+    return user;
+  });
+};
+
+export const updateProjectAssignments = (
+  projectList: ProjectType[],
+  projectId: string | number,
+  assignmentId: number,
+  updatedWorkWeeks: WorkWeekType[]
+): ProjectType[] => {
+  const projectIndex = projectList.findIndex(
+    (project) => project.id.toString() === projectId.toString()
+  );
+
+  if (projectIndex !== -1) {
+    const project = projectList[projectIndex];
+
+    if (project.assignments && project.assignments.length > 0) {
+      const assignmentIndex = project.assignments.findIndex(
+        (assignment) => assignment.id === assignmentId
+      );
+
+      if (assignmentIndex !== -1) {
+        const updatedAssignment: AssignmentType = {
+          ...project.assignments[assignmentIndex],
+          workWeeks: updatedWorkWeeks,
+        };
+
+        const updatedAssignments = [...project.assignments];
+        updatedAssignments[assignmentIndex] = updatedAssignment;
+
+        const updatedProject: ProjectType = {
+          ...project,
+          assignments: updatedAssignments,
+        };
+
+        const updatedProjectList = [...projectList];
+        updatedProjectList[projectIndex] = updatedProject;
+
+        return updatedProjectList;
+      }
+    }
+  }
+  return projectList;
+};
+
+export const updateOrInsertWorkWeekInProject = (
+  projectList: ProjectType[],
+  projectId: number | string,
+  assignmentId: number,
+  workWeek: WorkWeekType
+): ProjectType[] => {
+  return projectList.map((project) => {
+    if (project.id.toString() === projectId.toString()) {
+      if (project.assignments && project.assignments.length > 0) {
+        const updatedAssignments = project.assignments.map((assignment) => {
+          if (assignment.id.toString() === assignmentId.toString()) {
+            const workWeekIndex = assignment.workWeeks.findIndex(
+              (week) =>
+                week.cweek === workWeek.cweek && week.year === workWeek.year
+            );
+            let updatedWorkWeeks;
+            if (workWeekIndex !== -1) {
+              updatedWorkWeeks = [...assignment.workWeeks];
+              updatedWorkWeeks[workWeekIndex] = {
+                ...assignment.workWeeks[workWeekIndex],
+                ...workWeek,
+              };
+            } else {
+              updatedWorkWeeks = [...assignment.workWeeks, workWeek];
+            }
+            return {
+              ...assignment,
+              workWeeks: updatedWorkWeeks,
+            };
+          }
+          return assignment;
+        });
+
+        return {
+          ...project,
+          assignments: updatedAssignments,
+        };
+      }
+      return project;
+    }
+
+    return project;
+  });
+};
+
+export const updateOrInsertWorkWeek = (
+  userList: UserType[],
+  userId: number,
+  assignmentId: number,
+  workWeek: WorkWeekType
+): UserType[] => {
+  return userList.map((user) => {
+    if (user.id === userId) {
+      const updatedAssignments = user.assignments.map((assignment) => {
+        if (assignment.id.toString() === assignmentId.toString()) {
+          const workWeekIndex = assignment.workWeeks.findIndex(
+            (week) =>
+              week.cweek === workWeek.cweek && week.year === workWeek.year
+          );
+
+          let updatedWorkWeeks;
+          if (workWeekIndex !== -1) {
+            updatedWorkWeeks = [...assignment.workWeeks];
+            updatedWorkWeeks[workWeekIndex] = {
+              ...assignment.workWeeks[workWeekIndex],
+              ...workWeek,
+            };
+          } else {
+            updatedWorkWeeks = [...assignment.workWeeks, workWeek];
+          }
+          return {
+            ...assignment,
+            workWeeks: updatedWorkWeeks,
+          };
+        }
+        return assignment;
+      });
+
+      return {
+        ...user,
+        assignments: updatedAssignments,
+      };
+    }
+
+    return user;
+  });
 };
