@@ -45,7 +45,7 @@ export const ProjectUserLabel = ({
 
 					{!isUserTBD && (<div className="py-2 relative overflow-hidden w-[38px] h-[28px]  aspect-w-38 aspect-h-28">
 						<Image
-							src={assignment.assignedUser.avatarUrl}
+							src={decodeURIComponent(assignment.assignedUser.avatarUrl)}
 							className="rounded-md object-cover"
 							alt="user avatar"
 							fill

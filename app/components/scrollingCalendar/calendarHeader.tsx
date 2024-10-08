@@ -69,7 +69,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                             {avatarUrl && (
                                 <div className="px-2 py-2 relative overflow-hidden w-[92px] h-[67px] aspect-[92/67] mr-4">
                                     <Image
-                                        src={avatarUrl}
+                                        src={decodeURIComponent(avatarUrl)}
                                         fill
                                         sizes="(max-width: 640px) 80px, (max-width: 768px) 92px, 92px"
                                         className='rounded-lg object-cover'
