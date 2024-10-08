@@ -266,6 +266,7 @@ export const GET_VIEWER = gql`
 			name
 			id
 			avatarUrl
+			role
 		}
 	}
 `;

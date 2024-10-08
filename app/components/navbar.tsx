@@ -47,7 +47,7 @@ const Navbar: React.FC = () => {
 			label: "Open Source",
 		},
 		{ label: "Feedback" },
-		{ href: `${homepageUrl}/settings`, label: "Settings" },
+		viewer.role === 'admin' || viewer.role ===  'owner' ? { href: `${homepageUrl}/settings`, label: "Settings" } : {},
 		{ href: `${homepageUrl}/sign_out`, label: "Sign Out" },
 	];
 	return (
