@@ -13,7 +13,15 @@ const nextConfig = {
 		];
 	},
 	images:{
-		domains: ['secure.gravatar.com','www.gravatar.com','staffplan.fermion.dev','localhost']
+		domains: ['secure.gravatar.com','www.gravatar.com','staffplan.fermion.dev','localhost'],
+		remotePatterns:[
+			{
+				protocol: 'https',
+				hostname: 'www.staffplan.com',
+				port: '',
+				pathname: '/rails/active_storage/**',
+			}
+		]
 	}
 };
 export default nextConfig;
