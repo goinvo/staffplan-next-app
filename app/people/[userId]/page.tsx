@@ -2,8 +2,7 @@
 import { useParams } from "next/navigation";
 import React, { useEffect, useState, useRef } from "react";
 import withApollo from "@/lib/withApollo";
-import { UserType, AssignmentType, ClientType } from "../../typeInterfaces";
-import { useUserDataContext } from "../../userDataContext";
+import { AssignmentType, ClientType } from "../../typeInterfaces";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import { sortSingleUser } from "@/app/helperFunctions";
 import { ScrollingCalendar } from "@/app/components/scrollingCalendar/scrollingCalendar";
@@ -11,60 +10,32 @@ import { UserAssignmentRow } from "@/app/components/userAssignment/userAssignmen
 import AddAssignmentSingleUser from "@/app/components/addAssignmentSingleUser";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
 import AddInlineProject from "@/app/components/addInlineProject";
+import { useUserDataContext } from "@/app/contexts/userDataContext";
 
 const UserPage: React.FC = () => {
 	const params = useParams();
-	const [clientSide, setClientSide] = useState(false);
-	const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
 	const [addAssignmentVisible, setAddAssignmentVisible] = useState(false);
 	const inputRefs = useRef<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>([]);
 
-	const { setSingleUserPage, userList, viewsFilter } = useUserDataContext();
-
-	const setSelectedUserData = (newSelectedId: number) => {
-		if (!userList) return;
-
-		const selectedUserData = userList.find(
-			(user: UserType) => user.id?.toString() === newSelectedId.toString()
-		);
-		if (!selectedUserData) return;
-		setSingleUserPage(selectedUserData);
-		if (!viewsFilter.showArchivedProjects) {
-			const showArchivedProjectsUserData = selectedUserData.assignments.filter(
-				(assignment: AssignmentType) => assignment.status !== "archived"
-			);
-			return setSelectedUser(
-				sortSingleUser(viewsFilter.singleUserSort, {
-					...selectedUserData,
-					assignments: showArchivedProjectsUserData,
-				})
-			);
-		}
-		setSelectedUser(
-			sortSingleUser(viewsFilter.singleUserSort, selectedUserData)
-		);
-	};
+	const { userList, viewsFilterSingleUser, singleUserPage, setSelectedUserData, setSingleUserPage } = useUserDataContext();
 
 	useEffect(() => {
-		setClientSide(true);
-	}, []);
-
-	useEffect(() => {
-		if (clientSide && userList) {
-			const userId = decodeURIComponent(params.userId.toString());
+		if (userList.length) {
+			const userId = decodeURIComponent(params?.userId?.toString());
 			if (userId) {
 				setSelectedUserData(parseInt(userId));
 			}
 		}
-	}, [clientSide, userList, params.userId, viewsFilter]);
+	}, [userList, params.userId, setSelectedUserData]);
 
-	if (!userList) return <LoadingSpinner />;
+	if (!userList.length) return <LoadingSpinner />;
+
 	const onClose = () => setAddAssignmentVisible(false);
 	const onComplete = () => {
 		setAddAssignmentVisible(false);
 	};
 	const handleClientClick = (client: ClientType) => {
-		if (!selectedUser) return;
+		if (!singleUserPage) return;
 
 		const newAssignment: any = {
 
@@ -96,22 +67,22 @@ const UserPage: React.FC = () => {
 		};
 
 		// Add new assignment and then sort
-		const updatedAssignments = [...selectedUser.assignments, newAssignment];
-		const sortedAssignments = sortSingleUser(viewsFilter.singleUserSort, {
-			...selectedUser,
+		const updatedAssignments = [...singleUserPage.assignments, newAssignment];
+		const sortedAssignments = sortSingleUser(viewsFilterSingleUser, {
+			...singleUserPage,
 			assignments: updatedAssignments
 		});
 
-		setSelectedUser(sortedAssignments);
 		setSingleUserPage(sortedAssignments);
 	};
+
 	const columnsHeaderTitles = [{ title: 'Client', showIcon: true }, { title: 'Project', showIcon: false }]
 	return (
 		<>
-			{selectedUser && userList ? (
-				<ScrollingCalendar columnHeaderTitles={columnsHeaderTitles} avatarUrl={selectedUser.avatarUrl} userName={selectedUser.name} assignments={selectedUser.assignments}>
-					{selectedUser?.assignments?.map(
-						(assignment: AssignmentType, rowIndex, allAssignments) => {
+			{singleUserPage && userList.length ? (
+				<ScrollingCalendar columnHeaderTitles={columnsHeaderTitles} avatarUrl={singleUserPage.avatarUrl} userName={singleUserPage.name} assignments={singleUserPage.assignments}>
+					{singleUserPage?.assignments?.map(
+						(assignment: AssignmentType, rowIndex: number, allAssignments: AssignmentType[]) => {
 							const isFirstClient = rowIndex === allAssignments.findIndex((a) => a.project.client.id === assignment.project.client.id);
 							return (
 								<UserAssignmentRow
@@ -121,16 +92,15 @@ const UserPage: React.FC = () => {
 									isLastMonth={true}
 									isFirstClient={isFirstClient}
 									clickHandler={handleClientClick}
-									selectedUser={selectedUser}
-									setSelectedUser={setSelectedUser}
+									selectedUser={singleUserPage}
 									rowIndex={rowIndex}
-									totalRows={selectedUser?.assignments?.length || 0}
+									totalRows={singleUserPage?.assignments?.length || 0}
 									inputRefs={inputRefs}
 								/>
 							);
 						}
 					)}
-					{selectedUser && <AddInlineProject user={selectedUser} />}
+					{singleUserPage && <AddInlineProject user={singleUserPage} />}
 				</ScrollingCalendar>
 			) : (
 				<LoadingSpinner />
@@ -148,7 +118,7 @@ const UserPage: React.FC = () => {
 				</button>
 				{addAssignmentVisible && (
 					<AddAssignmentSingleUser
-						user={selectedUser}
+						user={singleUserPage}
 						onClose={onClose}
 						onComplete={onComplete}
 					/>

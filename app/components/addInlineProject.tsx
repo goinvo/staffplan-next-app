@@ -4,10 +4,12 @@ import React, { useState, useRef } from "react";
 import { useFormik } from 'formik';
 
 import { ClientType, UserType } from "@/app/typeInterfaces";
-import { useUserDataContext } from "@/app/userDataContext";
 import { AutocompleteInput } from "./autocompleteInput";
 import { useMutation } from "@apollo/client";
 import { UPSERT_PROJECT, UPSERT_CLIENT, UPSERT_ASSIGNMENT } from "@/app/gqlQueries";
+import { useUserDataContext } from "../contexts/userDataContext";
+import { useClientDataContext } from "../contexts/clientContext";
+import { useProjectsDataContext } from "../contexts/projectsDataContext";
 
 type AddInlineProjectProps = {
     user: UserType
@@ -29,7 +31,10 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
     const [showNewClientModal, setShowNewClientModal] = useState<boolean>(false);
     const [confirmedClientToCreate, setConfirmedClientToCreate] = useState<boolean>(false);
     const clientInputRef = useRef<HTMLInputElement>(null);
-    const { clientList, projectList, refetchProjectList, refetchClientList, refetchUserList } = useUserDataContext();
+    const { refetchUserList } = useUserDataContext()
+    const { clientList, refetchClientList } = useClientDataContext()
+    const { projectList, refetchProjectList } = useProjectsDataContext();
+
     const { id, assignments } = user;
 
     const [upsertClient] = useMutation(UPSERT_CLIENT, {
@@ -198,7 +203,7 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
                         ) : null}
                     </div>
                     <div className="ml-1">
-                        {clientList && <AutocompleteInput
+                        {!!clientList.length && <AutocompleteInput
                             ref={clientInputRef}
                             items={clientList}
                             onItemSelect={handleClientSelect}

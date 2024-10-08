@@ -8,7 +8,8 @@ import { UPSERT_CLIENT } from "../gqlQueries";
 import { ClientType } from "../typeInterfaces";
 import { LoadingSpinner } from "./loadingSpinner";
 import { Dialog } from "@headlessui/react";
-import { useUserDataContext } from "../userDataContext";
+import { useClientDataContext } from "../contexts/clientContext";
+
 const AddClient = () => {
 	const [clientSide, setClientSide] = useState(false);
 	const router = useRouter();
@@ -26,7 +27,7 @@ const AddClient = () => {
 		clientId: "",
 	};
 
-	const { clientList, setClientList,refetchClientList } = useUserDataContext();
+	const { clientList, setClientList, refetchClientList } = useClientDataContext();
 
 	const [
 		upsertClient,
@@ -36,7 +37,7 @@ const AddClient = () => {
 			setClientList([...clientList, upsertClient]);
 		},
 	});
-	if (mutationLoading || !clientList) return <LoadingSpinner />;
+	if (mutationLoading || !!clientList.length) return <LoadingSpinner />;
 	if (mutationError) return <p>ERROR ON PERSON</p>;
 	const onSubmitUpsert = ({
 		name,
@@ -84,7 +85,7 @@ const AddClient = () => {
 					aria-labelledby="client-modal"
 					aria-modal="true"
 				>
-					<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"/>
+					<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
 
 					<div className="fixed inset-0 z-10 w-screen overflow-y-auto">
 						<div className="flex min-h-full p-4 text-center justify-center sm:items-center sm:p-0">
@@ -189,9 +190,8 @@ const AddClient = () => {
 																<button
 																	disabled={!isValid}
 																	type="submit"
-																	className={`rounded-md bg-${
-																		isValid ? "accentgreen" : "slate-500"
-																	} px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accentgreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accentgreen`}
+																	className={`rounded-md bg-${isValid ? "accentgreen" : "slate-500"
+																		} px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accentgreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accentgreen`}
 																>
 																	Save
 																</button>

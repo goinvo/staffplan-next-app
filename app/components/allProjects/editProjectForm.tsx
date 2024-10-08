@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { Field, FormikValues, useFormik } from "formik";
+import { FormikValues, useFormik } from "formik";
 import { useParams, useRouter } from "next/navigation";
 import { useMutation } from "@apollo/client";
 
@@ -9,24 +9,25 @@ import { IoCheckmarkCircle } from "react-icons/io5";
 import { ArchiveBoxIcon } from "@heroicons/react/24/solid";
 
 import IconButton from "../iconButton";
-import { useUserDataContext } from "../../userDataContext";
 import { ProjectType, ClientType } from "../../typeInterfaces";
 import { UPSERT_PROJECT, UPSERT_CLIENT } from "@/app/gqlQueries";
 import { AutocompleteInput } from "../autocompleteInput";
+import { useClientDataContext } from "@/app/contexts/clientContext";
+import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
+import { useGeneralDataContext } from "@/app/contexts/generalContext";
 
 interface EditFormProps {
 	onClose?: () => void;
 }
 
 const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
+	const { refetchClientList, clientList } = useClientDataContext()
+
 	const {
 		projectList,
 		refetchProjectList,
-		viewsFilter,
-		refetchClientList,
-		clientList,
-	} = useUserDataContext();
-
+	} = useProjectsDataContext();
+	const { showArchivedProjects } = useGeneralDataContext()
 	const params = useParams();
 	const router = useRouter();
 	const selectedProjectId = decodeURIComponent(params.projectId.toString());
@@ -54,7 +55,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		errorPolicy: "all",
 		onCompleted({ upsertProject }) {
 			refetchProjectList();
-			if (archivedStatus && !viewsFilter.showArchivedProjects) {
+			if (archivedStatus && !showArchivedProjects) {
 				router.push("/projects");
 			}
 		},
@@ -103,9 +104,9 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 				...(values.startsOn && { startsOn: values.startsOn }),
 				...(values.endsOn && { endsOn: values.endsOn }),
 				status: values.projectStatus,
-                rateType: values.rateType,
-                hourlyRate: values.hourlyRate,
-                cost: values.cost,
+				rateType: values.rateType,
+				hourlyRate: values.hourlyRate,
+				cost: values.cost,
 			};
 			await upsertProject({
 				variables,
@@ -129,8 +130,8 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		const newStatus = !archivedStatus
 			? "archived"
 			: previousStatus !== "archived"
-			? previousStatus
-			: "unconfirmed";
+				? previousStatus
+				: "unconfirmed";
 		formik.setFieldValue("projectStatus", newStatus);
 	};
 
@@ -226,9 +227,8 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					) : null}
 				</div>
 				<IconButton
-					className={`text-black  ${
-						archivedStatus ? "text-tiffany" : "text-transparentGrey"
-					}`}
+					className={`text-black  ${archivedStatus ? "text-tiffany" : "text-transparentGrey"
+						}`}
 					onClick={handleArchiveButtonClick}
 					Icon={ArchiveBoxIcon}
 					iconSize="h-7 w-7"
@@ -325,92 +325,92 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 				</div>
 			</div>
 			<div className="flex mb-4 pb-2 border-b-4">
-    <div className="w-1/3 -mr-1 flex flex-col">
-        <div className="block flex items-center">
-            <input
-                type="radio"
-                name="rateType"
-                value="fixed"
-                id="fixed"
-                checked={formik.values.rateType === "fixed"}
-                onChange={() => {
-                    formik.setFieldValue("rateType", "fixed");
-                    formik.setFieldValue("hourlyRate", 0);
-                    formik.setFieldValue("cost", 0);
-                }}
-                className="form-radio text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent mr-2"
-            />
-            <label className="text-white font-normal text-tiny">Fixed Rate</label>
-        </div>
-        <div className="block flex items-center">
-            <input
-                type="radio"
-                name="rateType"
-                value="hourly"
-                id="hourly"
-                checked={formik.values.rateType === "hourly"}
-                onChange={() => {
-                    formik.setFieldValue("rateType", "hourly");
-                    formik.setFieldValue("cost", 0);
-                }}
-                className="form-radio text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent mr-2"
-            />
-            <label className="text-white font-normal text-tiny">Hourly Rate</label>
-        </div>
-    </div>
+				<div className="w-1/3 -mr-1 flex flex-col">
+					<div className="block flex items-center">
+						<input
+							type="radio"
+							name="rateType"
+							value="fixed"
+							id="fixed"
+							checked={formik.values.rateType === "fixed"}
+							onChange={() => {
+								formik.setFieldValue("rateType", "fixed");
+								formik.setFieldValue("hourlyRate", 0);
+								formik.setFieldValue("cost", 0);
+							}}
+							className="form-radio text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent mr-2"
+						/>
+						<label className="text-white font-normal text-tiny">Fixed Rate</label>
+					</div>
+					<div className="block flex items-center">
+						<input
+							type="radio"
+							name="rateType"
+							value="hourly"
+							id="hourly"
+							checked={formik.values.rateType === "hourly"}
+							onChange={() => {
+								formik.setFieldValue("rateType", "hourly");
+								formik.setFieldValue("cost", 0);
+							}}
+							className="form-radio text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent mr-2"
+						/>
+						<label className="text-white font-normal text-tiny">Hourly Rate</label>
+					</div>
+				</div>
 
-    <div className="w-1/2 flex justify-end items-center">
-        <label className='pr-2 text-white font-normal text-tiny w-[75px] text-right'>
-            <span className="relative">
-                <input
-                    disabled={
-                        formik.values.rateType === "fixed" ||
-                        formik.values.hours === 0
-                    }
-                    type="number"
-                    min="0"
-                    value={formik.values.hourlyRate}
-                    name="hourlyRate"
-                    id="hourlyRate"
-                    autoComplete="hourlyRate"
-                    onBlur={formik.handleBlur}
-                    onChange={(e) => {
-                        formik.handleChange(e);
-                        setTotalCost(e, formik.values, formik.setFieldValue);
-                    }}
-                    className={
-                        formik.values.rateType === "fixed"
-                            ? "bg-slate-500 h-6 px-2 shadow-top-input-shadow text-tiny text-black font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none max-w-[50px]"
-                            : "h-6 px-2 text-black shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none max-w-[60px]"
-                    }
-                    placeholder="0"
-                />
-            </span>
-            Rate($/hr)
-        </label>
-        <label className='pr-2 text-white font-normal text-tiny w-[55px] text-right'>
-            <span className="relative">
-                <input
-                    disabled={formik.values.rateType === "hourly"}
-                    type="number"
-                    min="0"
-                    name="cost"
-                    value={formik.values.cost}
-                    id="cost"
-                    autoComplete="cost"
-                    onBlur={formik.handleBlur}
-                    onChange={(e) => {
-                        formik.handleChange(e);
-                        setTotalCost(e, formik.values, formik.setFieldValue);
-                    }}
-                    className="h-6 px-2 shadow-top-input-shadow text-tiny text-black font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none max-w-[60px]"
-                    placeholder="0"
-                />
-            </span>
-            Value(k$)
-        </label>
-    </div>
-</div>
+				<div className="w-1/2 flex justify-end items-center">
+					<label className='pr-2 text-white font-normal text-tiny w-[75px] text-right'>
+						<span className="relative">
+							<input
+								disabled={
+									formik.values.rateType === "fixed" ||
+									formik.values.hours === 0
+								}
+								type="number"
+								min="0"
+								value={formik.values.hourlyRate}
+								name="hourlyRate"
+								id="hourlyRate"
+								autoComplete="hourlyRate"
+								onBlur={formik.handleBlur}
+								onChange={(e) => {
+									formik.handleChange(e);
+									setTotalCost(e, formik.values, formik.setFieldValue);
+								}}
+								className={
+									formik.values.rateType === "fixed"
+										? "bg-slate-500 h-6 px-2 shadow-top-input-shadow text-tiny text-black font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none max-w-[50px]"
+										: "h-6 px-2 text-black shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none max-w-[60px]"
+								}
+								placeholder="0"
+							/>
+						</span>
+						Rate($/hr)
+					</label>
+					<label className='pr-2 text-white font-normal text-tiny w-[55px] text-right'>
+						<span className="relative">
+							<input
+								disabled={formik.values.rateType === "hourly"}
+								type="number"
+								min="0"
+								name="cost"
+								value={formik.values.cost}
+								id="cost"
+								autoComplete="cost"
+								onBlur={formik.handleBlur}
+								onChange={(e) => {
+									formik.handleChange(e);
+									setTotalCost(e, formik.values, formik.setFieldValue);
+								}}
+								className="h-6 px-2 shadow-top-input-shadow text-tiny text-black font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none max-w-[60px]"
+								placeholder="0"
+							/>
+						</span>
+						Value(k$)
+					</label>
+				</div>
+			</div>
 
 			{showNewClientModal && (
 				<div className="fixed inset-0 font-normal bg-gray-800 bg-opacity-50 flex justify-center items-center z-10">

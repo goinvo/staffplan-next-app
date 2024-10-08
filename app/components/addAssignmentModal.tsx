@@ -5,8 +5,9 @@ import { Field, Formik, FormikValues } from "formik";
 import ProjectDatepicker from "./projectDatepicker";
 import { useMutation } from "@apollo/client";
 import { ProjectType, UserType } from "../typeInterfaces";
-import { useUserDataContext } from "../userDataContext";
 import { UPSERT_ASSIGNMENT } from "../gqlQueries";
+import { useUserDataContext } from "../contexts/userDataContext";
+import { useProjectsDataContext } from "../contexts/projectsDataContext";
 
 interface AddAssignmentModalProps {
 	user?: UserType;
@@ -14,12 +15,13 @@ interface AddAssignmentModalProps {
 	closeModal: () => void;
 }
 
-const AddAssignmenModal = ({ closeModal, user, project }: AddAssignmentModalProps) => {
+const AddAssignmentModal = ({ closeModal, user, project }: AddAssignmentModalProps) => {
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
 		{}
 	);
 
-	const { userList, projectList, refetchUserList, refetchProjectList } = useUserDataContext();
+	const { userList, refetchUserList } = useUserDataContext()
+	const { projectList, refetchProjectList } = useProjectsDataContext()
 
 	const autoFillAssignmentValues = {
 		dates: {
@@ -171,20 +173,19 @@ const AddAssignmenModal = ({ closeModal, user, project }: AddAssignmentModalProp
 																id="userId"
 																className="block mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-accentgreen focus:border-accentgreen sm:text-sm"
 															>
-																{[
+																<>
 																	<option key="TBD" value="">
 																		TBD
 																	</option>,
-																	...userList?.map((user: UserType) => (
+																	{userList?.map((user: UserType) => (
 																		<option
 																			key={`${user.id} + ${user.name}`}
 																			value={user.id}
 																		>
 																			{user.name}
 																		</option>
-																	)),
-																]}
-																``
+																	))}
+																</>
 															</Field>
 														</label>
 													</div>
@@ -320,4 +321,4 @@ const AddAssignmenModal = ({ closeModal, user, project }: AddAssignmentModalProp
 		</>
 	);
 };
-export default AddAssignmenModal;
+export default AddAssignmentModal;

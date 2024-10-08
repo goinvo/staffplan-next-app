@@ -1,12 +1,14 @@
 "use client";
-import { useState, ReactNode } from "react";
-import ProjectDatepicker from "./projectDatepicker";
-import { useMutation } from "@apollo/client";
-import { AssignmentType, ProjectType, UserType } from "../typeInterfaces";
+import { ReactNode } from "react";
 import { Field, Formik, FormikValues } from "formik";
-import { useUserDataContext } from "../userDataContext";
+import { useMutation } from "@apollo/client";
+
+import { AssignmentType, ProjectType, UserType } from "../typeInterfaces";
+import ProjectDatepicker from "./projectDatepicker";
 import { UPSERT_ASSIGNMENT } from "../gqlQueries";
 import { LoadingSpinner } from "./loadingSpinner";
+import { useUserDataContext } from "../contexts/userDataContext";
+import { useProjectsDataContext } from "../contexts/projectsDataContext";
 interface AddAssignmentSingleProjectProps {
 	project: ProjectType | null;
 	onClose: () => void;
@@ -17,7 +19,9 @@ const AddAssignmentSingleProject = ({
 	onClose,
 	onComplete,
 }: AddAssignmentSingleProjectProps) => {
-	const { userList, projectList,refetchUserList, refetchProjectList } = useUserDataContext();
+	const { userList, refetchUserList } = useUserDataContext()
+	const { projectList, refetchProjectList } = useProjectsDataContext();
+
 	const initialValues = {
 		dates: { endsOn: "", startsOn: "" },
 		hours: 0,
@@ -29,7 +33,7 @@ const AddAssignmentSingleProject = ({
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_ASSIGNMENT);
-	if (!userList || !projectList || mutationLoading) return <LoadingSpinner />;
+	if (!userList.length || !projectList.length || mutationLoading) return <LoadingSpinner />;
 	const onSubmitUpsert = ({
 		projectId,
 		userId,

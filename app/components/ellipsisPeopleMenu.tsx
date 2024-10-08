@@ -3,7 +3,7 @@ import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import React from "react";
 import { useRouter } from "next/navigation";
-import { useModal } from "../modalContext";
+import { useModal } from "../contexts/modalContext";
 import { UserType } from "../typeInterfaces";
 import AddAssignmentModal from "./addAssignmentModal";
 

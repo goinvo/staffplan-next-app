@@ -2,20 +2,24 @@
 import React from "react";
 import AddDropdown from "./addDropdown";
 import { FaSortAmountDown, FaExpand, FaFilter, FaSearch } from "react-icons/fa";
-import { useUserDataContext } from "../userDataContext";
 import ViewsMenu from "./viewsMenu/viewsMenu";
 import Image from "next/image";
 import { useParams } from "next/navigation";
+import { useGeneralDataContext } from "../contexts/generalContext";
+import { useUserDataContext } from "../contexts/userDataContext";
+import { useProjectsDataContext } from "../contexts/projectsDataContext";
 const ActionBar: React.FC = () => {
-	const { scrollToTodayFunction, singleUserPage, singleProjectPage } =
-		useUserDataContext();
+	const { scrollToTodayFunction } = useGeneralDataContext()
+	const { singleUserPage } = useUserDataContext();
+	const { singleProjectPage } = useProjectsDataContext()
+
 	const params = useParams();
 	return (
 		<div className="actionbar flex justify-between items-center bg-gray-50 p-4">
 			<div className="flex items-center space-x-4">
 				{!params.userId && !params.projectId ? <AddDropdown /> : null}
 				{singleUserPage &&
-				params.userId ? (
+					params.userId ? (
 					<div className="flex items-center text-white text-xl">
 						<div className="flex w-8 h-8 timeline-grid-bg mr-2 rounded-full overflow-hidden">
 							<Image
@@ -29,7 +33,7 @@ const ActionBar: React.FC = () => {
 					</div>
 				) : null}
 				{singleProjectPage &&
-				params.projectId ? (
+					params.projectId ? (
 					<div className="flex items-center text-white text-xl">
 						<div className="flex w-8 h-8 timeline-grid-bg mr-2 rounded-full overflow-hidden">
 							<Image

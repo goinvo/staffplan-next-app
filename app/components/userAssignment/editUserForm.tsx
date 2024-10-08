@@ -8,8 +8,8 @@ import { IoCheckmarkCircle } from "react-icons/io5";
 
 import ImageUploader from '../imageUploader';
 import IconButton from '../iconButton';
-import { useUserDataContext } from '../../userDataContext';
 import { UserType } from '../../typeInterfaces'
+import { useUserDataContext } from '@/app/contexts/userDataContext';
 interface EditFormProps {
     onClose?: () => void;
 }
@@ -17,6 +17,7 @@ interface EditFormProps {
 const EditUserForm: React.FC<EditFormProps> = ({
     onClose
 }) => {
+
     const { userList } = useUserDataContext();
 
     const params = useParams();
@@ -24,7 +25,8 @@ const EditUserForm: React.FC<EditFormProps> = ({
     const selectedUser = userList.find(
         (user: UserType) => user.id?.toString() === selectedUserId.toString()
     );
-    const { avatarUrl, name } = selectedUser
+    const avatarUrl = selectedUser?.avatarUrl || "http://www.gravatar.com/avatar/newavatars";
+    const name = selectedUser?.name || "  ";
     const [firstName, lastName] = name.split(' ');
 
     const formik = useFormik({

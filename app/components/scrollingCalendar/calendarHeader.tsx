@@ -10,7 +10,7 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import ColumnChart from '../columnChart';
 import IconButton from '../iconButton';
 
-import { useUserDataContext } from '@/app/userDataContext';
+import { useGeneralDataContext } from '@/app/contexts/generalContext';
 import { AssignmentType, MonthsDataType, ProjectType } from '@/app/typeInterfaces';
 import { calculateTotalHoursPerWeek, isBeforeWeek, showMonthAndYear, getNextWeeksPerView, getPrevWeeksPerView, currentWeek, currentYear } from './helpers';
 import ViewsMenu from '../viewsMenu/viewsMenu';
@@ -43,7 +43,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     projectInfo,
     columnHeaderTitles }) => {
     const [isEditing, setIsEditing] = useState(false);
-    const { setDateRange, scrollToTodayFunction } = useUserDataContext();
+    const { setDateRange, scrollToTodayFunction } = useGeneralDataContext();
     const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } = calculateTotalHoursPerWeek(assignments as AssignmentType[], months)
 
     const nextWeek = () => {

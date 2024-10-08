@@ -6,10 +6,11 @@ import { Formik, FormikValues } from "formik";
 import { useMutation } from "@apollo/client";
 import { AssignmentType, WorkWeekType, MonthsDataType } from "@/app/typeInterfaces";
 import { UPSERT_WORKWEEKS, UPSERT_WORKWEEK } from "@/app/gqlQueries";
-import { useUserDataContext } from "@/app/userDataContext";
 import { CustomInput } from "../cutomInput";
 import { assignmentContainsCWeek, isPastOrCurrentWeek, filterWeeksForFillForward, getWeekNumbersPerScreen, currentWeek, currentYear, tabbingAndArrowNavigation, updateOrInsertWorkWeek, updateOrInsertWorkWeekInProject, updateProjectAssignments, updateUserAssignments } from "../scrollingCalendar/helpers";
 import { ACTUAL_HOURS, ESTIMATED_HOURS } from "../scrollingCalendar/constants";
+import { useUserDataContext } from "@/app/contexts/userDataContext";
+import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 
 interface WorkWeekInputProps {
 	withinProjectDates?: boolean;
@@ -99,8 +100,8 @@ export const WorkWeekInput = ({
 			setUserList(updatedUserList)
 		}
 	});
-
-	const { userList, setUserList, projectList, setProjectList } = useUserDataContext();
+	const { userList, setUserList } = useUserDataContext()
+	const { projectList, setProjectList } = useProjectsDataContext();
 
 	useEffect(() => {
 		const currentWeekExists = months?.some(month =>

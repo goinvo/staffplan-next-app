@@ -1,10 +1,11 @@
+'use client'
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface ModalContextType {
     isModalOpen: boolean;
+    modalContent: ReactNode;
     openModal: (content: ReactNode) => void;
     closeModal: () => void;
-    modalContent: ReactNode;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);

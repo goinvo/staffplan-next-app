@@ -6,16 +6,16 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { FaSquarePlus } from "react-icons/fa6";
 import { ChatBubbleBottomCenterTextIcon } from "@heroicons/react/24/outline";
 import { usePathname } from "next/navigation";
-import { useUserDataContext } from "../userDataContext";
 import { LoadingSpinner } from "./loadingSpinner";
 
 import IconButton from "./iconButton";
 import NewPersonAndProjectModal from "./newPersonAndProjectModal";
-import { useModal } from "../modalContext";
+import { useModal } from "../contexts/modalContext";
 import AirTableFormModal from "./airTableFormModal";
+import { useGeneralDataContext } from "../contexts/generalContext";
 
 const Navbar: React.FC = () => {
-	const { viewer } = useUserDataContext();
+	const { viewer } = useGeneralDataContext();
 	const fullPathName = usePathname();
 	const pathname = usePathname().split("/")[1];
 	const { openModal, closeModal } = useModal();
