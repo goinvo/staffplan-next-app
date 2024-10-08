@@ -19,7 +19,7 @@ const ActionBar: React.FC = () => {
 					<div className="flex items-center text-white text-xl">
 						<div className="flex w-8 h-8 timeline-grid-bg mr-2 rounded-full overflow-hidden">
 							<Image
-								src={`${singleUserPage.avatarUrl}`}
+								src={`${decodeURIComponent(singleUserPage.avatarUrl)}`}
 								alt="user avatar"
 								width={500}
 								height={500}
@@ -33,7 +33,7 @@ const ActionBar: React.FC = () => {
 					<div className="flex items-center text-white text-xl">
 						<div className="flex w-8 h-8 timeline-grid-bg mr-2 rounded-full overflow-hidden">
 							<Image
-								src={`${singleProjectPage.client.avatarUrl}`}
+								src={`${decodeURIComponent(singleProjectPage.client.avatarUrl)}`}
 								alt="user avatar"
 								width={500}
 								height={500}
