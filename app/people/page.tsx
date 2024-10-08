@@ -2,11 +2,11 @@
 import React from "react";
 import withApollo from "@/lib/withApollo";
 
-import { useUserDataContext } from "../userDataContext";
 import { AssignmentType, UserType } from "../typeInterfaces";
 import { LoadingSpinner } from "../components/loadingSpinner";
 import { ScrollingCalendar } from "../components/scrollingCalendar/scrollingCalendar";
 import { AllUserRow } from "../components/allUsers/allUserRow";
+import { useUserDataContext } from "../contexts/userDataContext";
 
 const PeopleView: React.FC = () => {
 	const { userList } = useUserDataContext();
@@ -20,7 +20,7 @@ const PeopleView: React.FC = () => {
 
 	return (
 		<>
-			{userList ? (
+			{userList.length ? (
 				<ScrollingCalendar title='People' columnHeaderTitles={columnHeaderTitles} assignments={allAssignments}>
 					{userList?.map((user: UserType, index: number) => {
 						return (

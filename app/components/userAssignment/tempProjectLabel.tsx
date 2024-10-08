@@ -1,10 +1,14 @@
-import { UPSERT_PROJECT } from "@/app/gqlQueries";
-import { AssignmentType } from "@/app/typeInterfaces";
-import { useUserDataContext } from "@/app/userDataContext";
+import React from "react";
 import { useMutation } from "@apollo/client";
 import { FormikValues, Formik } from "formik";
 import { useParams } from "next/navigation";
-import React from "react";
+
+import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
+import { useUserDataContext } from "@/app/contexts/userDataContext";
+import { UPSERT_PROJECT } from "@/app/gqlQueries";
+import { AssignmentType } from "@/app/typeInterfaces";
+
+
 
 interface TempLabelProps {
 	assignment: AssignmentType;
@@ -18,7 +22,10 @@ export const TempProjectLabel = ({
 	setTempProjectOpen,
 }: TempLabelProps) => {
 	const { userId } = useParams();
-	const { refetchProjectList, refetchUserList } = useUserDataContext();
+
+	const { refetchUserList } = useUserDataContext()
+
+	const { refetchProjectList } = useProjectsDataContext();
 	const initialValues = {
 		client: assignment.project.client.id,
 		cost: 0,

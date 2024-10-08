@@ -10,7 +10,7 @@ import Select, {
 	DropdownIndicatorProps,
 	OptionProps,
 } from "react-select";
-import { useUserDataContext } from "../userDataContext";
+import { useUserDataContext } from "../contexts/userDataContext";
 import {
 	AssignmentType,
 	UserType,
@@ -22,6 +22,7 @@ import { UPSERT_ASSIGNMENT } from "../gqlQueries";
 import { useMutation } from "@apollo/client";
 import { LoadingSpinner } from "./loadingSpinner";
 import { DateTime } from "luxon";
+
 
 const DropdownIndicator = (props: DropdownIndicatorProps<UserOptionType>) => {
 	return (
@@ -53,7 +54,13 @@ export const AssignmentEditDrawer = ({
 		label: string;
 		avatarUrl: string;
 	}>({ value: "", label: "Assign To...", avatarUrl: "" });
-	const { userList, setUserList, refetchUserList } = useUserDataContext();
+
+	const { userList, refetchUserList } = useUserDataContext();
+	const [
+		upsertAssignment,
+		{ data: mutationData, loading: mutationLoading, error: mutationError },
+	] = useMutation(UPSERT_ASSIGNMENT);
+
 	const numberOfWeeks = (assignment: AssignmentType) => {
 		if (assignment.endsOn && assignment.startsOn) {
 			const currEndsOn = DateTime.fromISO(assignment.endsOn);
@@ -73,16 +80,13 @@ export const AssignmentEditDrawer = ({
 		numOfWeeks: numberOfWeeks(assignment),
 		status: assignment.status === "active" ? true : false,
 	};
-
+	if (userList.length === 0 || mutationLoading) return <LoadingSpinner />;
 	const listOfUsers = () => {
-		return userList.map((user: UserType) => {
-			return {
-				values: user.id,
-				label: user.name,
-				key: user.id,
-				avatarUrl: user.avatarUrl,
-			};
-		});
+		return (userList || []).map((user: UserType) => ({
+			value: user?.id?.toString() || '',
+			label: user.name,
+			avatarUrl: user.avatarUrl,
+		}));
 	};
 
 	const { Option } = components;
@@ -118,11 +122,8 @@ export const AssignmentEditDrawer = ({
 		}
 	};
 
-	const [
-		upsertAssignment,
-		{ data: mutationData, loading: mutationLoading, error: mutationError },
-	] = useMutation(UPSERT_ASSIGNMENT);
-	if (!userList || mutationLoading) return <LoadingSpinner />;
+
+
 	const onSubmitUpsert = ({
 		userId,
 		dates,
@@ -166,7 +167,7 @@ export const AssignmentEditDrawer = ({
 					onSubmitUpsert(e);
 				}}
 				initialValues={initialValues}
-				// validate={validateForm}
+			// validate={validateForm}
 			>
 				{({
 					errors,
@@ -319,9 +320,8 @@ export const AssignmentEditDrawer = ({
 								<button
 									type="submit"
 									disabled={!isValid}
-									className={`rounded-md bg-${
-										isValid ? "accentgreen" : "slate-500"
-									} px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accentgreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accentgreen`}
+									className={`rounded-md bg-${isValid ? "accentgreen" : "slate-500"
+										} px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accentgreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accentgreen`}
 								>
 									Accept
 								</button>

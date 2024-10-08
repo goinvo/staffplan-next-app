@@ -1,16 +1,17 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 import { ProjectSummaryProps } from '../typeInterfaces';
-import { useUserDataContext } from '../userDataContext';
 import IconButton from './iconButton';
 import { ArchiveBoxIcon } from '@heroicons/react/24/outline';
 import { UPSERT_PROJECT } from "@/app/gqlQueries";
 import { useMutation } from "@apollo/client";
+import { useProjectsDataContext } from '../contexts/projectsDataContext';
+import { useGeneralDataContext } from '../contexts/generalContext';
 
 
 const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
-	const { viewsFilter, refetchProjectList } = useUserDataContext();
-
+	const { showSummaries } = useGeneralDataContext();
+	const { refetchProjectList } = useProjectsDataContext()
 	const [upsertProject] = useMutation(UPSERT_PROJECT, {
 		errorPolicy: "all",
 		onCompleted({ upsertProject }) {
@@ -62,7 +63,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 
 	return (
 		<td className="font-normal py-2 pr-4 pl-0 w-1/6 flex justify-center items-center">
-			{viewsFilter.showSummaries ? (
+			{showSummaries ? (
 				<div className="flex flex-col items-start">
 					<div className="ml-auto">
 						<IconButton

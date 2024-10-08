@@ -4,15 +4,16 @@ import React from "react";
 import { UPSERT_ASSIGNMENT } from "../../gqlQueries";
 import { UserLabelProps } from "@/app/typeInterfaces";
 import { AddPersonInline } from "../addPersonInline";
-import { useUserDataContext } from "@/app/userDataContext";
 import { useMutation } from "@apollo/client";
+import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 
 export const ProjectUserLabel = ({
 	project,
 	assignment,
 	clickHandler,
 }: UserLabelProps) => {
-	const { refetchProjectList } = useUserDataContext();
+	const { refetchProjectList } = useProjectsDataContext()
+
 	const isUserTBD = assignment.assignedUser === null;
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
 		errorPolicy: "all",

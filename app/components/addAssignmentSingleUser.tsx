@@ -1,12 +1,15 @@
 "use client";
 import { useState, ReactNode } from "react";
-import ProjectDatepicker from "./projectDatepicker";
 import { useMutation } from "@apollo/client";
-import { AssignmentType, ProjectType, UserType } from "../typeInterfaces";
 import { Field, Formik, FormikValues } from "formik";
-import { useUserDataContext } from "../userDataContext";
+
+import ProjectDatepicker from "./projectDatepicker";
+import { AssignmentType, ProjectType, UserType } from "../typeInterfaces";
 import { UPSERT_ASSIGNMENT } from "../gqlQueries";
 import { LoadingSpinner } from "./loadingSpinner";
+import { useUserDataContext } from "../contexts/userDataContext";
+import { useProjectsDataContext } from "../contexts/projectsDataContext";
+
 interface AddAssignmentSingleUserProps {
 	user: UserType | null;
 	onClose: () => void;
@@ -20,7 +23,10 @@ const AddAssignmentSingleUser = ({
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
 		{}
 	);
-	const { userList, projectList, refetchUserList } = useUserDataContext();
+
+	const { userList, refetchUserList } = useUserDataContext()
+	const { projectList } = useProjectsDataContext();
+
 	const initialValues = {
 		dates: { endsOn: "", startsOn: "" },
 		hours: 0,
@@ -32,7 +38,7 @@ const AddAssignmentSingleUser = ({
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_ASSIGNMENT);
-	if (!userList || !projectList || mutationLoading) return <LoadingSpinner />;
+	if (!userList.length || !projectList.length || mutationLoading) return <LoadingSpinner />;
 	const onSubmitUpsert = ({
 		projectId,
 		userId,
@@ -115,7 +121,7 @@ const AddAssignmentSingleUser = ({
 		if (existingProject) setSelectedProject(existingProject);
 	};
 	const filteredProjects = () => {
-        if (user && user.assignments) {
+		if (user && user.assignments) {
 			return projectList?.filter((project: ProjectType) => {
 				return !user.assignments?.find(
 					(userProject: AssignmentType) => userProject.project.id === project.id

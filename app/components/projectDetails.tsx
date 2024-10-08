@@ -8,12 +8,12 @@ import { ClientType, ProjectType } from "../typeInterfaces";
 import { UPSERT_PROJECT } from "../gqlQueries";
 import { differenceInBusinessDays } from "date-fns";
 import { ReactNode } from "react";
-import { useUserDataContext } from "../userDataContext";
 import { LoadingSpinner } from "./loadingSpinner";
+import { useClientDataContext } from "../contexts/clientContext";
 
 const ProjectDetails = ({ project, projectList, refetchProjectList }: any) => {
 	const [selectedClient, setSelectedClient] = useState<number | string>("");
-	const { clientList } = useUserDataContext();
+	const { clientList } = useClientDataContext()
 	const editProjectInitialValues = {
 		id: project.id,
 		client: project.client.id,
@@ -153,7 +153,7 @@ const ProjectDetails = ({ project, projectList, refetchProjectList }: any) => {
 			setFieldValue("cost", totalCost);
 		}
 	};
-	if (!clientList || !projectList) return <LoadingSpinner />;
+	if (!clientList.length || !projectList.length) return <LoadingSpinner />;
 	return (
 		<>
 			<div className="bg-white p-10">
@@ -410,9 +410,8 @@ const ProjectDetails = ({ project, projectList, refetchProjectList }: any) => {
 											<button
 												type="submit"
 												disabled={!isValid}
-												className={`rounded-md bg-${
-													isValid ? "accentgreen" : "slate-500"
-												} px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accentgreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accentgreen`}
+												className={`rounded-md bg-${isValid ? "accentgreen" : "slate-500"
+													} px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accentgreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accentgreen`}
 											>
 												Save
 											</button>

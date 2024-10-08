@@ -1,17 +1,16 @@
-import { useUserDataContext } from "@/app/userDataContext";
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import React from "react";
 import { EyeIcon } from "@heroicons/react/24/outline";
+import { useUserDataContext } from "@/app/contexts/userDataContext";
 export const PeopleSortOptions = () => {
-	const { viewsFilter, setViewsFilter } = useUserDataContext();
+
+	const { viewsFilterPeople, setViewsFilterPeople } = useUserDataContext();
+
 	const handleSortMethodChange = (
 		event: React.ChangeEvent<HTMLInputElement>
 	) => {
-		return setViewsFilter({
-			...viewsFilter,
-			selectedUserSort: event.target.value,
-		});
+		return setViewsFilterPeople(event.target.value);
 	};
 	return (
 		<>
@@ -56,7 +55,7 @@ export const PeopleSortOptions = () => {
 											<input
 												id="showSummaries"
 												type="checkbox"
-												defaultChecked={viewsFilter.showSummaries}
+												defaultChecked={showSummaries}
 												className="w-4 h-4 text-accentgreen bg-gray-100 border-gray-300 rounded focus:accentgreen dark:focus:ring-accentgreen dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-200 dark:border-gray-600 mr-3"
 												onClick={() =>
 													setViewsFilter({
@@ -174,7 +173,7 @@ export const PeopleSortOptions = () => {
 													type="radio"
 													value="userAvailability"
 													checked={
-														viewsFilter.selectedUserSort === "userAvailability"
+														viewsFilterPeople === "userAvailability"
 													}
 													onChange={handleSortMethodChange}
 													className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
@@ -188,7 +187,7 @@ export const PeopleSortOptions = () => {
 													type="radio"
 													value="abcUserName"
 													checked={
-														viewsFilter.selectedUserSort === "abcUserName"
+														viewsFilterPeople === "abcUserName"
 													}
 													onChange={handleSortMethodChange}
 													className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
@@ -202,7 +201,7 @@ export const PeopleSortOptions = () => {
 													type="radio"
 													value="unconfirmedPlans"
 													checked={
-														viewsFilter.selectedUserSort === "unconfirmedPlans"
+														viewsFilterPeople === "unconfirmedPlans"
 													}
 													onChange={handleSortMethodChange}
 													className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"

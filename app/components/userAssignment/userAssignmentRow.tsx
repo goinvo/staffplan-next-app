@@ -11,9 +11,9 @@ import { ClientLabel } from "./clientLabel";
 import { TempProjectLabel } from "./tempProjectLabel";
 import { currentWeek, currentYear } from "../scrollingCalendar/helpers";
 import { AssignmentType, ClientType, MonthsDataType, UserType } from "@/app/typeInterfaces";
-import { useUserDataContext } from "@/app/userDataContext";
 import { useMutation } from "@apollo/client";
 import { UPSERT_ASSIGNMENT } from "../../gqlQueries";
+import { useUserDataContext } from "@/app/contexts/userDataContext";
 
 interface UserAssignmentRowProps {
 	assignment: AssignmentType;
@@ -23,7 +23,6 @@ interface UserAssignmentRowProps {
 	clickHandler: (client: ClientType) => void;
 	months?: MonthsDataType[];
 	selectedUser: UserType;
-	setSelectedUser: React.Dispatch<React.SetStateAction<UserType | null>>;
 	rowIndex: number;
 	totalRows: number;
 	inputRefs: React.MutableRefObject<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>;
@@ -37,15 +36,13 @@ export const UserAssignmentRow = ({
 	clickHandler,
 	months,
 	selectedUser,
-	setSelectedUser,
 	rowIndex,
 	inputRefs,
 	totalRows
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
 	const [tempProjectOpen, setTempProjectOpen] = useState(false)
-
-	const { viewsFilter, refetchUserList } = useUserDataContext();
+	const { refetchUserList, viewsFilterSingleUser } = useUserDataContext()
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
 		errorPolicy: "all",
 		onCompleted() {
@@ -53,7 +50,7 @@ export const UserAssignmentRow = ({
 		},
 	});
 	const handleProjectChange = (assignment: AssignmentType) => {
-		router.push("/projects/" + encodeURIComponent(assignment.project.id));
+		router.push("/projects/" + assignment.project.id);
 	};
 
 	const isWeekWithinProject = (weekNumber: number, year: number): boolean => {
@@ -92,10 +89,10 @@ export const UserAssignmentRow = ({
 					className='flex flex-row justify-between items-start space-x-2'
 				>
 					<div className={`${isFirstClient ? 'flex' : 'w-24'}`}>
-						{viewsFilter.singleUserSort === 'byClient' && isFirstClient && isFirstMonth && (
+						{viewsFilterSingleUser === 'byClient' && isFirstClient && isFirstMonth && (
 							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} selectedUser={selectedUser} />
 						)}
-						{viewsFilter.singleUserSort !== 'byClient' && isFirstMonth && (
+						{viewsFilterSingleUser !== 'byClient' && isFirstMonth && (
 							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} selectedUser={selectedUser} />
 						)}
 					</div>
@@ -147,7 +144,7 @@ export const UserAssignmentRow = ({
 						</td>)
 				});
 			})}
-			{isLastMonth && <UserSummary assignment={assignment} selectedUser={selectedUser} setSelectedUser={setSelectedUser} setTempProjectOpen={setTempProjectOpen} tempProjectOpen={tempProjectOpen} />}
+			{isLastMonth && <UserSummary assignment={assignment} selectedUser={selectedUser} setTempProjectOpen={setTempProjectOpen} tempProjectOpen={tempProjectOpen} />}
 		</tr >
 	);
 };

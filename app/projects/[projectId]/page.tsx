@@ -1,28 +1,22 @@
 "use client";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useCallback, useRef } from "react";
 import withApollo from "@/lib/withApollo";
 
 import { useMutation } from "@apollo/client";
 import { UPSERT_ASSIGNMENT } from "../../gqlQueries";
-import { ProjectType, UserType, AssignmentType } from "../../typeInterfaces";
+import { ProjectType, AssignmentType } from "../../typeInterfaces";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
-import { useUserDataContext } from "@/app/userDataContext";
-import { sortSingleProject } from "@/app/helperFunctions";
 import { ScrollingCalendar } from "@/app/components/scrollingCalendar/scrollingCalendar";
 import { ProjectAssignmentRow } from "@/app/components/projectAssignment/projectAssignmentRow";
 import { DateTime } from "luxon";
-import { set } from "lodash";
+import { useUserDataContext } from "@/app/contexts/userDataContext";
+import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
+
 
 const ProjectPage: React.FC = () => {
 	const params = useParams();
 	const selectedProjectId = decodeURIComponent(params.projectId.toString());
-	const [selectedProject, setSelectedProject] = useState<ProjectType | null>(
-		null
-	);
-	const [projectAssignments, setProjectAssignments] = useState<
-		AssignmentType[]
-	>([]);
 	const inputRefs = useRef<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>([]);
 	const [
 		upsertAssignment,
@@ -33,14 +27,15 @@ const ProjectPage: React.FC = () => {
 			refetchProjectList()
 		}
 	});
+
+	const { refetchUserList } = useUserDataContext()
 	const {
-		userList,
 		projectList,
-		viewsFilter,
+		sortedSingleProjectAssignments,
+		singleProjectPage,
 		setSingleProjectPage,
 		refetchProjectList,
-		refetchUserList,
-	} = useUserDataContext();
+	} = useProjectsDataContext();
 
 	const addNewAssignmentRow = useCallback(async () => {
 		const variables = {
@@ -60,22 +55,17 @@ const ProjectPage: React.FC = () => {
 			);
 			if (foundProject) {
 				setSingleProjectPage(foundProject);
-				setSelectedProject(foundProject);
 			}
 		}
 	}, [
 		projectList,
 		selectedProjectId,
-		viewsFilter.singleProjectSort,
-		viewsFilter.showArchivedAssignments,
-		setSingleProjectPage,
+		setSingleProjectPage
 	]);
-	
-	
 
 	const selectedProjectDates = () => {
-		const startDate = selectedProject?.startsOn ? DateTime.fromISO(selectedProject.startsOn) : null;
-		const endDate = selectedProject?.endsOn ? DateTime.fromISO(selectedProject.endsOn) : null;
+		const startDate = singleProjectPage?.startsOn ? DateTime.fromISO(singleProjectPage.startsOn) : null;
+		const endDate = singleProjectPage?.endsOn ? DateTime.fromISO(singleProjectPage.endsOn) : null;
 
 		if (!startDate || !endDate) {
 			return 'Start Date - End Date';
@@ -93,28 +83,23 @@ const ProjectPage: React.FC = () => {
 
 	const columnHeaderTitles = [{ title: 'People', showIcon: true, onClick: () => addNewAssignmentRow() }]
 
-	const projectInfoSubtitle = `${selectedProject?.client.name}, budget, ${selectedProject?.hours || 0}h, ${selectedProjectDates()}`
-
-	const sortedAssignments = viewsFilter.showArchivedAssignments ? sortSingleProject(
-		viewsFilter.singleProjectSort,
-		selectedProject?.assignments || []
-	) : sortSingleProject(viewsFilter.singleProjectSort,selectedProject?.assignments?.filter((assignment: AssignmentType) => assignment.status !== 'archived') || []);
+	const projectInfoSubtitle = `${singleProjectPage?.client.name}, budget, ${singleProjectPage?.hours || 0}h, ${selectedProjectDates()}`
 	return (
 		<>
-			{selectedProject && projectList && sortedAssignments ? (
+			{singleProjectPage && projectList.length ? (
 				<>
-					<ScrollingCalendar columnHeaderTitles={columnHeaderTitles} title={selectedProject.name} projectInfo={projectInfoSubtitle} assignments={sortedAssignments || []} editable={true}>
-						{sortedAssignments.map((assignment: AssignmentType, rowIndex) => {
+					<ScrollingCalendar columnHeaderTitles={columnHeaderTitles} title={singleProjectPage.name} projectInfo={projectInfoSubtitle} assignments={sortedSingleProjectAssignments || []} editable={true}>
+						{sortedSingleProjectAssignments?.map((assignment: AssignmentType, rowIndex) => {
 							return (
 								<ProjectAssignmentRow
-									project={selectedProject}
+									project={singleProjectPage}
 									key={`${assignment.id}-${rowIndex}`}
 									assignment={assignment}
 									monthData={{ monthLabel: "", year: 0 }}
 									isFirstMonth={true}
 									isLastMonth={true}
 									rowIndex={rowIndex}
-									totalRows={sortedAssignments?.length || 0}
+									totalRows={sortedSingleProjectAssignments?.length || 0}
 									inputRefs={inputRefs}
 								/>
 							);

@@ -1,18 +1,19 @@
-import { useUserDataContext } from "@/app/userDataContext";
+'use client'
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import React from "react";
 import { EyeIcon } from "@heroicons/react/24/outline";
+import { useGeneralDataContext } from "@/app/contexts/generalContext";
+import { useUserDataContext } from "@/app/contexts/userDataContext";
+
 export const SingleUserSortOptions = () => {
-	const { viewsFilter, setViewsFilter } = useUserDataContext();
+	const { viewsFilterSingleUser, setViewsFilterSingleUser } = useUserDataContext();
+	const { showArchivedProjects, setShowArchivedProjects, showSummaries, setShowSummaries } = useGeneralDataContext()
 
 	const handleSortMethodChange = (
 		event: React.ChangeEvent<HTMLInputElement>
 	) => {
-		return setViewsFilter({
-			...viewsFilter,
-			singleUserSort: event.target.value,
-		});
+		return setViewsFilterSingleUser(event.target.value);
 	};
 	return (
 		<>
@@ -57,14 +58,9 @@ export const SingleUserSortOptions = () => {
 											<input
 												id="showSummaries"
 												type="checkbox"
-												defaultChecked={viewsFilter.showSummaries}
+												defaultChecked={showSummaries}
 												className="w-4 h-4 text-accentgreen bg-gray-100 border-gray-300 rounded focus:accentgreen dark:focus:ring-accentgreen dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-200 dark:border-gray-600 mr-3"
-												onClick={() =>
-													setViewsFilter({
-														...viewsFilter,
-														showSummaries: !viewsFilter.showSummaries,
-													})
-												}
+												onClick={() => setShowSummaries(!showSummaries)}
 											/>
 											Show Summaries
 										</label>
@@ -82,7 +78,7 @@ export const SingleUserSortOptions = () => {
 												<input
 													type="radio"
 													value="startDate"
-													checked={viewsFilter.singleUserSort === "startDate"}
+													checked={viewsFilterSingleUser === "startDate"}
 													onChange={handleSortMethodChange}
 													className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
 												/>
@@ -94,7 +90,7 @@ export const SingleUserSortOptions = () => {
 												<input
 													type="radio"
 													value="byClient"
-													checked={viewsFilter.singleUserSort === "byClient"}
+													checked={viewsFilterSingleUser === "byClient"}
 													onChange={handleSortMethodChange}
 													className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
 												/>
@@ -107,7 +103,7 @@ export const SingleUserSortOptions = () => {
 													type="radio"
 													value="abcProjectName"
 													checked={
-														viewsFilter.singleUserSort === "abcProjectName"
+														viewsFilterSingleUser === "abcProjectName"
 													}
 													onChange={handleSortMethodChange}
 													className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
@@ -122,15 +118,9 @@ export const SingleUserSortOptions = () => {
 										<input
 											id="showArchivedProjects"
 											type="checkbox"
-											defaultChecked={viewsFilter.showArchivedProjects}
+											defaultChecked={showArchivedProjects}
 											className="w-4 h-4 text-accentgreen bg-gray-100 border-gray-300 rounded focus:accentgreen dark:focus:ring-accentgreen dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-200 dark:border-gray-600 mr-3"
-											onClick={() =>
-												setViewsFilter({
-													...viewsFilter,
-													showArchivedProjects:
-														!viewsFilter.showArchivedProjects,
-												})
-											}
+											onClick={() => setShowArchivedProjects(!showArchivedProjects)}
 										/>
 										Show Archived Projects
 									</label>

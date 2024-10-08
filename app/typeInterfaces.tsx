@@ -248,7 +248,3 @@ export interface MonthsDataType {
 	}[]
 }
 
-export interface DateRange {
-	week: number;
-	year: number;
-}

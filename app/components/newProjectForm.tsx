@@ -5,24 +5,26 @@ import { useFormik, FormikValues } from 'formik';
 import { useMutation } from "@apollo/client";
 
 import { UPSERT_PROJECT, UPSERT_CLIENT } from "@/app/gqlQueries";
-import { useUserDataContext } from '../userDataContext';
 import { ClientType, ProjectType } from "../typeInterfaces";
 import { AutocompleteInput } from './autocompleteInput';
+import { useUserDataContext } from '../contexts/userDataContext';
+import { useClientDataContext } from '../contexts/clientContext';
+import { useGeneralDataContext } from '../contexts/generalContext';
+import { useProjectsDataContext } from '../contexts/projectsDataContext';
 
 interface NewProjectFormProps {
     closeModal: () => void
 }
 
 const NewProjectForm = ({ closeModal }: NewProjectFormProps) => {
+    const { refetchUserList } = useUserDataContext()
+    const { clientList, setClientList } = useClientDataContext()
     const {
         projectList,
-        clientList,
-        viewer,
-        setClientList,
-        refetchProjectList,
-        refetchUserList
+        refetchProjectList
+    } = useProjectsDataContext();
 
-    } = useUserDataContext();
+    const { viewer } = useGeneralDataContext()
     const [showNewClientModal, setShowNewClientModal] = useState<boolean>(false);
     const clientInputRef = useRef<HTMLInputElement>(null);
 
@@ -86,7 +88,7 @@ const NewProjectForm = ({ closeModal }: NewProjectFormProps) => {
                 clientId,
                 name: values.projectName,
                 hours: +values.hours,
-                assignments: [{ userId: viewer.id }]
+                assignments: [{ userId: viewer?.id }]
             };
 
             const nullableDates = () => {

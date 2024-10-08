@@ -6,7 +6,7 @@ import { UPSERT_PROJECT } from "../gqlQueries";
 import { useMutation } from "@apollo/client";
 import { useRouter } from "next/navigation";
 import { convertProjectToCSV } from "../helperFunctions";
-import { useModal } from "../modalContext";
+import { useModal } from "../contexts/modalContext";
 import AddAssignmentModal from "./addAssignmentModal";
 import AddProjectModal from "./addProjectModal";
 import { ProjectType } from "../typeInterfaces";

@@ -1,17 +1,16 @@
-import { useUserDataContext } from "@/app/userDataContext";
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import React from "react";
 import { EyeIcon } from "@heroicons/react/24/outline";
+import { useGeneralDataContext } from "@/app/contexts/generalContext";
+import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 export const ProjectSortOptions = () => {
-	const { viewsFilter, setViewsFilter } = useUserDataContext();
+	const { viewsFilterProject, setViewsFilterProject } = useProjectsDataContext()
+	const { showArchivedProjects, setShowArchivedProjects, showSummaries, setShowSummaries } = useGeneralDataContext()
 	const handleSortMethodChange = (
 		event: React.ChangeEvent<HTMLInputElement>
 	) => {
-		return setViewsFilter({
-			...viewsFilter,
-			selectedProjectSort: event.target.value,
-		});
+		return setViewsFilterProject(event.target.value);
 	};
 	return (
 		<>
@@ -56,14 +55,9 @@ export const ProjectSortOptions = () => {
 											<input
 												id="showSummaries"
 												type="checkbox"
-												defaultChecked={viewsFilter.showSummaries}
+												defaultChecked={showSummaries}
 												className="w-4 h-4 text-accentgreen bg-gray-100 border-gray-300 rounded focus:accentgreen dark:focus:ring-accentgreen dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-200 dark:border-gray-600 mr-3"
-												onClick={() =>
-													setViewsFilter({
-														...viewsFilter,
-														showSummaries: !viewsFilter.showSummaries,
-													})
-												}
+												onClick={() => setShowSummaries(!showSummaries)}
 											/>
 											Show Summaries
 										</label>
@@ -174,7 +168,7 @@ export const ProjectSortOptions = () => {
 													type="radio"
 													value="staffingNeeds"
 													checked={
-														viewsFilter.selectedProjectSort === "staffingNeeds"
+														viewsFilterProject === "staffingNeeds"
 													}
 													onChange={handleSortMethodChange}
 													className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
@@ -188,7 +182,7 @@ export const ProjectSortOptions = () => {
 													type="radio"
 													value="startDate"
 													checked={
-														viewsFilter.selectedProjectSort === "startDate"
+														viewsFilterProject === "startDate"
 													}
 													onChange={handleSortMethodChange}
 													className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
@@ -201,7 +195,7 @@ export const ProjectSortOptions = () => {
 												<input
 													type="radio"
 													value="status"
-													checked={viewsFilter.selectedProjectSort === "status"}
+													checked={viewsFilterProject === "status"}
 													onChange={handleSortMethodChange}
 													className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
 												/>
@@ -214,7 +208,7 @@ export const ProjectSortOptions = () => {
 													type="radio"
 													value="abcProjectName"
 													checked={
-														viewsFilter.selectedProjectSort === "abcProjectName"
+														viewsFilterProject === "abcProjectName"
 													}
 													onChange={handleSortMethodChange}
 													className="mr-2 text-accentgreen focus:ring-accentgreen checked:bg-accentgreen checked:border-transparent"
@@ -229,15 +223,9 @@ export const ProjectSortOptions = () => {
 										<input
 											id="showArchivedProjects"
 											type="checkbox"
-											defaultChecked={viewsFilter.showArchivedProjects}
+											defaultChecked={showArchivedProjects}
 											className="w-4 h-4 text-accentgreen bg-gray-100 border-gray-300 rounded focus:accentgreen dark:focus:ring-accentgreen dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-200 dark:border-gray-600 mr-3"
-											onClick={() =>
-												setViewsFilter({
-													...viewsFilter,
-													showArchivedProjects:
-														!viewsFilter.showArchivedProjects,
-												})
-											}
+											onClick={() => setShowArchivedProjects(!showArchivedProjects)}
 										/>
 										Show Archived Projects
 									</label>

@@ -2,24 +2,25 @@
 import React from "react";
 
 import { ProjectType } from "../typeInterfaces";
-import { useUserDataContext } from "../userDataContext";
 import { LoadingSpinner } from "../components/loadingSpinner";
 import { ScrollingCalendar } from "../components/scrollingCalendar/scrollingCalendar";
 import { AllProjectRow } from "../components/allProjects/allProjectRow";
+import { useProjectsDataContext } from "../contexts/projectsDataContext";
 
 
 const ProjectsView: React.FC = () => {
-	const { projectList } = useUserDataContext();
+
+	const { filteredProjectList } = useProjectsDataContext();
 
 	const columnHeaderTitles = [{ title: 'Clients', showIcon: true }, { title: 'Projects', showIcon: false }]
 
-	const assignments = projectList?.flatMap((project: ProjectType) => project.assignments || []);
+	const assignments = filteredProjectList?.flatMap((project: ProjectType) => project.assignments || []);
 
 	return (
 		<>
-			{projectList ? (
+			{filteredProjectList.length ? (
 				<ScrollingCalendar title='Projects' columnHeaderTitles={columnHeaderTitles} assignments={assignments}>
-					{projectList?.map((project: ProjectType, index: number) => {
+					{filteredProjectList?.map((project: ProjectType, index: number) => {
 						return (
 							<AllProjectRow
 								key={index}

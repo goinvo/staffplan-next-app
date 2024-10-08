@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dialog } from '@headlessui/react';
-import { useModal } from '../modalContext';
+import { useModal } from '../contexts/modalContext';
 
 const ModalController = () => {
     const { isModalOpen, closeModal, modalContent } = useModal();

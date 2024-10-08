@@ -5,7 +5,8 @@ import { useMutation } from "@apollo/client";
 import { UserType, AssignmentType, ProjectType } from "@/app/typeInterfaces";
 import { FaUser } from "react-icons/fa";
 import { UPSERT_ASSIGNMENT } from "@/app/gqlQueries";
-import { useUserDataContext } from "@/app/userDataContext";
+import { useUserDataContext } from "../contexts/userDataContext";
+import { useProjectsDataContext } from "../contexts/projectsDataContext";
 
 type AddPersonInlineProps = {
     assignment: AssignmentType;
@@ -13,7 +14,10 @@ type AddPersonInlineProps = {
 };
 
 export const AddPersonInline = ({ project, assignment }: AddPersonInlineProps) => {
-    const { refetchProjectList, userList } = useUserDataContext();
+
+    const { userList } = useUserDataContext()
+
+    const { refetchProjectList } = useProjectsDataContext();
     const [selectedUserId, setSelectedUserId] = useState<string>("");
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [upsertAssignment, { loading: mutationLoading }] = useMutation(UPSERT_ASSIGNMENT, {

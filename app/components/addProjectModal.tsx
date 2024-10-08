@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, ReactNode } from "react";
 import { Field, Formik, FormikValues } from "formik";
 
 import ProjectDatepicker from "./projectDatepicker";
@@ -7,9 +7,10 @@ import { useMutation } from "@apollo/client";
 import { ClientType, ProjectType } from "../typeInterfaces";
 import { UPSERT_PROJECT } from "../gqlQueries";
 import { differenceInBusinessDays } from "date-fns";
-import { ReactNode } from "react";
-import { useUserDataContext } from "../userDataContext";
 import { LoadingSpinner } from "./loadingSpinner";
+import { useUserDataContext } from "../contexts/userDataContext";
+import { useClientDataContext } from "../contexts/clientContext";
+import { useProjectsDataContext } from "../contexts/projectsDataContext";
 interface AddProjectModalProps {
 	project: ProjectType;
 	closeModal: () => void;
@@ -20,7 +21,9 @@ const AddProjectModal = ({ project, closeModal }: AddProjectModalProps) => {
 		client: { id: clientId },
 	} = project;
 
-	const { projectList, clientList, refetchProjectList, refetchUserList } = useUserDataContext();
+	const { refetchUserList } = useUserDataContext()
+	const { clientList } = useClientDataContext()
+	const { projectList, refetchProjectList } = useProjectsDataContext();
 
 	const editProjectInitialValues = {
 		id: project.id,
@@ -195,7 +198,7 @@ const AddProjectModal = ({ project, closeModal }: AddProjectModalProps) => {
 			setFieldValue("cost", totalCost);
 		}
 	};
-	if (!clientList || !projectList) return <LoadingSpinner />;
+	if (!clientList.length || !projectList) return <LoadingSpinner />;
 	return (
 		<>
 			<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>

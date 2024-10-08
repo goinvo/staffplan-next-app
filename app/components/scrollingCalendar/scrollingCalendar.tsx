@@ -1,11 +1,12 @@
 'use client';
 import React, { useState, useEffect, useCallback } from "react";
-import { useUserDataContext } from "@/app/userDataContext";
+
 import CalendarHeader from "./calendarHeader";
 import { MonthsDataType, AssignmentType, ProjectType } from "@/app/typeInterfaces";
 import useMediaQuery from "@/app/hooks/useMediaQuery";
 import { MONTHS_COUNT, MONTS_PER_SCREEN_SIZE } from "./constants";
 import { getWeeksPerScreen } from "./helpers";
+import { useGeneralDataContext } from "@/app/contexts/generalContext";
 
 interface ScrollingCalendarProps {
 	children: React.ReactNode;
@@ -33,7 +34,7 @@ export const ScrollingCalendar = ({
 	editable
 }: ScrollingCalendarProps) => {
 	const [months, setMonths] = useState<MonthsDataType[]>([]);
-	const { dateRange } = useUserDataContext();
+	const { dateRange } = useGeneralDataContext();
 	const isSmallScreen = useMediaQuery('(max-width: 1299px)');
 	const isMediumScreen = useMediaQuery('(min-width: 1299px) and (max-width: 1499px)');
 	const isLargeScreen = useMediaQuery('(min-width: 1500px) and (max-width: 1799px)');
