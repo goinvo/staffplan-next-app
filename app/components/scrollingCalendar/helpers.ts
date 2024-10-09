@@ -5,6 +5,7 @@ import {
   MonthsDataType,
   UserType,
   ProjectType,
+  ClientType,
 } from "@/app/typeInterfaces";
 import { ACTUAL_HOURS } from "./constants";
 
@@ -982,5 +983,25 @@ export const updateOrInsertWorkWeek = (
     }
 
     return user;
+  });
+};
+
+export const getClientProjects = (
+  clientList: ClientType[],
+  clientId: string | number
+) => {
+  const client = clientList?.find((client) => client.id === clientId);
+  return client?.projects ?? [];
+};
+
+export const filterUnassignedProjectsForUser = (
+  projects: ProjectType[],
+  userId: string
+) => {
+  return projects?.filter((project) => {
+    const isUserAssigned = project?.assignments?.some(
+      (assignment) => String(assignment?.assignedUser?.id) === String(userId)
+    );
+    return !isUserAssigned;
   });
 };

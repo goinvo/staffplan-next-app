@@ -2,9 +2,8 @@
 import { useParams } from "next/navigation";
 import React, { useEffect, useState, useRef } from "react";
 import withApollo from "@/lib/withApollo";
-import { AssignmentType, ClientType } from "../../typeInterfaces";
+import { AssignmentType } from "../../typeInterfaces";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
-import { sortSingleUser } from "@/app/helperFunctions";
 import { ScrollingCalendar } from "@/app/components/scrollingCalendar/scrollingCalendar";
 import { UserAssignmentRow } from "@/app/components/userAssignment/userAssignmentRow";
 import AddAssignmentSingleUser from "@/app/components/addAssignmentSingleUser";
@@ -17,7 +16,7 @@ const UserPage: React.FC = () => {
 	const [addAssignmentVisible, setAddAssignmentVisible] = useState(false);
 	const inputRefs = useRef<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>([]);
 
-	const { userList, viewsFilterSingleUser, singleUserPage, setSelectedUserData, setSingleUserPage } = useUserDataContext();
+	const { userList, singleUserPage, setSelectedUserData } = useUserDataContext();
 
 	useEffect(() => {
 		if (userList.length) {
@@ -33,47 +32,6 @@ const UserPage: React.FC = () => {
 	const onClose = () => setAddAssignmentVisible(false);
 	const onComplete = () => {
 		setAddAssignmentVisible(false);
-	};
-	const handleClientClick = (client: ClientType) => {
-		if (!singleUserPage) return;
-
-		const newAssignment: any = {
-
-			id: Date.now(), // Generate a unique id
-			startsOn: null,
-			endsOn: null,
-			estimatedWeeklyHours: 0,
-			status: "active",
-			project: {
-				__typename: "Project",
-				id: Date.now(), // Generate a unique id for the project
-				name: "New Project",
-				startsOn: null,
-				endsOn: null,
-				client: {
-					id: client.id,
-					name: client.name,
-					avatarUrl: "http://www.gravatar.com/avatar/newavatar",
-					description: ""
-				},
-				paymentFrequency: "",
-				status: "",
-				users: [],
-				fte: 0,
-				hours: 0,
-				isTempProject: true,
-			},
-			workWeeks: [],
-		};
-
-		// Add new assignment and then sort
-		const updatedAssignments = [...singleUserPage.assignments, newAssignment];
-		const sortedAssignments = sortSingleUser(viewsFilterSingleUser, {
-			...singleUserPage,
-			assignments: updatedAssignments
-		});
-
-		setSingleUserPage(sortedAssignments);
 	};
 
 	const columnsHeaderTitles = [{ title: 'Client', showIcon: true }, { title: 'Project', showIcon: false }]
@@ -91,7 +49,6 @@ const UserPage: React.FC = () => {
 									isFirstMonth={true}
 									isLastMonth={true}
 									isFirstClient={isFirstClient}
-									clickHandler={handleClientClick}
 									selectedUser={singleUserPage}
 									rowIndex={rowIndex}
 									totalRows={singleUserPage?.assignments?.length || 0}
