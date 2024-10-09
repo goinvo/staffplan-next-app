@@ -203,7 +203,7 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
                         ) : null}
                     </div>
                     <div className="ml-1">
-                        {!!clientList.length && <AutocompleteInput
+                        <AutocompleteInput
                             ref={clientInputRef}
                             items={clientList}
                             onItemSelect={handleClientSelect}
@@ -216,7 +216,7 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
                             inputClassName="py-2 pl-3 max-w-[185px] max-h-[28px] rounded-md shadow-sm focus:ring-tiffany focus:border-tiffany text-tiny font-bold text-contrastBlue align-center"
                             dropdownClassName="max-w-[185px] p-2 rounded-sm text-tiny z-30"
                             listClassName="p-2 z-34"
-                        />}
+                        />
                         {formik.touched.clientName && formik.errors.clientName ? (
                             <p className="text-red-500 text-xs pl-1">{formik.errors.clientName}</p>
                         ) : null}

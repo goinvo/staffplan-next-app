@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from "react";
+import React from "react";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
 
@@ -20,7 +20,6 @@ interface UserAssignmentRowProps {
 	isFirstMonth: boolean;
 	isLastMonth: boolean;
 	isFirstClient: boolean;
-	clickHandler: (client: ClientType) => void;
 	months?: MonthsDataType[];
 	selectedUser: UserType;
 	rowIndex: number;
@@ -33,7 +32,6 @@ export const UserAssignmentRow = ({
 	isFirstMonth,
 	isLastMonth,
 	isFirstClient,
-	clickHandler,
 	months,
 	selectedUser,
 	rowIndex,
@@ -41,7 +39,6 @@ export const UserAssignmentRow = ({
 	totalRows
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
-	const [tempProjectOpen, setTempProjectOpen] = useState(false)
 	const { refetchUserList, viewsFilterSingleUser } = useUserDataContext()
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
 		errorPolicy: "all",
@@ -90,15 +87,15 @@ export const UserAssignmentRow = ({
 				>
 					<div className={`${isFirstClient ? 'flex' : 'w-24'}`}>
 						{viewsFilterSingleUser === 'byClient' && isFirstClient && isFirstMonth && (
-							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} selectedUser={selectedUser} />
+							<ClientLabel assignment={assignment} selectedUser={selectedUser} />
 						)}
 						{viewsFilterSingleUser !== 'byClient' && isFirstMonth && (
-							<ClientLabel assignment={assignment} clickHandler={clickHandler} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} selectedUser={selectedUser} />
+							<ClientLabel assignment={assignment} selectedUser={selectedUser} />
 						)}
 					</div>
 					{isFirstMonth && (
 						assignment.project.isTempProject ? (
-							<TempProjectLabel assignment={assignment} tempProjectOpen={tempProjectOpen} setTempProjectOpen={setTempProjectOpen} /> // Render custom label
+							<TempProjectLabel assignment={assignment} /> // Render custom label
 						) : (
 							<UserLabel assignment={assignment} clickHandler={handleProjectChange} />
 						)
@@ -144,7 +141,7 @@ export const UserAssignmentRow = ({
 						</td>)
 				});
 			})}
-			{isLastMonth && <UserSummary assignment={assignment} selectedUser={selectedUser} setTempProjectOpen={setTempProjectOpen} tempProjectOpen={tempProjectOpen} />}
+			{isLastMonth && <UserSummary assignment={assignment} selectedUser={selectedUser} />}
 		</tr >
 	);
 };

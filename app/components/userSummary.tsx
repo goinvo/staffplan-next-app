@@ -11,7 +11,7 @@ import { useUserDataContext } from "../contexts/userDataContext";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
 import { useGeneralDataContext } from '../contexts/generalContext';
 
-const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, setTempProjectOpen, project }) => {
+const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, project }) => {
 	const burnedHours = assignment.workWeeks.reduce(
 		(acc, curr) => acc + (curr.actualHours ?? 0),
 		0
@@ -58,12 +58,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, set
 				name: selectedUser?.name || "Default Name",
 				avatarUrl: selectedUser?.avatarUrl || "defaultAvatarUrl.png",
 			};
-			if (setTempProjectOpen) {
-				setTempProjectOpen(false);
-			}
-			if (setSingleUserPage) {
-				setSingleUserPage(selectedUserData);
-			}
+			setSingleUserPage(selectedUserData)
 			return;
 		}
 		if (assignment.assignedUser === null) {

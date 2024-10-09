@@ -61,7 +61,7 @@ export const ClientDataProvider: React.FC<{ children?: ReactNode }> = ({
     const refetchClientList = () => {
         client
             .query({
-                query: GET_CLIENT_DATA,
+                query: GET_ALL_CLIENTS_DATA,
                 context: {
                     headers: {
                         cookie: isClient ? document.cookie : null,
@@ -70,7 +70,7 @@ export const ClientDataProvider: React.FC<{ children?: ReactNode }> = ({
                 errorPolicy: "all",
             })
             .then((result) => {
-                setClientList(result.data.clients);
+                setClientList(result.data.currentCompany.clients);
             });
     };
 
