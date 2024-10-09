@@ -187,22 +187,6 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
             <td className='my-5 px-0 font-normal align-top max-w-1/3'>
                 <form onSubmit={formik.handleSubmit} className="flex flex-row gap-4">
                     <div className="mr-1">
-                        <input
-                            autoComplete="off"
-                            id="projectName"
-                            name="projectName"
-                            type="text"
-                            value={formik.values.projectName}
-                            onChange={formik.handleChange}
-                            onBlur={handleProjectNameBlur}
-                            className="py-2 max-w-[185px] max-h-[28px] text-tiny font-bold shadow-top-input-shadow rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-contrastBlue"
-                            placeholder="Project Name"
-                        />
-                        {formik.touched.projectName && formik.errors.projectName ? (
-                            <p className="text-red-500 max-w-[185px] text-xs pl-1">{formik.errors.projectName}</p>
-                        ) : null}
-                    </div>
-                    <div className="ml-1">
                         {!!clientList.length && <AutocompleteInput
                             ref={clientInputRef}
                             items={clientList}
@@ -219,6 +203,23 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
                         />}
                         {formik.touched.clientName && formik.errors.clientName ? (
                             <p className="text-red-500 text-xs pl-1">{formik.errors.clientName}</p>
+                        ) : null}
+
+                    </div>
+                    <div className="ml-1">
+                        <input
+                            autoComplete="off"
+                            id="projectName"
+                            name="projectName"
+                            type="text"
+                            value={formik.values.projectName}
+                            onChange={formik.handleChange}
+                            onBlur={handleProjectNameBlur}
+                            className="py-2 max-w-[185px] max-h-[28px] text-tiny font-bold shadow-top-input-shadow rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-contrastBlue"
+                            placeholder="Project Name"
+                        />
+                        {formik.touched.projectName && formik.errors.projectName ? (
+                            <p className="text-red-500 max-w-[185px] text-xs pl-1">{formik.errors.projectName}</p>
                         ) : null}
                     </div>
                 </form>
