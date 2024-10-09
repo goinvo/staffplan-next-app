@@ -226,7 +226,7 @@ export const WorkWeekInput = ({
 								}
 							}}
 							onFillForwardClick={() => onFillForwardClick(ESTIMATED_HOURS, cweek, year, values)}
-							disabled={false}
+							disabled={isUserTBD}
 							ref={(el: HTMLInputElement) => createEstimatedRef(el, rowIndex, cellIndex)}
 							onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => tabbingAndArrowNavigation(e, rowIndex, cellIndex, inputRefs, totalRows, false)}
 						/>
