@@ -48,6 +48,7 @@ const Navbar: React.FC = () => {
 		},
 		{ label: "Feedback" },
 		{ href: `${homepageUrl}/settings`, label: "Settings" },
+		{ href: `${homepageUrl}/users/profile`, label: "Profile" },
 		{ href: `${homepageUrl}/sign_out`, label: "Sign Out" },
 	];
 	return (
