@@ -169,6 +169,7 @@ export interface UserSummaryProps {
 export interface ViewerType {
 	name: string;
 	id: string;
+	role: string;
 }
 
 export interface ViewsFiltersType {
