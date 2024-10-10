@@ -17,7 +17,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 		(acc, curr) => acc + (curr.actualHours ?? 0),
 		0
 	);
-	const { setSingleUserPage } = useUserDataContext()
+	const { setSingleUserPage, userList, setUserList } = useUserDataContext()
 	const { showSummaries } = useGeneralDataContext()
 	const { projectList, setProjectList, singleProjectPage, setSingleProjectPage } = useProjectsDataContext();
 	const pastPlan = () => {
@@ -44,10 +44,6 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 			const updatedAssignments = singleProjectPage?.assignments?.map((assignment) =>
 				assignment.id === upsertAssignment.id ? upsertAssignment : assignment
 			);
-			setSingleProjectPage({
-				...singleProjectPage,
-				assignments: updatedAssignments,
-			});
 			const updatedProjectList = projectList?.map((project) => {
 				if (project.id === singleProjectPage?.id) {
 					return {
@@ -58,6 +54,25 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 					};
 				}
 				return project;
+			});
+			const updatedUserList = userList?.map((user) => {
+				if (user.id === upsertAssignment.assignedUser.id) {
+					const updatedUserAssignments = user.assignments.map((assignment) =>
+						assignment.id === upsertAssignment.id ? upsertAssignment : assignment
+					);
+
+					return {
+						...user,
+						assignments: updatedUserAssignments,
+					};
+				}
+				return user;
+			});
+
+			setUserList(updatedUserList);
+			setSingleProjectPage({
+				...singleProjectPage,
+				assignments: updatedAssignments,
 			});
 			setProjectList(updatedProjectList);
 		},
@@ -78,14 +93,18 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 			});
 			const projectId = singleProjectPage?.id;
 			if (projectList && projectId) {
-				const projectToUpdate = projectList.find((project) => project.id === projectId);
-
-				if (projectToUpdate) {
-					projectToUpdate.assignments = projectToUpdate?.assignments?.filter(
-						(assignment) => assignment.id !== deletedAssignmentId
-					);
-					setProjectList([...projectList]);
-				}
+				const updatedProjectList = projectList.map((project) => {
+					if (project.id === projectId) {
+						return {
+							...project,
+							assignments: project?.assignments?.filter(
+								(assignment) => assignment.id !== deletedAssignmentId
+							),
+						};
+					}
+					return project;
+				});
+				setProjectList(updatedProjectList);
 			}
 		},
 	});
