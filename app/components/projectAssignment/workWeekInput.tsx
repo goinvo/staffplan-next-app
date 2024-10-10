@@ -136,7 +136,6 @@ export const WorkWeekInput = ({
 	}, [months, rowIndex, inputRefs]);
 
 	const upsertWorkWeekValues = (values: FormikValues) => {
-
 		const variables: WorkWeekValues = {
 			assignmentId: values.assignmentId,
 			cweek: values.cweek,
@@ -226,7 +225,6 @@ export const WorkWeekInput = ({
 								}
 							}}
 							onFillForwardClick={() => onFillForwardClick(ESTIMATED_HOURS, cweek, year, values)}
-							disabled={isUserTBD}
 							ref={(el: HTMLInputElement) => createEstimatedRef(el, rowIndex, cellIndex)}
 							onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => tabbingAndArrowNavigation(e, rowIndex, cellIndex, inputRefs, totalRows, false)}
 						/>
