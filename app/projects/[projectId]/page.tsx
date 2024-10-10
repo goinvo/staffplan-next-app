@@ -22,9 +22,15 @@ const ProjectPage: React.FC = () => {
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_ASSIGNMENT, {
-		onCompleted({ upsertAssignment }) {
-			refetchUserList()
-			refetchProjectList()
+		async onCompleted() {
+			try {
+				await Promise.all([
+					refetchUserList(),
+					refetchProjectList(),
+				]);
+			} catch (e: any) {
+				throw new Error("Something went wrong", e.message);
+			}
 		}
 	});
 

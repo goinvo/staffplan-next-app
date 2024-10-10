@@ -1,3 +1,4 @@
+'use client'
 import React from "react";
 import { DateTime } from "luxon";
 
@@ -11,14 +12,15 @@ import { useUserDataContext } from "../contexts/userDataContext";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
 import { useGeneralDataContext } from '../contexts/generalContext';
 
+
 const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, project }) => {
 	const burnedHours = assignment.workWeeks.reduce(
 		(acc, curr) => acc + (curr.actualHours ?? 0),
 		0
 	);
-	const { refetchUserList, setSingleUserPage } = useUserDataContext()
+	const { setSingleUserPage } = useUserDataContext()
 	const { showSummaries } = useGeneralDataContext()
-	const { refetchProjectList } = useProjectsDataContext();
+	const { projectList, setProjectList, singleProjectPage, setSingleProjectPage } = useProjectsDataContext();
 	const pastPlan = () => {
 		const now = DateTime.now();
 		const startOfAssignment = DateTime.fromISO(assignment.startsOn ?? "");
@@ -38,17 +40,54 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
 		errorPolicy: "all",
 		onCompleted({ upsertAssignment }) {
-			refetchUserList();
-			refetchProjectList();
+			const updatedAssignments = singleProjectPage?.assignments?.map((assignment) =>
+				assignment.id === upsertAssignment.id ? upsertAssignment : assignment
+			);
+			setSingleProjectPage({
+				...singleProjectPage,
+				assignments: updatedAssignments,
+			});
+			const updatedProjectList = projectList?.map((project) => {
+				if (project.id === singleProjectPage?.id) {
+					return {
+						...project,
+						assignments: project?.assignments?.map((assignment) =>
+							assignment.id === upsertAssignment.id ? upsertAssignment : assignment
+						),
+					};
+				}
+				return project;
+			});
+			setProjectList(updatedProjectList);
 		},
+
 	});
+
+
 	const [deleteAssignment] = useMutation(DELETE_ASSIGNMENT, {
 		errorPolicy: "all",
 		onCompleted({ deleteAssignment }) {
-			refetchUserList();
-			refetchProjectList();
+			const deletedAssignmentId = deleteAssignment.id;
+			const updatedAssignments = singleProjectPage?.assignments?.filter(
+				(assignment) => assignment.id !== deletedAssignmentId
+			);
+			setSingleProjectPage({
+				...singleProjectPage,
+				assignments: updatedAssignments,
+			});
+			const projectId = singleProjectPage?.id;
+			if (projectList && projectId) {
+				const projectToUpdate = projectList.find((project) => project.id === projectId);
+
+				if (projectToUpdate) {
+					projectToUpdate.assignments = projectToUpdate?.assignments?.filter(
+						(assignment) => assignment.id !== deletedAssignmentId
+					);
+					setProjectList([...projectList]);
+				}
+			}
 		},
-	})
+	});
 	const handleArchiveItemClick = () => {
 		if (assignment.project && assignment.project.isTempProject) {
 			const removedTempAssignment = selectedUser?.assignments.filter((a: AssignmentType) => a.id !== assignment.id);
