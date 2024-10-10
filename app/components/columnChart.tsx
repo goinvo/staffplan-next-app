@@ -29,6 +29,14 @@ const ColumnChart = ({
     const proposedFillColor = isBeforeWeek ? '#AEB3C0' : '#79e3e0';
     const shouldRenderEstimatedWithProposedPath = !hasActualHoursForWeek && proposedSvgHeight > 0;
     const shouldRenderOnlyProposedPath = !hasActualHoursForWeek && proposedHours >= height;
+    const shouldNoRenderAnyHours = !hasActualHoursForWeek && isBeforeWeek;
+
+    const renderHeight = () => {
+        if (shouldNoRenderAnyHours) {
+            return 0;
+        }
+        return height || 0;
+    };
 
     const drawPath = () => (
         <>
@@ -54,9 +62,9 @@ const ColumnChart = ({
         <div className='w-[34px]'>
             <div className="absolute bottom-0 left-0 right-0 max-w-[34px] px-1">
                 <span className={`flex justify-center text-center w-[34px] text-${textColor}`}>
-                    {height || 0}
+                    {renderHeight()}
                 </span>
-                {!!height && (
+                {!!height && !shouldNoRenderAnyHours && (
                     <svg width='34px' height={svgHeight} viewBox={`0 0 34 ${svgHeight}`} xmlns="http://www.w3.org/2000/svg" className="transition-height duration-200 ease"
                     >
                         {drawPath()}

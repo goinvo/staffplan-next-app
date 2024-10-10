@@ -59,7 +59,7 @@ export default function EllipsisPeopleMenu({ user }: EllipsisPeopleMenuProps) {
 										openModal(<AddAssignmentModal user={user} closeModal={closeModal} />)
 									}
 								>
-									Add Person
+									Add Project
 								</button>
 							)}
 

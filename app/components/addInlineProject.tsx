@@ -187,6 +187,25 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
             <td className='my-5 px-0 font-normal align-top max-w-1/3'>
                 <form onSubmit={formik.handleSubmit} className="flex flex-row gap-4">
                     <div className="mr-1">
+                        <AutocompleteInput
+                            ref={clientInputRef}
+                            items={clientList}
+                            onItemSelect={handleClientSelect}
+                            onChange={handleClientChange}
+                            onBlur={handleClientBlur}
+                            displayKey="name"
+                            inputName="clientName"
+                            placeholder="Client Name"
+                            value={formik.values.clientName}
+                            inputClassName="py-2 pl-3 max-w-[185px] max-h-[28px] rounded-md shadow-sm focus:ring-tiffany focus:border-tiffany text-tiny font-bold text-contrastBlue align-center"
+                            dropdownClassName="max-w-[185px] p-2 rounded-sm text-tiny z-30"
+                            listClassName="p-2 z-34"
+                        />
+                        {formik.touched.clientName && formik.errors.clientName ? (
+                            <p className="text-red-500 text-xs pl-1">{formik.errors.clientName}</p>
+                        ) : null}
+                    </div>
+                    <div className="ml-1">
                         <input
                             autoComplete="off"
                             id="projectName"
@@ -200,25 +219,6 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
                         />
                         {formik.touched.projectName && formik.errors.projectName ? (
                             <p className="text-red-500 max-w-[185px] text-xs pl-1">{formik.errors.projectName}</p>
-                        ) : null}
-                    </div>
-                    <div className="ml-1">
-                        {!!clientList.length && <AutocompleteInput
-                            ref={clientInputRef}
-                            items={clientList}
-                            onItemSelect={handleClientSelect}
-                            onChange={handleClientChange}
-                            onBlur={handleClientBlur}
-                            displayKey="name"
-                            inputName="clientName"
-                            placeholder="Client Name"
-                            value={formik.values.clientName}
-                            inputClassName="py-2 pl-3 max-w-[185px] max-h-[28px] rounded-md shadow-sm focus:ring-tiffany focus:border-tiffany text-tiny font-bold text-contrastBlue align-center"
-                            dropdownClassName="max-w-[185px] p-2 rounded-sm text-tiny z-30"
-                            listClassName="p-2 z-34"
-                        />}
-                        {formik.touched.clientName && formik.errors.clientName ? (
-                            <p className="text-red-500 text-xs pl-1">{formik.errors.clientName}</p>
                         ) : null}
                     </div>
                 </form>

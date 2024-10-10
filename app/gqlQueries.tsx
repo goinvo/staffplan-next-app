@@ -186,9 +186,6 @@ export const GET_ALL_CLIENTS_DATA = gql`
 							estimatedHours
 							cweek
 							year
-							user {
-								name
-							}
 						}
 					}
 					workWeeks {
@@ -196,9 +193,6 @@ export const GET_ALL_CLIENTS_DATA = gql`
 						estimatedHours
 						cweek
 						year
-						user {
-							name
-						}
 					}
 				}
 			}
@@ -237,9 +231,6 @@ export const GET_ALL_PROJECTS_DATA = gql`
 						estimatedHours
 						cweek
 						year
-						user {
-							name
-						}
 					}
 				}
 				client {
@@ -252,9 +243,6 @@ export const GET_ALL_PROJECTS_DATA = gql`
 					estimatedHours
 					cweek
 					year
-					user {
-						name
-					}
 				}
 			}
 		}

@@ -20,7 +20,6 @@ const NewPersonForm = ({ closeModal }: NewPersonFormProps) => {
                 userEmail: values.userEmail,
                 isAdmin: values.isAdmin
             };
-            console.log('Form values:', newValues);
             closeModal()
             // Here will be logic for create new user
         },

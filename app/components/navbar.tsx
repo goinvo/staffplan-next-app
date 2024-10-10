@@ -49,7 +49,9 @@ const Navbar: React.FC = () => {
 		},
 		{ label: "Feedback" },
 		{ href: `${homepageUrl}/settings`, label: "Settings", show:showSettingsLink },
+		{ href: `${homepageUrl}/users/profile`, label: "Profile", show:true },
 		{ href: `${homepageUrl}/sign_out`, label: "Sign Out", show:true },
+        
 	];
 	return (
 		<nav className="navbar bg-gray-100 px-5 h-14 flex justify-between items-center">
