@@ -41,7 +41,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 		return acc;
 	}, 0);
 
-	const weeks = () => {
+	const weeks = (): number => {
 		if (project.startsOn && project.endsOn) {
 			const startsOn = DateTime.fromISO(project.startsOn);
 			const endsOn = DateTime.fromISO(project.endsOn);
@@ -61,65 +61,53 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 		}
 	};
 
+	const summaries = [
+		{ label: 'target', value: project.hours, unit: 'hrs' },
+		{ label: 'planned', value: plannedHours, unit: 'hrs', alwaysShow: true },
+		{ label: 'burned', value: burnedHours, unit: 'hrs', alwaysShow: true },
+		{ label: 'short', value: shortHours(), unit: 'hrs' },
+	];
+	const weeksAndFte = [
+		{ unit: 'FTE', value: project.fte, separator: weeks() > 0 ? ',' : '' },
+		{ unit: 'wks', value: weeks() }
+	]
 	return (
 		<td className="font-normal py-2 pr-4 pl-0 w-1/6 flex justify-center items-center">
-			{showSummaries ? (
-				<div className="flex flex-col items-start">
+			{showSummaries && (
+				<div className='flex flex-col'>
 					<div className="ml-auto">
 						<IconButton
 							className="text-black text-transparentGrey"
-							onClick={() => handleArchiveItemClick()}
+							onClick={handleArchiveItemClick}
 							Icon={ArchiveBoxIcon}
 							iconSize="h6 w-6"
 						/>
 					</div>
-					{project.fte ? (
-						<span className="text-sm flex items-center">
-							<span className="font-bold text-sm px-1">{project.fte}</span>
-							FTE
-						</span>
-					) : null}
-					{weeks() ? (
-						<span className="text-sm flex items-center">
-							<span className="font-bold text-sm px-1">{weeks()}</span>
-							wks
-						</span>
-					) : null}
-					{project.hours ? (
-						<div className="flex justify-between">
-							<label className="text-sm">target</label>
-							<span className="font-bold text-sm px-1">
-								{project.hours}
-								<span className="text-sm font-normal pl-1">hrs</span>
-							</span>
-						</div>
-					) : null}
-					<div className="flex">
-						<label className="text-sm">planned</label>
-						<span className="font-bold text-sm px-1">
-							{plannedHours}
-							<span className="text-sm font-normal pl-1">hrs</span>
-						</span>
+					<div className="flex justify-between w-full space-x-1">
+						{weeksAndFte.map((item, index) => (
+							item.value ? (
+								<div key={index} className="flex items-center space-x-1">
+									<span className="font-bold">{item.value}</span>
+									<label className="text-sm">{item.unit + (item.separator || '')}</label>
+								</div>
+							) : null
+						))}
 					</div>
-					<div className="flex">
-						<label className="text-sm">burned</label>
-						<span className="font-bold text-sm px-1">
-							{burnedHours}
-							<span className="text-sm font-normal pl-1">hrs</span>
-						</span>
-					</div>
-					{shortHours() ? (
-						<div className="flex">
-							<label className="text-sm">short</label>
-							<span className="font-bold text-sm px-1">
-								{shortHours()}
-								<span className="text-sm font-normal pl-1">hrs</span>
-							</span>
-						</div>
-					) : null}
+					{summaries.map((summary, index) =>
+						(summary.value || summary.alwaysShow) ? (
+							<div key={index} className="flex justify-between space-x-1">
+								<label className="text-sm whitespace-nowrap">{summary.label}</label>
+								<span className="font-bold text-sm">
+									{summary.value}
+									<span className="text-sm font-normal pl-1">{summary.unit}</span>
+								</span>
+							</div>
+						) : null
+					)}
 				</div>
-			) : null}
-		</td>
+			)
+			}
+		</td >
 	);
 };
 
