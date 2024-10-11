@@ -294,6 +294,7 @@ export const UPSERT_ASSIGNMENT = gql`
 			assignedUser {
 				id
 				name
+				avatarUrl
 			}
 			workWeeks {
 				id

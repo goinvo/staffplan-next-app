@@ -22,9 +22,15 @@ const ProjectPage: React.FC = () => {
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_ASSIGNMENT, {
-		onCompleted({ upsertAssignment }) {
-			refetchUserList()
-			refetchProjectList()
+		async onCompleted() {
+			try {
+				await Promise.all([
+					refetchUserList(),
+					refetchProjectList(),
+				]);
+			} catch (e: any) {
+				throw new Error("Something went wrong", e.message);
+			}
 		}
 	});
 
@@ -83,7 +89,7 @@ const ProjectPage: React.FC = () => {
 
 	const columnHeaderTitles = [{ title: 'People', showIcon: true, onClick: () => addNewAssignmentRow() }]
 
-	const projectInfoSubtitle = `${singleProjectPage?.client.name}, budget, ${singleProjectPage?.hours || 0}h, ${selectedProjectDates()}`
+	const projectInfoSubtitle = `${singleProjectPage?.client?.name}, budget, ${singleProjectPage?.hours || 0}h, ${selectedProjectDates()}`
 	return (
 		<>
 			{singleProjectPage && projectList.length ? (
