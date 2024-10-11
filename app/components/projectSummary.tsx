@@ -7,6 +7,7 @@ import { UPSERT_PROJECT } from "@/app/gqlQueries";
 import { useMutation } from "@apollo/client";
 import { useProjectsDataContext } from '../contexts/projectsDataContext';
 import { useGeneralDataContext } from '../contexts/generalContext';
+import { calculatePlannedHoursPerProject } from './scrollingCalendar/helpers';
 
 
 const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
@@ -33,13 +34,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 		}
 	}
 
-
-	const plannedHours = project.assignments?.reduce((acc, curr) => {
-		if (curr.status === 'active') {
-			return acc + curr.estimatedWeeklyHours;
-		}
-		return acc;
-	}, 0);
+	const plannedHours = calculatePlannedHoursPerProject(project)
 
 	const weeks = (): number => {
 		if (project.startsOn && project.endsOn) {

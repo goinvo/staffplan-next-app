@@ -10,6 +10,7 @@ import { DELETE_ASSIGNMENT, UPSERT_ASSIGNMENT } from "../gqlQueries";
 import { useUserDataContext } from "../contexts/userDataContext";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
 import { useGeneralDataContext } from '../contexts/generalContext';
+import { calculatePlan } from "./scrollingCalendar/helpers";
 
 
 const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, project }) => {
@@ -20,23 +21,6 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 	const { setSingleUserPage, userList, setUserList } = useUserDataContext()
 	const { showSummaries } = useGeneralDataContext()
 	const { projectList, setProjectList, singleProjectPage, setSingleProjectPage } = useProjectsDataContext();
-	const pastPlan = () => {
-		const now = DateTime.now();
-		const startOfAssignment = DateTime.fromISO(assignment.startsOn ?? "");
-		const timeBetween = now.diff(startOfAssignment, ["weeks"]).toObject();
-		if (timeBetween.weeks && timeBetween.weeks > 0) {
-			return assignment.estimatedWeeklyHours * Math.ceil(timeBetween.weeks);
-		}
-	};
-
-	const futurePlan = () => {
-		const now = DateTime.now();
-		const endOfAssignment = DateTime.fromISO(assignment.endsOn ?? "");
-		const timeBetween = endOfAssignment.diff(now, ["weeks"]).toObject();
-		if (timeBetween.weeks && timeBetween.weeks > 0) {
-			return assignment.estimatedWeeklyHours * Math.ceil(timeBetween.weeks);
-		}
-	};
 
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
 		errorPolicy: "all",
@@ -140,9 +124,9 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 	};
 
 	const summaries = [
-		{ label: 'future plan', value: futurePlan(), unit: 'hrs' },
+		{ label: 'future plan', value: calculatePlan(assignment, { isFuture: true }), unit: 'hrs' },
 		{ label: 'burned', value: burnedHours, unit: 'hrs', alwaysShow: true },
-		{ label: 'past plan', value: pastPlan(), unit: 'hrs' },
+		{ label: 'past plan', value: calculatePlan(assignment, { isFuture: false }), unit: 'hrs' },
 	];
 
 	return (
