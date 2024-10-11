@@ -2,10 +2,6 @@
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import React from "react";
-import { useRouter } from "next/navigation";
-import { useModal } from "../contexts/modalContext";
-import { UserType } from "../typeInterfaces";
-import AddAssignmentModal from "./addAssignmentModal";
 import Link from "next/link";
 import { useGeneralDataContext } from "../contexts/generalContext";
 import { LoadingSpinner } from "./loadingSpinner";
@@ -19,7 +15,6 @@ export default function EllipsisNavbarMenu() {
 	};
 	const { viewer } = useGeneralDataContext();
 	if (!viewer) return <LoadingSpinner />;
-	const showSettingsLink = viewer.role === "admin" || viewer.role === "owner";
 	const homepageUrl = process.env.NEXT_PUBLIC_NODE_ENV
 		? "http://localhost:3000"
 		: "https://staffplan.com";
@@ -32,9 +27,8 @@ export default function EllipsisNavbarMenu() {
 		{
 			href: `${homepageUrl}/settings`,
 			label: "Settings",
-			show: showSettingsLink,
+			show: true,
 		},
-		{ href: `${homepageUrl}/users/profile`, label: "Profile", show: true },
 		{ href: `${homepageUrl}/sign_out`, label: "Sign Out", show: true },
 	];
 	return (
