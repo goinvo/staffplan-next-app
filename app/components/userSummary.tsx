@@ -70,7 +70,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 			});
 
 			setUserList(updatedUserList);
-			setSingleProjectPage({
+			singleProjectPage && setSingleProjectPage({
 				...singleProjectPage,
 				assignments: updatedAssignments,
 			});
@@ -87,7 +87,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 			const updatedAssignments = singleProjectPage?.assignments?.filter(
 				(assignment) => assignment.id !== deletedAssignmentId
 			);
-			setSingleProjectPage({
+			singleProjectPage && setSingleProjectPage({
 				...singleProjectPage,
 				assignments: updatedAssignments,
 			});
