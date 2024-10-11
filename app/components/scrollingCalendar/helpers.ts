@@ -1,4 +1,6 @@
 import { DateTime, Interval } from "luxon";
+import { isNil } from "lodash";
+
 import {
   WorkWeekType,
   AssignmentType,
@@ -1004,4 +1006,112 @@ export const filterUnassignedProjectsForUser = (
     );
     return !isUserAssigned;
   });
+};
+
+export const calculatePlan = (
+  assignment: AssignmentType,
+  options: { isFuture: boolean }
+): number => {
+  const { isFuture } = options;
+  const now = DateTime.now().startOf("week");
+
+  const totalFromWorkWeeks = assignment.workWeeks.reduce((total, workWeek) => {
+    const workWeekStart = DateTime.fromObject({
+      weekYear: workWeek.year,
+      weekNumber: workWeek.cweek,
+    }).startOf("week");
+    const isRelevantWeek = isFuture
+      ? workWeekStart >= now.plus({ weeks: 1 })
+      : workWeekStart <= now;
+
+    if (!isNil(workWeek.estimatedHours) && isRelevantWeek) {
+      return total + workWeek.estimatedHours;
+    }
+    return total;
+  }, 0);
+
+  if (assignment?.startsOn) {
+    const start = DateTime.fromISO(assignment.startsOn).startOf("week");
+    const end = assignment.endsOn
+      ? DateTime.fromISO(assignment.endsOn).endOf("week")
+      : now;
+
+    const weeks: { weekNumber: number; year: number }[] = [];
+    let cursor = start;
+
+    while (cursor <= end) {
+      const weekNumber = cursor.weekNumber;
+      const year = cursor.year;
+
+      if (assignmentContainsCWeek(assignment, weekNumber, year)) {
+        if (isFuture ? cursor >= now.plus({ weeks: 1 }) : cursor <= now) {
+          weeks.push({ weekNumber, year });
+        }
+      }
+      cursor = cursor.plus({ weeks: 1 });
+    }
+
+    const additionalHours = weeks.reduce((total, week) => {
+      const matchingWorkWeek = assignment.workWeeks.find(
+        (workWeek) =>
+          workWeek.cweek === week.weekNumber &&
+          workWeek.year === week.year &&
+          !isNil(workWeek.estimatedHours)
+      );
+
+      if (!matchingWorkWeek) {
+        return total + (assignment.estimatedWeeklyHours ?? 0);
+      }
+      return total;
+    }, 0);
+
+    return totalFromWorkWeeks + additionalHours;
+  }
+
+  return totalFromWorkWeeks;
+};
+
+export const calculatePlannedHoursPerProject = (
+  project: ProjectType
+): number => {
+  if (!project?.assignments) {
+    return 0;
+  }
+  return project?.assignments?.reduce((totalAssignments, assignment) => {
+    let totalForAssignment = assignment.workWeeks.reduce((total, workWeek) => {
+      if (!isNil(workWeek.estimatedHours)) {
+        return total + workWeek.estimatedHours;
+      }
+      return total;
+    }, 0);
+    if (
+      assignment.estimatedWeeklyHours &&
+      assignment.startsOn &&
+      assignment.endsOn
+    ) {
+      const start = DateTime.fromISO(assignment.startsOn).startOf("week");
+      const end = DateTime.fromISO(assignment.endsOn).endOf("week");
+      let cursor = start;
+
+      while (cursor <= end) {
+        const weekNumber = cursor.weekNumber;
+        const year = cursor.year;
+
+        if (assignmentContainsCWeek(assignment, weekNumber, year)) {
+          const matchingWorkWeek = assignment.workWeeks.find(
+            (workWeek) =>
+              workWeek.cweek === weekNumber && workWeek.year === year
+          );
+
+          if (!matchingWorkWeek || isNil(matchingWorkWeek.estimatedHours)) {
+            totalForAssignment += assignment.estimatedWeeklyHours;
+          }
+        }
+
+        cursor = cursor.plus({ weeks: 1 });
+      }
+    }
+
+    return totalAssignments + totalForAssignment;
+  }, 0);
 };
