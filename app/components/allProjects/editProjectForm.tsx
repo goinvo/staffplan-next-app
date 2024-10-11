@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { FormikValues, useFormik } from "formik";
 import { useParams, useRouter } from "next/navigation";
 import { useMutation } from "@apollo/client";
@@ -69,6 +69,19 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 			refetchClientList();
 		},
 	});
+
+	useEffect(() => {
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === "Escape") {
+				onClose?.();
+			}
+		};
+
+		document.addEventListener("keydown", handleKeyDown);
+		return () => {
+			document.removeEventListener("keydown", handleKeyDown);
+		};
+	}, [onClose]);
 
 	const formik = useFormik({
 		initialValues: {
@@ -198,7 +211,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					className="text-tiffany"
 					type="submit"
 					Icon={IoCheckmarkCircle}
-					iconSize="h-7 w-7 ml-1 "
+					iconSize="h-7 w-7 ml-1"
 				/>
 			</div>
 			<div className="flex flex-row justify-between h-6">
@@ -226,13 +239,6 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 						<p className="text-red-500 ml-2">{formik.errors.clientName}</p>
 					) : null}
 				</div>
-				<IconButton
-					className={`text-black  ${archivedStatus ? "text-tiffany" : "text-transparentGrey"
-						}`}
-					onClick={handleArchiveButtonClick}
-					Icon={ArchiveBoxIcon}
-					iconSize="h-7 w-7"
-				/>
 			</div>
 			<div className="flex flex-row justify-between">
 				<div className="flex items-center">
@@ -324,7 +330,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					) : null}
 				</div>
 			</div>
-			<div className="flex mb-4 pb-2 border-b-4">
+			<div className="flex flex-row justify-between mb-4 pb-2 border-b-4">
 				<div className="w-1/3 -mr-1 flex flex-col">
 					<div className="block flex items-center">
 						<input
@@ -409,6 +415,15 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 						</span>
 						Value(k$)
 					</label>
+				</div>
+				<div>
+					<IconButton
+						className={`text-black  ${archivedStatus ? "text-tiffany" : "text-transparentGrey"
+							}`}
+						onClick={handleArchiveButtonClick}
+						Icon={ArchiveBoxIcon}
+						iconSize="h-7 w-7"
+					/>
 				</div>
 			</div>
 
