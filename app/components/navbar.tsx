@@ -13,7 +13,7 @@ import NewPersonAndProjectModal from "./newPersonAndProjectModal";
 import { useModal } from "../contexts/modalContext";
 import AirTableFormModal from "./airTableFormModal";
 import { useGeneralDataContext } from "../contexts/generalContext";
-import EllipsisNavbarMenu from "./elilipsisNavbarMenu";
+import EllipsisDropdownMenu from "./ellipsisDropdownMenu";
 
 const Navbar: React.FC = () => {
 	const { viewer } = useGeneralDataContext();
@@ -27,6 +27,9 @@ const Navbar: React.FC = () => {
 	};
 	const myStaffPlanURL = new RegExp(`^\\/people\\/${viewer.id}$`);
 	const myStaffPlanCheck = fullPathName.match(myStaffPlanURL);
+	const homepageUrl = process.env.NEXT_PUBLIC_NODE_ENV
+	? "http://localhost:3000"
+	: "https://staffplan.com";
 	const links = [
 		{
 			href: `/people/${myPlanUrl()}`,
@@ -40,8 +43,18 @@ const Navbar: React.FC = () => {
 		},
 		{ href: "/projects", label: "Projects", isActive: pathname === "projects"},
 	];
-	const additionalLinks = [
-		{ label: "Feedback" },
+	const ellipsisLinks = [
+		{
+			href: "https://github.com/goinvo/staffplan-next-app",
+			label: "Open Source",
+			show: true,
+		},
+		{
+			href: `${homepageUrl}/settings`,
+			label: "Settings",
+			show: true,
+		},
+		{ href: `${homepageUrl}/sign_out`, label: "Sign Out", show: true },
 	];
 	return (
 		<nav className="navbar bg-gray-100 px-5 h-14 flex justify-between items-center">
@@ -79,22 +92,15 @@ const Navbar: React.FC = () => {
 				/>
 			</div> */}
 			<div className="flex items-center space-x-4 py-4 ml-2">
-				{additionalLinks.map((link) => 
-				(
-					<div key={link.label}>
-						{
+					<div>
 								<button
 									className="inline-flex items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue"
 									onClick={() => openModal(<AirTableFormModal closeModal={closeModal} />)}
 								>
-
-									{link.label}
+									Feedback
 								</button>
-							
-						}
 					</div>
-				))}
-				<EllipsisNavbarMenu/>
+				<EllipsisDropdownMenu options={ellipsisLinks}/>
 				{/* Temporary commented */}
 				{/* <div className="h-4 w-4">
 					<ChatBubbleBottomCenterTextIcon />

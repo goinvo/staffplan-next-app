@@ -17,7 +17,7 @@ export const SingleProjectSortOptions = () => {
 		<>
 			<Menu
 				as="div"
-				className="relative inline-block text-left z-50"
+				className="relative inline-block text-left z-15"
 				id="views-menu"
 				data-testid="views-menu"
 			>
