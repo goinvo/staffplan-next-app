@@ -17,7 +17,7 @@
     "@tailwindcss/forms": "^0.5.9",
     "date-fns": "^3.3.1",
     "dayjs": "^1.11.10",
-    "formik": "^2.4.5",
+    "formik": "^2.4.6",
     "graphql": "^16.9.0",
     "luxon": "^3.5.0",
     "next": "14.2.15",
