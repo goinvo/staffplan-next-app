@@ -50,7 +50,7 @@ const Navbar: React.FC = () => {
 			show: true,
 		},
 		{
-			href: `${homepageUrl}/settings`,
+			href: `${homepageUrl}/settings/profile`,
 			label: "Settings",
 			show: true,
 		},
