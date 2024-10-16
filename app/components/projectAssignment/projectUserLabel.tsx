@@ -34,7 +34,7 @@ export const ProjectUserLabel = ({
 		})
 	}
 	return (
-		<td className='px-0 pr-0 pt-2 pb-2 font-normal flex align-center w-1/3'>
+		<td className='px-0 pr-0 pt-2 pb-2 font-normal flex align-center sm:w-1/3 w-1/2'>
 			<div
 				className='flex flex-row justify-between items-start'
 			>
@@ -60,7 +60,7 @@ export const ProjectUserLabel = ({
 					</div>
 				</div>
 			</div>
-			<div className='text-contrastBlue flex flex-col space-y-3 ml-auto px-2 items-end max-w-[60px]'>
+			<div className='text-contrastBlue sm:flex hidden flex-col space-y-3 ml-auto px-2 items-end max-w-[60px]'>
 				<button className='pt-1 underline' onClick={onChangeStatusButtonClick}>
 					{assignment.status === 'proposed' ? 'Proposed' : 'Signed'}
 				</button>

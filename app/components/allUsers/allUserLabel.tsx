@@ -16,8 +16,8 @@ export const AllUserLabel = ({ user, clickHandler }: AllUserLabelProps) => {
 						sizes="(max-width: 640px) 28px, (max-width: 768px) 38px, 38px"
 					/>
 				</div>
-				<button className="px-2" onClick={() => clickHandler(user)}>{user.name}</button>
-				<div className="hover:cursor-pointer">
+				<button className="px-2 whitespace-nowrap" onClick={() => clickHandler(user)}>{user.name}</button>
+				<div className="hover:cursor-pointer ml-auto sm:flex hidden">
 					<EllipsisPeopleMenu user={user} />
 				</div>
 			</div>

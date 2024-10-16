@@ -73,12 +73,13 @@ export const ProjectAssignmentRow = ({
 					if (!inputRefs.current[rowIndex]) {
 						inputRefs.current[rowIndex] = [[], []];
 					}
+					const isCurrentWeek = currentWeek === week.weekNumberOfTheYear && currentYear === month.year
 					return (
 						<td key={`${month.monthLabel}-${week.weekNumberOfTheYear}-${monthIndex}`}
 							className={`relative px-1 py-1 font-normal ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year && 'bg-selectedColumnBg'}`}
 						>
 							<div
-								className={`flex flex-col space-y-3 ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year ? 'font-bold' : 'font-normal'}`}>
+								className={`flex flex-col sm:justify-normal justify-center h-full sm:space-y-3 ${isCurrentWeek ? 'font-bold' : 'font-normal'}`}>
 								<WorkWeekInput
 									isUserTBD={isUserTBD}
 									withinProjectDates={withinProjectDates}
@@ -98,7 +99,7 @@ export const ProjectAssignmentRow = ({
 						</td>)
 				});
 			})}
-			{isLastMonth && <UserSummary assignment={assignment} project={project}/>}
+			{isLastMonth && <UserSummary assignment={assignment} project={project} />}
 		</tr >
 	);
 };

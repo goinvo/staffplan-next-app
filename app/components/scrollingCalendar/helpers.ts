@@ -317,6 +317,27 @@ export const getEndDateInterval = (
 export const getWeeksPerScreen = (startDate: string, amountOfWeeks: number) => {
   if (!startDate) return [];
   const start = DateTime.fromISO(startDate);
+  if (amountOfWeeks === 1) {
+    const nextMonday = DateTime.fromISO(startDate)
+      .plus({ weeks: 1 })
+      .startOf("week");
+    const weekNumberOfTheYear = nextMonday.weekNumber;
+    const weekNumberOfTheMonth = Math.ceil(nextMonday.day / 7);
+    const monthLabel = nextMonday.toFormat("M");
+    const year = nextMonday.year;
+    return [
+      {
+        monthLabel,
+        year,
+        weeks: [
+          {
+            weekNumberOfTheYear,
+            weekNumberOfTheMonth,
+          },
+        ],
+      },
+    ];
+  }
   const endDateString = getEndDateInterval(startDate, amountOfWeeks);
   if (!endDateString) return [];
 

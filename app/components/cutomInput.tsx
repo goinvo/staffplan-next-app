@@ -11,6 +11,7 @@ interface CustomInputProps {
     onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
     onFillForwardClick?: () => void;
     disabled?: boolean;
+    className?: string;
 }
 
 export const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(({
@@ -23,6 +24,7 @@ export const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(({
     onFillForwardClick,
     onKeyDown,
     disabled,
+    className
 }, ref) => {
     const buttonRef = React.useRef<HTMLButtonElement>(null);
 
@@ -58,7 +60,7 @@ export const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(({
     }, [onBlur]);
 
     return (
-        <div className="relative my-1">
+        <div className={`relative my-1 ${className || ''}`}>
             <input
                 name={name}
                 value={value}
@@ -70,14 +72,14 @@ export const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(({
                 }}
                 onKeyDown={onKeyDown}
                 disabled={disabled}
-                className="bg-white text-center rounded-sm shadow-top-input-shadow w-[34px] h-[25px] focus:border-tiffany focus:ring-1 focus:ring-tiffany border-none focus:border-tiffany outlined-none mb-0 px-0 py-0"
+                className="bg-white text-center sm:text-base text-2xl rounded-sm shadow-top-input-shadow sm:w-[34px] w-[68px] sm:h-[25px] h-[50px] focus:border-tiffany focus:ring-1 focus:ring-tiffany border-none outlined-none mb-0 px-0 py-0"
                 autoComplete="off"
                 ref={ref}
             />
             <button
                 ref={buttonRef}
                 type="button"
-                className="absolute left-0 top-full h-[12px] w-[34px] border-2 flex items-center justify-center bg-transparent border-transparent rounded-b-sm opacity-0 pointer-events-none transition-opacity duration-200"
+                className="sm:flex hidden absolute left-0 top-full h-[12px] sm:w-[34px] w-[68px] border-2 flex items-center justify-center bg-transparent border-transparent rounded-b-sm opacity-0 pointer-events-none transition-opacity duration-200"
             >
                 <ArrowLongRightIcon className="w-6 text-white" />
             </button>

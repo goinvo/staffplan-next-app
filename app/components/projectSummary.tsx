@@ -67,9 +67,9 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 		{ unit: 'wks', value: weeks() }
 	]
 	return (
-		<td className="font-normal py-2 pr-4 pl-0 w-1/6 flex justify-center items-center">
+		<td className="font-normal py-2 pr-4 pl-0 sm:w-1/6 w-1/3 flex justify-center items-center">
 			{showSummaries && (
-				<div className='flex flex-col'>
+				<div className='sm:flex hidden flex-col'>
 					<div className="ml-auto">
 						<IconButton
 							className="text-black text-transparentGrey"
@@ -78,7 +78,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 							iconSize="h6 w-6"
 						/>
 					</div>
-					<div className="flex justify-between w-full space-x-1">
+					<div className="sm:flex hidden justify-between w-full space-x-1">
 						{weeksAndFte.map((item, index) => (
 							item.value ? (
 								<div key={index} className="flex items-center space-x-1">
@@ -90,7 +90,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 					</div>
 					{summaries.map((summary, index) =>
 						(summary.value || summary.alwaysShow) ? (
-							<div key={index} className="flex justify-between space-x-1">
+							<div key={index} className="sm:flex hidden justify-between space-x-1">
 								<label className="text-sm whitespace-nowrap">{summary.label}</label>
 								<span className="font-bold text-sm">
 									{summary.value}

@@ -35,18 +35,20 @@ export const ScrollingCalendar = ({
 }: ScrollingCalendarProps) => {
 	const [months, setMonths] = useState<MonthsDataType[]>([]);
 	const { dateRange } = useGeneralDataContext();
+	const isMobile = useMediaQuery('(max-width: 640px)');
 	const isXSmallScreen = useMediaQuery('(max-width: 1216px')
 	const isSmallScreen = useMediaQuery('(min-width: 1217px) and (max-width: 1388px)');
 	const isMediumScreen = useMediaQuery('(min-width: 1389px) and (max-width: 1560px)');
 	const isLargeScreen = useMediaQuery('(min-width: 1561px) and (max-width: 1799px)');
 
 	const detectWeeksAmountPerScreen = useCallback(() => {
+		if (isMobile) return MONTHS_COUNT[MONTS_PER_SCREEN_SIZE.MOBILE]
 		if (isXSmallScreen) return MONTHS_COUNT[MONTS_PER_SCREEN_SIZE.X_SMALL]
 		if (isSmallScreen) return MONTHS_COUNT[MONTS_PER_SCREEN_SIZE.SMALL]
 		if (isMediumScreen) return MONTHS_COUNT[MONTS_PER_SCREEN_SIZE.MEDIUM]
 		if (isLargeScreen) return MONTHS_COUNT[MONTS_PER_SCREEN_SIZE.LARGE]
 		return MONTHS_COUNT[MONTS_PER_SCREEN_SIZE.X_LARGE]
-	}, [isLargeScreen, isMediumScreen, isSmallScreen, isXSmallScreen]);
+	}, [isLargeScreen, isMediumScreen, isSmallScreen, isXSmallScreen, isMobile]);
 
 	useEffect(() => {
 		const monthData = getWeeksPerScreen(dateRange, detectWeeksAmountPerScreen())

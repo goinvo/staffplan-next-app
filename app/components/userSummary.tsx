@@ -1,6 +1,5 @@
 'use client'
 import React from "react";
-import { DateTime } from "luxon";
 import { useMutation } from "@apollo/client";
 import { ArchiveBoxIcon } from "@heroicons/react/24/outline";
 
@@ -130,12 +129,12 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 	];
 
 	return (
-		<td className="font-normal py-2 pl-4 w-1/6 flex items-center justify-between">
+		<td className="font-normal py-2 sm:pl-4 pl-0 sm:w-1/6 w-1/2 flex items-center sm:justify-between justify-center">
 			{showSummaries && (
 				<div>
 					{summaries.map((sum, index) =>
 						sum.value || sum.alwaysShow ? (
-							<div key={index} className="flex justify-between">
+							<div key={index} className="sm:flex hidden justify-between">
 								<label className="text-sm pr-1 whitespace-nowrap">{sum.label}</label>
 								<span className="font-bold text-sm">
 									{sum.value}
@@ -146,7 +145,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 					)}
 				</div>
 			)}
-			<div className="flex items-start justify-center">
+			<div className="sm:flex hidden items-start justify-center">
 				<IconButton
 					className='text-black flex items-start justify-center text-transparentGrey'
 					onClick={handleArchiveItemClick}
