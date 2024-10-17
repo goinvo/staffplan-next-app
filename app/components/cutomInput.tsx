@@ -11,6 +11,7 @@ interface CustomInputProps {
     onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
     onFillForwardClick?: () => void;
     disabled?: boolean;
+    showFillForward?: boolean;
 }
 
 export const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(({
@@ -23,6 +24,7 @@ export const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(({
     onFillForwardClick,
     onKeyDown,
     disabled,
+    showFillForward = true,
 }, ref) => {
     const buttonRef = React.useRef<HTMLButtonElement>(null);
 
@@ -77,7 +79,7 @@ export const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(({
             <button
                 ref={buttonRef}
                 type="button"
-                className="absolute left-0 top-full h-[12px] w-[34px] border-2 flex items-center justify-center bg-transparent border-transparent rounded-b-sm opacity-0 pointer-events-none transition-opacity duration-200"
+                className={`${showFillForward ? 'block' : 'hidden'} absolute left-0 top-full h-[12px] w-[34px] border-2 flex items-center justify-center bg-transparent border-transparent rounded-b-sm opacity-0 pointer-events-none transition-opacity duration-200`}
             >
                 <ArrowLongRightIcon className="w-6 text-white" />
             </button>
