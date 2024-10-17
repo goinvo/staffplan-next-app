@@ -239,7 +239,7 @@ export const WorkWeekInput = ({
 									upsertWorkWeekValues(values);
 								}
 							}}
-							onFillForwardClick={() => onFillForwardClick(ACTUAL_HOURS, cweek, year, values)}
+							showFillForward={false}
 							disabled={isUserTBD}
 							ref={(el: HTMLInputElement) => createActualRef(el, rowIndex, cellIndex)}
 							onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => tabbingAndArrowNavigation(e, rowIndex, cellIndex, inputRefs, totalRows, true)}
