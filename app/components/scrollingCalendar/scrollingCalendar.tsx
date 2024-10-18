@@ -3,9 +3,10 @@ import React, { useState, useEffect } from "react";
 
 import CalendarHeader from "./calendarHeader";
 import { MonthsDataType, AssignmentType, ProjectType } from "@/app/typeInterfaces";
-import { getWeeksPerScreen } from "./helpers";
+import { getNextWeeksPerView, getPrevWeeksPerView, getWeeksPerScreen } from "./helpers";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
 import useDynamicWeeks from "@/app/hooks/useDynamicWeeks";
+import useSwipe from "@/app/hooks/useSwipe";
 
 interface ScrollingCalendarProps {
 	children: React.ReactNode;
@@ -33,7 +34,7 @@ export const ScrollingCalendar = ({
 	editable
 }: ScrollingCalendarProps) => {
 	const [months, setMonths] = useState<MonthsDataType[]>([]);
-	const { dateRange } = useGeneralDataContext();
+	const { dateRange, setDateRange } = useGeneralDataContext();
 	const weeksCount = useDynamicWeeks({
 		baseWidth: 600,
 		baseWeeksCount: 1,
@@ -41,6 +42,19 @@ export const ScrollingCalendar = ({
 		isMobileCheck: true,
 		minWeeks: 5
 	});
+
+	const handleSwipeLeft = () => {
+		setDateRange(getNextWeeksPerView(months))
+	};
+	const handleSwipeRight = () => {
+		setDateRange(getPrevWeeksPerView(months))
+	};
+
+	useSwipe({
+		onSwipeLeft: handleSwipeLeft,
+		onSwipeRight: handleSwipeRight,
+	});
+
 	useEffect(() => {
 		const monthData = getWeeksPerScreen(dateRange, weeksCount);
 		setMonths(monthData);
