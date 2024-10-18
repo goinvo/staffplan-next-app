@@ -55,7 +55,7 @@ export const ProjectAssignmentRow = ({
 	};
 
 	return (
-		<tr className={`flex border-b border-gray-300 hover:bg-hoverGrey min-h-[100px] ${assignment.status === 'proposed' ? 'bg-diagonal-stripes' :
+		<tr className={`${isUserTBD ? 'sm:flex hidden' : 'flex'} border-b border-gray-300 hover:bg-hoverGrey min-h-[100px] ${assignment.status === 'proposed' ? 'bg-diagonal-stripes' :
 			''
 			} pl-5`}>
 			{isFirstMonth && (
