@@ -61,7 +61,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     return (
         <thead>
             <tr className="pl-5 border-bottom bg-contrastBlue min-h-28 text-white sm:flex hidden">
-                <th className="flex w-1/3 px-0 py-5">
+                <th className={`flex w-1/2 sm:w-1/3 px-0 py-5 ${isEditing ? 'lg:mr-0' : 'lg:mr-1'}`}>
                     {isEditing ? (
                         <EditFormController onClose={() => setIsEditing(false)} />
                     ) : (
@@ -110,7 +110,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                         </th>)
                     });
                 })}
-                <th className="pr-4 pl-2 py-2 w-1/6">
+                <th className="pr-4 pl-2 py-2 w-1/2 sm:w-1/6">
                     <div className="sm:flex hidden flex-row justify-between">
                         <ViewsMenu />
                         <button
@@ -122,16 +122,16 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                 </th>
             </tr>
             <tr className="flex sm:justify-normal justify-between border-b border-gray-300 pl-5">
-                <th className="px-0 pt-1 pb-2 font-normal align-top text-transparentGrey w-1/3">
+                <th className="px-0 pt-1 pb-2 font-normal align-top text-transparentGrey w-1/2 sm:w-1/3">
                     <div className='sm:flex hidden  flex-row justify-between items-start'>
                         {columnHeaderTitles?.map((el, i) => {
                             return (
-                                <div key={el.title} className={`w-24 flex items-center justify-start text-start ${el.onClick ? 'cursor-pointer' : ''}`} onClick={el?.onClick}>
+                                <div key={el.title} className={`w-24 flex ${!el.showIcon ? 'mx-auto md:pl-2 lg:pl-0' : ''} items-center justify-start text-start ${el.onClick ? 'cursor-pointer' : ''}`} onClick={el?.onClick}>
                                     {el.showIcon && (<PlusIcon className='w-4 h-4 mr-1' />)}
                                     <span>{el.title}</span>
                                 </div>)
                         })}
-                        <IconButton className='pt-2 text-black flex items-center justify-center' onClick={prevWeek} Icon={ChevronLeftIcon} iconSize={'h6 w-6'} />
+                        <IconButton className='pt-2 sm:ml-2 lg:ml-0 text-black flex items-center justify-center' onClick={prevWeek} Icon={ChevronLeftIcon} iconSize={'h6 w-6'} />
                     </div>
                 </th>
                 {months?.map((month) => {
@@ -149,7 +149,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 
                     });
                 })}
-                <th className="pl-0 pr-4 pt-1 pb-2 font-normal align-top sm:w-1/6 w-1/3">
+                <th className="pl-0 pr-4 pt-1 pb-2 font-normal align-top w-1/2 sm:w-1/6">
                     <IconButton className='sm:flex hidden pt-2 text-contrastBlue items-center justify-center'
                         onClick={nextWeek}
                         Icon={ChevronRightIcon}

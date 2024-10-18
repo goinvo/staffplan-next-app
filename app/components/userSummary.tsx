@@ -129,29 +129,31 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 	];
 
 	return (
-		<td className="font-normal py-2 sm:pl-4 pl-0 sm:w-1/6 w-1/2 flex items-center sm:justify-between justify-center">
-			{showSummaries && (
-				<div>
-					{summaries.map((sum, index) =>
-						sum.value || sum.alwaysShow ? (
-							<div key={index} className="sm:flex hidden justify-between">
-								<label className="text-sm pr-1 whitespace-nowrap">{sum.label}</label>
-								<span className="font-bold text-sm">
-									{sum.value}
-									<span className="text-sm font-normal pl-1">{sum.unit}</span>
-								</span>
-							</div>
-						) : null
-					)}
+		<td className="font-normal py-2 sm:pl-4 pl-0 pr-0 ml-1 sm:ml-0 w-1/2 sm:w-1/6">
+			<div className="flex justify-between">
+				{showSummaries && (
+					<div>
+						{summaries.map((sum, index) =>
+							sum.value || sum.alwaysShow ? (
+								<div key={index} className="sm:flex hidden justify-between">
+									<label className="text-sm pr-1 whitespace-nowrap">{sum.label}</label>
+									<span className="font-bold text-sm">
+										{sum.value}
+										<span className="text-sm font-normal pl-1">{sum.unit}</span>
+									</span>
+								</div>
+							) : null
+						)}
+					</div>
+				)}
+				<div className="sm:flex hidden items-start justify-center">
+					<IconButton
+						className='text-black flex items-start justify-center text-transparentGrey'
+						onClick={handleArchiveItemClick}
+						Icon={ArchiveBoxIcon}
+						iconSize={'h6 w-6'}
+					/>
 				</div>
-			)}
-			<div className="sm:flex hidden items-start justify-center">
-				<IconButton
-					className='text-black flex items-start justify-center text-transparentGrey'
-					onClick={handleArchiveItemClick}
-					Icon={ArchiveBoxIcon}
-					iconSize={'h6 w-6'}
-				/>
 			</div>
 		</td >
 	);

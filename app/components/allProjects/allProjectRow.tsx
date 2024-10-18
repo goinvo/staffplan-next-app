@@ -35,7 +35,7 @@ export const AllProjectRow = ({
 		<tr className={`pl-5 flex sm:justify-normal justify-between border-b border-gray-300 hover:bg-hoverGrey ${project.status === 'proposed' ? 'bg-diagonal-stripes' :
 			''
 			}`}>
-			<td className='sm:block flex items-center pt-1 pb-2 px-0 font-normal align-top w-1/3'>
+			<td className='sm:block flex items-center pt-1 pb-2 px-0 font-normal align-top w-1/2 sm:w-1/3'>
 				{isFirstMonth && (
 					<AllProjectLabel clickHandler={handleProjectChange} project={project} />
 

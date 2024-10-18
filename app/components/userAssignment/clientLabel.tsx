@@ -65,7 +65,7 @@ export const ClientLabel = ({ assignment, selectedUser }: ClientLabelProps) => {
 	return (
 		<>
 			<IconButton
-				className={'text-contrastBlue w-24 sm:flex hidden items-center justify-start sm:pt-2 pl-0 text-start'}
+				className={'text-contrastBlue sm:flex hidden items-center justify-start sm:pt-2 pl-0 text-start'}
 				Icon={PlusIcon} iconSize='h-4 w-4' text={assignment.project.client.name}
 				onClick={() => {
 					if (!activeTempProject) {

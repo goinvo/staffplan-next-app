@@ -67,7 +67,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 		{ unit: 'wks', value: weeks() }
 	]
 	return (
-		<td className="font-normal py-2 pr-4 pl-0 sm:w-1/6 w-1/3 flex justify-center items-center">
+		<td className="font-normal ml-auto py-2 pr-4 pl-0 sm:w-1/6 w-1/2 flex justify-center items-center">
 			{showSummaries && (
 				<div className='sm:flex hidden flex-col'>
 					<div className="ml-auto">

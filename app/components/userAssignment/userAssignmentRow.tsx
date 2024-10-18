@@ -77,16 +77,17 @@ export const UserAssignmentRow = ({
 		})
 	}
 	const isAssignmentProposed = assignment.status === 'proposed'
+	const isTempProject = assignment.project.isTempProject
 	return (
 		<tr
 			className={`flex sm:justify-normal justify-between ${isFirstClient ? '' : 'border-b border-gray-300'} ${isAssignmentProposed ? 'bg-diagonal-stripes' :
 				''
 				} hover:bg-hoverGrey min-h-[100px] pl-5`}>
-			<td className={`px-0 pt-1 pb-2 font-normal align-top ${!isFirstClient ? 'sm:block flex items-center' : ''} sm:w-1/3 w-1/2`}>
+			<td className={`px-0 pt-1 pb-2 font-normal align-top ${!isFirstClient ? 'sm:block flex items-center' : ''} w-1/2 sm:w-1/3`}>
 				<div
-					className='flex sm:flex-row flex-col justify-between items-start sm:space-x-2'
+					className='flex sm:flex-row flex-col justify-between items-start md:space-x-2'
 				>
-					<div className={`${isFirstClient ? 'flex align-center' : 'sm:w-24'} whitespace-nowrap`}>
+					<div className={`${isTempProject ? '' : 'sm:w-24'} ${isFirstClient ? 'mb-1' : ''}`}>
 						{viewsFilterSingleUser === 'byClient' && isFirstClient && isFirstMonth && (
 							<ClientLabel assignment={assignment} selectedUser={selectedUser} />
 						)}
@@ -95,15 +96,15 @@ export const UserAssignmentRow = ({
 						)}
 					</div>
 					{isFirstMonth && (
-						assignment.project.isTempProject ? (
+						isTempProject ? (
 							<TempProjectLabel assignment={assignment} /> // Render custom label
 						) : (
 							<UserLabel assignment={assignment} clickHandler={handleProjectChange} />
 						)
 					)}
-					<div className='text-contrastBlue sm:flex hidden flex-col space-y-3 ml-auto px-2 items-end max-w-[60px] '>
+					<div className='text-contrastBlue sm:flex hidden flex-col space-y-3 ml-auto lg:px-2 items-end max-w-[60px] '>
 						<button className='pt-2 underline' onClick={onChangeStatusButtonClick}>
-							{assignment.status === 'proposed' ? 'Proposed' : 'Signed'}
+							{isAssignmentProposed ? 'Proposed' : 'Signed'}
 						</button>
 						<div className='pt-2'>
 							Actual
