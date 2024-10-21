@@ -154,7 +154,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 						iconSize={'h6 w-6'}
 					/>
 				</div>
-			)}
+			</div>
 			{viewer?.id === singleUserPage?.id && <div className="flex items-start justify-center">
 				<IconButton
 					className='text-black flex items-start justify-center text-transparentGrey'
