@@ -10,6 +10,8 @@ import AddAssignmentSingleUser from "@/app/components/addAssignmentSingleUser";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
 import AddInlineProject from "@/app/components/addInlineProject";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
+import ApproveHours from "@/app/components/userAssignment/approveHours";
+import ColumnChartsRow from "@/app/components/userAssignment/columnChartsRow";
 
 const UserPage: React.FC = () => {
 	const params = useParams();
@@ -33,7 +35,6 @@ const UserPage: React.FC = () => {
 	const onComplete = () => {
 		setAddAssignmentVisible(false);
 	};
-
 	const columnsHeaderTitles = [{ title: 'Client', showIcon: true }, { title: 'Project', showIcon: false }]
 	return (
 		<>
@@ -57,12 +58,14 @@ const UserPage: React.FC = () => {
 							);
 						}
 					)}
+					<ApproveHours />
+					<ColumnChartsRow />
 					{singleUserPage && <AddInlineProject user={singleUserPage} />}
 				</ScrollingCalendar>
 			) : (
 				<LoadingSpinner />
 			)}
-			<div className="mt-5">
+			<div className="sm:block hidden mt-5">
 				<button
 					className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center"
 					onClick={() => setAddAssignmentVisible(!addAssignmentVisible)}

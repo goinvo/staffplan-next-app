@@ -212,6 +212,7 @@ export const WorkWeekInput = ({
 			}) => (
 				<>
 					<CustomInput
+						className="sm:block hidden"
 						value={values.estimatedHours || ''}
 						name="estimatedHours"
 						id={`estHours-${assignment?.id}-${cweek}-${year}`}

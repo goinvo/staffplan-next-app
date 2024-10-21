@@ -59,13 +59,17 @@ const ColumnChart = ({
         </>
     );
     return (
-        <div className='w-[34px]'>
-            <div className="absolute bottom-0 left-0 right-0 max-w-[34px] px-1">
-                <span className={`flex justify-center text-center w-[34px] text-${textColor}`}>
+        <div className='sm:w-[34px] w-[68px]'>
+            <div className="absolute bottom-0 left-0 right-0 sm:max-w-[34px] max-w-[68px] px-1">
+                <span className={`flex justify-center text-center sm:w-[34px] w-[68px] text-${textColor}`}>
                     {renderHeight()}
                 </span>
                 {!!height && !shouldNoRenderAnyHours && (
-                    <svg width='34px' height={svgHeight} viewBox={`0 0 34 ${svgHeight}`} xmlns="http://www.w3.org/2000/svg" className="transition-height duration-200 ease"
+                    <svg
+                        height={svgHeight}
+                        viewBox={`0 0 34 ${svgHeight}`}
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="transition-height duration-200 ease sm:w-[34px] w-[68px]"
                     >
                         {drawPath()}
                     </svg>

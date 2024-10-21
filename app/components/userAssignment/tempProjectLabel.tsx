@@ -144,7 +144,7 @@ export const TempProjectLabel = ({
 	}, [clientProjects, userId]);
 
 	return (
-		<div className="w-24 pl-4 pt-2">
+		<div className="w-24 mx-auto pt-2">
 			<form onSubmit={formik.handleSubmit}>
 				<AutocompleteInput
 					items={filteredProjects}

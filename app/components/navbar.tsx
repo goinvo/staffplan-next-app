@@ -28,8 +28,8 @@ const Navbar: React.FC = () => {
 	const myStaffPlanURL = new RegExp(`^\\/people\\/${viewer.id}$`);
 	const myStaffPlanCheck = fullPathName.match(myStaffPlanURL);
 	const homepageUrl = process.env.NEXT_PUBLIC_NODE_ENV
-	? "http://localhost:3000"
-	: "https://staffplan.com";
+		? "http://localhost:3000"
+		: "https://staffplan.com";
 	const links = [
 		{
 			href: `/people/${myPlanUrl()}`,
@@ -41,7 +41,7 @@ const Navbar: React.FC = () => {
 			label: "People",
 			isActive: pathname === "people" && !myStaffPlanCheck,
 		},
-		{ href: "/projects", label: "Projects", isActive: pathname === "projects"},
+		{ href: "/projects", label: "Projects", isActive: pathname === "projects" },
 	];
 	const ellipsisLinks = [
 		{
@@ -58,12 +58,12 @@ const Navbar: React.FC = () => {
 	];
 	return (
 		<nav className="navbar bg-gray-100 px-5 h-14 flex justify-between items-center">
-			<div className="flex items-center space-x-4 h-full">
+			<div className="flex items-center sm:space-x-4 space-x-1 h-full">
 				{links.map((link) => (
 					<Link
 						key={link.href}
 						href={link.href}
-						className={`inline-flex items-center text-base px-4 py-2 rounded-md ${link.isActive
+						className={`inline-flex items-center text-base sm:px-4 px-1 sm:py-2 py-1 rounded-md whitespace-nowrap ${link.isActive
 							? "bg-contrastBlue font-semibold"
 							: "hover:bg-contrastBlue"
 							}`}
@@ -76,7 +76,7 @@ const Navbar: React.FC = () => {
 					onClick={() =>
 						openModal(<NewPersonAndProjectModal closeModal={closeModal} />)
 					}
-					iconSize="h-8 w-8 rounded-md text-contrastGrey"
+					iconSize="sm:block hidden h-8 w-8 rounded-md text-contrastGrey"
 					className="px-8"
 				/>
 			</div>
@@ -91,16 +91,16 @@ const Navbar: React.FC = () => {
 					className="flex py-1 pl-2 bg-contrastBlue text-white text-sm border-none outline-none focus:ring-0 focus:border-none"
 				/>
 			</div> */}
-			<div className="flex items-center space-x-4 py-4 ml-2">
-					<div>
-								<button
-									className="inline-flex items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue"
-									onClick={() => openModal(<AirTableFormModal closeModal={closeModal} />)}
-								>
-									Feedback
-								</button>
-					</div>
-				<EllipsisDropdownMenu options={ellipsisLinks}/>
+			<div className="flex items-center sm:space-x-4 py-4 sm:ml-2">
+				<div>
+					<button
+						className="sm:inline-flex hidden items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue"
+						onClick={() => openModal(<AirTableFormModal closeModal={closeModal} />)}
+					>
+						Feedback
+					</button>
+				</div>
+				<EllipsisDropdownMenu options={ellipsisLinks} />
 				{/* Temporary commented */}
 				{/* <div className="h-4 w-4">
 					<ChatBubbleBottomCenterTextIcon />

@@ -52,7 +52,7 @@ export const AddPersonInline = ({ project, assignment }: AddPersonInlineProps) =
 
     return (
         <div className='flex flex-row justify-between items-start'>
-            <div className="h-[28px] w-[38px] rounded-md bg-blueGreyLight flex items-center justify-center rounded mr-2">
+            <div className="hidden lg:flex h-[28px] w-[38px] rounded-md bg-blueGreyLight items-center justify-center rounded mr-2">
                 <FaUser className="text-white h-6 w-4" />
             </div>
             <div>
@@ -63,7 +63,7 @@ export const AddPersonInline = ({ project, assignment }: AddPersonInlineProps) =
                         onChange={handleUserChange}
                         value={selectedUserId}
                         disabled={mutationLoading || isSubmitted}
-                        className={`w-[185px] h-[28px] pl-2 py-0 text-start rounded-md focus:ring-tiffany focus:border-tiffany text-tiny font-bold align-middle border-none shadow-top-input-shadow ${!selectedUserId ? 'text-contrastGrey' : 'text-contrastBlue'
+                        className={`md:min-w-[185px] h-[28px] pl-2 py-0 text-start rounded-md focus:ring-tiffany focus:border-tiffany text-tiny font-bold align-middle border-none shadow-top-input-shadow ${!selectedUserId ? 'text-contrastGrey' : 'text-contrastBlue'
                             }`}
                     >
                         <option value="" disabled hidden>
