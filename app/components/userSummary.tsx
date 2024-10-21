@@ -18,8 +18,8 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 		(acc, curr) => acc + (curr.actualHours ?? 0),
 		0
 	);
-	const { setSingleUserPage, userList, setUserList } = useUserDataContext()
-	const { showSummaries } = useGeneralDataContext()
+	const { setSingleUserPage, userList, setUserList, singleUserPage } = useUserDataContext()
+	const { showSummaries, viewer } = useGeneralDataContext()
 	const { projectList, setProjectList, singleProjectPage, setSingleProjectPage } = useProjectsDataContext();
 
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
@@ -146,14 +146,14 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 					)}
 				</div>
 			)}
-			<div className="flex items-start justify-center">
+			{viewer?.id === singleUserPage?.id && <div className="flex items-start justify-center">
 				<IconButton
 					className='text-black flex items-start justify-center text-transparentGrey'
 					onClick={handleArchiveItemClick}
 					Icon={ArchiveBoxIcon}
 					iconSize={'h6 w-6'}
 				/>
-			</div>
+			</div>}
 		</td >
 	);
 };
