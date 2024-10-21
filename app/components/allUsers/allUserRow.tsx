@@ -35,15 +35,15 @@ export const AllUserRow = ({
 	};
 
 	return (
-		<tr className="pl-5 flex border-b border-gray-300 hover:bg-hoverGrey">
+		<tr className="pl-5 flex sm:justify-normal justify-between border-b border-gray-300 hover:bg-hoverGrey">
 			{isFirstMonth && (
 				<AllUserLabel clickHandler={handleUserChange} user={user} />
 			)}
 			{months?.map((month: MonthsDataType) => {
 				return month.weeks.map((week) => {
-
+					const isCurrentWeek = currentWeek === week.weekNumberOfTheYear && currentYear === month.year
 					return (
-						<td key={`${month.monthLabel}-${week.weekNumberOfTheYear}`} className={`relative px-1 py-1 font-normal min-h-[100px] ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year ? 'bg-selectedColumnBg font-bold' : 'font-normal'}}`}>
+						<td key={`${month.monthLabel}-${week.weekNumberOfTheYear}`} className={`relative px-1 py-1 min-h-[100px] ${isCurrentWeek ? 'bg-selectedColumnBg font-bold' : ''}`}>
 							<ColumnChart
 								hasActualHoursForWeek={hasActualHoursForWeek(month.year, week.weekNumberOfTheYear)}
 								height={
@@ -59,8 +59,8 @@ export const AllUserRow = ({
 						</td>)
 				});
 			})}
-			<td className="flex items-center justify-center font-normal py-2 pr-4 pl-0 w-1/6">
-				<IconButton className='text-transparentGrey'
+			<td className="flex items-center justify-center font-normal py-2 pr-4 pl-0 sm:w-1/6 w-1/2">
+				<IconButton className='text-transparentGrey sm:flex hidden'
 					onClick={() => console.log('On archive box btn click')}
 					Icon={ArchiveBoxIcon}
 					iconSize={'h6 w-6'} />

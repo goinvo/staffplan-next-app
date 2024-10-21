@@ -1,12 +1,12 @@
 'use client';
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 
 import CalendarHeader from "./calendarHeader";
 import { MonthsDataType, AssignmentType, ProjectType } from "@/app/typeInterfaces";
-import useMediaQuery from "@/app/hooks/useMediaQuery";
-import { MONTHS_COUNT, MONTS_PER_SCREEN_SIZE } from "./constants";
-import { getWeeksPerScreen } from "./helpers";
+import { getNextWeeksPerView, getPrevWeeksPerView, getWeeksPerScreen } from "./helpers";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
+import useDynamicWeeks from "@/app/hooks/useDynamicWeeks";
+import useSwipe from "@/app/hooks/useSwipe";
 
 interface ScrollingCalendarProps {
 	children: React.ReactNode;
@@ -34,24 +34,31 @@ export const ScrollingCalendar = ({
 	editable
 }: ScrollingCalendarProps) => {
 	const [months, setMonths] = useState<MonthsDataType[]>([]);
-	const { dateRange } = useGeneralDataContext();
-	const isXSmallScreen = useMediaQuery('(max-width: 1216px')
-	const isSmallScreen = useMediaQuery('(min-width: 1217px) and (max-width: 1388px)');
-	const isMediumScreen = useMediaQuery('(min-width: 1389px) and (max-width: 1560px)');
-	const isLargeScreen = useMediaQuery('(min-width: 1561px) and (max-width: 1799px)');
+	const { dateRange, setDateRange } = useGeneralDataContext();
+	const weeksCount = useDynamicWeeks({
+		baseWidth: 600,
+		baseWeeksCount: 1,
+		pixelsPerWeek: 42,
+		isMobileCheck: true,
+		minWeeks: 5
+	});
 
-	const detectWeeksAmountPerScreen = useCallback(() => {
-		if (isXSmallScreen) return MONTHS_COUNT[MONTS_PER_SCREEN_SIZE.X_SMALL]
-		if (isSmallScreen) return MONTHS_COUNT[MONTS_PER_SCREEN_SIZE.SMALL]
-		if (isMediumScreen) return MONTHS_COUNT[MONTS_PER_SCREEN_SIZE.MEDIUM]
-		if (isLargeScreen) return MONTHS_COUNT[MONTS_PER_SCREEN_SIZE.LARGE]
-		return MONTHS_COUNT[MONTS_PER_SCREEN_SIZE.X_LARGE]
-	}, [isLargeScreen, isMediumScreen, isSmallScreen, isXSmallScreen]);
+	const handleSwipeLeft = () => {
+		setDateRange(getNextWeeksPerView(months))
+	};
+	const handleSwipeRight = () => {
+		setDateRange(getPrevWeeksPerView(months))
+	};
+
+	useSwipe({
+		onSwipeLeft: handleSwipeLeft,
+		onSwipeRight: handleSwipeRight,
+	});
 
 	useEffect(() => {
-		const monthData = getWeeksPerScreen(dateRange, detectWeeksAmountPerScreen())
-		setMonths(monthData)
-	}, [dateRange, detectWeeksAmountPerScreen]);
+		const monthData = getWeeksPerScreen(dateRange, weeksCount);
+		setMonths(monthData);
+	}, [dateRange, weeksCount]);
 
 	return (
 		<div className="min-h-screen h-auto timeline-grid-bg">

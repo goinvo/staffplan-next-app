@@ -317,6 +317,32 @@ export const getEndDateInterval = (
 export const getWeeksPerScreen = (startDate: string, amountOfWeeks: number) => {
   if (!startDate) return [];
   const start = DateTime.fromISO(startDate);
+  // Cause on initial screen load we start from previous week date
+  if (amountOfWeeks === 1) {
+    const nextMonday = DateTime.fromISO(startDate)
+      .plus({ weeks: 1 })
+      .startOf("week");
+    let weekNumberOfTheYear = nextMonday.weekNumber;
+    const weekNumberOfTheMonth = Math.ceil(nextMonday.day / 7);
+    const monthLabel = nextMonday.toFormat("M");
+    const year = nextMonday.year;
+
+    if (weekNumberOfTheYear === 1 && nextMonday.month === 12) {
+      weekNumberOfTheYear = 53;
+    }
+    return [
+      {
+        monthLabel,
+        year,
+        weeks: [
+          {
+            weekNumberOfTheYear,
+            weekNumberOfTheMonth,
+          },
+        ],
+      },
+    ];
+  }
   const endDateString = getEndDateInterval(startDate, amountOfWeeks);
   if (!endDateString) return [];
 
@@ -364,16 +390,19 @@ export const getWeeksPerScreen = (startDate: string, amountOfWeeks: number) => {
 
 export const getPrevWeeksPerView = (months: MonthsDataType[]): string => {
   let amountOfWeeks = 0;
-
   months.forEach((month) => {
     amountOfWeeks += month.weeks.length;
   });
-
+  // Cause on initial screen load we start from previous week date
+  if (amountOfWeeks === 1) {
+    amountOfWeeks = 2;
+  }
   const firstMonthPerView = months[0];
   const firstWeekPerView = firstMonthPerView.weeks[0];
   const firstISODate = getISODateFromWeek(
     firstMonthPerView.year,
-    firstWeekPerView.weekNumberOfTheYear
+    firstWeekPerView.weekNumberOfTheYear,
+    Number(firstMonthPerView.monthLabel)
   );
 
   const date = DateTime.fromISO(firstISODate);
@@ -393,9 +422,12 @@ export const getNextWeeksPerView = (months: MonthsDataType[]): string => {
     lastMonthPerView.weeks[lastMonthPerView.weeks.length - 1];
   const lastISODate = getISODateFromWeek(
     lastMonthPerView.year,
-    lastWeekPerView.weekNumberOfTheYear
+    lastWeekPerView.weekNumberOfTheYear,
+    Number(lastMonthPerView.monthLabel)
   );
-
+  if (months.length === 1 && lastMonthPerView.weeks.length === 1) {
+    return lastISODate;
+  }
   const date = DateTime.fromISO(lastISODate);
 
   if (!date.isValid) {
@@ -403,19 +435,31 @@ export const getNextWeeksPerView = (months: MonthsDataType[]): string => {
   }
 
   const nextView = date.plus({ weeks: 1 });
-
   return nextView.toISODate();
+};
+
+const getLastMondayOfDecember = (year: number): DateTime => {
+  let date = DateTime.local(year, 12, 31);
+  while (date.weekday !== 1) {
+    date = date.minus({ days: 1 });
+  }
+  return date;
 };
 
 export const getISODateFromWeek = (
   year: number,
-  weekNumber: number
+  weekNumber: number,
+  month?: number
 ): string => {
   if (!checkIfWeekExists(year, weekNumber)) {
     const lastWeekOfYear = DateTime.local(year, 12, 31).weekNumber;
-
     if (weekNumber > lastWeekOfYear) {
       weekNumber = lastWeekOfYear;
+      if (month === 12) {
+        const lastMondayInDecember = getLastMondayOfDecember(year);
+        const isoDate = lastMondayInDecember.toISODate();
+        if (isoDate) return isoDate;
+      }
     }
   }
 
@@ -423,7 +467,6 @@ export const getISODateFromWeek = (
   if (!date.isValid) {
     throw new Error("Invalid ISO date provided");
   }
-
   return date.toISODate();
 };
 

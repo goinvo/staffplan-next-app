@@ -183,7 +183,7 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
     }
 
     return (
-        <tr className={`pl-5 flex border-b border-gray-300 hover:bg-hoverGrey min-h-[100px]`}>
+        <tr className={`pl-5 sm:flex hidden border-b border-gray-300 hover:bg-hoverGrey min-h-[100px]`}>
             <td className='my-5 px-0 font-normal align-top max-w-1/3'>
                 <form onSubmit={formik.handleSubmit} className="flex flex-row gap-4">
                     <div className="mr-1">
