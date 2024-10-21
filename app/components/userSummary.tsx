@@ -146,7 +146,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 						)}
 					</div>
 				)}
-			{viewer?.id === assignment.assignedUser?.id && <div className="flex items-start justify-center">
+			{(viewer?.id === assignment.assignedUser?.id || !assignment.assignedUser) && <div className="flex items-start justify-center">
 				<IconButton
 					className='text-black flex items-start justify-center text-transparentGrey'
 					onClick={handleArchiveItemClick}
