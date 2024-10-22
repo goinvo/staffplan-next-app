@@ -22,7 +22,7 @@ const UserPage: React.FC = () => {
 
 	useEffect(() => {
 		if (userList.length) {
-			const userId = decodeURIComponent(params?.userId?.toString());
+			const userId = params?.userId?.toString();
 			if (userId) {
 				setSelectedUserData(parseInt(userId));
 			}
