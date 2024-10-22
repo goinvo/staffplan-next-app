@@ -21,9 +21,9 @@ const EditUserForm: React.FC<EditFormProps> = ({
     const { userList } = useUserDataContext();
 
     const params = useParams();
-    const selectedUserId = decodeURIComponent(params.userId.toString());
+    const selectedUserId = params.userId?.toString();
     const selectedUser = userList.find(
-        (user: UserType) => user.id?.toString() === selectedUserId.toString()
+        (user: UserType) => user.id?.toString() === selectedUserId?.toString()
     );
     const avatarUrl = selectedUser?.avatarUrl || "http://www.gravatar.com/avatar/newavatars";
     const name = selectedUser?.name || "  ";
