@@ -16,7 +16,7 @@ import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 
 const ProjectPage: React.FC = () => {
 	const params = useParams();
-	const selectedProjectId = decodeURIComponent(params.projectId.toString());
+	const selectedProjectId = params.projectId?.toString();
 	const inputRefs = useRef<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>([]);
 	const [
 		upsertAssignment,
