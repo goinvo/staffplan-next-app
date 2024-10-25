@@ -2,13 +2,12 @@
 
 import React, { useEffect } from "react";
 import { Formik, FormikValues } from "formik";
-
 import { useMutation } from "@apollo/client";
+
 import { AssignmentType, WorkWeekType, MonthsDataType } from "@/app/typeInterfaces";
 import { UPSERT_WORKWEEKS, UPSERT_WORKWEEK } from "@/app/gqlQueries";
 import { CustomInput } from "../cutomInput";
 import { assignmentContainsCWeek, isPastOrCurrentWeek, filterWeeksForFillForward, getWeekNumbersPerScreen, currentWeek, currentYear, tabbingAndArrowNavigation, updateOrInsertWorkWeek, updateOrInsertWorkWeekInProject, updateProjectAssignments, updateUserAssignments } from "../scrollingCalendar/helpers";
-import { ACTUAL_HOURS, ESTIMATED_HOURS } from "../scrollingCalendar/constants";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 
@@ -18,6 +17,7 @@ interface WorkWeekInputProps {
 	assignment: AssignmentType;
 	cweek: number;
 	year: number;
+	monthLabel: string;
 	months: MonthsDataType[];
 	rowIndex: number,
 	cellIndex: number,
@@ -45,7 +45,8 @@ export const WorkWeekInput = ({
 	inputRefs,
 	rowIndex,
 	cellIndex,
-	totalRows
+	totalRows,
+	monthLabel
 }: WorkWeekInputProps) => {
 	const weekWithinAssignmentDates = assignmentContainsCWeek(assignment, cweek, year)
 	const existingWorkWeek = assignment?.workWeeks.find((week) => week.cweek === cweek && week.year === year);
@@ -146,40 +147,25 @@ export const WorkWeekInput = ({
 		})
 	};
 
-	const onFillForwardClick = async (inputName: string,
-		targetCweek: number, targetYear: number, values: FormikValues) => {
+	const onFillForwardClick = async (
+		targetCweek: number, targetYear: number, targetMonth: number, values: FormikValues) => {
+		if (values.estimatedHours === '') {
+			return;
+		}
 		const variables: FillForwardVariablesType = {
 			assignmentId: values.assignmentId,
 		};
 
-		if ((inputName === ESTIMATED_HOURS && values.estimatedHours === '') ||
-			(inputName === ACTUAL_HOURS && values.actualHours === '')) {
-			return;
-		}
-
 		const weekNumbersPerScreen = getWeekNumbersPerScreen(months);
 
-		let filteredWeeks = filterWeeksForFillForward(weekNumbersPerScreen, targetCweek, targetYear, inputName);
-		if (assignment.endsOn || assignment.startsOn) {
-			filteredWeeks = filteredWeeks.filter(week =>
-				assignmentContainsCWeek(assignment, week.cweek, week.year))
-		}
+		const filteredWeeks = filterWeeksForFillForward(weekNumbersPerScreen, targetCweek, targetYear, targetMonth, assignment?.endsOn);
 
-		if (inputName === ESTIMATED_HOURS && values.estimatedHours !== "") {
-			variables.workWeeks = filteredWeeks.map(week => ({
-				cweek: week.cweek,
-				estimatedHours: parseInt(values.estimatedHours),
-				year: week.year
-			}));
-		}
+		variables.workWeeks = filteredWeeks.map(week => ({
+			cweek: week.cweek,
+			estimatedHours: parseInt(values.estimatedHours),
+			year: week.year
+		}));
 
-		if (inputName === ACTUAL_HOURS && values.actualHours !== "") {
-			variables.workWeeks = filteredWeeks.map(week => ({
-				cweek: week.cweek,
-				actualHours: parseInt(values.actualHours),
-				year: week.year
-			}));
-		}
 		upsertWorkWeeks({
 			variables
 		})
@@ -223,7 +209,7 @@ export const WorkWeekInput = ({
 								upsertWorkWeekValues(values);
 							}
 						}}
-						onFillForwardClick={() => onFillForwardClick(ESTIMATED_HOURS, cweek, year, values)}
+						onFillForwardClick={() => onFillForwardClick(cweek, year, Number(monthLabel), values)}
 						ref={(el: HTMLInputElement) => createEstimatedRef(el, rowIndex, cellIndex)}
 						onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => tabbingAndArrowNavigation(e, rowIndex, cellIndex, inputRefs, totalRows, false)}
 					/>
