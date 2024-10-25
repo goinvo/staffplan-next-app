@@ -146,15 +146,15 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 						)}
 					</div>
 				)}
-			{(viewer?.id === assignment.assignedUser?.id || !assignment.assignedUser) && <div className="flex items-start justify-center">
-				<IconButton
-					className='text-black flex items-start justify-center text-transparentGrey'
-					onClick={handleArchiveItemClick}
-					Icon={ArchiveBoxIcon}
-					iconSize={'h6 w-6'}
+				{(viewer?.id === assignment.assignedUser?.id || !assignment.assignedUser) && <div className="sm:flex hidden items-start justify-center">
+					<IconButton
+						className='text-black flex items-start justify-center text-transparentGrey'
+						onClick={handleArchiveItemClick}
+						Icon={ArchiveBoxIcon}
+						iconSize={'h6 w-6'}
 					/>
-			</div>}
-					</div>
+				</div>}
+			</div>
 		</td >
 	);
 };

@@ -13,7 +13,7 @@ import { AllUserLabel } from "./allUserLabel";
 import ColumnChart from "../columnChart";
 import { calculateTotalHoursPerWeek, currentYear, currentWeek, isBeforeWeek } from "../scrollingCalendar/helpers";
 import IconButton from "../iconButton";
-import {useGeneralDataContext} from "@/app/contexts/generalContext";
+import { useGeneralDataContext } from "@/app/contexts/generalContext";
 
 export const AllUserRow = ({
 	user,
@@ -21,10 +21,10 @@ export const AllUserRow = ({
 	months
 }: AllUserRowProps) => {
 	const router = useRouter();
-
+	const nonArchivedAssignments = user.assignments.filter(assignment => assignment.status !== 'archived')
 	const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } =
-		calculateTotalHoursPerWeek(user.assignments, months as MonthsDataType[]);
-	const {viewer} = useGeneralDataContext();
+		calculateTotalHoursPerWeek(nonArchivedAssignments, months as MonthsDataType[]);
+	const { viewer } = useGeneralDataContext();
 
 	const handleUserChange = (user: UserType) => {
 		if (user.id) {
@@ -62,10 +62,10 @@ export const AllUserRow = ({
 				});
 			})}
 			<td className="flex items-center justify-center font-normal py-2 pr-4 pl-0 sm:w-1/6 w-1/2">
-				{viewer?.id === user.id  &&	<IconButton className='text-transparentGrey sm:flex hidden'
-										 onClick={() => console.log('On archive box btn click')}
-										 Icon={ArchiveBoxIcon}
-										 iconSize={'h6 w-6'}/>}
+				{viewer?.id === user.id && <IconButton className='text-transparentGrey sm:flex hidden'
+					onClick={() => console.log('On archive box btn click')}
+					Icon={ArchiveBoxIcon}
+					iconSize={'h6 w-6'} />}
 			</td>
 		</tr>
 	);
