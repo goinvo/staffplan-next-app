@@ -19,9 +19,15 @@ const DraggableDates: FC<DraggableDatesProps> = ({
     monthLabel,
 }) => {
     const { projectList, setProjectList, singleProjectPage } = useProjectsDataContext()
+    let endDateWeekNumber;
+    let startDateWeekNumber;
 
-    const endDateWeekNumber = getWeekNumberAndYear(singleProjectPage?.endsOn)
-    const startDateWeekNumber = getWeekNumberAndYear(singleProjectPage?.startsOn)
+    if (singleProjectPage?.endsOn) {
+        endDateWeekNumber = getWeekNumberAndYear(singleProjectPage?.endsOn)
+    }
+    if (singleProjectPage?.startsOn) {
+        startDateWeekNumber = getWeekNumberAndYear(singleProjectPage?.startsOn)
+    }
     const isEndDateWeek = endDateWeekNumber?.weekNumber === weekNumberOfTheYear && monthYear === endDateWeekNumber?.year
     const isStartDateWeek = startDateWeekNumber?.weekNumber === weekNumberOfTheYear && monthYear === startDateWeekNumber?.year
 
