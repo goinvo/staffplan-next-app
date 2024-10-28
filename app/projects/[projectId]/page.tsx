@@ -73,18 +73,17 @@ const ProjectPage: React.FC = () => {
 		const startDate = singleProjectPage?.startsOn ? DateTime.fromISO(singleProjectPage.startsOn) : null;
 		const endDate = singleProjectPage?.endsOn ? DateTime.fromISO(singleProjectPage.endsOn) : null;
 
-		if (!startDate || !endDate) {
+		if (!startDate && !endDate) {
 			return 'Start Date - End Date';
 		}
-		const formattedStartDate = startDate.toFormat('d.MMM');
-		const formattedEndDate = endDate.toFormat('d.MMM');
-		const startYear = startDate.year;
-		const endYear = endDate.year;
-		if (startYear === endYear) {
-			return `${formattedStartDate}-${formattedEndDate}.${endYear}`;
-		} else {
-			return `${formattedStartDate}.${startYear}-${formattedEndDate} ${endYear}`;
+		const formattedStartDate = startDate?.toFormat('d.MMM')
+		const formattedEndDate = endDate?.toFormat('d.MMM')
+		const startYear = startDate?.year || ''
+		const endYear = endDate?.year || ''
+		if (startDate && startYear && startYear !== endYear) {
+			return `${formattedStartDate}.${startYear}-${formattedEndDate || 'End Date'} ${endYear}`;
 		}
+		return `${formattedStartDate || 'Start Date'}-${formattedEndDate}.${endYear}`;
 	}
 
 	const columnHeaderTitles = [{ title: 'People', showIcon: true, onClick: () => addNewAssignmentRow() }]
@@ -94,7 +93,14 @@ const ProjectPage: React.FC = () => {
 		<>
 			{singleProjectPage && projectList.length ? (
 				<>
-					<ScrollingCalendar columnHeaderTitles={columnHeaderTitles} title={singleProjectPage.name} projectInfo={projectInfoSubtitle} assignments={sortedSingleProjectAssignments || []} editable={true}>
+					<ScrollingCalendar
+						columnHeaderTitles={columnHeaderTitles}
+						title={singleProjectPage.name}
+						projectInfo={projectInfoSubtitle}
+						assignments={sortedSingleProjectAssignments || []}
+						editable={true}
+						draggableDates={true}
+					>
 						{sortedSingleProjectAssignments?.map((assignment: AssignmentType, rowIndex) => {
 							return (
 								<ProjectAssignmentRow

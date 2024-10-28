@@ -15,6 +15,7 @@ import { AssignmentType, MonthsDataType, ProjectType } from '@/app/typeInterface
 import { calculateTotalHoursPerWeek, isBeforeWeek, showMonthAndYear, getNextWeeksPerView, getPrevWeeksPerView, currentWeek, currentYear } from './helpers';
 import ViewsMenu from '../viewsMenu/viewsMenu';
 import EditFormController from './editFormController';
+import DraggableDates from '../projectAssignment/draggableProjectDates';
 
 interface ColumnHeaderTitle {
     title: string;
@@ -31,6 +32,7 @@ type CalendarHeaderProps = {
     editable?: boolean,
     projectInfo?: string,
     columnHeaderTitles: ColumnHeaderTitle[],
+    draggableDates?: boolean
 }
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
@@ -41,7 +43,9 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     userName,
     editable = false,
     projectInfo,
-    columnHeaderTitles }) => {
+    columnHeaderTitles,
+    draggableDates = false,
+}) => {
     const [isEditing, setIsEditing] = useState(false);
     const { setDateRange, scrollToTodayFunction } = useGeneralDataContext();
     const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } = calculateTotalHoursPerWeek(assignments as AssignmentType[], months)
@@ -99,8 +103,15 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                 </th>
                 {months?.map((month) => {
                     return month.weeks.map((week) => {
-                        return (<th key={`month-${month.monthLabel}-week-${week.weekNumberOfTheYear}`}
-                            className={`sm:block hidden relative px-1 ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year ? 'navbar font-bold' : 'font-normal'}`}>
+                        const isCurrentWeek = currentWeek === week.weekNumberOfTheYear && currentYear === month.year
+                        return (<th
+                            key={`month-${month.monthLabel}-week-${week.weekNumberOfTheYear}`}
+                            className={`sm:block hidden relative px-1 ${isCurrentWeek ? 'navbar font-bold' : 'font-normal'}`}>
+                            {draggableDates && <DraggableDates
+                                weekNumberOfTheYear={week.weekNumberOfTheYear}
+                                monthYear={month.year}
+                                monthLabel={month.monthLabel}
+                            />}
                             <ColumnChart
                                 hasActualHoursForWeek={hasActualHoursForWeek(month.year, week.weekNumberOfTheYear)}
                                 height={hasActualHoursForWeek(month.year, week.weekNumberOfTheYear) ? totalActualHours[`${month.year}-${week.weekNumberOfTheYear}`] : totalEstimatedHours[`${month.year}-${week.weekNumberOfTheYear}`]}
@@ -136,9 +147,9 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                 </th>
                 {months?.map((month) => {
                     return month.weeks.map((week, index) => {
+                        const isCurrentWeek = currentWeek === week.weekNumberOfTheYear && currentYear === month.year
                         return (
-                            <th key={`${month.monthLabel}-${index}`} className={`relative py-2 px-1 font-normal text-contrastBlue ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year && 'bg-selectedColumnBg'
-                                }`}>
+                            <th key={`${month.monthLabel}-${index}`} className={`relative py-2 px-1 font-normal text-contrastBlue ${isCurrentWeek ? 'bg-selectedColumnBg' : ''}`}>
                                 <div className={`flex flex-col items-center sm:text-base text-2xl sm:w-[34px] w-[68px] ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year ? 'font-bold' : 'font-normal'}`}>
                                     <span>{`W${week.weekNumberOfTheMonth}`}</span>
                                     <span className={`${week.weekNumberOfTheMonth !== 1 ? 'sm:hidden' : ''}`}>
