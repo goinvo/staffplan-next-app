@@ -24,6 +24,7 @@ const config: Config = {
         selectedColumnBg: "#dfe0ec",
       },
       fontSize: {
+        "2xs": "10px",
         tiny: "14px",
         huge: "28px",
       },

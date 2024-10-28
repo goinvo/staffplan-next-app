@@ -22,3 +22,8 @@ export const MONTHS_COUNT: MonthsCount = {
 
 export const ACTUAL_HOURS = "actualHours";
 export const ESTIMATED_HOURS = "estimatedHours";
+
+export enum PROJECT_DATES_TYPE {
+  STARTS_ON = "startsOn",
+  ENDS_ON = "endsOn",
+}

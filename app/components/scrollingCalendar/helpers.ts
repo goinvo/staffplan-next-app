@@ -1158,3 +1158,24 @@ export const calculatePlannedHoursPerProject = (
     return totalAssignments + totalForAssignment;
   }, 0);
 };
+
+export const getWeekNumberAndYear = (dateString: string | null) => {
+  if (!dateString) {
+    return;
+  }
+  const date = DateTime.fromISO(dateString, { zone: "utc" });
+
+  if (!date.isValid) {
+    throw new Error("Invalid date format. Use ISO string format (YYYY-MM-DD).");
+  }
+
+  const monday = date.startOf("week");
+  let weekNumber = monday.weekNumber;
+  if (monday.month === 12 && weekNumber === 1) {
+    weekNumber = 53;
+  }
+  return {
+    weekNumber: weekNumber,
+    year: monday.year,
+  };
+};
