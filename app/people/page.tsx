@@ -14,8 +14,10 @@ const PeopleView: React.FC = () => {
 	const columnHeaderTitles = [{ title: 'People', showIcon: true }]
 
 	const getAllAssignments = (users: UserType[]): AssignmentType[] => {
-		return users?.flatMap(user => user.assignments);
-	}
+		return users?.flatMap(user =>
+			user.assignments.filter(assignment => assignment.status !== 'archived')
+		);
+	};
 	const allAssignments = getAllAssignments(userList)
 
 	return (

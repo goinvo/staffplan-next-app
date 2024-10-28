@@ -9,7 +9,6 @@ import {
   ProjectType,
   ClientType,
 } from "@/app/typeInterfaces";
-import { ACTUAL_HOURS } from "./constants";
 
 interface MonthData {
   monthLabel: string;
@@ -474,26 +473,35 @@ export const filterWeeksForFillForward = (
   allWeeks: { cweek: number; year: number }[],
   targetCweek: number,
   targetYear: number,
-  inputName: string
+  targetMonth: number,
+  endsOnDate: string | null
 ) => {
-  const currentYear = getCurrentYear();
-  const currentWeek = getCurrentWeekOfYear();
-
-  if (inputName === ACTUAL_HOURS) {
-    return allWeeks.filter(
-      (week) =>
-        (week.year > targetYear ||
-          (week.year === targetYear && week.cweek >= targetCweek)) &&
-        week.year <= currentYear &&
-        (week.year < currentYear || week.cweek <= currentWeek)
-    );
-  }
-
-  return allWeeks.filter((week) => {
+  const filteredWeeks = allWeeks.filter((week) => {
     if (week.year > targetYear) return true;
     if (week.year === targetYear && week.cweek >= targetCweek) return true;
     return false;
   });
+
+  // If the active week is earlier than the End date, fill weeks from the active week to (and including) the End date.
+  if (endsOnDate) {
+    const endsOnWeek = getWeekNumberAndYear(endsOnDate);
+    if (
+      targetYear < endsOnWeek.year ||
+      (targetYear === endsOnWeek.year && targetCweek < endsOnWeek.weekNumber)
+    ) {
+      const startDate = getISODateFromWeek(
+        targetYear,
+        targetCweek,
+        targetMonth
+      );
+      const filteredWeeksBeforeEndDate = getWeeksBetweenDates(
+        startDate,
+        endsOnDate
+      );
+      return filteredWeeksBeforeEndDate;
+    }
+  }
+  return filteredWeeks;
 };
 
 export const getWeekNumbersPerScreen = (
@@ -1159,10 +1167,12 @@ export const calculatePlannedHoursPerProject = (
   }, 0);
 };
 
-export const getWeekNumberAndYear = (dateString: string | null) => {
-  if (!dateString) {
-    return;
-  }
+export const getWeekNumberAndYear = (
+  dateString: string
+): {
+  weekNumber: number;
+  year: number;
+} => {
   const date = DateTime.fromISO(dateString, { zone: "utc" });
 
   if (!date.isValid) {

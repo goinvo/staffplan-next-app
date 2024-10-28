@@ -134,6 +134,7 @@ export const UserAssignmentRow = ({
 									year={month.year}
 									key={`input-${assignment.id}-${month.monthLabel}-${week.weekNumberOfTheYear}`}
 									months={months}
+									monthLabel={month.monthLabel}
 									rowIndex={rowIndex}
 									cellIndex={cellIndex}
 									inputRefs={inputRefs}
