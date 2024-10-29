@@ -976,9 +976,10 @@ export const updateOrInsertWorkWeekInProject = (
             } else {
               updatedWorkWeeks = [...assignment.workWeeks, workWeek];
             }
+            const updatedFields = {workWeeks: updatedWorkWeeks, canBeDeleted:false};
             return {
               ...assignment,
-              workWeeks: updatedWorkWeeks,
+             ...updatedFields,
             };
           }
           return assignment;

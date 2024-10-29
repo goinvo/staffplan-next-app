@@ -1,7 +1,7 @@
 'use client'
 import React from "react";
 import { useMutation } from "@apollo/client";
-import { ArchiveBoxIcon } from "@heroicons/react/24/outline";
+import { ArchiveBoxIcon, XCircleIcon } from "@heroicons/react/24/outline";
 
 import { AssignmentType, UserSummaryProps } from "../typeInterfaces";
 import IconButton from "./iconButton";
@@ -103,13 +103,13 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 			setSingleUserPage(selectedUserData);
 			return;
 		}
-		if (assignment.assignedUser === null) {
-			const variables = {
-				assignmentId: assignment.id,
-			};
-			deleteAssignment({ variables });
-			return;
-		}
+		// if (assignment.assignedUser === null) {
+		// 	const variables = {
+		// 		assignmentId: assignment.id,
+		// 	};
+		// 	deleteAssignment({ variables });
+		// 	return;
+		// }
 		if (assignment.status !== 'archived') {
 			const projectId = project ? project.id : assignment.project.id;
 			const variables = {
@@ -119,6 +119,16 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 				status: 'archived',
 			};
 			upsertAssignment({ variables });
+		}
+	};
+
+	const handleDeleteAssignmentClick = () => {
+		if (assignment.canBeDeleted === true) {
+			const variables = {
+				assignmentId: assignment.id,
+			};
+			deleteAssignment({ variables });
+			return;
 		}
 	};
 
@@ -146,11 +156,19 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 						)}
 					</div>
 				)}
-				{(viewer?.id === assignment.assignedUser?.id || !assignment.assignedUser) && <div className="sm:flex hidden items-start justify-center">
+				{(viewer?.id === assignment.assignedUser?.id && assignment.canBeDeleted === false) && <div className="sm:flex hidden items-start justify-center">
 					<IconButton
 						className='text-black flex items-start justify-center text-transparentGrey'
 						onClick={handleArchiveItemClick}
 						Icon={ArchiveBoxIcon}
+						iconSize={'h6 w-6'}
+					/>
+				</div>}
+				{(!assignment.assignedUser || assignment.canBeDeleted ) && <div className="sm:flex hidden items-start justify-center">
+					<IconButton
+						className='text-black flex items-start justify-center text-transparentGrey'
+						onClick={handleDeleteAssignmentClick}
+						Icon={XCircleIcon}
 						iconSize={'h6 w-6'}
 					/>
 				</div>}

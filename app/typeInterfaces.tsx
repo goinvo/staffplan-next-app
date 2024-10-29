@@ -33,6 +33,7 @@ export interface AllProjectRowProps {
 }
 export interface AssignmentType {
 	assignedUser: UserType;
+	canBeDeleted: boolean;
 	endsOn: string | null;
 	client: ClientType;
 	id: number;

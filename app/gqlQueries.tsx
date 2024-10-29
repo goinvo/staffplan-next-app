@@ -119,8 +119,10 @@ export const GET_USER_LIST = gql`
 					endsOn
 					estimatedWeeklyHours
 					status
+					canBeDeleted
 					assignedUser {
 						id
+						name
 					}
 					project {
 						id
@@ -221,6 +223,7 @@ export const GET_ALL_PROJECTS_DATA = gql`
 						id
 						avatarUrl
 					}
+					canBeDeleted
 					id
 					startsOn
 					estimatedWeeklyHours
