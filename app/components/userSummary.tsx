@@ -103,13 +103,6 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 			setSingleUserPage(selectedUserData);
 			return;
 		}
-		// if (assignment.assignedUser === null) {
-		// 	const variables = {
-		// 		assignmentId: assignment.id,
-		// 	};
-		// 	deleteAssignment({ variables });
-		// 	return;
-		// }
 		if (assignment.status !== 'archived') {
 			const projectId = project ? project.id : assignment.project.id;
 			const variables = {
