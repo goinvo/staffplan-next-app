@@ -20,10 +20,11 @@ export const UserLabel = ({ assignment, clickHandler }: UserLabelProps) => {
 		</button>,
 		show:true
 		},
-		{
-			component: () => <button className="text-gray-900 block px-4 py-2 text-sm">Delete</button>,
-			show: true,
-		},
+		// temporary removal of delete button
+		// {
+		// 	component: () => <button className="text-gray-900 block px-4 py-2 text-sm">Delete</button>,
+		// 	show: true,
+		// },
 	];
 	return (
 		<div className="sm:ml-auto ml-0 sm:w-24 flex">
