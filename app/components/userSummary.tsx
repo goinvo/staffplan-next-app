@@ -117,14 +117,22 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 
 	const handleDeleteAssignmentClick = () => {
 		if (assignment.canBeDeleted === true) {
+				const deletedAssignment = selectedUser?.assignments.filter((a: AssignmentType) => a.id !== assignment.id);
+				const selectedUserData = {
+					...selectedUser,
+					assignments: deletedAssignment || [],
+					name: selectedUser?.name || "Default Name",
+					avatarUrl: selectedUser?.avatarUrl || "defaultAvatarUrl.png",
+				};
+				setSingleUserPage(selectedUserData);
 			const variables = {
 				assignmentId: assignment.id,
 			};
 			deleteAssignment({ variables });
 			return;
-		}
+		
 	};
-
+	}
 	const summaries = [
 		{ label: 'future plan', value: calculatePlan(assignment, { isFuture: true }), unit: 'hrs' },
 		{ label: 'burned', value: burnedHours, unit: 'hrs', alwaysShow: true },
