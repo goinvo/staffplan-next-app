@@ -979,6 +979,7 @@ export const updateOrInsertWorkWeekInProject = (
             const canBeDeleted = !updatedWorkWeeks.some(
               (week) => (week.actualHours ?? 0) > 0
             );
+            console.log("canBeDeleted",canBeDeleted,'in helper')
             const updatedFields = {
               workWeeks: updatedWorkWeeks,
               canBeDeleted:canBeDeleted
