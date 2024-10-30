@@ -80,6 +80,8 @@ export const WorkWeekInput = ({
 			);
 			setUserList(updatedUserList);
 			setProjectList(updatedProjectList)
+			refetchProjectList();
+			refetchUserList();
 		}
 	});
 	const [upsertWorkWeeks] = useMutation(UPSERT_WORKWEEKS, {
@@ -101,8 +103,8 @@ export const WorkWeekInput = ({
 			setUserList(updatedUserList)
 		}
 	});
-	const { userList, setUserList } = useUserDataContext()
-	const { projectList, setProjectList } = useProjectsDataContext();
+	const { userList, setUserList,refetchUserList } = useUserDataContext()
+	const { projectList, setProjectList,refetchProjectList } = useProjectsDataContext();
 
 	useEffect(() => {
 		const currentWeekExists = months?.some(month =>
