@@ -43,29 +43,17 @@ const Navbar: React.FC = () => {
 		},
 		{ href: "/projects", label: "Projects", isActive: pathname === "projects" },
 	];
-	const ellipsisDropdownMenuOption = (href: string, label: string) => {
-		return <Link href={href}>{label}</Link>;
-	};
 	const ellipsisDropdownMenuOptions = [
 		{
-			component:()=> ellipsisDropdownMenuOption(
-				"https://github.com/goinvo/staffplan-next-app",
-				"Open Source"
-			),
+			component:<Link href={"https://github.com/goinvo/staffplan-next-app"}>{"Open Source"}</Link>,
 			show: true,
 		},
 		{
-			component:()=> ellipsisDropdownMenuOption(
-				`${homepageUrl}/settings/profile`,
-				"Settings"
-			),
+			component:<Link href={`${homepageUrl}/settings/profile`}>{"Settings"}</Link>,
 			show: true,
 		},
 		{
-			component:()=> ellipsisDropdownMenuOption(
-				`${homepageUrl}/sign_out`,
-				"Sign Out"
-			),
+			component:<Link href={`${homepageUrl}/sign_out`}>{"Sign Out"}</Link>,
 			show: true,
 		},
 	];
@@ -116,7 +104,10 @@ const Navbar: React.FC = () => {
 						Feedback
 					</button>
 				</div>
-				<EllipsisDropdownMenu options={ellipsisDropdownMenuOptions} location={"navbar"} />
+				<EllipsisDropdownMenu
+					options={ellipsisDropdownMenuOptions}
+					textColor={"text-white"}
+				/>
 				{/* Temporary commented */}
 				{/* <div className="h-4 w-4">
 					<ChatBubbleBottomCenterTextIcon />
