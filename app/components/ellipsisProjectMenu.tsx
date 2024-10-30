@@ -1,6 +1,6 @@
 "use client";
 import { BaseSyntheticEvent, Fragment, useState } from "react";
-import { Menu, Transition } from "@headlessui/react";
+import {  Menu,MenuItem, MenuButton, MenuItems, Transition } from "@headlessui/react";
 import React from "react";
 import { UPSERT_PROJECT } from "../gqlQueries";
 import { useMutation } from "@apollo/client";
@@ -94,7 +94,7 @@ export default function EllipsisProjectMenu({ project }: EllipsisProjectMenuProp
 			id="add-dropdown"
 			data-testid="add-dropdown"
 		>
-			<Menu.Button className="relative z-1 actionbar-text-accent w-full h-full rounded-full flex justify-center items-center ellipsismenu text-2xl"></Menu.Button>
+			<MenuButton className="relative z-1 actionbar-text-accent w-full h-full rounded-full flex justify-center items-center ellipsismenu text-2xl"></MenuButton>
 
 			<Transition
 				as={Fragment}
@@ -105,7 +105,7 @@ export default function EllipsisProjectMenu({ project }: EllipsisProjectMenuProp
 				leaveFrom="transform opacity-100 scale-100"
 				leaveTo="transform opacity-0 scale-95"
 			>
-				<Menu.Items className="absolute left-0 top-full z-50 ml-9 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+				<MenuItems className="absolute left-0 top-full z-50 ml-9 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 					<div className="py-1 border-b-2">
 						<label className="ml-3 inline-block pl-[0.15rem] hover:cursor-pointer text-gray-900 px-4 py-2 text-sm">
 							<input
@@ -122,7 +122,7 @@ export default function EllipsisProjectMenu({ project }: EllipsisProjectMenuProp
 							/>
 							{confirmed ? "Confirmed" : "Unconfirmed"}
 						</label>
-						<Menu.Item>
+						<MenuItem>
 							{({ active }) => (
 								<p
 									className={dropdownSelectedItemClass(active)}
@@ -131,8 +131,8 @@ export default function EllipsisProjectMenu({ project }: EllipsisProjectMenuProp
 									View Project Plan
 								</p>
 							)}
-						</Menu.Item>
-						<Menu.Item>
+						</MenuItem>
+						<MenuItem>
 							{({ active }) => (
 								<button
 									onClick={() => openModal(<AddProjectModal project={project} closeModal={closeModal} />)}
@@ -141,8 +141,8 @@ export default function EllipsisProjectMenu({ project }: EllipsisProjectMenuProp
 									Edit Project
 								</button>
 							)}
-						</Menu.Item>
-						<Menu.Item>
+						</MenuItem>
+						<MenuItem>
 							{({ active }) => (
 								<button
 									className={dropdownSelectedItemClass(active)}
@@ -154,12 +154,14 @@ export default function EllipsisProjectMenu({ project }: EllipsisProjectMenuProp
 								</button>
 							)}
 
-						</Menu.Item>
+						</MenuItem>
+						<MenuItem>
 						<button className="px-4 py-2 text-sm hover:text-accentgreen border-none" onClick={downloadCSV}>
 							Export CSV
 						</button>
+						</MenuItem>
 					</div>
-
+						
 					<div
 						id={`${project.status}`}
 						onClick={onSubmitUpsert}
@@ -171,7 +173,7 @@ export default function EllipsisProjectMenu({ project }: EllipsisProjectMenuProp
 							? "Unarchive Project"
 							: "Archive Project"}
 					</div>
-				</Menu.Items>
+				</MenuItems>
 			</Transition>
 		</Menu>
 	);

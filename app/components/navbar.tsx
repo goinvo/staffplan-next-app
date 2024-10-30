@@ -43,18 +43,19 @@ const Navbar: React.FC = () => {
 		},
 		{ href: "/projects", label: "Projects", isActive: pathname === "projects" },
 	];
-	const ellipsisLinks = [
+	const ellipsisDropdownMenuOptions = [
 		{
-			href: "https://github.com/goinvo/staffplan-next-app",
-			label: "Open Source",
+			component:<Link href={"https://github.com/goinvo/staffplan-next-app"}>{"Open Source"}</Link>,
 			show: true,
 		},
 		{
-			href: `${homepageUrl}/settings/profile`,
-			label: "Settings",
+			component:<Link href={`${homepageUrl}/settings/profile`}>{"Settings"}</Link>,
 			show: true,
 		},
-		{ href: `${homepageUrl}/sign_out`, label: "Sign Out", show: true },
+		{
+			component:<Link href={`${homepageUrl}/sign_out`}>{"Sign Out"}</Link>,
+			show: true,
+		},
 	];
 	return (
 		<nav className="navbar bg-gray-100 px-5 h-14 flex justify-between items-center">
@@ -63,10 +64,11 @@ const Navbar: React.FC = () => {
 					<Link
 						key={link.href}
 						href={link.href}
-						className={`inline-flex items-center text-base sm:px-4 px-1 sm:py-2 py-1 rounded-md whitespace-nowrap ${link.isActive
-							? "bg-contrastBlue font-semibold"
-							: "hover:bg-contrastBlue"
-							}`}
+						className={`inline-flex items-center text-base sm:px-4 px-1 sm:py-2 py-1 rounded-md whitespace-nowrap ${
+							link.isActive
+								? "bg-contrastBlue font-semibold"
+								: "hover:bg-contrastBlue"
+						}`}
 					>
 						{link.label}
 					</Link>
@@ -95,12 +97,17 @@ const Navbar: React.FC = () => {
 				<div>
 					<button
 						className="sm:inline-flex hidden items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue"
-						onClick={() => openModal(<AirTableFormModal closeModal={closeModal} />)}
+						onClick={() =>
+							openModal(<AirTableFormModal closeModal={closeModal} />)
+						}
 					>
 						Feedback
 					</button>
 				</div>
-				<EllipsisDropdownMenu options={ellipsisLinks} />
+				<EllipsisDropdownMenu
+					options={ellipsisDropdownMenuOptions}
+					textColor={"text-white"}
+				/>
 				{/* Temporary commented */}
 				{/* <div className="h-4 w-4">
 					<ChatBubbleBottomCenterTextIcon />

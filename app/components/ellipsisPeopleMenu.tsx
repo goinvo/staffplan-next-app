@@ -1,6 +1,6 @@
 "use client";
 import { Fragment } from "react";
-import { Menu, Transition } from "@headlessui/react";
+import {  Menu,MenuItem, MenuButton, MenuItems, Transition } from "@headlessui/react";
 import React from "react";
 import { useRouter } from "next/navigation";
 import { useModal } from "../contexts/modalContext";
@@ -28,7 +28,7 @@ export default function EllipsisPeopleMenu({ user }: EllipsisPeopleMenuProps) {
 			className="relative inline-block text-left z-100"
 			id="add-dropdown" data-testid="add-dropdown"
 		>
-			<Menu.Button className="relative z-1 actionbar-text-accent w-full h-full rounded-full flex justify-center items-center ellipsismenu text-2xl"></Menu.Button>
+			<MenuButton className="relative z-1 actionbar-text-accent w-full h-full rounded-full flex justify-center items-center ellipsismenu text-2xl"></MenuButton>
 
 			<Transition
 				as={Fragment}
@@ -39,9 +39,9 @@ export default function EllipsisPeopleMenu({ user }: EllipsisPeopleMenuProps) {
 				leaveFrom="transform opacity-100 scale-100"
 				leaveTo="transform opacity-0 scale-95"
 			>
-				<Menu.Items className="absolute left-0 top-full z-50 ml-9 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+				<MenuItems className="absolute left-0 top-full z-50 ml-9 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 					<div className="py-1 border-b-2">
-						<Menu.Item>
+						<MenuItem>
 							{({ active }) => (
 								<p
 									className={dropdownSelectedItemClass(active)}
@@ -50,8 +50,8 @@ export default function EllipsisPeopleMenu({ user }: EllipsisPeopleMenuProps) {
 									View StaffPlan
 								</p>
 							)}
-						</Menu.Item>
-						<Menu.Item>
+						</MenuItem>
+						<MenuItem>
 							{({ active }) => (
 								<button
 									className={dropdownSelectedItemClass(active)}
@@ -63,9 +63,9 @@ export default function EllipsisPeopleMenu({ user }: EllipsisPeopleMenuProps) {
 								</button>
 							)}
 
-						</Menu.Item>
+						</MenuItem>
 					</div>
-				</Menu.Items>
+				</MenuItems>
 			</Transition>
 		</Menu>
 	);
