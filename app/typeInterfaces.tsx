@@ -151,6 +151,7 @@ export interface UserAssignmentDataMapType {
 export interface UserLabelProps {
 	project?: ProjectType;
 	assignment: AssignmentType;
+	selectedUser: UserType;
 	clickHandler: (assignment: AssignmentType) => void;
 }
 export interface ClientLabelProps {

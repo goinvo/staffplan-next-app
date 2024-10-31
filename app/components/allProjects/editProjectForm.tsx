@@ -417,15 +417,13 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					</label>
 				</div>
 				<div>
-					<IconButton
-						className={`text-black  ${archivedStatus ? "text-tiffany" : "text-transparentGrey"
-							}`}
-						onClick={handleArchiveButtonClick}
-						Icon={ArchiveBoxIcon}
-						iconSize="h-7 w-7"
-					/>
 				</div>
 			</div>
+					<button
+						className={`mr-2 px-4 py-2 text-tiny font-bold bg-tiffany rounded-sm text-white text-black  ${archivedStatus ? "text-tiffany" : "text-transparentGrey"
+							}`}
+						onClick={handleArchiveButtonClick}
+					>Archive</button>
 
 			{showNewClientModal && (
 				<div className="fixed inset-0 font-normal bg-gray-800 bg-opacity-50 flex justify-center items-center z-10">

@@ -1,38 +1,12 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 import { ProjectSummaryProps } from '../typeInterfaces';
-import IconButton from './iconButton';
-import { ArchiveBoxIcon } from '@heroicons/react/24/outline';
-import { UPSERT_PROJECT } from "@/app/gqlQueries";
-import { useMutation } from "@apollo/client";
-import { useProjectsDataContext } from '../contexts/projectsDataContext';
 import { useGeneralDataContext } from '../contexts/generalContext';
 import { calculatePlannedHoursPerProject } from './scrollingCalendar/helpers';
 
 
 const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 	const { showSummaries } = useGeneralDataContext();
-	const { refetchProjectList } = useProjectsDataContext()
-	const [upsertProject] = useMutation(UPSERT_PROJECT, {
-		errorPolicy: "all",
-		onCompleted({ upsertProject }) {
-			refetchProjectList();
-		},
-	});
-
-	const handleArchiveItemClick = () => {
-		if (project.status !== 'archived') {
-			const variables = {
-				id: project.id,
-				name: project.name,
-				clientId: project.client.id,
-				status: 'archived'
-			};
-			upsertProject({
-				variables
-			})
-		}
-	}
 
 	const plannedHours = calculatePlannedHoursPerProject(project)
 
@@ -70,14 +44,6 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 		<td className="font-normal ml-auto py-2 pr-4 pl-0 sm:w-1/6 w-1/2 flex justify-center items-center">
 			{showSummaries && (
 				<div className='sm:flex hidden flex-col'>
-					<div className="ml-auto">
-						<IconButton
-							className="text-black text-transparentGrey"
-							onClick={handleArchiveItemClick}
-							Icon={ArchiveBoxIcon}
-							iconSize="h6 w-6"
-						/>
-					</div>
 					<div className="sm:flex hidden justify-between w-full space-x-1">
 						{weeksAndFte.map((item, index) => (
 							item.value ? (
