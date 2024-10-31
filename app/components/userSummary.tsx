@@ -1,7 +1,7 @@
 'use client'
 import React from "react";
 import { useMutation } from "@apollo/client";
-import { ArchiveBoxIcon } from "@heroicons/react/24/outline";
+import { ArchiveBoxIcon, XCircleIcon } from "@heroicons/react/24/outline";
 
 import { AssignmentType, UserSummaryProps } from "../typeInterfaces";
 import IconButton from "./iconButton";
@@ -103,13 +103,6 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 			setSingleUserPage(selectedUserData);
 			return;
 		}
-		if (assignment.assignedUser === null) {
-			const variables = {
-				assignmentId: assignment.id,
-			};
-			deleteAssignment({ variables });
-			return;
-		}
 		if (assignment.status !== 'archived') {
 			const projectId = project ? project.id : assignment.project.id;
 			const variables = {
@@ -122,11 +115,35 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 		}
 	};
 
+	const handleDeleteAssignmentClick = () => {
+		if (assignment.canBeDeleted) {
+				const deletedAssignment = selectedUser?.assignments.filter((a: AssignmentType) => a.id !== assignment.id);
+				const selectedUserData = {
+					...selectedUser,
+					assignments: deletedAssignment || [],
+					name: selectedUser?.name || "Default Name",
+					avatarUrl: selectedUser?.avatarUrl || "defaultAvatarUrl.png",
+				};
+				setSingleUserPage(selectedUserData);
+			const variables = {
+				assignmentId: assignment.id,
+			};
+			deleteAssignment({ variables });
+			return;
+		
+	};
+	}
 	const summaries = [
 		{ label: 'future plan', value: calculatePlan(assignment, { isFuture: true }), unit: 'hrs' },
 		{ label: 'burned', value: burnedHours, unit: 'hrs', alwaysShow: true },
 		{ label: 'past plan', value: calculatePlan(assignment, { isFuture: false }), unit: 'hrs' },
 	];
+	const canAssignmentBeDeleted = !assignment.workWeeks.some(
+		(week) => (week.actualHours ?? 0) > 0
+	  );
+	const showArchiveButton = viewer?.id === assignment.assignedUser?.id && !canAssignmentBeDeleted
+	const showDeleteButton = !assignment.assignedUser || viewer?.id === assignment.assignedUser?.id && assignment.canBeDeleted && canAssignmentBeDeleted
+
 
 	return (
 		<td className="font-normal py-2 sm:pl-4 pl-0 pr-0 ml-1 sm:ml-0 w-1/2 sm:w-1/6">
@@ -146,11 +163,19 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment, selectedUser, pro
 						)}
 					</div>
 				)}
-				{(viewer?.id === assignment.assignedUser?.id || !assignment.assignedUser) && <div className="sm:flex hidden items-start justify-center">
+				{showArchiveButton && <div className="sm:flex hidden items-start justify-center">
 					<IconButton
 						className='text-black flex items-start justify-center text-transparentGrey'
 						onClick={handleArchiveItemClick}
 						Icon={ArchiveBoxIcon}
+						iconSize={'h6 w-6'}
+					/>
+				</div>}
+				{showDeleteButton && <div className="sm:flex hidden items-start justify-center">
+					<IconButton
+						className='text-black flex items-start justify-center text-transparentGrey'
+						onClick={handleDeleteAssignmentClick}
+						Icon={XCircleIcon}
 						iconSize={'h6 w-6'}
 					/>
 				</div>}
