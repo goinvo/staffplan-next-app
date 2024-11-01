@@ -170,7 +170,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler }: UserLabelP
 					isAssignmentProposed ? "sm:pl-4" : "sm:pl-2"
 				} font-bold flex items-center justify-start text-contrastBlue text-start`}
 				onClick={() => clickHandler(assignment)}
-			>
+				>
 				{assignment.project.name}
 			</button>
 			{showActionsButton &&<EllipsisDropdownMenu

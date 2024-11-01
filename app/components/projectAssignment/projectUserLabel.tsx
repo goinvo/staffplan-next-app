@@ -130,6 +130,13 @@ export const ProjectUserLabel = ({
 				{isUserTBD &&
 					<AddPersonInline project={project} assignment={assignment} />
 				}
+					<div className="hover:cursor-pointer ml-auto sm:flex hidden">
+						{showActionsButton && <EllipsisDropdownMenu
+				options={assignmentDropMenuOptions}
+				textColor={"text-gray-900"}
+				menuPositioning="relative -top-2.5"
+				/>}
+				</div>
 				<div className="w-48 font-bold flex text-contrastBlue w-full">
 
 					{!isUserTBD && (<div className="py-2 relative overflow-hidden w-[38px] h-[28px]  aspect-w-38 aspect-h-28">
@@ -139,7 +146,7 @@ export const ProjectUserLabel = ({
 							alt="user avatar"
 							fill
 							sizes="(max-width: 640px) 28px, (max-width: 768px) 38px, 38px"
-						/>
+							/>
 					</div>)}
 					<div className="flex flex-col items-center justify-center">
 						{!isUserTBD &&
@@ -148,6 +155,10 @@ export const ProjectUserLabel = ({
 							</button>)}
 					</div>
 				</div>
+				{/* {showActionsButton && <EllipsisDropdownMenu
+				options={assignmentDropMenuOptions}
+				textColor={"text-gray-900"}
+			/>} */}
 			</div>
 			<div className='text-contrastBlue sm:flex hidden flex-col space-y-3 ml-auto px-2 items-end max-w-[60px]'>
 				<button className='pt-1 underline' onClick={onChangeStatusButtonClick}>
@@ -157,10 +168,6 @@ export const ProjectUserLabel = ({
 					Actual
 				</div>
 			</div>
-			{showActionsButton && <EllipsisDropdownMenu
-				options={assignmentDropMenuOptions}
-				textColor={"text-gray-900"}
-			/>}
 		</td >
 	);
 };
