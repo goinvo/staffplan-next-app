@@ -185,10 +185,6 @@ export const ProjectUserLabel = ({
 						)}
 					</div>
 				</div>
-				{/* {showActionsButton && <EllipsisDropdownMenu
-				options={assignmentDropMenuOptions}
-				textColor={"text-gray-900"}
-			/>} */}
 			</div>
 			<div className="text-contrastBlue sm:flex hidden flex-col space-y-3 ml-auto px-2 items-end max-w-[60px]">
 				<button className="pt-1 underline" onClick={onChangeStatusButtonClick}>
