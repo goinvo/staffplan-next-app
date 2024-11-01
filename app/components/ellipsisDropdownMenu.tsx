@@ -11,11 +11,13 @@ import React from "react";
 interface DropdownMenuProps {
 	options: { component: ReactNode; show?: boolean }[];
 	textColor: string;
+	menuPositioning?: string;
 }
 
 const EllipsisDropdownMenu: React.FC<DropdownMenuProps> = ({
 	options,
 	textColor,
+	menuPositioning
 }) => {
 	const dropdownSelectedItemClass = (isActive: boolean) => {
 		return isActive
@@ -25,8 +27,9 @@ const EllipsisDropdownMenu: React.FC<DropdownMenuProps> = ({
 	return (
 		<Menu as="div" className="relative inline-block text-left z-15">
 			<MenuButton
-				className={`flex items-center ${textColor} hover:text-gray-300 p-2 rounded-full ellipsismenu focus:outline-none`}
+				className={`flex items-center text-3xl ${textColor} hover:text-gray-300 p-2 rounded-full ellipsismenu focus:outline-none ${menuPositioning}`}
 			/>
+
 			<Transition
 				as={Fragment}
 				enter="transition ease-out duration-100"
@@ -36,10 +39,10 @@ const EllipsisDropdownMenu: React.FC<DropdownMenuProps> = ({
 				leaveFrom="transform opacity-100 scale-100"
 				leaveTo="transform opacity-0 scale-95"
 			>
-				<MenuItems className="absolute right-0 mt-2 w-48 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-20">
+				<MenuItems className="absolute right-0 mt-2 w-48 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-20" anchor='right start'>
 					<div className="py-1">
-						{options.map((option, index) =>
-							option.show ? (
+						{options.filter(option => option.show).map((option, index) =>
+							 (
 								<MenuItem key={index}>
 									{({ active }) => (
 										<div className={dropdownSelectedItemClass(active)}>
@@ -47,7 +50,7 @@ const EllipsisDropdownMenu: React.FC<DropdownMenuProps> = ({
 										</div>
 									)}
 								</MenuItem>
-							) : null
+							)
 						)}
 					</div>
 				</MenuItems>

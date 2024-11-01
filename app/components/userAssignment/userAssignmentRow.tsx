@@ -99,7 +99,7 @@ export const UserAssignmentRow = ({
 						isTempProject ? (
 							<TempProjectLabel assignment={assignment} /> // Render custom label
 						) : (
-							<UserLabel assignment={assignment} clickHandler={handleProjectChange} />
+							<UserLabel assignment={assignment} selectedUser={selectedUser} clickHandler={handleProjectChange} />
 						)
 					)}
 					<div className='text-contrastBlue sm:flex hidden flex-col space-y-3 ml-auto lg:px-2 items-end max-w-[60px] '>

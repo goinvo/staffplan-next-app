@@ -1,10 +1,9 @@
 "use client";
 import { ReactNode } from "react";
 import { Field, Formik, FormikValues } from "formik";
-
 import ProjectDatepicker from "../projectDatepicker";
 import { useMutation } from "@apollo/client";
-import { AssignmentType, UserType } from "../../typeInterfaces";
+import { AssignmentType, ProjectType, UserType } from "../../typeInterfaces";
 import { UPSERT_ASSIGNMENT } from "../../gqlQueries";
 import { useUserDataContext } from "../../contexts/userDataContext";
 import { useProjectsDataContext } from "../../contexts/projectsDataContext";
@@ -12,13 +11,15 @@ import { useProjectsDataContext } from "../../contexts/projectsDataContext";
 interface EditAssignmentModalProps {
 	user?: UserType;
 	assignment: AssignmentType;
+	project?: ProjectType;
 	closeModal: () => void;
 }
 
-const EditAssignmentModal = ({ closeModal, user, assignment }: EditAssignmentModalProps) => {
-	const { userList, refetchUserList } = useUserDataContext()
-	const { projectList, refetchProjectList } = useProjectsDataContext()
+const EditAssignmentModal = ({ closeModal, assignment,project }: EditAssignmentModalProps) => {
+	const { refetchUserList } = useUserDataContext()
+	const { refetchProjectList } = useProjectsDataContext()
 
+	const projectId = project ? project.id : assignment.project.id
 	const initialValues = {
 		dates: {
 			endsOn: assignment?.endsOn || "",
@@ -26,7 +27,7 @@ const EditAssignmentModal = ({ closeModal, user, assignment }: EditAssignmentMod
 		},
 		hours: assignment.estimatedWeeklyHours ? assignment.estimatedWeeklyHours : 0,
 		assignmentId: assignment?.id,
-        projectId: assignment?.project.id,
+        projectId: projectId,
 		status: assignment.status === "active" ? true : false,
 		userId: assignment.assignedUser.id,
 	};
