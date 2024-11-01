@@ -154,6 +154,11 @@ export interface UserLabelProps {
 	selectedUser: UserType;
 	clickHandler: (assignment: AssignmentType) => void;
 }
+export interface ProjectLabelProps {
+	project?: ProjectType;
+	assignment: AssignmentType;
+	clickHandler: (assignment: AssignmentType) => void;
+}
 export interface ClientLabelProps {
 	assignment: AssignmentType;
 }

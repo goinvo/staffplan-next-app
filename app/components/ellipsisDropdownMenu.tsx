@@ -38,8 +38,8 @@ const EllipsisDropdownMenu: React.FC<DropdownMenuProps> = ({
 			>
 				<MenuItems className="absolute right-0 mt-2 w-48 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-20">
 					<div className="py-1">
-						{options.map((option, index) =>
-							option.show ? (
+						{options.filter(option => option.show).map((option, index) =>
+							 (
 								<MenuItem key={index}>
 									{({ active }) => (
 										<div className={dropdownSelectedItemClass(active)}>
@@ -47,7 +47,7 @@ const EllipsisDropdownMenu: React.FC<DropdownMenuProps> = ({
 										</div>
 									)}
 								</MenuItem>
-							) : null
+							)
 						)}
 					</div>
 				</MenuItems>

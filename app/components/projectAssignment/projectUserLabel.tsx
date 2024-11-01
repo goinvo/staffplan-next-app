@@ -2,7 +2,7 @@ import Image from "next/image";
 import React from "react";
 
 import { DELETE_ASSIGNMENT, UPSERT_ASSIGNMENT } from "../../gqlQueries";
-import { UserLabelProps } from "@/app/typeInterfaces";
+import { ProjectLabelProps } from "@/app/typeInterfaces";
 import { AddPersonInline } from "../addPersonInline";
 import { useMutation } from "@apollo/client";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
@@ -15,7 +15,7 @@ export const ProjectUserLabel = ({
 	project,
 	assignment,
 	clickHandler,
-}: UserLabelProps) => {
+}: ProjectLabelProps) => {
 	const { refetchProjectList } = useProjectsDataContext()
 	const { openModal, closeModal } = useModal();
 	const { viewer } = useGeneralDataContext()
@@ -30,9 +30,9 @@ export const ProjectUserLabel = ({
 	const canAssignmentBeDeleted = !assignment.workWeeks.some(
 		(week) => (week.actualHours ?? 0) > 0
 	  );
+	  const showActionsButton = viewer?.id === assignment.assignedUser?.id || assignment.assignedUser === null;
 	  const showArchiveButton = viewer?.id === assignment.assignedUser?.id && !canAssignmentBeDeleted
-	  const showDeleteButton = !assignment.assignedUser || viewer?.id === assignment.assignedUser?.id && assignment.canBeDeleted && canAssignmentBeDeleted
-
+	  const showDeleteButton = !assignment.assignedUser || viewer?.id === assignment.assignedUser?.id && canAssignmentBeDeleted && assignment.canBeDeleted;
 	const [deleteAssignment] = useMutation(DELETE_ASSIGNMENT, {
 		errorPolicy: "all",
 		onCompleted({ deleteAssignment }) {
@@ -93,21 +93,6 @@ export const ProjectUserLabel = ({
 			variables
 		})
 	}
-	const displayDeleteOrArchive = () => {
-		if (showArchiveButton) {
-			return {
-				component: <button onClick={handleArchiveAssignmentClick} className="text-gray-900 block px-4 py-2 text-sm">Archive</button>,
-				show: true,
-			}
-		}
-		if (showDeleteButton){
-			return {
-				component: <button onClick={handleDeleteAssignmentClick} className="text-gray-900 block px-4 py-2 text-sm">Delete</button>,
-				show: true,
-			}
-		}
-		return {}
-	}
 	const assignmentDropMenuOptions = [
 		{
 			component: (
@@ -129,11 +114,14 @@ export const ProjectUserLabel = ({
 			show: true,
 		},
 		{
-			component: displayDeleteOrArchive().component,
-			show: true,
-		}
+			component: <button onClick={handleArchiveAssignmentClick} className="text-gray-900 block px-4 py-2 text-sm">Archive</button>,
+			show: showArchiveButton && showActionsButton,
+		},
+		{
+			component: <button onClick={handleDeleteAssignmentClick} className="text-gray-900 block px-4 py-2 text-sm">Delete</button>,
+			show: showDeleteButton && showActionsButton,
+		},
 	];
-
 	return (
 		<td className='px-0 pr-0 pt-2 pb-2 font-normal flex align-center sm:w-1/3 w-1/2'>
 			<div
@@ -169,10 +157,10 @@ export const ProjectUserLabel = ({
 					Actual
 				</div>
 			</div>
-			<EllipsisDropdownMenu
+			{showActionsButton && <EllipsisDropdownMenu
 				options={assignmentDropMenuOptions}
 				textColor={"text-gray-900"}
-			/>
+			/>}
 		</td >
 	);
 };

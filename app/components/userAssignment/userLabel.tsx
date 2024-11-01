@@ -12,15 +12,16 @@ import { useMutation } from "@apollo/client";
 export const UserLabel = ({ assignment, selectedUser, clickHandler }: UserLabelProps) => {
 	const { openModal, closeModal } = useModal();
 	const { setSingleUserPage, userList, setUserList } = useUserDataContext()
-	const { showSummaries, viewer } = useGeneralDataContext()
+	const { viewer } = useGeneralDataContext()
 	const { projectList, setProjectList, singleProjectPage, setSingleProjectPage } = useProjectsDataContext();
 
 	const isAssignmentProposed = assignment.status === "proposed";
 	const canAssignmentBeDeleted = !assignment.workWeeks.some(
-		(week) => (week.actualHours ?? 0) > 0
-	  );
+		(week) => (week.actualHours ?? 0) > 0);
+	const showActionsButton = viewer?.id === assignment.assignedUser?.id || assignment.assignedUser === null;
 	const showArchiveButton = viewer?.id === assignment.assignedUser?.id && !canAssignmentBeDeleted
-	const showDeleteButton = !assignment.assignedUser || viewer?.id === assignment.assignedUser?.id && assignment.canBeDeleted && canAssignmentBeDeleted
+	const showDeleteButton = !assignment.assignedUser || viewer?.id === assignment.assignedUser?.id && canAssignmentBeDeleted && assignment.canBeDeleted;
+
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
 		errorPolicy: "all",
 		onCompleted({ upsertAssignment }) {
@@ -133,26 +134,11 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler }: UserLabelP
 		
 	};
 	}
-	const displayDeleteOrArchive = () => {
-		if (showArchiveButton) {
-			return {
-				component: <button onClick={handleArchiveAssignmentClick} className="text-gray-900 block px-4 py-2 text-sm">Archive</button>,
-				show: true,
-			}
-		}
-		if (showDeleteButton){
-			return {
-				component: <button onClick={handleDeleteAssignmentClick} className="text-gray-900 block px-4 py-2 text-sm">Delete</button>,
-				show: true,
-			}
-		}
-		return {}
-	}
 	const assignmentDropMenuOptions = [
 		{
 			component: (
 				<button
-					className="text-gray-900 block px-4 py-2 text-sm"
+					className="block px-4 py-2 text-sm"
 					onClick={() =>
 						openModal(
 							<EditAssignmentModal
@@ -168,9 +154,14 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler }: UserLabelP
 			show: true,
 		},
 		{
-			component: displayDeleteOrArchive().component,
-			show: true,
-		}
+			component: <button onClick={handleArchiveAssignmentClick} className="block px-4 py-2 text-sm">Archive</button>,
+			show: showArchiveButton && showActionsButton,
+		},
+		{
+			component: <button onClick={handleDeleteAssignmentClick} className="block px-4 py-2 text-sm">Delete</button>,
+			show: showDeleteButton && showActionsButton,
+		},
+
 	];
 	return (
 		<div className="sm:ml-auto ml-0 sm:w-24 flex">
@@ -182,10 +173,10 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler }: UserLabelP
 			>
 				{assignment.project.name}
 			</button>
-			<EllipsisDropdownMenu
+			{showActionsButton &&<EllipsisDropdownMenu
 				options={assignmentDropMenuOptions}
 				textColor={"text-gray-900"}
-			/>
+			/>}
 		</div>
 	);
 };
