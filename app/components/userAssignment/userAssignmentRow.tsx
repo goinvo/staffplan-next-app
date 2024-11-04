@@ -14,7 +14,7 @@ import { AssignmentType, MonthsDataType, UserType } from "@/app/typeInterfaces";
 import { useMutation } from "@apollo/client";
 import { UPSERT_ASSIGNMENT } from "../../gqlQueries";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
-import UndoButton from "./undoButton";
+import UndoRow from "../undoRow";
 import { UNDO_ARCHIVED_OR_DELETED_PROJECT } from "../constants/undoModifyStrings";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
 
@@ -109,7 +109,7 @@ export const UserAssignmentRow = ({
 	if (showUndoRow && (isModifiedAssignment(assignment.id))) {
 		return (
 			<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.id}`}>
-				<UndoButton onClick={handleUndoModifyAssignment} text={UNDO_ARCHIVED_OR_DELETED_PROJECT} />
+				<UndoRow onClick={handleUndoModifyAssignment} text={UNDO_ARCHIVED_OR_DELETED_PROJECT} />
 			</tr>
 		)
 	}
