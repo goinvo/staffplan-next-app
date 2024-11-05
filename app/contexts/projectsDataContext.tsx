@@ -149,7 +149,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
     const timerId = enqueueTask(async () => {
       await finalAction();
       handleFinalDelete(updatedProject);
-    }, 5000);
+    }, 20000);
 
     setProjectsWithUndoActions((prev) => [
       ...prev,

@@ -101,7 +101,7 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
         const timerId = enqueueTask(async () => {
             await finalAction();
             handleFinalDelete(updatedAssignment);
-        }, 5000);
+        }, 20000);
 
         setAssignmentsWithUndoActions((prev) => [
             ...prev,

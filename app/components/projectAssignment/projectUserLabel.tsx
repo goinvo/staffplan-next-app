@@ -158,21 +158,23 @@ export const ProjectUserLabel = ({
 	);
 
 	const handleArchiveAssignmentClick = async () => {
-		const variables = {
-			id: assignment.id,
-			projectId: project?.id,
-			userId: assignment.assignedUser.id,
-			status: "archived",
-		};
-		try {
-			const response = await upsertAssignment({ variables });
-			if (response && response.data) {
-				const updatedAssignment = response.data.upsertAssignment
-				const undoAction = (undoableAssignments: UndoableModifiedAssignment[]) => { undoArchivedStatus(undoableAssignments) }
-				enqueueTimer(assignment, updatedAssignment, () => updateContext(updatedAssignment), undoAction);
+		if (assignment.status !== "archived") {
+			const variables = {
+				id: assignment.id,
+				projectId: project?.id,
+				userId: assignment.assignedUser.id,
+				status: "archived",
+			};
+			try {
+				const response = await upsertAssignment({ variables });
+				if (response && response.data) {
+					const updatedAssignment = response.data.upsertAssignment
+					const undoAction = (undoableAssignments: UndoableModifiedAssignment[]) => { undoArchivedStatus(undoableAssignments) }
+					enqueueTimer(assignment, updatedAssignment, () => updateContext(updatedAssignment), undoAction);
+				}
+			} catch (error) {
+				console.error('Error updating assignment:', error);
 			}
-		} catch (error) {
-			console.error('Error updating assignment:', error);
 		}
 	};
 	const assignmentDropMenuOptions = [
