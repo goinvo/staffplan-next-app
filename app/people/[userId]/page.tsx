@@ -45,7 +45,7 @@ const UserPage: React.FC = () => {
 							const isFirstClient = rowIndex === allAssignments.findIndex((a) => a.project.client.id === assignment.project.client.id);
 							return (
 								<UserAssignmentRow
-									key={rowIndex}
+									key={assignment.id}
 									assignment={assignment}
 									isFirstMonth={true}
 									isLastMonth={true}

@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, RefObject } from "react";
 
 export interface AllUserLabelProps {
 	user: UserType;
@@ -153,6 +153,7 @@ export interface UserLabelProps {
 	assignment: AssignmentType;
 	selectedUser: UserType;
 	clickHandler: (assignment: AssignmentType) => void;
+	undoRowRef: any;
 }
 export interface ProjectLabelProps {
 	project?: ProjectType;
