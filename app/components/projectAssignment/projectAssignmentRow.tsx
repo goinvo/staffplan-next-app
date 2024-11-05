@@ -1,13 +1,18 @@
-import React from "react";
+'use client'
+
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DateTime } from "luxon";
 
 import { AssignmentType, MonthsDataType, ProjectType } from "@/app/typeInterfaces";
 import UserSummary from "../userSummary";
+import UndoRow from "../undoRow";
 import { ProjectUserLabel } from "./projectUserLabel";
 import { WorkWeekInput } from "./workWeekInput";
 import { currentWeek, currentYear } from "../scrollingCalendar/helpers";
-
+import { useUserDataContext } from "@/app/contexts/userDataContext";
+import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
+import { UNDO_ARCHIVED_OR_DELETED_PERSON } from "../constants/undoModifyStrings";
 
 interface ProjectAssignmentRowProps {
 	project: ProjectType;
@@ -32,7 +37,9 @@ export const ProjectAssignmentRow = ({
 	totalRows
 }: ProjectAssignmentRowProps) => {
 	const router = useRouter();
-
+	const [showUndoRow, setShowUndoRow] = useState<boolean>(false);
+	const rowRef = useRef<HTMLTableRowElement>(null);
+	const undoRowRef = useRef<HTMLTableRowElement>(null);
 	const isUserTBD = assignment.assignedUser === null;
 	const handleUserChange = (assignment: AssignmentType) => {
 		const user = assignment.assignedUser.id?.toString();
@@ -40,6 +47,10 @@ export const ProjectAssignmentRow = ({
 			router.push("/people/" + encodeURIComponent(user?.toString() || ""));
 		}
 	};
+	const { assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
+	const { animateRow } = useFadeInOutRow({ rowRef, setShowUndoRow })
+	const isModifiedAssignment = (assignmentId: number) =>
+		assignmentsWithUndoActions.some((item) => item.assignment.id === assignmentId);
 	const isWeekWithinProject = (weekNumber: number, year: number) => {
 		const weekDateFormatted = DateTime.fromObject({ weekNumber, weekYear: year, weekday: 1 }).toJSDate();
 		if (project.startsOn && !project.endsOn) {
@@ -53,9 +64,29 @@ export const ProjectAssignmentRow = ({
 		}
 		return true;
 	};
+	const handleUndoModifyAssignment = async () => {
+		undoModifyAssignment(assignment.id)
+		setShowUndoRow(false)
+		setTimeout(() => animateRow(false), 10);
+	}
+
+	useEffect(() => {
+		if (isModifiedAssignment(assignment.id)) {
+			animateRow(true);
+		}
+	}, [assignmentsWithUndoActions, assignment.id]);
+
+
+	if (showUndoRow && (isModifiedAssignment(assignment.id))) {
+		return (
+			<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.id}`}>
+				<UndoRow onClick={handleUndoModifyAssignment} text={UNDO_ARCHIVED_OR_DELETED_PERSON} />
+			</tr>
+		)
+	}
 
 	return (
-		<tr className={`${isUserTBD ? 'sm:flex hidden' : 'flex'} border-b border-gray-300 hover:bg-hoverGrey min-h-[100px] ${assignment.status === 'proposed' ? 'bg-diagonal-stripes' :
+		<tr ref={rowRef} key={`assignment-${assignment.id}`} className={`${isUserTBD ? 'sm:flex hidden' : 'flex'} border-b border-gray-300 hover:bg-hoverGrey pb-5 ${assignment.status === 'proposed' ? 'bg-diagonal-stripes' :
 			''
 			} pl-5`}>
 			{isFirstMonth && (
@@ -63,6 +94,7 @@ export const ProjectAssignmentRow = ({
 					project={project}
 					assignment={assignment}
 					clickHandler={handleUserChange}
+					undoRowRef={undoRowRef}
 				/>
 			)}
 			{months?.map((month: MonthsDataType, monthIndex) => {

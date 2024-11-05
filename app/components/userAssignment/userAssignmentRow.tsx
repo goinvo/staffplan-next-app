@@ -1,6 +1,6 @@
 'use client'
 
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
 
@@ -10,10 +10,13 @@ import { WorkWeekInput } from "./workWeekInput";
 import { ClientLabel } from "./clientLabel";
 import { TempProjectLabel } from "./tempProjectLabel";
 import { currentWeek, currentYear } from "../scrollingCalendar/helpers";
-import { AssignmentType, ClientType, MonthsDataType, UserType } from "@/app/typeInterfaces";
+import { AssignmentType, MonthsDataType, UserType } from "@/app/typeInterfaces";
 import { useMutation } from "@apollo/client";
 import { UPSERT_ASSIGNMENT } from "../../gqlQueries";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
+import UndoRow from "../undoRow";
+import { UNDO_ARCHIVED_OR_DELETED_PROJECT } from "../constants/undoModifyStrings";
+import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
 
 interface UserAssignmentRowProps {
 	assignment: AssignmentType;
@@ -39,7 +42,14 @@ export const UserAssignmentRow = ({
 	totalRows
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
-	const { refetchUserList, viewsFilterSingleUser } = useUserDataContext()
+	const { refetchUserList, viewsFilterSingleUser, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
+	const [showUndoRow, setShowUndoRow] = useState<boolean>(false);
+	const rowRef = useRef<HTMLTableRowElement>(null);
+	const undoRowRef = useRef<HTMLTableRowElement>(null);
+	const isModifiedAssignment = (assignmentId: number) =>
+		assignmentsWithUndoActions.some((item) => item.assignment.id === assignmentId);
+
+	const { animateRow } = useFadeInOutRow({ rowRef, setShowUndoRow });
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
 		errorPolicy: "all",
 		onCompleted() {
@@ -64,6 +74,11 @@ export const UserAssignmentRow = ({
 		return true;
 	};
 
+	const handleUndoModifyAssignment = async () => {
+		undoModifyAssignment(assignment.id)
+		setShowUndoRow(false)
+		setTimeout(() => animateRow(false), 10);
+	}
 
 	const onChangeStatusButtonClick = async () => {
 		const variables = {
@@ -72,17 +87,41 @@ export const UserAssignmentRow = ({
 			userId: selectedUser.id,
 			status: assignment.status === "active" ? "proposed" : "active",
 		};
+
 		await upsertAssignment({
 			variables
 		})
+
 	}
 	const isAssignmentProposed = assignment.status === 'proposed'
 	const isTempProject = assignment.project.isTempProject
+
+	useEffect(() => {
+		const runAnimation = async () => {
+			if (isModifiedAssignment(assignment.id)) {
+				await animateRow(true);
+			}
+		};
+
+		runAnimation();
+	}, [assignmentsWithUndoActions, assignment.id])
+
+	if (showUndoRow && (isModifiedAssignment(assignment.id))) {
+		return (
+			<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.id}`}>
+				<UndoRow onClick={handleUndoModifyAssignment} text={UNDO_ARCHIVED_OR_DELETED_PROJECT} />
+			</tr>
+		)
+	}
+
+
+
 	return (
 		<tr
-			className={`flex sm:justify-normal justify-between ${isFirstClient ? '' : 'border-b border-gray-300'} ${isAssignmentProposed ? 'bg-diagonal-stripes' :
-				''
-				} hover:bg-hoverGrey min-h-[100px] pl-5`}>
+			ref={rowRef}
+			key={`assignment-${assignment.id}`}
+			className={`flex sm:justify-normal justify-between ${isFirstClient ? '' : 'border-b border-gray-300'} bg-white-300 ${isAssignmentProposed ? 'bg-diagonal-stripes' : ''} hover:bg-hoverGrey pl-5`}
+		>
 			<td className={`px-0 pt-1 pb-2 font-normal align-top ${!isFirstClient ? 'sm:block flex items-center' : ''} w-1/2 sm:w-1/3`}>
 				<div
 					className='flex sm:flex-row flex-col justify-between items-start md:space-x-2'
@@ -99,7 +138,7 @@ export const UserAssignmentRow = ({
 						isTempProject ? (
 							<TempProjectLabel assignment={assignment} /> // Render custom label
 						) : (
-							<UserLabel assignment={assignment} selectedUser={selectedUser} clickHandler={handleProjectChange} />
+							<UserLabel assignment={assignment} selectedUser={selectedUser} clickHandler={handleProjectChange} undoRowRef={undoRowRef} />
 						)
 					)}
 					<div className='text-contrastBlue sm:flex hidden flex-col space-y-3 ml-auto lg:px-2 items-end max-w-[60px] '>

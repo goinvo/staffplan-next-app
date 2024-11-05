@@ -105,7 +105,7 @@ const ProjectPage: React.FC = () => {
 							return (
 								<ProjectAssignmentRow
 									project={singleProjectPage}
-									key={`${assignment.id}-${rowIndex}`}
+									key={`${assignment.id}`}
 									assignment={assignment}
 									monthData={{ monthLabel: "", year: 0 }}
 									isFirstMonth={true}

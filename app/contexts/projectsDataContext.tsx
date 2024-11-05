@@ -1,11 +1,12 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from "react";
 import { useApolloClient, useQuery } from "@apollo/client";
 
-import { ProjectType, AssignmentType } from "../typeInterfaces";
+import { ProjectType, AssignmentType, UndoableModifiedProject } from "../typeInterfaces";
 import { GET_ALL_PROJECTS_DATA } from "../gqlQueries";
 import { sortProjectList, sortSingleProject } from "../helperFunctions";
 import { useGeneralDataContext } from "./generalContext";
+import { useTaskQueue } from "../hooks/useTaskQueue";
 
 export interface ProjectsDataContextType {
   projectList: ProjectType[] | [];
@@ -14,12 +15,15 @@ export interface ProjectsDataContextType {
   filteredProjectList: ProjectType[] | [];
   sortedSingleProjectAssignments: AssignmentType[];
   viewsFilterSingleProject: string;
+  projectsWithUndoActions: UndoableModifiedProject[]
+  undoModifyProject: (projectId: number) => void;
   setViewsFilterSingleProject: React.Dispatch<React.SetStateAction<string>>;
   setProjectList: React.Dispatch<React.SetStateAction<ProjectType[] | []>>;
   setFilteredProjectList: React.Dispatch<React.SetStateAction<ProjectType[] | []>>;
   setViewsFilterProject: React.Dispatch<React.SetStateAction<string>>;
   setSingleProjectPage: React.Dispatch<React.SetStateAction<ProjectType>>;
   refetchProjectList: () => void;
+  enqueueTimer: (project: ProjectType, updatedProject: ProjectType, updateFunc: () => Promise<void>, undoAction: (modifiedAssignments: UndoableModifiedProject[]) => void) => void;
 }
 
 const ProjectsDataContext = createContext<ProjectsDataContextType | undefined>(
@@ -46,8 +50,9 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
   const [singleProjectPage, setSingleProjectPage] = useState<any>(null);
   const [viewsFilterProject, setViewsFilterProject] = useState<string>("abcProjectName")
   const [viewsFilterSingleProject, setViewsFilterSingleProject] = useState<string>("abcUserName")
-
+  const [projectsWithUndoActions, setProjectsWithUndoActions] = useState<UndoableModifiedProject[]>([]);
   const { showArchivedProjects, showArchivedAssignments } = useGeneralDataContext()
+  const { enqueueTask } = useTaskQueue();
   const {
     loading: projectDataLoading,
     error: projectDataError,
@@ -126,6 +131,32 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
       });
   };
 
+  const handleFinalDelete = useCallback((updatedProject: ProjectType) => {
+    setProjectsWithUndoActions((prev) => prev.filter(({ project: p }) => p.id !== updatedProject.id));
+  }, []);
+
+  const undoModifyProject = useCallback(async (projectId: number) => {
+    const restored = projectsWithUndoActions.find(({ project }) => project.id === projectId);
+    if (!restored) return;
+    if (restored?.undoAction) {
+      restored.undoAction(projectsWithUndoActions)
+    }
+    clearTimeout(restored.timerId);
+    setProjectsWithUndoActions((prev) => prev.filter(({ project }) => project.id !== projectId));
+  }, [projectsWithUndoActions]);
+
+  const enqueueTimer = (project: ProjectType, updatedProject: ProjectType, finalAction: () => Promise<void>, undoAction: (modifiedAssignments: UndoableModifiedProject[]) => void) => {
+    const timerId = enqueueTask(async () => {
+      await finalAction();
+      handleFinalDelete(updatedProject);
+    }, 20000);
+
+    setProjectsWithUndoActions((prev) => [
+      ...prev,
+      { project, timerId, undoAction, actionType: "update" }
+    ]);
+  };
+
   return (
     <ProjectsDataContext.Provider
       value={{
@@ -135,6 +166,9 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
         filteredProjectList,
         sortedSingleProjectAssignments,
         viewsFilterSingleProject,
+        projectsWithUndoActions,
+        undoModifyProject,
+        enqueueTimer,
         setViewsFilterSingleProject,
         setFilteredProjectList,
         setProjectList,

@@ -1,34 +1,34 @@
 "use client";
-import { BaseSyntheticEvent, Fragment, useState } from "react";
-import {  Menu,MenuItem, MenuButton, MenuItems, Transition } from "@headlessui/react";
-import React from "react";
+import React, { BaseSyntheticEvent, Fragment, useState, RefObject, useCallback } from "react";
+import { Menu, MenuItem, MenuButton, MenuItems, Transition } from "@headlessui/react";
+
 import { UPSERT_PROJECT } from "../gqlQueries";
-import { useMutation } from "@apollo/client";
+import { useApolloClient, useMutation } from "@apollo/client";
 import { useRouter } from "next/navigation";
 import { convertProjectToCSV } from "../helperFunctions";
 import { useModal } from "../contexts/modalContext";
 import AddAssignmentModal from "./addAssignmentModal";
 import AddProjectModal from "./addProjectModal";
-import { ProjectType } from "../typeInterfaces";
+import { ProjectType, UndoableModifiedProject } from "../typeInterfaces";
+import { useFadeInOutRow } from "../hooks/useFadeInOutRow";
+import { useProjectsDataContext } from "../contexts/projectsDataContext";
 interface EllipsisProjectMenuProps {
 	project: ProjectType
+	undoRowRef: RefObject<HTMLTableRowElement>;
 }
 
-export default function EllipsisProjectMenu({ project }: EllipsisProjectMenuProps) {
+export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisProjectMenuProps) {
 	const { openModal, closeModal } = useModal();
+	const client = useApolloClient()
+	const { animateRow } = useFadeInOutRow({ rowRef: undoRowRef, minHeight: 0, heightStep: 2 })
+	const { enqueueTimer } = useProjectsDataContext()
+
 	const router = useRouter();
 	const {
 		client: { id: clientId },
 		name,
-		endsOn,
 		id,
-		startsOn,
 		status,
-		cost,
-		hours,
-		fte,
-		rateType,
-		hourlyRate
 	} = project;
 	const [confirmed, setConfirmed] = useState(
 		status === "confirmed" ? true : false
@@ -41,11 +41,11 @@ export default function EllipsisProjectMenu({ project }: EllipsisProjectMenuProp
 	const [
 		upsertProject,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
-	] = useMutation(UPSERT_PROJECT, { errorPolicy: "all" });
+	] = useMutation(UPSERT_PROJECT, { errorPolicy: "all", fetchPolicy: 'no-cache' });
 	const handleProjectChange = () => {
 		router.push(`projects/${id}`);
 	};
-	const onSubmitUpsert = (e: BaseSyntheticEvent) => {
+	const onSubmitUpsert = async (e: BaseSyntheticEvent) => {
 		const statusCheck = () => {
 			if (e.target.checked === true) {
 				return "confirmed";
@@ -65,14 +65,18 @@ export default function EllipsisProjectMenu({ project }: EllipsisProjectMenuProp
 			clientId: clientId,
 			name: name,
 			status: statusCheck(),
-			startsOn: startsOn,
-			cost: cost,
-			fte: fte,
-			hours: hours,
 		};
-		upsertProject({
-			variables: endsOn ? { ...variables, endsOn: endsOn } : variables,
-		});
+		const { data } = await upsertProject({ variables });
+		if (data) {
+			client.cache.modify({
+				id: client.cache.identify({ __typename: "Project", id: id }),
+				fields: {
+					status() {
+						return data.upsertProject.status;
+					},
+				},
+			});
+		}
 	};
 
 	const downloadCSV = () => {
@@ -86,7 +90,73 @@ export default function EllipsisProjectMenu({ project }: EllipsisProjectMenuProp
 		link.click();
 		document.body.removeChild(link);
 	};
+	const undoArchivedStatus = useCallback(
+		async (projectsWithUndoActions: UndoableModifiedProject[]) => {
+			const projectBeforeModified = projectsWithUndoActions.find((p: UndoableModifiedProject) => p.project.id === project.id)
+			const variables = {
+				id: project?.id,
+				name: project?.name,
+				clientId: project?.client?.id,
+				status: projectBeforeModified?.project.status || 'confirmed'
+			};
+			try {
+				await upsertProject({ variables });
+			} catch (error) {
+				console.error('Error updating project:', error);
+			}
+		},
+		[]
+	);
+	const updateCache = async () => {
+		await animateRow(true)
+		client.cache.modify({
+			id: client.cache.identify({ __typename: "Project", id: project.id }),
+			fields: {
+				status() {
+					return 'archived';
+				},
+			},
+		});
+	}
+	const handleArchiveItemClick = async (projectStatus: string) => {
+		if (projectStatus === 'archived') {
+			const variables = {
+				id: project.id,
+				name: project.name,
+				clientId: project.client.id,
+				status: "unconfirmed"
+			};
+			const { data } = await upsertProject({ variables });
+			if (data) {
+				client.cache.modify({
+					id: client.cache.identify({ __typename: "Project", id: id }),
+					fields: {
+						status() {
+							return data.upsertProject.status;
+						},
+					},
+				});
+			}
+			return;
+		}
+		const variables = {
+			id: project.id,
+			name: project.name,
+			clientId: project.client.id,
+			status: 'archived'
+		};
+		try {
+			const response = await upsertProject({ variables });
+			if (response && response.data) {
+				const updatedProject = response.data.upsertProject
+				const undoAction = (assignment: any) => { undoArchivedStatus(assignment) }
+				enqueueTimer(project, updatedProject, updateCache, undoAction);
+			}
+		} catch (error) {
+			console.error('Error updating project:', error);
+		}
 
+	}
 	return (
 		<Menu
 			as="div"
@@ -156,15 +226,14 @@ export default function EllipsisProjectMenu({ project }: EllipsisProjectMenuProp
 
 						</MenuItem>
 						<MenuItem>
-						<button className="px-4 py-2 text-sm hover:text-accentgreen border-none" onClick={downloadCSV}>
-							Export CSV
-						</button>
+							<button className="px-4 py-2 text-sm hover:text-accentgreen border-none" onClick={downloadCSV}>
+								Export CSV
+							</button>
 						</MenuItem>
 					</div>
-						
 					<div
 						id={`${project.status}`}
-						onClick={onSubmitUpsert}
+						onClick={() => handleArchiveItemClick(project.status)}
 						className={
 							"text-orange-500 block px-4 py-2 text-sm hover:text-accentgreen hover:border-b-2 hover:cursor-pointer hover:border-gray-200"
 						}

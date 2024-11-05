@@ -12,7 +12,7 @@ interface ClientLabelProps {
 	selectedUser: UserType | null;
 }
 
-export const ClientLabel = ({ assignment, selectedUser }: ClientLabelProps) => {
+export const ClientLabel = ({ assignment }: ClientLabelProps) => {
 	const { singleUserPage, setSingleUserPage, viewsFilterSingleUser } = useUserDataContext()
 
 	const activeTempProject = singleUserPage?.assignments.some(a => {

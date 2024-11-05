@@ -1,8 +1,9 @@
+'use client'
 import Image from "next/image";
-import React from "react";
+import React, { useCallback } from "react";
 
 import { DELETE_ASSIGNMENT, UPSERT_ASSIGNMENT } from "../../gqlQueries";
-import { ProjectLabelProps } from "@/app/typeInterfaces";
+import { ProjectLabelProps, AssignmentType, UndoableModifiedAssignment } from "@/app/typeInterfaces";
 import { AddPersonInline } from "../addPersonInline";
 import { useMutation } from "@apollo/client";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
@@ -10,13 +11,16 @@ import EllipsisDropdownMenu from "../ellipsisDropdownMenu";
 import EditAssignmentModal from "../userAssignment/editAssignmentModal";
 import { useModal } from "@/app/contexts/modalContext";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
+import { useUserDataContext } from "@/app/contexts/userDataContext";
+import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
 
 export const ProjectUserLabel = ({
 	project,
 	assignment,
 	clickHandler,
+	undoRowRef
 }: ProjectLabelProps) => {
-	const { refetchProjectList } = useProjectsDataContext();
+	const { setUserList, enqueueTimer } = useUserDataContext()
 	const { openModal, closeModal } = useModal();
 	const { viewer } = useGeneralDataContext();
 	const isUserTBD = assignment.assignedUser === null;
@@ -24,14 +28,48 @@ export const ProjectUserLabel = ({
 		projectList,
 		setProjectList,
 		singleProjectPage,
+		refetchProjectList,
 		setSingleProjectPage,
 	} = useProjectsDataContext();
+	const { animateRow } = useFadeInOutRow({ rowRef: undoRowRef, minHeight: 0, heightStep: 2 })
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
-		errorPolicy: "all",
-		onCompleted() {
-			refetchProjectList();
-		},
+		errorPolicy: "all"
 	});
+
+	const updateContext = async (upsertAssignment: AssignmentType) => {
+		await animateRow(true)
+		setUserList((prevUserList) => {
+			return prevUserList?.map((user) => {
+				if (user.id === upsertAssignment.assignedUser.id) {
+					const updatedUserAssignments = user.assignments.map((assignment) =>
+						assignment.id === upsertAssignment.id ? upsertAssignment : assignment
+					);
+					return {
+						...user,
+						assignments: updatedUserAssignments,
+					};
+
+				}
+
+				return user;
+			});
+		});
+
+		setProjectList((prevProjectList) => {
+			return prevProjectList?.map((project) => {
+				if (project.id === upsertAssignment?.project?.id) {
+					return {
+						...project,
+						assignments: project.assignments?.map((assignment) =>
+							assignment.id === upsertAssignment.id ? upsertAssignment : assignment
+						),
+					};
+				}
+				return project;
+			});
+		});
+
+	};
 	const canAssignmentBeDeleted = !assignment.workWeeks.some(
 		(week) => (week.actualHours ?? 0) > 0
 	);
@@ -91,20 +129,53 @@ export const ProjectUserLabel = ({
 			userId: assignment.assignedUser.id,
 			status: assignment.status === "active" ? "proposed" : "active",
 		};
-		await upsertAssignment({
+
+		const { errors } = await upsertAssignment({
 			variables,
 		});
+
+		if (!errors) {
+			refetchProjectList();
+		}
 	};
+	const undoArchivedStatus = useCallback(
+		async (assignmentsWithUndoActions: UndoableModifiedAssignment[]) => {
+			const projectId = project?.id || assignment?.project?.id
+			const assignmentBeforeModified = assignmentsWithUndoActions.find((el: UndoableModifiedAssignment) => el.assignment.id === assignment.id)
+			const variables = {
+				id: assignment.id,
+				projectId: projectId,
+				userId: assignment.assignedUser.id,
+				status: assignmentBeforeModified?.assignment?.status || 'active'
+			};
+			try {
+				await upsertAssignment({ variables });
+			} catch (error) {
+				console.error('Error updating assignment:', error);
+			}
+		},
+		[]
+	);
+
 	const handleArchiveAssignmentClick = async () => {
-		const variables = {
-			id: assignment.id,
-			projectId: project?.id,
-			userId: assignment.assignedUser.id,
-			status: "archived",
-		};
-		await upsertAssignment({
-			variables,
-		});
+		if (assignment.status !== "archived") {
+			const variables = {
+				id: assignment.id,
+				projectId: project?.id,
+				userId: assignment.assignedUser.id,
+				status: "archived",
+			};
+			try {
+				const response = await upsertAssignment({ variables });
+				if (response && response.data) {
+					const updatedAssignment = response.data.upsertAssignment
+					const undoAction = (undoableAssignments: UndoableModifiedAssignment[]) => { undoArchivedStatus(undoableAssignments) }
+					enqueueTimer(assignment, updatedAssignment, () => updateContext(updatedAssignment), undoAction);
+				}
+			} catch (error) {
+				console.error('Error updating assignment:', error);
+			}
+		}
 	};
 	const assignmentDropMenuOptions = [
 		{

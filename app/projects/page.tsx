@@ -23,7 +23,7 @@ const ProjectsView: React.FC = () => {
 					{filteredProjectList?.map((project: ProjectType, index: number) => {
 						return (
 							<AllProjectRow
-								key={index}
+								key={project.id}
 								project={project}
 								monthData={{ monthLabel: "", year: 0 }}
 								isFirstMonth={true}

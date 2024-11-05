@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, RefObject } from "react";
 
 export interface AllUserLabelProps {
 	user: UserType;
@@ -22,6 +22,7 @@ export interface AllUserAccumulatorProps {
 export interface AllProjectLabelProps {
 	project: ProjectType;
 	clickHandler: (project: ProjectType) => void;
+	undoRowRef: RefObject<HTMLTableRowElement>;
 }
 
 export interface AllProjectRowProps {
@@ -153,11 +154,13 @@ export interface UserLabelProps {
 	assignment: AssignmentType;
 	selectedUser: UserType;
 	clickHandler: (assignment: AssignmentType) => void;
+	undoRowRef: RefObject<HTMLTableRowElement>;
 }
 export interface ProjectLabelProps {
 	project?: ProjectType;
 	assignment: AssignmentType;
 	clickHandler: (assignment: AssignmentType) => void;
+	undoRowRef: RefObject<HTMLTableRowElement>;
 }
 export interface ClientLabelProps {
 	assignment: AssignmentType;
@@ -253,3 +256,16 @@ export interface MonthsDataType {
 	}[]
 }
 
+export interface UndoableModifiedAssignment {
+	assignment: AssignmentType;
+	timerId: NodeJS.Timeout;
+	undoAction: (assignments: UndoableModifiedAssignment[]) => void;
+	actionType: string;
+}
+
+export interface UndoableModifiedProject {
+	project: ProjectType;
+	timerId: NodeJS.Timeout;
+	undoAction: (projects: UndoableModifiedProject[]) => void;
+	actionType: string;
+}
