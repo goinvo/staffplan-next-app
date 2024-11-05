@@ -159,6 +159,7 @@ export interface ProjectLabelProps {
 	project?: ProjectType;
 	assignment: AssignmentType;
 	clickHandler: (assignment: AssignmentType) => void;
+	undoRowRef: any;
 }
 export interface ClientLabelProps {
 	assignment: AssignmentType;
