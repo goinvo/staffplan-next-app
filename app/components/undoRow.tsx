@@ -1,11 +1,11 @@
 import React from "react";
 
-interface UndoButtonProps {
+interface UndoRowProps {
     text: string;
     onClick: () => void;
 }
 
-const UndoButton: React.FC<UndoButtonProps> = ({ onClick, text }) => {
+const UndoRow: React.FC<UndoRowProps> = ({ onClick, text }) => {
 
     return (
         <td
@@ -17,4 +17,4 @@ const UndoButton: React.FC<UndoButtonProps> = ({ onClick, text }) => {
     );
 };
 
-export default UndoButton;
+export default UndoRow;

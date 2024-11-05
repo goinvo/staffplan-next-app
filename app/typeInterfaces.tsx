@@ -22,6 +22,7 @@ export interface AllUserAccumulatorProps {
 export interface AllProjectLabelProps {
 	project: ProjectType;
 	clickHandler: (project: ProjectType) => void;
+	undoRowRef: RefObject<HTMLTableRowElement>;
 }
 
 export interface AllProjectRowProps {
@@ -153,13 +154,13 @@ export interface UserLabelProps {
 	assignment: AssignmentType;
 	selectedUser: UserType;
 	clickHandler: (assignment: AssignmentType) => void;
-	undoRowRef: any;
+	undoRowRef: RefObject<HTMLTableRowElement>;
 }
 export interface ProjectLabelProps {
 	project?: ProjectType;
 	assignment: AssignmentType;
 	clickHandler: (assignment: AssignmentType) => void;
-	undoRowRef: any;
+	undoRowRef: RefObject<HTMLTableRowElement>;
 }
 export interface ClientLabelProps {
 	assignment: AssignmentType;

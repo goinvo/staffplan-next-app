@@ -7,6 +7,7 @@ import IconButton from "../iconButton";
 export const AllProjectLabel = ({
 	project,
 	clickHandler,
+	undoRowRef,
 }: AllProjectLabelProps) => {
 	return (
 		<div className="flex justify-between items-start sm:flex-row flex-col pt-2">
@@ -22,7 +23,7 @@ export const AllProjectLabel = ({
 				{project.name}
 			</button>
 			<div className="sm:block hidden">
-				<EllipsisProjectMenu project={project} />
+				<EllipsisProjectMenu undoRowRef={undoRowRef} project={project} />
 			</div>
 		</div>
 	);
