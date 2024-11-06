@@ -259,13 +259,15 @@ export interface MonthsDataType {
 export interface UndoableModifiedAssignment {
 	assignment: AssignmentType;
 	timerId: NodeJS.Timeout;
-	undoAction: (assignments: UndoableModifiedAssignment[]) => void;
-	actionType: string;
+	undoAction?: (assignments: UndoableModifiedAssignment[]) => void;
+	actionType?: string;
+	finalApiCall?: () => void;
 }
 
 export interface UndoableModifiedProject {
 	project: ProjectType;
 	timerId: NodeJS.Timeout;
-	undoAction: (projects: UndoableModifiedProject[]) => void;
-	actionType: string;
+	undoAction?: (projects: UndoableModifiedProject[]) => void;
+	actionType?: string;
+	finalApiCall?: () => void;
 }

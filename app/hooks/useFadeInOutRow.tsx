@@ -8,9 +8,10 @@ interface FadeInOutRowOptions {
     minHeight?: number;
     maxHeight?: number;
     heightStep?: number;
+    opacityStep?: number;
 }
 
-export const useFadeInOutRow = ({ rowRef, setShowUndoRow, heightStep = 4, minHeight = 26, maxHeight = 100 }: FadeInOutRowOptions) => {
+export const useFadeInOutRow = ({ rowRef, setShowUndoRow, opacityStep = 0.05, heightStep = 4, minHeight = 26, maxHeight = 100 }: FadeInOutRowOptions) => {
     const animationFrameId = useRef<number | null>(null);
     const isAnimating = useRef(false);
 
@@ -32,7 +33,7 @@ export const useFadeInOutRow = ({ rowRef, setShowUndoRow, heightStep = 4, minHei
 
             const step = () => {
                 if (isFadingOut) {
-                    opacity -= 0.05;
+                    opacity -= opacityStep;
                     height -= heightStep;
                 } else {
                     height += heightStep;

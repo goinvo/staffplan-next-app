@@ -25,18 +25,33 @@ export const ProjectUserLabel = ({
 	const { viewer } = useGeneralDataContext();
 	const isUserTBD = assignment.assignedUser === null;
 	const {
-		projectList,
 		setProjectList,
-		singleProjectPage,
 		refetchProjectList,
-		setSingleProjectPage,
 	} = useProjectsDataContext();
 	const { animateRow } = useFadeInOutRow({ rowRef: undoRowRef, minHeight: 0, heightStep: 2 })
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
 		errorPolicy: "all"
 	});
+	const [deleteAssignment] = useMutation(DELETE_ASSIGNMENT, {
+		errorPolicy: "all",
+		context: {
+			fetchOptions: {
+				keepalive: true,
+			},
+		},
+	})
 
-	const updateContext = async (upsertAssignment: AssignmentType) => {
+	const canAssignmentBeDeleted = !assignment.workWeeks.some(
+		(week) => (week.actualHours ?? 0) > 0
+	);
+	const showActionsButton =
+		viewer?.id === assignment.assignedUser?.id ||
+		!assignment.assignedUser;
+	const showArchiveButton =
+		showActionsButton && !canAssignmentBeDeleted;
+	const showDeleteButton = showActionsButton && canAssignmentBeDeleted
+
+	const updateAssignmentStatus = async (upsertAssignment: AssignmentType) => {
 		await animateRow(true)
 		setUserList((prevUserList) => {
 			return prevUserList?.map((user) => {
@@ -70,58 +85,62 @@ export const ProjectUserLabel = ({
 		});
 
 	};
-	const canAssignmentBeDeleted = !assignment.workWeeks.some(
-		(week) => (week.actualHours ?? 0) > 0
-	);
-	const showActionsButton =
-		viewer?.id === assignment.assignedUser?.id ||
-		assignment.assignedUser === null;
-	const showArchiveButton =
-		viewer?.id === assignment.assignedUser?.id && !canAssignmentBeDeleted;
-	const showDeleteButton =
-		!assignment.assignedUser ||
-		(viewer?.id === assignment.assignedUser?.id &&
-			canAssignmentBeDeleted &&
-			assignment.canBeDeleted);
-	const [deleteAssignment] = useMutation(DELETE_ASSIGNMENT, {
-		errorPolicy: "all",
-		onCompleted({ deleteAssignment }) {
-			const deletedAssignmentId = deleteAssignment.id;
-			const updatedAssignments = singleProjectPage?.assignments?.filter(
-				(assignment) => assignment.id !== deletedAssignmentId
-			);
-			singleProjectPage &&
-				setSingleProjectPage({
-					...singleProjectPage,
-					assignments: updatedAssignments,
+
+
+	const finalDeletingAssignment = () => {
+		const variables = {
+			assignmentId: assignment.id,
+		};
+		deleteAssignment({ variables })
+	}
+
+	const undoableDeleteAssignment = async () => {
+		const variables = {
+			assignmentId: assignment.id,
+		};
+		try {
+			const { data } = await deleteAssignment({ variables });
+			await animateRow(true)
+			if (data) {
+				setProjectList((prevProjectList) => {
+					return prevProjectList?.map((proj) => {
+						if (proj.id === project?.id) {
+							const updatedProjectAssignments = proj.assignments?.filter(
+								(assignment) => assignment.id !== data.deleteAssignment.id
+							);
+							return {
+								...proj,
+								assignments: updatedProjectAssignments,
+							};
+						}
+						return proj;
+					});
 				});
-			const projectId = singleProjectPage?.id;
-			if (projectList && projectId) {
-				const updatedProjectList = projectList.map((project) => {
-					if (project.id === projectId) {
-						return {
-							...project,
-							assignments: project?.assignments?.filter(
-								(assignment) => assignment.id !== deletedAssignmentId
-							),
-						};
-					}
-					return project;
+				setUserList((prevUserList) => {
+					return prevUserList?.map((user) => {
+						if (user.id === assignment?.assignedUser?.id) {
+							const updatedUserAssignments = user.assignments.filter(
+								(assignment) => assignment.id !== data.deleteAssignment.id
+							);
+							return {
+								...user,
+								assignments: updatedUserAssignments,
+							};
+						}
+						return user;
+					});
 				});
-				setProjectList(updatedProjectList);
+
 			}
-		},
-	});
+		} catch (error) {
+			console.log("Error deleting assignment.:", error)
+		}
+	}
 
 	const handleDeleteAssignmentClick = () => {
-		if (assignment.canBeDeleted) {
-			const variables = {
-				assignmentId: assignment.id,
-			};
-			deleteAssignment({ variables });
-			return;
-		}
-	};
+		enqueueTimer({ assignment, updatedAssignment: assignment, finalAction: undoableDeleteAssignment, finalApiCall: finalDeletingAssignment });
+	}
+
 	const onChangeStatusButtonClick = async () => {
 		const variables = {
 			id: assignment.id,
@@ -170,7 +189,12 @@ export const ProjectUserLabel = ({
 				if (response && response.data) {
 					const updatedAssignment = response.data.upsertAssignment
 					const undoAction = (undoableAssignments: UndoableModifiedAssignment[]) => { undoArchivedStatus(undoableAssignments) }
-					enqueueTimer(assignment, updatedAssignment, () => updateContext(updatedAssignment), undoAction);
+					enqueueTimer({
+						assignment,
+						updatedAssignment,
+						finalAction: () => updateAssignmentStatus(updatedAssignment),
+						undoAction,
+					});
 				}
 			} catch (error) {
 				console.error('Error updating assignment:', error);

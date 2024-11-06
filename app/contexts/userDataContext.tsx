@@ -6,7 +6,15 @@ import { GET_USER_LIST } from "../gqlQueries";
 import { sortSingleUser, sortUserList } from "../helperFunctions";
 import { useGeneralDataContext } from "./generalContext";
 import { useTaskQueue } from '../hooks/useTaskQueue'
+import useBeforeUnload from "../hooks/useBeforeUnload";
 
+type EnqueueTimerParams = {
+    assignment: AssignmentType;
+    updatedAssignment: AssignmentType;
+    finalAction: () => Promise<void>;
+    undoAction?: (modifiedAssignments: UndoableModifiedAssignment[]) => void;
+    finalApiCall?: () => void;
+};
 export interface UserDataContextType {
     userList: UserType[] | [];
     singleUserPage: UserType | null;
@@ -21,7 +29,7 @@ export interface UserDataContextType {
     refetchUserList: () => void;
     setSelectedUserData: (id: number) => void;
     handleFinalDelete: (assignment: AssignmentType) => void;
-    enqueueTimer: (assignment: AssignmentType, updatedAssignment: AssignmentType, updateFunc: () => Promise<void>, undoAction: (modifiedAssignments: UndoableModifiedAssignment[]) => void) => void;
+    enqueueTimer: (params: EnqueueTimerParams) => void;
 }
 
 const UserDataContext = createContext<UserDataContextType | undefined>(undefined);
@@ -82,6 +90,14 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
         [userList, showArchivedProjects, viewsFilterSingleUser]
     );
 
+    // Clear timeouts for all undoable modification assignments
+    useBeforeUnload(() => {
+        assignmentsWithUndoActions.forEach(({ timerId, finalApiCall }) => {
+            finalApiCall?.();
+            clearTimeout(timerId);
+        });
+    })
+
     const handleFinalDelete = useCallback((assignment: AssignmentType) => {
         setAssignmentsWithUndoActions((prev) => prev.filter(({ assignment: a }) => a.id !== assignment.id));
     }, []);
@@ -97,7 +113,7 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
     }, [assignmentsWithUndoActions]);
 
 
-    const enqueueTimer = (assignment: AssignmentType, updatedAssignment: AssignmentType, finalAction: () => Promise<void>, undoAction: (modifiedAssignments: UndoableModifiedAssignment[]) => void) => {
+    const enqueueTimer = ({ assignment, updatedAssignment, finalAction, undoAction, finalApiCall }: EnqueueTimerParams) => {
         const timerId = enqueueTask(async () => {
             await finalAction();
             handleFinalDelete(updatedAssignment);
@@ -105,7 +121,7 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
 
         setAssignmentsWithUndoActions((prev) => [
             ...prev,
-            { assignment, timerId, undoAction, actionType: "update" }
+            { assignment, timerId, undoAction, finalApiCall }
         ]);
     };
 

@@ -156,7 +156,7 @@ export const TempProjectLabel = ({
 					placeholder="Project Name"
 					value={formik.values.name}
 					inputClassName="w-[150px] h-7 rounded-md shadow-sm focus:ring-tiffany focus:border-tiffany font-bold text-tiny text-contrastBlue"
-					dropdownClassName="w-[150px] p-2 rounded-sm text-tiny z-30"
+					dropdownClassName="min-w-[150px] p-2 rounded-sm text-tiny z-30"
 					listClassName="p-2 z-34"
 				/>
 				{formik.touched.name && formik.errors.name ? (

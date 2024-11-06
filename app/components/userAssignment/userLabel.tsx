@@ -1,5 +1,6 @@
 'use client'
 import React, { useCallback } from "react";
+
 import { AssignmentType, UserLabelProps, UndoableModifiedAssignment } from "../../typeInterfaces";
 import EllipsisDropdownMenu from "../ellipsisDropdownMenu";
 import { useModal } from "@/app/contexts/modalContext";
@@ -10,26 +11,37 @@ import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { DELETE_ASSIGNMENT, UPSERT_ASSIGNMENT } from "@/app/gqlQueries";
 import { useMutation } from "@apollo/client";
 import { useFadeInOutRow } from "../../hooks/useFadeInOutRow";
+import { useClientDataContext } from "@/app/contexts/clientContext";
 
 export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef }: UserLabelProps) => {
 	const { openModal, closeModal } = useModal();
 	const { setSingleUserPage, setUserList, enqueueTimer } = useUserDataContext()
 	const { viewer } = useGeneralDataContext()
-	const { projectList, setProjectList, singleProjectPage, setSingleProjectPage } = useProjectsDataContext();
-
+	const { refetchClientList } = useClientDataContext()
+	const { setProjectList } = useProjectsDataContext();
 	const isAssignmentProposed = assignment.status === "proposed";
 	const canAssignmentBeDeleted = !assignment.workWeeks.some(
 		(week) => (week.actualHours ?? 0) > 0);
-	const showActionsButton = viewer?.id === assignment.assignedUser?.id || assignment.assignedUser === null;
-	const showArchiveButton = viewer?.id === assignment.assignedUser?.id && !canAssignmentBeDeleted
-	const showDeleteButton = !assignment.assignedUser || viewer?.id === assignment.assignedUser?.id && canAssignmentBeDeleted && assignment.canBeDeleted;
+	const showActionsButton = viewer?.id === assignment.assignedUser?.id
+	const showArchiveButton = showActionsButton && !canAssignmentBeDeleted
+	const showDeleteButton = showActionsButton && canAssignmentBeDeleted
 
-	const { animateRow } = useFadeInOutRow({ rowRef: undoRowRef, minHeight: 0, heightStep: 2 })
+	const { animateRow } = useFadeInOutRow({ rowRef: undoRowRef, minHeight: 0, heightStep: 2, opacityStep: 0.1 })
 
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
 		errorPolicy: "all"
 	});
-	const updateContext = async (upsertAssignment: AssignmentType) => {
+
+	const [deleteAssignment] = useMutation(DELETE_ASSIGNMENT, {
+		errorPolicy: "all",
+		context: {
+			fetchOptions: {
+				keepalive: true,
+			},
+		},
+	})
+
+	const updateAssignmentStatus = async (upsertAssignment: AssignmentType) => {
 		await animateRow(true)
 		setUserList((prevUserList) => {
 			return prevUserList?.map((user) => {
@@ -63,6 +75,56 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef }
 		});
 
 	};
+
+	const finalDeletingAssignment = () => {
+		const variables = {
+			assignmentId: assignment.id,
+		};
+		deleteAssignment({ variables })
+	}
+
+	const undoableDeleteAssignment = async () => {
+		const variables = {
+			assignmentId: assignment.id,
+		};
+		try {
+			const { data } = await deleteAssignment({ variables });
+			await animateRow(true)
+			if (data) {
+				setUserList((prevUserList) => {
+					return prevUserList?.map((user) => {
+						if (user.id === assignment.assignedUser.id) {
+							const updatedUserAssignments = user.assignments.filter(
+								(assignment) => assignment.id !== data.deleteAssignment.id
+							);
+							return {
+								...user,
+								assignments: updatedUserAssignments,
+							};
+						}
+						return user;
+					});
+				});
+				setProjectList((prevProjectList) => {
+					return prevProjectList?.map((project) => {
+						if (project.id === assignment.project.id) {
+							const updatedProjectAssignments = project?.assignments?.filter(
+								(assignment) => assignment.id !== data.deleteAssignment.id
+							);
+							return {
+								...project,
+								assignments: updatedProjectAssignments,
+							};
+						}
+						return project;
+					});
+				});
+				refetchClientList()
+			}
+		} catch (error) {
+			console.log("Error deleting assignment.:", error)
+		}
+	}
 	const undoArchivedStatus = useCallback(
 		async (assignmentsWithUndoActions: UndoableModifiedAssignment[]) => {
 			const projectId = assignment.project.id;
@@ -82,34 +144,8 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef }
 		[]
 	);
 
-	const [deleteAssignment] = useMutation(DELETE_ASSIGNMENT, {
-		errorPolicy: "all",
-		onCompleted({ deleteAssignment }) {
-			const deletedAssignmentId = deleteAssignment.id;
-			const updatedAssignments = singleProjectPage?.assignments?.filter(
-				(assignment) => assignment.id !== deletedAssignmentId
-			);
-			singleProjectPage && setSingleProjectPage({
-				...singleProjectPage,
-				assignments: updatedAssignments,
-			});
-			const projectId = singleProjectPage?.id;
-			if (projectList && projectId) {
-				const updatedProjectList = projectList.map((project) => {
-					if (project.id === projectId) {
-						return {
-							...project,
-							assignments: project?.assignments?.filter(
-								(assignment) => assignment.id !== deletedAssignmentId
-							),
-						};
-					}
-					return project;
-				});
-				setProjectList(updatedProjectList);
-			}
-		},
-	});
+
+
 	const handleArchiveAssignmentClick = async () => {
 		if (assignment.project && assignment.project.isTempProject) {
 			const removedTempAssignment = selectedUser?.assignments.filter((a: AssignmentType) => a.id !== assignment.id);
@@ -135,7 +171,12 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef }
 				if (response && response.data) {
 					const updatedAssignment = response.data.upsertAssignment
 					const undoAction = (undoableAssignments: UndoableModifiedAssignment[]) => { undoArchivedStatus(undoableAssignments) }
-					enqueueTimer(assignment, updatedAssignment, () => updateContext(updatedAssignment), undoAction);
+					enqueueTimer({
+						assignment,
+						updatedAssignment,
+						finalAction: () => updateAssignmentStatus(updatedAssignment),
+						undoAction,
+					});
 				}
 			} catch (error) {
 				console.error('Error updating assignment:', error);
@@ -144,23 +185,9 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef }
 	};
 
 	const handleDeleteAssignmentClick = () => {
-		if (assignment.canBeDeleted) {
-			const deletedAssignment = selectedUser?.assignments.filter((a: AssignmentType) => a.id !== assignment.id);
-			const selectedUserData = {
-				...selectedUser,
-				assignments: deletedAssignment || [],
-				name: selectedUser?.name || "Default Name",
-				avatarUrl: selectedUser?.avatarUrl || "defaultAvatarUrl.png",
-			};
-			setSingleUserPage(selectedUserData);
-			const variables = {
-				assignmentId: assignment.id,
-			};
-			deleteAssignment({ variables });
-			return;
-
-		};
+		enqueueTimer({ assignment, updatedAssignment: assignment, finalAction: undoableDeleteAssignment, finalApiCall: finalDeletingAssignment });
 	}
+
 	const assignmentDropMenuOptions = [
 		{
 			component: (
@@ -182,11 +209,11 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef }
 		},
 		{
 			component: <button onClick={handleArchiveAssignmentClick} className="block px-4 py-2 text-sm">Archive</button>,
-			show: showArchiveButton && showActionsButton,
+			show: showArchiveButton,
 		},
 		{
 			component: <button onClick={handleDeleteAssignmentClick} className="block px-4 py-2 text-sm">Delete</button>,
-			show: showDeleteButton && showActionsButton,
+			show: showDeleteButton,
 		},
 
 	];

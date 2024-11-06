@@ -7,6 +7,15 @@ import { GET_ALL_PROJECTS_DATA } from "../gqlQueries";
 import { sortProjectList, sortSingleProject } from "../helperFunctions";
 import { useGeneralDataContext } from "./generalContext";
 import { useTaskQueue } from "../hooks/useTaskQueue";
+import useBeforeUnload from "../hooks/useBeforeUnload";
+
+type EnqueueTimerParams = {
+  project: ProjectType;
+  updatedProject: ProjectType;
+  finalAction: () => Promise<void>;
+  undoAction: (modifiedAssignments: UndoableModifiedProject[]) => void
+  finalApiCall?: () => void;
+};
 
 export interface ProjectsDataContextType {
   projectList: ProjectType[] | [];
@@ -23,7 +32,7 @@ export interface ProjectsDataContextType {
   setViewsFilterProject: React.Dispatch<React.SetStateAction<string>>;
   setSingleProjectPage: React.Dispatch<React.SetStateAction<ProjectType>>;
   refetchProjectList: () => void;
-  enqueueTimer: (project: ProjectType, updatedProject: ProjectType, updateFunc: () => Promise<void>, undoAction: (modifiedAssignments: UndoableModifiedProject[]) => void) => void;
+  enqueueTimer: (params: EnqueueTimerParams) => void;
 }
 
 const ProjectsDataContext = createContext<ProjectsDataContextType | undefined>(
@@ -135,6 +144,13 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
     setProjectsWithUndoActions((prev) => prev.filter(({ project: p }) => p.id !== updatedProject.id));
   }, []);
 
+  // Clear timeouts 
+  useBeforeUnload(() => {
+    projectsWithUndoActions.forEach(({ timerId, finalApiCall }) => {
+      clearTimeout(timerId);
+      finalApiCall?.();
+    });
+  })
   const undoModifyProject = useCallback(async (projectId: number) => {
     const restored = projectsWithUndoActions.find(({ project }) => project.id === projectId);
     if (!restored) return;
@@ -145,7 +161,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
     setProjectsWithUndoActions((prev) => prev.filter(({ project }) => project.id !== projectId));
   }, [projectsWithUndoActions]);
 
-  const enqueueTimer = (project: ProjectType, updatedProject: ProjectType, finalAction: () => Promise<void>, undoAction: (modifiedAssignments: UndoableModifiedProject[]) => void) => {
+  const enqueueTimer = ({ project, updatedProject, finalAction, undoAction }: EnqueueTimerParams) => {
     const timerId = enqueueTask(async () => {
       await finalAction();
       handleFinalDelete(updatedProject);
@@ -153,7 +169,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
 
     setProjectsWithUndoActions((prev) => [
       ...prev,
-      { project, timerId, undoAction, actionType: "update" }
+      { project, timerId, undoAction }
     ]);
   };
 

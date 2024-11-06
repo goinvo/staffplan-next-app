@@ -149,8 +149,8 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 			const response = await upsertProject({ variables });
 			if (response && response.data) {
 				const updatedProject = response.data.upsertProject
-				const undoAction = (assignment: any) => { undoArchivedStatus(assignment) }
-				enqueueTimer(project, updatedProject, updateCache, undoAction);
+				const undoAction = (projectsWithUndoActions: UndoableModifiedProject[]) => { undoArchivedStatus(projectsWithUndoActions) }
+				enqueueTimer({ project, updatedProject, finalAction: updateCache, undoAction });
 			}
 		} catch (error) {
 			console.error('Error updating project:', error);
