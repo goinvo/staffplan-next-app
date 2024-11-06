@@ -86,7 +86,7 @@ export const ProjectAssignmentRow = ({
 	}
 
 	return (
-		<tr ref={rowRef} key={`assignment-${assignment.id}`} className={`${isUserTBD ? 'sm:flex hidden' : 'flex'} border-b border-gray-300 hover:bg-hoverGrey pb-5 ${assignment.status === 'proposed' ? 'bg-diagonal-stripes' :
+		<tr ref={rowRef} key={`assignment-${assignment.id}`} className={`${isUserTBD ? 'sm:flex hidden' : 'flex'} border-b border-gray-300 hover:bg-hoverGrey ${assignment.status === 'proposed' ? 'bg-diagonal-stripes' :
 			''
 			} pl-5`}>
 			{isFirstMonth && (
@@ -108,7 +108,7 @@ export const ProjectAssignmentRow = ({
 					const isCurrentWeek = currentWeek === week.weekNumberOfTheYear && currentYear === month.year
 					return (
 						<td key={`${month.monthLabel}-${week.weekNumberOfTheYear}-${monthIndex}`}
-							className={`relative px-1 py-1 font-normal ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year && 'bg-selectedColumnBg'}`}
+							className={`relative px-1 min-h-[100px] py-1 font-normal ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year && 'bg-selectedColumnBg'}`}
 						>
 							<div
 								className={`flex flex-col sm:justify-normal justify-center h-full sm:space-y-3 ${isCurrentWeek ? 'font-bold' : 'font-normal'}`}>
