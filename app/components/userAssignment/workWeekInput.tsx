@@ -205,7 +205,7 @@ export const WorkWeekInput = ({
 						onChange={handleChange}
 						onBlur={(e) => {
 							handleBlur("estimatedHours");
-							if (dirty && values.estimatedHours) {
+							if (dirty) {
 								upsertWorkWeekValues(values);
 							}
 						}}
@@ -221,7 +221,7 @@ export const WorkWeekInput = ({
 							onChange={handleChange}
 							onBlur={(e) => {
 								handleBlur("actualHours");
-								if (dirty && values.actualHours) {
+								if (dirty) {
 									upsertWorkWeekValues(values);
 								}
 							}}
