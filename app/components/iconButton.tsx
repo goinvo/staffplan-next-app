@@ -18,7 +18,7 @@ const IconButton: React.FC<IconButtonProps> = ({ Icon, onClick, iconSize, classN
             type={type}
         >
             <div className='flex self-start py-0.5'>{Icon && <Icon className={iconSize} />}</div>
-            {text && <span className='px-1'>
+            {text && <span className='pl-1.5'>
                 {text}
             </span>}
         </button>

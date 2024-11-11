@@ -138,7 +138,9 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                         {columnHeaderTitles?.map((el, i) => {
                             return (
                                 <div key={el.title} className={`w-24 flex ${!el.showIcon ? 'mx-auto md:pl-2 lg:pl-0' : ''} items-center justify-start text-start ${el.onClick ? 'cursor-pointer' : ''}`} onClick={el?.onClick}>
-                                    {el.showIcon && (<PlusIcon className='w-4 h-4 mr-1' />)}
+                                    {el.showIcon && (
+                                        <div className='mr-1 transform -translate-x-0.5'><PlusIcon className='w-4 h-4' /></div>
+                                    )}
                                     <span>{el.title}</span>
                                 </div>)
                         })}

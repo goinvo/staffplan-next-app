@@ -12,7 +12,7 @@ export const AllProjectLabel = ({
 	return (
 		<div className="flex justify-between items-start sm:flex-row flex-col pt-2">
 			<IconButton
-				className={'text-contrastBlue w-24 sm:flex hidden text-start'}
+				className={'text-contrastBlue w-24 sm:flex hidden text-start transform -translate-x-0.5'}
 				Icon={PlusIcon} iconSize='h-4 w-4' text={project.client.name}
 				onClick={() => console.log('On client click')} />
 			<span className="sm:hidden block">{project.client.name}</span>
