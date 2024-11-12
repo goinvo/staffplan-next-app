@@ -155,6 +155,7 @@ export interface UserLabelProps {
 	selectedUser: UserType;
 	clickHandler: (assignment: AssignmentType) => void;
 	undoRowRef: RefObject<HTMLTableRowElement>;
+	isFirstClient?: boolean;
 }
 export interface ProjectLabelProps {
 	project?: ProjectType;
