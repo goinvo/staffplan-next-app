@@ -271,3 +271,5 @@ export interface UndoableModifiedProject {
 	actionType?: string;
 	finalApiCall?: () => void;
 }
+
+export type ClassValue = string | undefined | { [key: string]: boolean };

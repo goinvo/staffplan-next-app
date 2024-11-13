@@ -17,6 +17,7 @@ import { useUserDataContext } from "@/app/contexts/userDataContext";
 import UndoRow from "../undoRow";
 import { UNDO_ARCHIVED_OR_DELETED_PROJECT } from "../constants/undoModifyStrings";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
+import { mergeClasses } from "@/app/helperFunctions";
 
 interface UserAssignmentRowProps {
 	assignment: AssignmentType;
@@ -115,12 +116,21 @@ export const UserAssignmentRow = ({
 	}
 
 
+	const filterByClient = viewsFilterSingleUser === 'byClient'
+	const isFirstRow = rowIndex === 0;
+	const isLastRow = rowIndex === totalRows - 1;
+	const rowClasses = mergeClasses(
+		'flex sm:justify-normal justify-between bg-white-300 hover:bg-hoverGrey pl-5',
+		{ 'border-t border-gray-300': isFirstClient && filterByClient && !isFirstRow },
+		{ 'border-b border-gray-300': !filterByClient || isLastRow },
+		{ 'bg-diagonal-stripes': isAssignmentProposed }
+	);
 
 	return (
 		<tr
 			ref={rowRef}
 			key={`assignment-${assignment.id}`}
-			className={`flex sm:justify-normal justify-between ${isFirstClient ? '' : 'border-b border-gray-300'} bg-white-300 ${isAssignmentProposed ? 'bg-diagonal-stripes' : ''} hover:bg-hoverGrey pl-5`}
+			className={rowClasses}
 		>
 			<td className={`px-0 pt-1 pb-2 font-normal align-top ${!isFirstClient ? 'sm:block flex items-center' : ''} w-1/2 sm:w-1/3`}>
 				<div
