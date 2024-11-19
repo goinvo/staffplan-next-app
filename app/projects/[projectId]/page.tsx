@@ -12,6 +12,8 @@ import { ProjectAssignmentRow } from "@/app/components/projectAssignment/project
 import { DateTime } from "luxon";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
+import { calculatePlanFromToday } from "@/app/components/scrollingCalendar/helpers";
+
 
 
 const ProjectPage: React.FC = () => {
@@ -86,8 +88,25 @@ const ProjectPage: React.FC = () => {
 		return `${formattedStartDate || 'Start Date'}-${formattedEndDate}.${endYear}`;
 	}
 
+
 	const columnHeaderTitles = [{ title: 'People', showIcon: true, onClick: () => addNewAssignmentRow() }]
 
+	const totalPlanPerProject = sortedSingleProjectAssignments?.reduce((total, assignment) => {
+		return total + calculatePlanFromToday(assignment);
+	}, 0);
+	const totalBurnedPerProject = sortedSingleProjectAssignments?.reduce((total, assignment) => {
+		return total + assignment.workWeeks.reduce(
+			(acc, curr) => acc + (curr.actualHours ?? 0),
+			0
+		);
+	}, 0);
+
+	const projectSummaryInfo = [
+		{ label: 'Target', value: singleProjectPage?.hours, show: !!singleProjectPage?.hours },
+		{ label: 'Plan', value: totalPlanPerProject + totalBurnedPerProject, show: true },
+		{ label: 'Actual', value: totalBurnedPerProject, show: true },
+		{ label: 'Delta', value: totalPlanPerProject + totalBurnedPerProject - singleProjectPage?.hours, show: !!singleProjectPage?.hours }
+	]
 	const projectInfoSubtitle = `${singleProjectPage?.client?.name}, budget, ${singleProjectPage?.hours || 0}h, ${selectedProjectDates()}`
 	return (
 		<>
@@ -100,6 +119,7 @@ const ProjectPage: React.FC = () => {
 						assignments={sortedSingleProjectAssignments || []}
 						editable={true}
 						draggableDates={true}
+						projectSummaryInfo={projectSummaryInfo}
 					>
 						{sortedSingleProjectAssignments?.map((assignment: AssignmentType, rowIndex) => {
 							return (

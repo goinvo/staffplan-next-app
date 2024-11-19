@@ -11,7 +11,7 @@ import ColumnChart from '../columnChart';
 import IconButton from '../iconButton';
 
 import { useGeneralDataContext } from '@/app/contexts/generalContext';
-import { AssignmentType, MonthsDataType, ProjectType } from '@/app/typeInterfaces';
+import { AssignmentType, MonthsDataType, ProjectSummaryInfoItem, ProjectType } from '@/app/typeInterfaces';
 import { calculateTotalHoursPerWeek, isBeforeWeek, showMonthAndYear, getNextWeeksPerView, getPrevWeeksPerView, currentWeek, currentYear } from './helpers';
 import ViewsMenu from '../viewsMenu/viewsMenu';
 import EditFormController from './editFormController';
@@ -32,7 +32,8 @@ type CalendarHeaderProps = {
     editable?: boolean,
     projectInfo?: string,
     columnHeaderTitles: ColumnHeaderTitle[],
-    draggableDates?: boolean
+    draggableDates?: boolean,
+    projectSummaryInfo?: ProjectSummaryInfoItem[];
 }
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
@@ -45,6 +46,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     projectInfo,
     columnHeaderTitles,
     draggableDates = false,
+    projectSummaryInfo
 }) => {
     const [isEditing, setIsEditing] = useState(false);
     const { setDateRange, scrollToTodayFunction } = useGeneralDataContext();
@@ -161,10 +163,30 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                     });
                 })}
                 <th className="pl-0 pr-4 pt-1 pb-2 font-normal align-top w-1/2 sm:w-1/6">
-                    <IconButton className='sm:flex hidden pt-2 text-contrastBlue items-center justify-center'
-                        onClick={nextWeek}
-                        Icon={ChevronRightIcon}
-                        iconSize={'h6 w-6'} />
+                    <div className='flex flex-row items-center'>
+                        <IconButton className='sm:flex hidden pt-2 text-contrastBlue items-center justify-center'
+                            onClick={nextWeek}
+                            Icon={ChevronRightIcon}
+                            iconSize={'h6 w-6'} />
+                        {projectSummaryInfo?.length && (<div className='sm:flex hidden justify-center flex-col pl-4 max-w-fit pt-1'>
+                            {projectSummaryInfo?.map((sum, index) =>
+                                (sum.show) ? (
+                                    <div
+                                        key={index}
+                                        className="flex relative justify-between space-x-0.5"
+                                    >
+                                        <label className={`text-sm pr-1 whitespace-nowrap`}>
+                                            {sum.label}
+                                        </label>
+                                        <span className="font-bold text-sm mr-auto">
+                                            {sum.value}
+                                            <span className="text-sm font-normal pl-1">hrs</span>
+                                        </span>
+                                    </div>
+                                ) : null
+                            )}
+                        </div>)}
+                    </div>
                 </th>
             </tr>
         </thead >
