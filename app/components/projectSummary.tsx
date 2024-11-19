@@ -44,7 +44,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 		<td className="font-normal ml-auto py-2 pr-4 pl-0 sm:w-1/6 w-1/2 flex justify-center items-center">
 			{showSummaries && (
 				<div className='sm:flex hidden flex-col'>
-					<div className="sm:flex hidden justify-between w-full space-x-1">
+					<div className="flex justify-between w-full space-x-1">
 						{weeksAndFte.map((item, index) => (
 							item.value ? (
 								<div key={index} className="flex items-center space-x-1">
