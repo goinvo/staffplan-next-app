@@ -313,6 +313,7 @@ export const UPSERT_ASSIGNMENT = gql`
 				client {
 					name
 					avatarUrl
+					id
 				}
 				startsOn
 				endsOn
@@ -344,59 +345,87 @@ export const UPSERT_CLIENT = gql`
 `;
 
 export const UPSERT_PROJECT = gql`
-	mutation UpsertProjectUpdate(
-		$id: ID
-		$clientId: ID
-		$name: String
-		$status: String
-		$startsOn: ISO8601Date
-		$endsOn: ISO8601Date
-		$rateType: String
-		$cost: Float
-		$hours: Int
-		$fte: Float
-		$hourlyRate: Int
-		$assignments: [AssignmentAttributes!]
-	) {
-		upsertProject(
-			id: $id
-			clientId: $clientId
-			name: $name
-			status: $status
-			startsOn: $startsOn
-			endsOn: $endsOn
-			cost: $cost
-			hours: $hours
-			fte: $fte
-			rateType: $rateType
-			hourlyRate: $hourlyRate
-			assignments: $assignments
-		) {
-			id
+  mutation UpsertProjectUpdate(
+    $id: ID
+    $clientId: ID
+    $name: String
+    $status: String
+    $startsOn: ISO8601Date
+    $endsOn: ISO8601Date
+    $rateType: String
+    $cost: Float
+    $hours: Int
+    $fte: Float
+    $hourlyRate: Int
+    $assignments: [AssignmentAttributes!]
+  ) {
+    upsertProject(
+      id: $id
+      clientId: $clientId
+      name: $name
+      status: $status
+      startsOn: $startsOn
+      endsOn: $endsOn
+      cost: $cost
+      hours: $hours
+      fte: $fte
+      rateType: $rateType
+      hourlyRate: $hourlyRate
+      assignments: $assignments
+    ) {
+      id
+      client {
+        id
+        name
+        avatarUrl
+      }
+      name
+      status
+      cost
+      paymentFrequency
+      startsOn
+      endsOn
+      hours
+      fte
+      rateType
+      hourlyRate
+      workWeeks {
+        actualHours
+        estimatedHours
+        cweek
+        year
+      }
+      assignments {
+        id
+        startsOn
+        endsOn
+        status
+        estimatedWeeklyHours
+        canBeDeleted
+        workWeeks {
+          actualHours
+          estimatedHours
+          cweek
+          year
+        }
+        assignedUser {
+          id
+          name
+          avatarUrl
+        }
+        project {
+          id
+          name
 			client {
-				id
-				name
-				avatarUrl
-			}
 			name
-			status
-			cost
-			paymentFrequency
-			startsOn
-			endsOn
-			hours
-			fte
-			rateType
-			hourlyRate
-			workWeeks {
-				actualHours
-				estimatedHours
-				cweek
-				year
+			id
 			}
-		}
-	}
+        }
+      }
+    }
+  }
 `;
+
 export const UPSERT_WORKWEEK = gql`
 	mutation UpsertWorkWeek(
 		$assignmentId: ID!
