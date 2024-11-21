@@ -1,3 +1,5 @@
+"use client"
+
 import React, { FocusEvent, forwardRef, useCallback, KeyboardEvent } from 'react';
 import { ArrowLongRightIcon } from "@heroicons/react/24/outline";
 
@@ -29,6 +31,7 @@ export const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(({
     showFillForward = true,
 }, ref) => {
     const buttonRef = React.useRef<HTMLButtonElement>(null);
+    const inputRef = React.useRef<HTMLInputElement | null>(null);
 
     const handleFocus = useCallback((event: FocusEvent<HTMLInputElement>) => {
         if (buttonRef.current) {
@@ -37,6 +40,8 @@ export const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(({
             buttonRef.current.style.backgroundColor = '#27B5B0';
             buttonRef.current.style.outline = '1px solid #27B5B0';
         }
+        inputRef.current?.select();
+
         if (onFocus) onFocus(event);
     }, [onFocus]);
 
@@ -76,7 +81,11 @@ export const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(({
                 disabled={disabled}
                 className="bg-white text-center sm:text-base text-2xl rounded-sm shadow-top-input-shadow sm:w-[34px] w-[68px] sm:h-[25px] h-[50px] focus:border-tiffany focus:ring-1 focus:ring-tiffany border-none outlined-none mb-0 px-0 py-0"
                 autoComplete="off"
-                ref={ref}
+                ref={(el) => {
+                    inputRef.current = el;
+                    if (typeof ref === "function") ref(el);
+                    else if (ref) ref.current = el;
+                }}
             />
             <button
                 ref={buttonRef}
