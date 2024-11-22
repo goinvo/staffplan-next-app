@@ -10,7 +10,6 @@ import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import { ScrollingCalendar } from "@/app/components/scrollingCalendar/scrollingCalendar";
 import { ProjectAssignmentRow } from "@/app/components/projectAssignment/projectAssignmentRow";
 import { DateTime } from "luxon";
-import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { calculatePlanFromToday } from "@/app/components/scrollingCalendar/helpers";
 
@@ -24,25 +23,32 @@ const ProjectPage: React.FC = () => {
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_ASSIGNMENT, {
-		async onCompleted() {
-			try {
-				await Promise.all([
-					refetchUserList(),
-					refetchProjectList(),
-				]);
-			} catch (e: any) {
-				throw new Error("Something went wrong", e.message);
+		async onCompleted({ upsertAssignment }) {
+			if (upsertAssignment) {
+				setProjectList((prevProjectList) => {
+					return prevProjectList?.map((project) => {
+						if (project.id === upsertAssignment?.project?.id) {
+							return {
+								...project,
+								assignments: [
+									...(project.assignments || []),
+									upsertAssignment,
+								],
+							};
+						}
+						return project;
+					});
+				});
 			}
 		}
 	});
 
-	const { refetchUserList } = useUserDataContext()
 	const {
 		projectList,
 		sortedSingleProjectAssignments,
 		singleProjectPage,
 		setSingleProjectPage,
-		refetchProjectList,
+		setProjectList
 	} = useProjectsDataContext();
 
 	const addNewAssignmentRow = useCallback(async () => {

@@ -313,6 +313,7 @@ export const UPSERT_ASSIGNMENT = gql`
 				client {
 					name
 					avatarUrl
+					id
 				}
 				startsOn
 				endsOn
