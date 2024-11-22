@@ -101,11 +101,18 @@ const ProjectPage: React.FC = () => {
 		);
 	}, 0);
 
+	const getDeltaValue = () => {
+		if (!singleProjectPage?.hours) {
+			return;
+		}
+		const delta = totalPlanPerProject + totalBurnedPerProject - singleProjectPage?.hours
+		return delta > 0 ? `+${delta}` : `${delta}`;
+	}
 	const projectSummaryInfo = [
 		{ label: 'Target', value: singleProjectPage?.hours, show: !!singleProjectPage?.hours },
 		{ label: 'Plan', value: totalPlanPerProject + totalBurnedPerProject, show: true },
 		{ label: 'Actual', value: totalBurnedPerProject, show: true },
-		{ label: 'Delta', value: totalPlanPerProject + totalBurnedPerProject - singleProjectPage?.hours, show: !!singleProjectPage?.hours }
+		{ label: 'Delta', value: getDeltaValue(), show: !!singleProjectPage?.hours }
 	]
 	const projectInfoSubtitle = `${singleProjectPage?.client?.name}, budget, ${singleProjectPage?.hours || 0}h, ${selectedProjectDates()}`
 	return (
