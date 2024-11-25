@@ -13,7 +13,7 @@ import { useMutation } from "@apollo/client";
 import { useFadeInOutRow } from "../../hooks/useFadeInOutRow";
 import { useClientDataContext } from "@/app/contexts/clientContext";
 
-export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef }: UserLabelProps) => {
+export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, isFirstClient }: UserLabelProps) => {
 	const { openModal, closeModal } = useModal();
 	const { setSingleUserPage, setUserList, enqueueTimer } = useUserDataContext()
 	const { viewer } = useGeneralDataContext()
@@ -218,18 +218,20 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef }
 
 	];
 	return (
-		<div className="sm:ml-auto ml-0 sm:w-24 flex">
+		<div className={`sm:ml-auto ml-0 w-full sm:w-24 flex justify-between items-center ${isFirstClient ? "mb-4 sm:mb-0" : ''}`}>
 			<button
-				className={`lg:pl-5 md:ml-2 lg:ml-0 pt-2 ${isAssignmentProposed ? "sm:pl-4" : "sm:pl-2"
+				className={`lg:pl-5 md:ml-2 lg:ml-0 pt-0 sm:pt-2 ${isAssignmentProposed ? "sm:pl-4" : "sm:pl-2"
 					} font-bold flex items-center justify-start text-contrastBlue text-start`}
 				onClick={() => clickHandler(assignment)}
 			>
 				{assignment.project.name}
 			</button>
-			{showActionsButton && <EllipsisDropdownMenu
-				options={assignmentDropMenuOptions}
-				textColor={"text-gray-900"}
-			/>}
+			{showActionsButton &&
+				<EllipsisDropdownMenu
+					options={assignmentDropMenuOptions}
+					textColor={"text-gray-900"}
+				/>
+			}
 		</div>
 	);
 };
