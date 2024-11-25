@@ -2,9 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { FaSquarePlus } from "react-icons/fa6";
-import { ChatBubbleBottomCenterTextIcon } from "@heroicons/react/24/outline";
 import { usePathname } from "next/navigation";
 import { LoadingSpinner } from "./loadingSpinner";
 
@@ -29,7 +27,7 @@ const Navbar: React.FC = () => {
 	const myStaffPlanCheck = fullPathName.match(myStaffPlanURL);
 	const homepageUrl = process.env.NEXT_PUBLIC_NODE_ENV
 		? "http://localhost:3000"
-		: "https://staffplan.com";
+		: "https://app.staffplan.com";
 	const links = [
 		{
 			href: `/people/${myPlanUrl()}`,
