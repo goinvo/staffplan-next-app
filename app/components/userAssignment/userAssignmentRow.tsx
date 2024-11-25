@@ -122,9 +122,9 @@ export const UserAssignmentRow = ({
 			key={`assignment-${assignment.id}`}
 			className={`flex sm:justify-normal justify-between ${isFirstClient ? '' : 'border-b border-gray-300'} bg-white-300 ${isAssignmentProposed ? 'bg-diagonal-stripes' : ''} hover:bg-hoverGrey pl-5`}
 		>
-			<td className={`px-0 pt-1 pb-2 font-normal align-top ${!isFirstClient ? 'sm:block flex items-center' : ''} w-1/2 sm:w-1/3`}>
+			<td className={`pl-3 sm:px-0 py-1 sm:pt-1 sm:pb-2 font-normal align-top ${!isFirstClient ? 'sm:block flex items-center' : 'pt-5'} w-1/2 sm:w-1/3`}>
 				<div
-					className='flex sm:flex-row flex-col justify-between items-start md:space-x-2'
+					className='flex sm:flex-row flex-col w-full justify-between items-start md:space-x-2'
 				>
 					<div className={`${isTempProject ? '' : 'sm:w-24'} ${isFirstClient ? 'mb-1' : ''}`}>
 						{viewsFilterSingleUser === 'byClient' && isFirstClient && isFirstMonth && (
@@ -138,7 +138,7 @@ export const UserAssignmentRow = ({
 						isTempProject ? (
 							<TempProjectLabel assignment={assignment} /> // Render custom label
 						) : (
-							<UserLabel assignment={assignment} selectedUser={selectedUser} clickHandler={handleProjectChange} undoRowRef={undoRowRef} />
+							<UserLabel assignment={assignment} selectedUser={selectedUser} clickHandler={handleProjectChange} undoRowRef={undoRowRef} isFirstClient={isFirstClient} />
 						)
 					)}
 					<div className='text-contrastBlue sm:flex hidden flex-col space-y-3 ml-auto lg:px-2 items-end max-w-[60px] '>
@@ -165,7 +165,7 @@ export const UserAssignmentRow = ({
 							className={`relative px-1 py-1 font-normal ${isCurrentWeek ? 'bg-selectedColumnBg' : ''}`}
 
 						>
-							<div className={`flex flex-col sm:justify-normal justify-center h-full sm:space-y-3 ${isCurrentWeek ? 'font-bold' : 'font-normal'}`}>
+							<div className={`flex flex-col sm:justify-normal justify-center h-full sm:space-y-3 ${isCurrentWeek ? 'font-bold' : 'font-normal'} ${isFirstClient ? 'pt-5 sm:pt-0' : ''}`}>
 								<WorkWeekInput
 									withinProjectDates={withinProjectDates}
 									assignment={assignment}

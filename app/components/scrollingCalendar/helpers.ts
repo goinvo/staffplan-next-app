@@ -1197,6 +1197,57 @@ export const getWeekNumberAndYear = (
   };
 };
 
+export const calculateTotalHoursForApprove = (
+  assignments: AssignmentType | AssignmentType[],
+  months: MonthsDataType[]
+) => {
+  const totalHoursForApprove: { [key: string]: number } = {};
+
+  months.forEach((month) => {
+    month.weeks.forEach((week) => {
+      const key = `${month.year}-${week.weekNumberOfTheYear}`;
+      totalHoursForApprove[key] = totalHoursForApprove[key] || 0;
+    });
+  });
+
+  const calculateAssignment = (assignment: AssignmentType) => {
+    if (assignment.estimatedWeeklyHours) {
+      months.forEach((month) => {
+        month.weeks.forEach((week) => {
+          const weekExistsWithEstimatedHours = assignment.workWeeks?.some(
+            (w) =>
+              w.cweek === week.weekNumberOfTheYear &&
+              w.year === month.year &&
+              w.actualHours !== undefined &&
+              w.actualHours !== null
+          );
+          if (!weekExistsWithEstimatedHours) {
+            const key = `${month.year}-${week.weekNumberOfTheYear}`;
+            totalHoursForApprove[key] += assignment.estimatedWeeklyHours;
+          }
+        });
+      });
+    }
+    assignment.workWeeks.forEach((weekData) => {
+      const key = `${weekData.year}-${weekData.cweek}`;
+      if (!totalHoursForApprove[key]) {
+        totalHoursForApprove[key] = 0;
+      }
+      totalHoursForApprove[key] += !isNil(weekData?.actualHours)
+        ? weekData.actualHours
+        : assignment?.estimatedWeeklyHours || 0;
+    });
+  };
+
+  if (Array.isArray(assignments)) {
+    assignments.forEach(calculateAssignment);
+  } else {
+    calculateAssignment(assignments);
+  }
+
+  return totalHoursForApprove;
+}
+
 export const calculatePlanFromToday = (assignment: AssignmentType): number => {
   const now = DateTime.now().startOf("week");
 

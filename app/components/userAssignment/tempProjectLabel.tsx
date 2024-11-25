@@ -144,7 +144,7 @@ export const TempProjectLabel = ({
 	}, [clientProjects, userId]);
 
 	return (
-		<div className="w-24 mx-auto pt-2">
+		<div className="w-24 mr-auto sm:mx-auto pt-2">
 			<form onSubmit={formik.handleSubmit}>
 				<AutocompleteInput
 					items={filteredProjects}
@@ -155,12 +155,12 @@ export const TempProjectLabel = ({
 					inputName="name"
 					placeholder="Project Name"
 					value={formik.values.name}
-					inputClassName="w-[150px] h-7 rounded-md shadow-sm focus:ring-tiffany focus:border-tiffany font-bold text-tiny text-contrastBlue"
-					dropdownClassName="min-w-[150px] p-2 rounded-sm text-tiny z-30"
+					inputClassName="min-w-[125px] sm:w-[150px] h-7 rounded-md shadow-sm focus:ring-tiffany focus:border-tiffany font-bold text-tiny text-contrastBlue"
+					dropdownClassName="min-w-[125px] sm:min-w-[150px] p-2 rounded-sm text-tiny z-30"
 					listClassName="p-2 z-34"
 				/>
 				{formik.touched.name && formik.errors.name ? (
-					<p className="text-tiny whitespace-nowrap py-1 text-red-500">{formik.errors.name}</p>
+					<p className="text-tiny sm:whitespace-nowrap py-1 text-red-500">{formik.errors.name}</p>
 				) : null}
 			</form>
 		</div>

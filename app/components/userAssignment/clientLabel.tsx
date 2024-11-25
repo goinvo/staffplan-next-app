@@ -72,7 +72,14 @@ export const ClientLabel = ({ assignment }: ClientLabelProps) => {
 						handleClientClick(assignment.project.client)
 					}
 				}} />
-			<span className="sm:hidden block">{assignment.project.client.name}</span>
+			<div className="sm:hidden flex items-center relative" onClick={() => {
+				if (!activeTempProject) {
+					handleClientClick(assignment.project.client);
+				}
+			}}>
+				<PlusIcon className="w-3 h-3 absolute transform -translate-x-5" />
+				<span>{assignment.project.client.name}</span>
+			</div >
 		</>
 	);
 };
