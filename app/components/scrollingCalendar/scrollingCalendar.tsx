@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 
 import CalendarHeader from "./calendarHeader";
-import { MonthsDataType, AssignmentType, ProjectType } from "@/app/typeInterfaces";
+import { MonthsDataType, AssignmentType, ProjectType, ProjectSummaryInfoItem } from "@/app/typeInterfaces";
 import { getNextWeeksPerView, getPrevWeeksPerView, getWeeksPerScreen } from "./helpers";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
 import useDynamicWeeks from "@/app/hooks/useDynamicWeeks";
@@ -21,7 +21,8 @@ interface ScrollingCalendarProps {
 	userName?: string;
 	projectInfo?: string;
 	editable?: boolean;
-	draggableDates?: boolean
+	draggableDates?: boolean;
+	projectSummaryInfo?: ProjectSummaryInfoItem[]
 }
 
 export const ScrollingCalendar = ({
@@ -33,7 +34,8 @@ export const ScrollingCalendar = ({
 	userName,
 	projectInfo,
 	editable,
-	draggableDates
+	draggableDates,
+	projectSummaryInfo
 }: ScrollingCalendarProps) => {
 	const [months, setMonths] = useState<MonthsDataType[]>([]);
 	const { dateRange, setDateRange } = useGeneralDataContext();
@@ -75,6 +77,7 @@ export const ScrollingCalendar = ({
 					projectInfo={projectInfo}
 					editable={editable}
 					draggableDates={draggableDates}
+					projectSummaryInfo={projectSummaryInfo}
 				/>
 				<tbody>
 					{React.Children.map(children, (child) =>

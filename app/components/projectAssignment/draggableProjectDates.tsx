@@ -84,6 +84,9 @@ const DraggableDates: FC<DraggableDatesProps> = ({
         e.currentTarget.style.opacity = '1';
     };
 
+    const isEndDateWeekStyles = "bg-pencil-strokes bg-[length:pencil-strokes]"
+    const projectDatesStyles = "cursor-pointer navbar"
+
     return (
         <div
             draggable={isStartDateWeek || isEndDateWeek}
@@ -91,8 +94,9 @@ const DraggableDates: FC<DraggableDatesProps> = ({
             onDragEnd={handleDragEnd}
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
-            className={`absolute top-0 left-0 right-0 inset-0 flex flex-col leading-none h-full w-full ${(isStartDateWeek || isEndDateWeek) ? 'cursor-pointer navbar' : ''
-                } `}
+            className={`absolute top-0 left-0 right-0 inset-0 flex flex-col leading-none h-full w-full 
+                ${isStartDateWeek || isEndDateWeek ? projectDatesStyles : ''} 
+                ${isEndDateWeek ? isEndDateWeekStyles : ''}`}
         >
             <span className='text-contrastGrey text-2xs px-1 pt-1 font-normal'>{isStartDateWeek && 'START' || isEndDateWeek && 'END'}</span>
         </div>

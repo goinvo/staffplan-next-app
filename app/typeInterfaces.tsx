@@ -272,3 +272,9 @@ export interface UndoableModifiedProject {
 	actionType?: string;
 	finalApiCall?: () => void;
 }
+
+export type ProjectSummaryInfoItem = {
+	label: string;
+	value: number | null;
+	show: boolean;
+};

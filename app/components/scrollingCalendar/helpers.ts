@@ -1246,4 +1246,33 @@ export const calculateTotalHoursForApprove = (
   }
 
   return totalHoursForApprove;
+}
+
+export const calculatePlanFromToday = (assignment: AssignmentType): number => {
+  const now = DateTime.now().startOf("week");
+
+  const totalFromWorkWeeks = assignment.workWeeks.reduce((total, workWeek) => {
+    let workWeekStart = DateTime.fromObject({
+      weekYear: workWeek.year,
+      weekNumber: workWeek.cweek,
+    }).startOf("week");
+
+    if (
+      workWeek.cweek === 53 &&
+      !checkIfWeekExists(workWeek.cweek, workWeek.year)
+    ) {
+      workWeekStart = getLastMondayOfDecember(workWeek.year);
+    }
+    const isRelevantWeek = workWeekStart >= now;
+    if (
+      !isNil(workWeek.estimatedHours) &&
+      isRelevantWeek &&
+      !workWeek.actualHours
+    ) {
+      return total + workWeek.estimatedHours;
+    }
+    return total;
+  }, 0);
+
+  return totalFromWorkWeeks;
 };
