@@ -277,6 +277,6 @@ export type ClassValue = string | undefined | { [key: string]: boolean };
   
 export type ProjectSummaryInfoItem = {
 	label: string;
-	value: number | null;
+	value?: string | number;
 	show: boolean;
 };
