@@ -15,16 +15,41 @@ type AddPersonInlineProps = {
 
 export const AddPersonInline = ({ project, assignment }: AddPersonInlineProps) => {
 
-    const { userList } = useUserDataContext()
+    const { userList, setUserList } = useUserDataContext()
 
-    const { refetchProjectList } = useProjectsDataContext();
+    const { setProjectList } = useProjectsDataContext();
     const [selectedUserId, setSelectedUserId] = useState<string>("");
-    const [isSubmitted, setIsSubmitted] = useState(false);
+
     const [upsertAssignment, { loading: mutationLoading }] = useMutation(UPSERT_ASSIGNMENT, {
         errorPolicy: "all",
-        onCompleted: async () => {
-            await refetchProjectList();
-            setIsSubmitted(true);
+        onCompleted: async ({ upsertAssignment }) => {
+            if (upsertAssignment) {
+                setProjectList((prevProjectList) => {
+                    return prevProjectList?.map((project) => {
+                        if (project.id === upsertAssignment?.project?.id) {
+                            const updatedAssignments = (project.assignments || []).map((assignment) =>
+                                assignment.id === upsertAssignment.id ? upsertAssignment : assignment
+                            );
+
+                            return {
+                                ...project,
+                                assignments: updatedAssignments,
+                            };
+                        }
+                        return project;
+                    });
+                });
+                setUserList((prev) =>
+                    prev.map((user) =>
+                        user.id === upsertAssignment.assignedUser.id
+                            ? {
+                                ...user,
+                                assignments: [...user.assignments, upsertAssignment],
+                            }
+                            : user
+                    )
+                );
+            }
         },
     });
 
@@ -62,7 +87,7 @@ export const AddPersonInline = ({ project, assignment }: AddPersonInlineProps) =
                         id="userId"
                         onChange={handleUserChange}
                         value={selectedUserId}
-                        disabled={mutationLoading || isSubmitted}
+                        disabled={mutationLoading}
                         className={`md:min-w-[185px] h-[28px] pl-2 py-0 text-start rounded-md focus:ring-tiffany focus:border-tiffany text-tiny font-bold align-middle border-none shadow-top-input-shadow ${!selectedUserId ? 'text-contrastGrey' : 'text-contrastBlue'
                             }`}
                     >

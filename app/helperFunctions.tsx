@@ -5,6 +5,7 @@ import {
 	UserAssignmentDataMapType,
 	UserType,
 	WorkWeekBlockMemberType,
+	ClassValue
 } from "./typeInterfaces";
 import _ from "lodash";
 import { DateTime, Interval } from "luxon";
@@ -536,8 +537,8 @@ export const sortSingleProject = (sortMethod: string, assignments: AssignmentTyp
 	const arrayToSort = assignments?.length ? [...assignments] : [];
 	if (sortMethod === "abcUserName") {
 		return arrayToSort.sort((a, b) => {
-			const userA = a.assignedUser? a.assignedUser.name.toLowerCase() : "";
-			const userB = b.assignedUser? b.assignedUser.name.toLowerCase(): "";
+			const userA = a.assignedUser ? a.assignedUser.name.toLowerCase() : "";
+			const userB = b.assignedUser ? b.assignedUser.name.toLowerCase() : "";
 			if (userA < userB) {
 				return -1;
 			}
@@ -867,3 +868,18 @@ export const convertProjectToCSV = (data: ProjectType): string => {
 	return `${headers}\n${projectRows}\n${summaryRows}\n\n${userRows}`;
 };
 
+export const mergeClasses = (...classes: ClassValue[]): string => {
+	return classes
+		.flatMap((cls) => {
+			if (typeof cls === 'string' || typeof cls === 'undefined') {
+				return cls;
+			} else if (typeof cls === 'object' && cls !== null) {
+				return Object.entries(cls)
+					.filter(([, condition]) => condition)
+					.map(([className]) => className);
+			}
+			return [];
+		})
+		.filter(Boolean)
+		.join(' ');
+};

@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { Formik, FormikValues } from "formik";
 import { useMutation } from "@apollo/client";
+import { isNil } from "lodash";
 
 import { AssignmentType, WorkWeekType, MonthsDataType } from "@/app/typeInterfaces";
 import { UPSERT_WORKWEEKS, UPSERT_WORKWEEK } from "@/app/gqlQueries";
@@ -10,6 +11,8 @@ import { CustomInput } from "../cutomInput";
 import { assignmentContainsCWeek, isPastOrCurrentWeek, filterWeeksForFillForward, getWeekNumbersPerScreen, currentWeek, currentYear, tabbingAndArrowNavigation, updateOrInsertWorkWeek, updateOrInsertWorkWeekInProject, updateProjectAssignments, updateUserAssignments } from "../scrollingCalendar/helpers";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
+import useIsMobile from "@/app/hooks/useIsMobileWidth";
+
 
 interface WorkWeekInputProps {
 	withinProjectDates?: boolean;
@@ -50,14 +53,23 @@ export const WorkWeekInput = ({
 }: WorkWeekInputProps) => {
 	const weekWithinAssignmentDates = assignmentContainsCWeek(assignment, cweek, year)
 	const existingWorkWeek = assignment?.workWeeks.find((week) => week.cweek === cweek && week.year === year);
+	const isMobile = useIsMobile()
+
+	const actualValueToShow = () => {
+		if (isMobile && !isNil(existingWorkWeek?.actualHours)) return existingWorkWeek?.actualHours || ''
+		if (isMobile && !existingWorkWeek?.actualHours) return assignment?.estimatedWeeklyHours || ''
+		return existingWorkWeek?.actualHours || ''
+	}
 	const initialValues = {
-		actualHours: existingWorkWeek?.actualHours || "",
+		actualHours: actualValueToShow(),
 		estimatedHours:
 			existingWorkWeek?.estimatedHours ?? (weekWithinAssignmentDates && assignment?.estimatedWeeklyHours || ""),
 		assignmentId: assignment?.id,
 		cweek: cweek,
 		year: year,
 	};
+
+
 	const { project: { id: projectId } } = assignment;
 	const { assignedUser } = assignment || {};
 	const userId = assignedUser?.id || '';
@@ -215,7 +227,7 @@ export const WorkWeekInput = ({
 					/>
 					{isPastOrCurrentWeek(cweek, year) && (
 						<CustomInput
-							value={values.actualHours || ''}
+							value={values.actualHours}
 							name="actualHours"
 							id={`actHours-${assignment?.id}-${cweek}-${year}`}
 							onChange={handleChange}

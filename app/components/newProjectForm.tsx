@@ -17,11 +17,11 @@ interface NewProjectFormProps {
 }
 
 const NewProjectForm = ({ closeModal }: NewProjectFormProps) => {
-    const { refetchUserList } = useUserDataContext()
-    const { clientList, setClientList } = useClientDataContext()
+    const { setUserList } = useUserDataContext()
+    const { clientList, setClientList, refetchClientList } = useClientDataContext()
     const {
         projectList,
-        refetchProjectList
+        setProjectList
     } = useProjectsDataContext();
 
     const { viewer } = useGeneralDataContext()
@@ -41,8 +41,20 @@ const NewProjectForm = ({ closeModal }: NewProjectFormProps) => {
     const [upsertProject] = useMutation(UPSERT_PROJECT, {
         errorPolicy: "all",
         onCompleted({ upsertProject }) {
-            refetchProjectList();
-            refetchUserList();
+            if (upsertProject) {
+                refetchClientList()
+                setUserList((prev) =>
+                    prev.map((user) =>
+                        user.id === upsertProject.assignments?.[0].assignedUser.id
+                            ? {
+                                ...user,
+                                assignments: [...user.assignments, ...upsertProject.assignments],
+                            }
+                            : user
+                    )
+                );
+                setProjectList((prev) => [...prev, upsertProject]);
+            }
         },
     });
 

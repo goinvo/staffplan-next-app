@@ -2,9 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { FaSquarePlus } from "react-icons/fa6";
-import { ChatBubbleBottomCenterTextIcon } from "@heroicons/react/24/outline";
 import { usePathname } from "next/navigation";
 import { LoadingSpinner } from "./loadingSpinner";
 
@@ -29,7 +27,7 @@ const Navbar: React.FC = () => {
 	const myStaffPlanCheck = fullPathName.match(myStaffPlanURL);
 	const homepageUrl = process.env.NEXT_PUBLIC_NODE_ENV
 		? "http://localhost:3000"
-		: "https://staffplan.com";
+		: "https://app.staffplan.com";
 	const links = [
 		{
 			href: `/people/${myPlanUrl()}`,
@@ -45,30 +43,29 @@ const Navbar: React.FC = () => {
 	];
 	const ellipsisDropdownMenuOptions = [
 		{
-			component:<Link href={"https://github.com/goinvo/staffplan-next-app"}>{"Open Source"}</Link>,
+			component: <Link href={"https://github.com/goinvo/staffplan-next-app"}>{"Open Source"}</Link>,
 			show: true,
 		},
 		{
-			component:<Link href={`${homepageUrl}/settings/profile`}>{"Settings"}</Link>,
+			component: <Link href={`${homepageUrl}/settings/profile`}>{"Settings"}</Link>,
 			show: true,
 		},
 		{
-			component:<Link href={`${homepageUrl}/sign_out`}>{"Sign Out"}</Link>,
+			component: <Link href={`${homepageUrl}/sign_out`}>{"Sign Out"}</Link>,
 			show: true,
 		},
 	];
 	return (
-		<nav className="navbar bg-gray-100 px-5 h-14 flex justify-between items-center">
-			<div className="flex items-center sm:space-x-4 space-x-1 h-full">
+		<nav className="navbar bg-gray-100 pl-6 pr-0 sm:px-5 h-14 flex justify-between items-center">
+			<div className="flex items-center pl-1 sm:pl-0 sm:space-x-4 space-x-1 h-full">
 				{links.map((link) => (
 					<Link
 						key={link.href}
 						href={link.href}
-						className={`inline-flex items-center text-base sm:px-4 px-1 sm:py-2 py-1 rounded-md whitespace-nowrap ${
-							link.isActive
-								? "bg-contrastBlue font-semibold"
-								: "hover:bg-contrastBlue"
-						}`}
+						className={`inline-flex items-center text-base sm:px-4 px-1 sm:py-2 py-1 rounded-md whitespace-nowrap ${link.isActive
+							? "bg-contrastBlue font-semibold"
+							: "hover:bg-contrastBlue"
+							}`}
 					>
 						{link.label}
 					</Link>

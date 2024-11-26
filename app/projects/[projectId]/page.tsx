@@ -10,7 +10,6 @@ import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import { ScrollingCalendar } from "@/app/components/scrollingCalendar/scrollingCalendar";
 import { ProjectAssignmentRow } from "@/app/components/projectAssignment/projectAssignmentRow";
 import { DateTime } from "luxon";
-import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { calculatePlanFromToday } from "@/app/components/scrollingCalendar/helpers";
 
@@ -24,25 +23,32 @@ const ProjectPage: React.FC = () => {
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_ASSIGNMENT, {
-		async onCompleted() {
-			try {
-				await Promise.all([
-					refetchUserList(),
-					refetchProjectList(),
-				]);
-			} catch (e: any) {
-				throw new Error("Something went wrong", e.message);
+		async onCompleted({ upsertAssignment }) {
+			if (upsertAssignment) {
+				setProjectList((prevProjectList) => {
+					return prevProjectList?.map((project) => {
+						if (project.id === upsertAssignment?.project?.id) {
+							return {
+								...project,
+								assignments: [
+									...(project.assignments || []),
+									upsertAssignment,
+								],
+							};
+						}
+						return project;
+					});
+				});
 			}
 		}
 	});
 
-	const { refetchUserList } = useUserDataContext()
 	const {
 		projectList,
 		sortedSingleProjectAssignments,
 		singleProjectPage,
 		setSingleProjectPage,
-		refetchProjectList,
+		setProjectList
 	} = useProjectsDataContext();
 
 	const addNewAssignmentRow = useCallback(async () => {
@@ -101,11 +107,18 @@ const ProjectPage: React.FC = () => {
 		);
 	}, 0);
 
+	const getDeltaValue = () => {
+		if (!singleProjectPage?.hours) {
+			return;
+		}
+		const delta = totalPlanPerProject + totalBurnedPerProject - singleProjectPage?.hours
+		return delta > 0 ? `+${delta}` : `${delta}`;
+	}
 	const projectSummaryInfo = [
 		{ label: 'Target', value: singleProjectPage?.hours, show: !!singleProjectPage?.hours },
 		{ label: 'Plan', value: totalPlanPerProject + totalBurnedPerProject, show: true },
 		{ label: 'Actual', value: totalBurnedPerProject, show: true },
-		{ label: 'Delta', value: totalPlanPerProject + totalBurnedPerProject - singleProjectPage?.hours, show: !!singleProjectPage?.hours }
+		{ label: 'Delta', value: getDeltaValue(), show: !!singleProjectPage?.hours }
 	]
 	const projectInfoSubtitle = `${singleProjectPage?.client?.name}, budget, ${singleProjectPage?.hours || 0}h, ${selectedProjectDates()}`
 	return (

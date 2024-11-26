@@ -31,9 +31,9 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
     const [showNewClientModal, setShowNewClientModal] = useState<boolean>(false);
     const [confirmedClientToCreate, setConfirmedClientToCreate] = useState<boolean>(false);
     const clientInputRef = useRef<HTMLInputElement>(null);
-    const { refetchUserList } = useUserDataContext()
+    const { setUserList } = useUserDataContext()
     const { clientList, refetchClientList } = useClientDataContext()
-    const { projectList, refetchProjectList } = useProjectsDataContext();
+    const { projectList, setProjectList } = useProjectsDataContext();
 
     const { id, assignments } = user;
 
@@ -46,16 +46,52 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
 
     const [upsertProject] = useMutation(UPSERT_PROJECT, {
         errorPolicy: "all",
-        onCompleted() {
-            refetchProjectList();
-            refetchUserList();
-        },
+        onCompleted({ upsertProject }) {
+            if (upsertProject) {
+                refetchClientList()
+                setProjectList((prev) => [...prev, upsertProject]);
+                setUserList((prev) =>
+                    prev.map((user) =>
+                        user.id === upsertProject.assignments?.[0].assignedUser.id
+                            ? {
+                                ...user,
+                                assignments: [...user.assignments, ...upsertProject.assignments],
+                            }
+                            : user
+                    )
+                );
+            }
+        }
     });
 
     const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
         errorPolicy: 'all',
-        onCompleted() {
-            refetchUserList();
+        onCompleted({ upsertAssignment }) {
+            refetchClientList()
+            setUserList((prev) =>
+                prev.map((user) =>
+                    user.id === upsertAssignment.assignedUser.id
+                        ? {
+                            ...user,
+                            assignments: [...user.assignments, upsertAssignment],
+                        }
+                        : user
+                )
+            );
+            setProjectList((prevProjectList) => {
+                return prevProjectList?.map((project) => {
+                    if (project.id === upsertAssignment?.project?.id) {
+                        return {
+                            ...project,
+                            assignments: [
+                                ...(project.assignments || []),
+                                upsertAssignment,
+                            ],
+                        };
+                    }
+                    return project;
+                });
+            });
         }
     });
 
