@@ -73,7 +73,7 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<
         }
 
         return (
-            <div className="relative flex flex-col" onBlur={handleInputBlur}>
+            <div className="relative flex flex-col w-full" onBlur={handleInputBlur} >
                 {label && <label className="py-1 text-tiny">{label}</label>}
                 <input
                     ref={ref}
