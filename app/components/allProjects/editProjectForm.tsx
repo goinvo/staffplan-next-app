@@ -4,17 +4,16 @@ import React, { useState, useRef, useEffect } from "react";
 import { FormikValues, useFormik } from "formik";
 import { useParams, useRouter } from "next/navigation";
 import { useMutation } from "@apollo/client";
+import { DateTime } from "luxon";
 
-import { IoCheckmarkCircle } from "react-icons/io5";
-import { ArchiveBoxIcon } from "@heroicons/react/24/solid";
-
-import IconButton from "../iconButton";
 import { ProjectType, ClientType } from "../../typeInterfaces";
 import { UPSERT_PROJECT, UPSERT_CLIENT } from "@/app/gqlQueries";
 import { AutocompleteInput } from "../autocompleteInput";
 import { useClientDataContext } from "@/app/contexts/clientContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
+import CustomDateInput from "../customDateInput";
+import { ARCHIVED_PROJECT_WARNING } from "../constants/archivedStatusStrings";
 
 interface EditFormProps {
 	onClose?: () => void;
@@ -34,6 +33,27 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 	const selectedProject = projectList.find(
 		(project: ProjectType) => project.id.toString() === selectedProjectId
 	);
+	const validateForm = (values: FormikValues) => {
+		const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
+		if (!values.clientName) errors.clientName = "Client is required";
+		if (!values.projectName) errors.projectName = "Project name is required";
+
+		const currentClient = clientList.find((client: ClientType) => client.name === values.clientName);
+		if (values.projectName && currentClient) {
+			const projectNameExists = projectList.find(
+				(project: ProjectType) =>
+					project.name === values.projectName &&
+					currentClient.id === project.client.id &&
+					project.id.toString() !== selectedProjectId.toString()
+			);
+			if (projectNameExists) {
+				errors.projectName = "Project name already in use";
+			}
+		}
+
+		return errors;
+	}
+
 	const {
 		name,
 		startsOn,
@@ -47,6 +67,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		cost,
 	} = selectedProject as ProjectType;
 	const [archivedStatus, setArchivedStatus] = useState(status === "archived");
+	const [showTooltip, setShowTooltip] = useState(false);
 	const [previousStatus] = useState(status);
 	const [showNewClientModal, setShowNewClientModal] = useState<boolean>(false);
 	const clientInputRef = useRef<HTMLInputElement>(null);
@@ -83,6 +104,8 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		};
 	}, [onClose]);
 
+	const startsOnDefaultValue = startsOn || DateTime.now().toISODate()
+	const endsOnDateDefaultValue = DateTime.fromISO(startsOnDefaultValue).plus({ months: 3 }).toISODate()
 	const formik = useFormik({
 		initialValues: {
 			projectName: name || "",
@@ -90,13 +113,14 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 			clientId: clientId,
 			budget: "",
 			hours: hours,
-			startsOn: startsOn || "",
-			endsOn: endsOn || "",
+			startsOn: startsOnDefaultValue || '',
+			endsOn: endsOn || endsOnDateDefaultValue || '',
 			projectStatus: status,
 			rateType: rateType ? rateType : "fixed",
 			hourlyRate: hourlyRate && hourlyRate > 0 ? hourlyRate : 0,
 			cost: cost,
 		},
+		validate: validateForm,
 		onSubmit: async (values) => {
 			let clientId = clientList?.find(
 				(client) =>
@@ -145,7 +169,11 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 			: previousStatus !== "archived"
 				? previousStatus
 				: "unconfirmed";
-		formik.setFieldValue("projectStatus", newStatus);
+		formik.setFieldValue("projectStatus", newStatus, false);
+		if (!archivedStatus) {
+			setShowTooltip(true);
+			setTimeout(() => setShowTooltip(false), 8000);
+		}
 	};
 
 	const handleClientSelect = (client: ClientType) => {
@@ -176,49 +204,44 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 			clientInputRef?.current.focus();
 		}
 	};
-	const setTotalCost = (
-		event: React.ChangeEvent<HTMLInputElement>,
-		values: FormikValues,
-		setFieldValue: <ValueType = FormikValues>(
-			field: string,
-			value: ValueType,
-			shouldValidate?: boolean
-		) => void
-	) => {
-		if (values.rateType === "hourly") {
-			setFieldValue("cost", parseInt(event.target.value) * values.hours);
-		}
-	};
+	// temporary commented
+	// const setTotalCost = (
+	// 	event: React.ChangeEvent<HTMLInputElement>,
+	// 	values: FormikValues,
+	// 	setFieldValue: <ValueType = FormikValues>(
+	// 		field: string,
+	// 		value: ValueType,
+	// 		shouldValidate?: boolean
+	// 	) => void
+	// ) => {
+	// 	if (values.rateType === "hourly") {
+	// 		setFieldValue("cost", parseInt(event.target.value) * values.hours);
+	// 	}
+	// };
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className="flex flex-col space-y-2 my-2 text-contrastBlue"
+			className="flex flex-col space-y-2 my-2 text-contrastBlue w-full pr-2"
 		>
-			<div className="flex flex-row justify-start pl-1">
+			<div className="flex flex-col justify-start pl-1 w-full">
 				<input
 					type="text"
 					name="projectName"
 					value={formik.values.projectName}
 					onChange={formik.handleChange}
 					onBlur={formik.handleBlur}
-					className="h-10 mr-2 px-2 rounded-sm shadow-top-input-shadow focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-huge max-w-[300px]"
+					className="h-10 px-2 rounded-sm shadow-top-input-shadow focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-huge w-full"
 					placeholder="Project Name"
 				/>
 				{formik.touched.projectName && formik.errors.projectName ? (
-					<p className="text-red-500">{formik.errors.projectName}</p>
+					<p className="pl-2 text-2xs text-left font-normal text-red-500">{formik.errors.projectName}</p>
 				) : null}
-				<IconButton
-					className="text-tiffany"
-					type="submit"
-					Icon={IoCheckmarkCircle}
-					iconSize="h-7 w-7 ml-1"
-				/>
 			</div>
-			<div className="flex flex-row justify-between h-6">
-				<div className="relative flex items-center py-0 my-0 w-full">
+			<div className="flex flex-col items-start space-x-0.5 w-full pl-2">
+				<div className="flex items-center w-full space-x-1 flex-grow">
 					<label
 						htmlFor="clientName"
-						className="pr-2 text-white font-normal text-tiny w-[55px] text-right"
+						className="text-white font-normal text-tiny min-w-12 text-left"
 					>
 						Client
 					</label>
@@ -230,21 +253,21 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 						onItemSelect={handleClientSelect}
 						onChange={handleClientChange}
 						onBlur={handleClientBlur}
-						inputClassName="h-6 px-2 py-0 rounded-sm font-normal text-tiny max-w-[100px] w-full"
-						dropdownClassName="w-[155px] font-normal rounded-sm"
+						inputClassName="h-6 flex-grow w-full pl-1 py-0 rounded-sm font-normal text-tiny"
+						dropdownClassName="font-normal rounded-sm"
 						displayKey="name"
 						placeholder="Client"
 					/>
-					{formik.touched.clientName && formik.errors.clientName ? (
-						<p className="text-red-500 ml-2">{formik.errors.clientName}</p>
-					) : null}
 				</div>
+				{formik.touched.clientName && formik.errors.clientName ? (
+					<p className="pl-14 text-2xs text-left font-normal text-red-500">{formik.errors.clientName}</p>
+				) : null}
 			</div>
-			<div className="flex flex-row justify-between">
-				<div className="flex items-center">
+			<div className="flex items-center space-x-0.5 w-full pl-2">
+				<div className="flex items-center flex-grow space-x-1">
 					<label
 						htmlFor="budget"
-						className="pr-2 text-white font-normal text-tiny w-[55px] text-right"
+						className="text-white font-normal text-tiny min-w-12 text-left"
 					>
 						Budget
 					</label>
@@ -256,17 +279,17 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 						onChange={formik.handleChange}
 						onBlur={formik.handleBlur}
 						id="budget"
-						className="h-6 px-2 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none max-w-[100px]"
-						placeholder="Budget"
+						className="h-6 w-full pl-1 max-w-[115px] shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none"
+						placeholder="$USD"
 					/>
 					{formik.touched.budget && formik.errors.budget ? (
 						<p className="text-red-500">{formik.errors.budget}</p>
 					) : null}
 				</div>
-				<div className="flex items-center">
+				<div className="flex items-center flex-grow space-x-1">
 					<label
 						htmlFor="hours"
-						className="pr-2 text-white font-normal text-tiny w-[55px] text-right"
+						className="text-white font-normal text-tiny min-w-12 text-left pl-1"
 					>
 						Hours
 					</label>
@@ -277,60 +300,122 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 						onChange={formik.handleChange}
 						onBlur={formik.handleBlur}
 						id="hours"
-						className="h-6 px-2 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none max-w-[100px]"
+						className="h-6 w-full pl-1 max-w-[115px] shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none"
 						placeholder="Hours"
 					/>
+
 					{formik.touched.hours && formik.errors.hours ? (
 						<p className="text-red-500">{formik.errors.hours}</p>
 					) : null}
 				</div>
 			</div>
-
-			<div className="flex flex-row justify-between">
-				<div className="flex items-center">
+			<div className="flex items-center space-x-0.5 w-full pl-2">
+				<div className="flex items-center flex-grow space-x-1">
 					<label
 						htmlFor="startsOn"
-						className="pr-2 text-white font-normal text-tiny w-[55px] text-right"
+						className="text-white font-normal text-tiny min-w-12 text-left"
 					>
 						Starts
 					</label>
-					<input
-						type="date"
-						name="startsOn"
-						value={formik.values.startsOn}
-						onChange={formik.handleChange}
-						onBlur={formik.handleBlur}
-						id="startsOn"
-						className="h-6 px-2 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none max-w-[100px]"
-						placeholder="Start date"
-					/>
-					{formik.touched.startsOn && formik.errors.startsOn ? (
-						<p className="text-red-500">{formik.errors.startsOn}</p>
-					) : null}
+					<div className="max-w-[115px]">
+						<CustomDateInput
+							name="startsOn"
+							errorString="Invalid start date format. Please use dd.MMM.yy."
+							value={formik.values.startsOn}
+							onChange={(value) => formik.setFieldValue("startsOn", value)}
+							onBlur={() => formik.setFieldTouched("startsOn", true)}
+							setError={(error) => formik.setFieldError("startsOn", error)}
+						/>
+					</div>
+
 				</div>
-				<div className="flex items-center">
+				<div className="flex items-center space-x-1 flex-grow">
 					<label
 						htmlFor="endsOn"
-						className="pr-2 text-white font-normal text-tiny w-[55px] text-right"
+						className="text-white font-normal text-tiny min-w-12 text-left pl-1"
 					>
 						Ends
 					</label>
-					<input
-						type="date"
-						name="endsOn"
-						value={formik.values.endsOn}
-						onChange={formik.handleChange}
-						onBlur={formik.handleBlur}
-						id="endsOn"
-						className="h-6 px-2 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none max-w-[100px]"
-						placeholder="End date"
-					/>
-					{formik.touched.endsOn && formik.errors.endsOn ? (
-						<p className="text-red-500">{formik.errors.endsOn}</p>
-					) : null}
+					<div className="max-w-[115px]">
+						<CustomDateInput
+							name="endsOn"
+							errorString="Invalid end date format. Please use dd.MMM.yy."
+							value={formik.values.endsOn}
+							onChange={(value) => formik.setFieldValue("endsOn", value)}
+							onBlur={() => formik.setFieldTouched("endsOn", true)}
+							setError={(error) => {
+								formik.setFieldError("endsOn", error);
+							}}
+						/>
+					</div>
 				</div>
 			</div>
-			<div className="flex flex-row justify-between mb-4 pb-2 border-b-4">
+			{formik.errors.endsOn && <p className="pl-2 text-2xs text-left font-normal text-red-500">{formik.errors.endsOn}</p>}
+			{formik.errors.startsOn && <p className="pl-2 text-2xs text-left font-normal text-red-500">{formik.errors.startsOn}</p>}
+			<div className="flex items-center justify-between space-x-8 w-full pl-2 border-t border-grey-700 py-2">
+				<div className="relative flex items-center">
+					<span
+						className={`py-2 text-tiny font-normal rounded-sm underline text-left  ${archivedStatus ? "text-tiffany" : "text-white"
+							} cursor-pointer`}
+						onClick={handleArchiveButtonClick}
+					>
+						Archive
+					</span>
+					{showTooltip && (
+						<div className="absolute top-full mt-2 bg-gray-700 text-white text-xs font-normal rounded px-4 py-2 z-10 shadow-lg w-[300px]">
+							{ARCHIVED_PROJECT_WARNING}
+						</div>
+					)}
+				</div>
+				<div className="flex w-full space-x-4">
+					<button
+						className={`sm:w-1/2 md:w-1/3 py-2 text-tiny text-center bg-contrastGrey rounded-sm text-white`}
+						onClick={() => onClose?.()}
+					>
+						Cancel
+					</button>
+					<button
+						type="submit"
+						disabled={!formik.isValid}
+						className={`sm:w-1/2 md:w-2/3 py-2 text-tiny text-center bg-tiffany rounded-sm text-white`}
+					>
+						Done
+					</button>
+				</div>
+			</div>
+			{
+				showNewClientModal && (
+					<div className="fixed inset-0 font-normal bg-gray-800 bg-opacity-50 flex justify-center items-center z-10">
+						<div className="bg-white p-6 rounded-md shadow-md">
+							<p className="mb-4">
+								Is &quot;{formik.values.clientName}&quot; a new client?
+							</p>
+							<div className="flex justify-center">
+								<button
+									className="mr-2 px-4 py-2 text-tiny font-bold bg-tiffany rounded-sm text-white"
+									onClick={() => setShowNewClientModal(false)}
+								>
+									Yes
+								</button>
+								<button
+									className="px-4 py-2 text-tiny font-bold bg-contrastGrey rounded-sm text-white"
+									onClick={() => handleNewClientCancel()}
+								>
+									No
+								</button>
+							</div>
+						</div>
+					</div>
+				)
+			}
+		</form >
+	);
+};
+
+export default EditProjectForm;
+
+// temporary commented
+{/* <div className="flex flex-row justify-between mb-4 pb-2 border-b-4">
 				<div className="w-1/3 -mr-1 flex flex-col">
 					<div className="block flex items-center">
 						<input
@@ -418,38 +503,4 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 				</div>
 				<div>
 				</div>
-			</div>
-					<button
-						className={`mr-2 px-4 py-2 text-tiny font-bold bg-tiffany rounded-sm text-white text-black  ${archivedStatus ? "text-tiffany" : "text-transparentGrey"
-							}`}
-						onClick={handleArchiveButtonClick}
-					>Archive</button>
-
-			{showNewClientModal && (
-				<div className="fixed inset-0 font-normal bg-gray-800 bg-opacity-50 flex justify-center items-center z-10">
-					<div className="bg-white p-6 rounded-md shadow-md">
-						<p className="mb-4">
-							Is &quot;{formik.values.clientName}&quot; a new client?
-						</p>
-						<div className="flex justify-center">
-							<button
-								className="mr-2 px-4 py-2 text-tiny font-bold bg-tiffany rounded-sm text-white"
-								onClick={() => setShowNewClientModal(false)}
-							>
-								Yes
-							</button>
-							<button
-								className="px-4 py-2 text-tiny font-bold bg-contrastGrey rounded-sm text-white"
-								onClick={() => handleNewClientCancel()}
-							>
-								No
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
-		</form>
-	);
-};
-
-export default EditProjectForm;
+			</div> */}
