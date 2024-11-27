@@ -10,9 +10,9 @@ import { useProjectsDataContext } from "../contexts/projectsDataContext";
 
 const ProjectsView: React.FC = () => {
 
-	const { filteredProjectList } = useProjectsDataContext();
+	const { filteredProjectList, setShowOneClientProjects } = useProjectsDataContext();
 
-	const columnHeaderTitles = [{ title: 'Clients', showIcon: true }, { title: 'Projects', showIcon: false }]
+	const columnHeaderTitles = [{ title: 'Clients', showIcon: true, onClick: () => setShowOneClientProjects('') }, { title: 'Projects', showIcon: false }]
 
 	const assignments = filteredProjectList?.flatMap((project: ProjectType) => project.assignments || []);
 

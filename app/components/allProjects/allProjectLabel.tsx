@@ -3,18 +3,20 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import { AllProjectLabelProps } from "../../typeInterfaces";
 import EllipsisProjectMenu from "../ellipsisProjectMenu";
 import IconButton from "../iconButton";
+import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 
 export const AllProjectLabel = ({
 	project,
 	clickHandler,
 	undoRowRef,
 }: AllProjectLabelProps) => {
+	const { setShowOneClientProjects } = useProjectsDataContext()
 	return (
 		<div className="flex justify-between items-start sm:flex-row flex-col pt-2">
 			<IconButton
 				className={'text-contrastBlue w-24 sm:flex hidden text-start transform -translate-x-0.5'}
 				Icon={PlusIcon} iconSize='h-4 w-4' text={project.client.name}
-				onClick={() => console.log('On client click')} />
+				onClick={() => setShowOneClientProjects(project.client.id.toString())} />
 			<span className="sm:hidden block">{project.client.name}</span>
 			<button
 				onClick={() => clickHandler(project)}
