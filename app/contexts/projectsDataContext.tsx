@@ -33,6 +33,7 @@ export interface ProjectsDataContextType {
   setSingleProjectPage: React.Dispatch<React.SetStateAction<ProjectType>>;
   refetchProjectList: () => void;
   enqueueTimer: (params: EnqueueTimerParams) => void;
+  setShowOneClientProjects: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const ProjectsDataContext = createContext<ProjectsDataContextType | undefined>(
@@ -60,6 +61,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
   const [viewsFilterProject, setViewsFilterProject] = useState<string>("abcProjectName")
   const [viewsFilterSingleProject, setViewsFilterSingleProject] = useState<string>("abcUserName")
   const [projectsWithUndoActions, setProjectsWithUndoActions] = useState<UndoableModifiedProject[]>([]);
+  const [showOneClientProjects, setShowOneClientProjects] = useState<string>('')
   const { showArchivedProjects, showArchivedAssignments } = useGeneralDataContext()
   const { enqueueTask } = useTaskQueue();
   const {
@@ -88,12 +90,17 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
   const sortedAndFilteredProjects = useMemo(() => {
     if (!projectList.length) return [];
     const sortedList = sortProjectList(viewsFilterProject, projectList);
-    if (!showArchivedProjects && sortedList) {
-      return sortedList.filter((project: ProjectType) => project.status !== "archived");
-    }
+    if (sortedList) {
+      const filteredByClient = showOneClientProjects
+        ? sortedList.filter((project: ProjectType) => project.client.id.toString() === showOneClientProjects)
+        : sortedList;
+      const finalFilteredList = !showArchivedProjects
+        ? filteredByClient.filter((project: ProjectType) => project.status !== "archived")
+        : filteredByClient;
 
-    return sortedList;
-  }, [projectList, viewsFilterProject, showArchivedProjects]);
+      return finalFilteredList;
+    }
+  }, [projectList, viewsFilterProject, showArchivedProjects, showOneClientProjects]);
 
   useEffect(() => {
     if (sortedAndFilteredProjects) {
@@ -191,6 +198,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
         setViewsFilterProject,
         setSingleProjectPage,
         refetchProjectList,
+        setShowOneClientProjects
       }}
     >
       {children}
