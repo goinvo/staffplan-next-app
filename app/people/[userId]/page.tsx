@@ -65,25 +65,6 @@ const UserPage: React.FC = () => {
 			) : (
 				<LoadingSpinner />
 			)}
-			<div className="sm:block hidden mt-5">
-				<button
-					className="bg-white border-2 border-accentgreen w-8 h-8 ml-2 rounded-full flex justify-center items-center"
-					onClick={() => setAddAssignmentVisible(!addAssignmentVisible)}
-				>
-					{addAssignmentVisible ? (
-						<MinusIcon className="fill-accentgreen" />
-					) : (
-						<PlusIcon className="fill-accentgreen" />
-					)}
-				</button>
-				{addAssignmentVisible && (
-					<AddAssignmentSingleUser
-						user={singleUserPage}
-						onClose={onClose}
-						onComplete={onComplete}
-					/>
-				)}
-			</div>
 		</>
 	);
 };
