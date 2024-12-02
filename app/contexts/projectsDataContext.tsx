@@ -111,14 +111,11 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
 
   const sortedSingleProjectAssignments = useMemo(() => {
     const assignments = singleProjectPage?.assignments || [];
-    const filteredAssignments = showArchivedAssignments
-      ? assignments
-      : assignments.filter((assignment: AssignmentType) => assignment.status !== 'archived');
     return sortSingleProject(
       viewsFilterSingleProject,
-      filteredAssignments
+      assignments
     );
-  }, [viewsFilterSingleProject, singleProjectPage, showArchivedAssignments]);
+  }, [viewsFilterSingleProject, singleProjectPage]);
 
   const refetchProjectList = () => {
     client

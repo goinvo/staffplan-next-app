@@ -1,9 +1,9 @@
 'use client'
 import Image from "next/image";
-import React, { useCallback } from "react";
+import React from "react";
 
 import { DELETE_ASSIGNMENT, UPSERT_ASSIGNMENT } from "../../gqlQueries";
-import { ProjectLabelProps, AssignmentType, UndoableModifiedAssignment } from "@/app/typeInterfaces";
+import { ProjectLabelProps } from "@/app/typeInterfaces";
 import { AddPersonInline } from "../addPersonInline";
 import { useMutation } from "@apollo/client";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
@@ -44,48 +44,11 @@ export const ProjectUserLabel = ({
 	const canAssignmentBeDeleted = !assignment.workWeeks.some(
 		(week) => (week.actualHours ?? 0) > 0
 	);
-	const showActionsButton =
-		viewer?.id === assignment.assignedUser?.id ||
-		!assignment.assignedUser;
-	const showArchiveButton =
-		showActionsButton && !canAssignmentBeDeleted;
-	const showDeleteButton = showActionsButton && canAssignmentBeDeleted
 
-	const updateAssignmentStatus = async (upsertAssignment: AssignmentType) => {
-		await animateRow(true)
-		setUserList((prevUserList) => {
-			return prevUserList?.map((user) => {
-				if (user.id === upsertAssignment.assignedUser.id) {
-					const updatedUserAssignments = user.assignments.map((assignment) =>
-						assignment.id === upsertAssignment.id ? upsertAssignment : assignment
-					);
-					return {
-						...user,
-						assignments: updatedUserAssignments,
-					};
-
-				}
-
-				return user;
-			});
-		});
-
-		setProjectList((prevProjectList) => {
-			return prevProjectList?.map((project) => {
-				if (project.id === upsertAssignment?.project?.id) {
-					return {
-						...project,
-						assignments: project.assignments?.map((assignment) =>
-							assignment.id === upsertAssignment.id ? upsertAssignment : assignment
-						),
-					};
-				}
-				return project;
-			});
-		});
-
-	};
-
+	const isAdminOrOwner = viewer?.role === 'admin' || viewer?.role === 'owner';
+	const canEditAssignment = viewer?.id === assignment.assignedUser?.id || !assignment.assignedUser;
+	const canDeleteAssignment = canAssignmentBeDeleted && (isAdminOrOwner || canEditAssignment);
+	const showEllipsisMenu = canEditAssignment || canDeleteAssignment;
 
 	const finalDeletingAssignment = () => {
 		const variables = {
@@ -157,50 +120,7 @@ export const ProjectUserLabel = ({
 			refetchProjectList();
 		}
 	};
-	const undoArchivedStatus = useCallback(
-		async (assignmentsWithUndoActions: UndoableModifiedAssignment[]) => {
-			const projectId = project?.id || assignment?.project?.id
-			const assignmentBeforeModified = assignmentsWithUndoActions.find((el: UndoableModifiedAssignment) => el.assignment.id === assignment.id)
-			const variables = {
-				id: assignment.id,
-				projectId: projectId,
-				userId: assignment.assignedUser.id,
-				status: assignmentBeforeModified?.assignment?.status || 'active'
-			};
-			try {
-				await upsertAssignment({ variables });
-			} catch (error) {
-				console.error('Error updating assignment:', error);
-			}
-		},
-		[]
-	);
 
-	const handleArchiveAssignmentClick = async () => {
-		if (assignment.status !== "archived") {
-			const variables = {
-				id: assignment.id,
-				projectId: project?.id,
-				userId: assignment.assignedUser.id,
-				status: "archived",
-			};
-			try {
-				const response = await upsertAssignment({ variables });
-				if (response && response.data) {
-					const updatedAssignment = response.data.upsertAssignment
-					const undoAction = (undoableAssignments: UndoableModifiedAssignment[]) => { undoArchivedStatus(undoableAssignments) }
-					enqueueTimer({
-						assignment,
-						updatedAssignment,
-						finalAction: () => updateAssignmentStatus(updatedAssignment),
-						undoAction,
-					});
-				}
-			} catch (error) {
-				console.error('Error updating assignment:', error);
-			}
-		}
-	};
 	const assignmentDropMenuOptions = [
 		{
 			component: (
@@ -219,18 +139,7 @@ export const ProjectUserLabel = ({
 					Edit Assignment
 				</button>
 			),
-			show: true,
-		},
-		{
-			component: (
-				<button
-					onClick={handleArchiveAssignmentClick}
-					className="text-gray-900 block px-4 py-2 text-sm"
-				>
-					Archive
-				</button>
-			),
-			show: showArchiveButton && showActionsButton,
+			show: canEditAssignment,
 		},
 		{
 			component: (
@@ -241,14 +150,15 @@ export const ProjectUserLabel = ({
 					Delete
 				</button>
 			),
-			show: showDeleteButton && showActionsButton,
+			show: canDeleteAssignment,
 		},
 	];
+
 	return (
 		<td className="px-0 pr-0 pt-2 pb-2 font-normal flex align-center sm:w-1/3 w-1/2">
 			<div className="flex flex-row justify-between sm:items-start items-center">
 				<div className="w-12 ml-auto sm:flex hidden">
-					{showActionsButton && (
+					{showEllipsisMenu && (
 						<EllipsisDropdownMenu
 							options={assignmentDropMenuOptions}
 							textColor={"text-gray-900"}
