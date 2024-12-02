@@ -2,7 +2,6 @@
 import { useState, ReactNode } from "react";
 import { Field, Formik, FormikValues } from "formik";
 
-import ProjectDatepicker from "./projectDatepicker";
 import { useMutation } from "@apollo/client";
 import { ClientType, ProjectType } from "../typeInterfaces";
 import { UPSERT_PROJECT } from "../gqlQueries";
@@ -11,6 +10,7 @@ import { LoadingSpinner } from "./loadingSpinner";
 import { useUserDataContext } from "../contexts/userDataContext";
 import { useClientDataContext } from "../contexts/clientContext";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
+import CustomDateInput from "./customDateInput";
 interface AddProjectModalProps {
 	project: ProjectType;
 	closeModal: () => void;
@@ -21,17 +21,15 @@ const AddProjectModal = ({ project, closeModal }: AddProjectModalProps) => {
 		client: { id: clientId },
 	} = project;
 
-	const { refetchUserList } = useUserDataContext()
-	const { clientList } = useClientDataContext()
+	const { refetchUserList } = useUserDataContext();
+	const { clientList } = useClientDataContext();
 	const { projectList, refetchProjectList } = useProjectsDataContext();
 
 	const editProjectInitialValues = {
 		id: project.id,
 		client: clientId,
-		dates: {
-			endsOn: project.endsOn || "",
-			startsOn: project.startsOn,
-		},
+		endsOn: project.endsOn || "",
+		startsOn: project.startsOn,
 		hours: project.hours || 0,
 		name: project.name,
 		numOfFTE: project.fte || 0,
@@ -43,7 +41,8 @@ const AddProjectModal = ({ project, closeModal }: AddProjectModalProps) => {
 	const newProjectInitialValues = {
 		client: "",
 		cost: 0,
-		dates: { endsOn: "", startsOn: "" },
+		endsOn: "",
+		startsOn: "",
 		hourlyRate: 0,
 		hours: 0,
 		name: "",
@@ -60,11 +59,12 @@ const AddProjectModal = ({ project, closeModal }: AddProjectModalProps) => {
 		onCompleted() {
 			refetchProjectList();
 			refetchUserList();
-			closeModal()
+			closeModal();
 		},
 	});
 
 	const onSubmitUpsert = (values: FormikValues) => {
+		console.log(values, "VALUES");
 		const variables = {
 			id: values.id,
 			clientId: values.client,
@@ -77,24 +77,24 @@ const AddProjectModal = ({ project, closeModal }: AddProjectModalProps) => {
 			hourlyRate: values.hourlyRate,
 		};
 		const nullableDates = () => {
-			if (values.dates.startsOn && values.dates.endsOn) {
+			if (values.startsOn && values.endsOn) {
 				return {
 					...variables,
-					endsOn: values.dates.endsOn,
-					startsOn: values.dates.startsOn,
+					endsOn: values.endsOn,
+					startsOn: values.startsOn,
 				};
 			}
-			if (values.dates.startsOn && !values.dates.endsOn) {
-				return { ...variables, startsOn: values.dates.startsOn };
+			if (values.startsOn && !values.endsOn) {
+				return { ...variables, startsOn: values.startsOn };
 			}
-			if (!values.dates.startsOn && values.dates.endsOn) {
-				return { ...variables, endsOn: values.dates.endsOn };
+			if (!values.startsOn && values.endsOn) {
+				return { ...variables, endsOn: values.endsOn };
 			}
 			return variables;
 		};
 		upsertProject({
 			variables: nullableDates(),
-		})
+		});
 	};
 
 	const validateForm = (values: FormikValues) => {
@@ -169,12 +169,12 @@ const AddProjectModal = ({ project, closeModal }: AddProjectModalProps) => {
 			shouldValidate?: boolean
 		) => void
 	) => {
-		if (values.dates.startsOn && values.dates.endsOn) {
+		if (values.startsOn && values.endsOn) {
 			const weeklyFTEHours = 38 * parseFloat(event.target.value);
 			const hoursPerDay = weeklyFTEHours / 5;
 			const businessDays = differenceInBusinessDays(
-				values.dates.endsOn,
-				values.dates.startsOn
+				values.endsOn,
+				values.startsOn
 			);
 			const totalHours = Math.round(hoursPerDay * businessDays);
 			setFieldValue("hours", totalHours);
@@ -192,7 +192,7 @@ const AddProjectModal = ({ project, closeModal }: AddProjectModalProps) => {
 		if (
 			values.hourlyRate > 0 &&
 			values.rateType === "hourly" &&
-			!values.dates.endsOn
+			!values.endsOn
 		) {
 			const totalCost = parseInt(event.target.value) * values.hourlyRate;
 			setFieldValue("cost", totalCost);
@@ -220,6 +220,8 @@ const AddProjectModal = ({ project, closeModal }: AddProjectModalProps) => {
 											handleChange,
 											values,
 											setErrors,
+											setFieldError,
+											setFieldTouched,
 											handleBlur,
 											errors,
 											touched,
@@ -290,13 +292,37 @@ const AddProjectModal = ({ project, closeModal }: AddProjectModalProps) => {
 												</div>
 												{/* section 2 */}
 												<div className="flex mb-4 pb-2 border-b-4">
-													<div className="w-1/5 mr-4 flex flex-col">
-														<Field
-															name="dates"
-															handleBlur={handleBlur}
-															component={ProjectDatepicker}
-															projectView={false}
-														/>
+													<div className="mr-4 flex flex">
+														<label className="block mb-2">
+															Start Date
+															<CustomDateInput
+																name="startsOn"
+																errorString="Invalid start date format. Please use dd/Mon/yr."
+																value={values.startsOn || ""}
+																onChange={(value) =>
+																	setFieldValue("startsOn", value)
+																}
+																onBlur={() => setFieldTouched("startsOn", true)}
+																setError={(error) =>
+																	setFieldError("startsOn", error)
+																}
+															/>
+														</label>
+														<label className="block mb-2">
+															End Date
+															<CustomDateInput
+																name="endsOn"
+																errorString="Invalid end date format. Please use dd/Mon/yr."
+																value={values.endsOn}
+																onChange={(value) =>
+																	setFieldValue("endsOn", value)
+																}
+																onBlur={() => setFieldTouched("endsOn", true)}
+																setError={(error) =>
+																	setFieldError("endsOn", error)
+																}
+															/>
+														</label>
 													</div>
 												</div>
 												{/* section 3 */}
@@ -343,7 +369,7 @@ const AddProjectModal = ({ project, closeModal }: AddProjectModalProps) => {
 																handleChange(e);
 																handleManualHours(e, values, setFieldValue);
 															}}
-															readOnly={values.dates.endsOn ? true : false}
+															readOnly={values.endsOn ? true : false}
 														/>
 													</div>
 												</div>
@@ -453,7 +479,7 @@ const AddProjectModal = ({ project, closeModal }: AddProjectModalProps) => {
 															type="button"
 															className="p-2 text-sm font-semibold leading-6 text-gray-900"
 															onClick={() => {
-																closeModal()
+																closeModal();
 																setErrors({});
 															}}
 														>
@@ -462,19 +488,18 @@ const AddProjectModal = ({ project, closeModal }: AddProjectModalProps) => {
 														<button
 															type="submit"
 															disabled={!isValid}
-															className={`rounded-md bg-${isValid ? "accentgreen" : "slate-500"
-																} px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accentgreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accentgreen`}
+															className={`rounded-md bg-${
+																isValid ? "accentgreen" : "slate-500"
+															} px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accentgreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accentgreen`}
 														>
 															Save
 														</button>
 
-														{errors.dates &&
-															(touched.dates?.startsOn ||
-																touched.dates?.endsOn) && (
-																<div className="text-red-500">
-																	{errors.dates?.endsOn as ReactNode}
-																</div>
-															)}
+														{errors && (touched.startsOn || touched.endsOn) && (
+															<div className="text-red-500">
+																{errors.endsOn as ReactNode}
+															</div>
+														)}
 														{errors.name && touched.name && (
 															<div className="text-red-500">
 																{errors.name as ReactNode}
