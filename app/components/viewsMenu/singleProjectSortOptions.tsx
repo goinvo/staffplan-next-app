@@ -105,7 +105,7 @@ export const SingleProjectSortOptions = () => {
 												A - Z
 											</label>
 										</div>
-										<div className="border-t-2 border-gray-200">
+										{/* <div className="border-t-2 border-gray-200">
 											<label className="block px-4 py-2 text-sm text-gray-600">
 												<input
 													id="showArchivedProjects"
@@ -116,7 +116,7 @@ export const SingleProjectSortOptions = () => {
 												/>
 												Show Archived Assignments
 											</label>
-										</div>
+										</div> */}
 									</div>
 								</div>
 							</Menu.Items>

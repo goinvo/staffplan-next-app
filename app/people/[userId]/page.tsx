@@ -63,7 +63,6 @@ const UserPage: React.FC = () => {
 			) : (
 				<LoadingSpinner />
 			)}
-			
 		</>
 	);
 };
