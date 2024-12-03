@@ -6,8 +6,6 @@ import { AssignmentType } from "../../typeInterfaces";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import { ScrollingCalendar } from "@/app/components/scrollingCalendar/scrollingCalendar";
 import { UserAssignmentRow } from "@/app/components/userAssignment/userAssignmentRow";
-import AddAssignmentSingleUser from "@/app/components/addAssignmentSingleUser";
-import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
 import AddInlineProject from "@/app/components/addInlineProject";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import ApproveHours from "@/app/components/userAssignment/approveHours";

@@ -1,300 +1,322 @@
-'use client'
+"use client";
 
-import React, { useState, useRef } from 'react';
-import { useFormik, FormikValues } from 'formik';
+import React, { useState, useRef } from "react";
+import { useFormik, FormikValues } from "formik";
 import { useMutation } from "@apollo/client";
 
 import { UPSERT_PROJECT, UPSERT_CLIENT } from "@/app/gqlQueries";
 import { ClientType, ProjectType } from "../typeInterfaces";
-import { AutocompleteInput } from './autocompleteInput';
-import { useUserDataContext } from '../contexts/userDataContext';
-import { useClientDataContext } from '../contexts/clientContext';
-import { useGeneralDataContext } from '../contexts/generalContext';
-import { useProjectsDataContext } from '../contexts/projectsDataContext';
+import { AutocompleteInput } from "./autocompleteInput";
+import { useUserDataContext } from "../contexts/userDataContext";
+import { useClientDataContext } from "../contexts/clientContext";
+import { useGeneralDataContext } from "../contexts/generalContext";
+import { useProjectsDataContext } from "../contexts/projectsDataContext";
+import CustomDateInput from "./customDateInput";
 
 interface NewProjectFormProps {
-    closeModal: () => void
+	closeModal: () => void;
 }
 
 const NewProjectForm = ({ closeModal }: NewProjectFormProps) => {
-    const { setUserList } = useUserDataContext()
-    const { clientList, setClientList, refetchClientList } = useClientDataContext()
-    const {
-        projectList,
-        setProjectList
-    } = useProjectsDataContext();
+	const { setUserList } = useUserDataContext();
+	const { clientList, setClientList, refetchClientList } =
+		useClientDataContext();
+	const { projectList, setProjectList } = useProjectsDataContext();
 
-    const { viewer } = useGeneralDataContext()
-    const [showNewClientModal, setShowNewClientModal] = useState<boolean>(false);
-    const clientInputRef = useRef<HTMLInputElement>(null);
+	const { viewer } = useGeneralDataContext();
+	const [showNewClientModal, setShowNewClientModal] = useState<boolean>(false);
+	const clientInputRef = useRef<HTMLInputElement>(null);
 
-    const [
-        upsertClient,
-        { data: mutationData, loading: mutationLoading, error: mutationError },
-    ] = useMutation(UPSERT_CLIENT, {
-        errorPolicy: "all",
-        onCompleted({ upsertClient }) {
-            setClientList([...clientList, upsertClient]);
-        },
-    });
+	const [
+		upsertClient,
+		{ data: mutationData, loading: mutationLoading, error: mutationError },
+	] = useMutation(UPSERT_CLIENT, {
+		errorPolicy: "all",
+		onCompleted({ upsertClient }) {
+			setClientList([...clientList, upsertClient]);
+		},
+	});
 
-    const [upsertProject] = useMutation(UPSERT_PROJECT, {
-        errorPolicy: "all",
-        onCompleted({ upsertProject }) {
-            if (upsertProject) {
-                refetchClientList()
-                setUserList((prev) =>
-                    prev.map((user) =>
-                        user.id === upsertProject.assignments?.[0].assignedUser.id
-                            ? {
-                                ...user,
-                                assignments: [...user.assignments, ...upsertProject.assignments],
-                            }
-                            : user
-                    )
-                );
-                setProjectList((prev) => [...prev, upsertProject]);
-            }
-        },
-    });
+	const [upsertProject] = useMutation(UPSERT_PROJECT, {
+		errorPolicy: "all",
+		onCompleted({ upsertProject }) {
+			if (upsertProject) {
+				refetchClientList();
+				setUserList((prev) =>
+					prev.map((user) =>
+						user.id === upsertProject.assignments?.[0].assignedUser.id
+							? {
+									...user,
+									assignments: [
+										...user.assignments,
+										...upsertProject.assignments,
+									],
+							  }
+							: user
+					)
+				);
+				setProjectList((prev) => [...prev, upsertProject]);
+			}
+		},
+	});
 
-    const validateForm = (values: FormikValues) => {
-        const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
-        if (!values.clientName) errors.clientName = "Client is required";
-        if (!values.projectName) errors.projectName = "Project name is required";
+	const validateForm = (values: FormikValues) => {
+		const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
+		if (!values.clientName) errors.clientName = "Client is required";
+		if (!values.projectName) errors.projectName = "Project name is required";
 
-        const currentClient = clientList.find((client: ClientType) => client.name === values.clientName);
-        if (values.projectName && currentClient) {
-            const projectNameExists = projectList.find((project: ProjectType) =>
-                project.name === values.projectName && currentClient.id === project.client.id);
-            if (projectNameExists) {
-                errors.projectName = "Project name already in use";
-            }
-        }
+		const currentClient = clientList.find(
+			(client: ClientType) => client.name === values.clientName
+		);
+		if (values.projectName && currentClient) {
+			const projectNameExists = projectList.find(
+				(project: ProjectType) =>
+					project.name === values.projectName &&
+					currentClient.id === project.client.id
+			);
+			if (projectNameExists) {
+				errors.projectName = "Project name already in use";
+			}
+		}
 
-        return errors;
-    }
+		return errors;
+	};
 
-    const formik = useFormik({
-        initialValues: {
-            projectName: '',
-            clientName: '',
-            budget: '',
-            hours: '',
-            startsOn: '',
-            endsOn: ''
-        },
-        validate: validateForm,
-        onSubmit: async (values) => {
-            let clientId = clientList?.find(
-                ({ name }: ClientType) => name === values.clientName
-            )?.id;
+	const formik = useFormik({
+		initialValues: {
+			projectName: "",
+			clientName: "",
+			budget: "",
+			hours: "",
+			startsOn: "",
+			endsOn: "",
+		},
+		validate: validateForm,
+		onSubmit: async (values) => {
+			let clientId = clientList?.find(
+				({ name }: ClientType) => name === values.clientName
+			)?.id;
 
-            if (!clientId) {
-                const { data } = await upsertClient({
-                    variables: { name: values.clientName },
-                });
-                clientId = data?.upsertClient?.id;
-            }
-            const variables = {
-                clientId,
-                name: values.projectName,
-                hours: +values.hours,
-                assignments: [{ userId: viewer?.id }]
-            };
+			if (!clientId) {
+				const { data } = await upsertClient({
+					variables: { name: values.clientName },
+				});
+				clientId = data?.upsertClient?.id;
+			}
+			const variables = {
+				clientId,
+				name: values.projectName,
+				hours: +values.hours,
+				assignments: [{ userId: viewer?.id }],
+			};
 
-            const nullableDates = () => {
-                if (values.startsOn && values.endsOn) {
-                    return {
-                        ...variables,
-                        endsOn: values.endsOn,
-                        startsOn: values.startsOn,
-                    };
-                }
-                if (values.startsOn && !values.endsOn) {
-                    return { ...variables, startsOn: values.startsOn };
-                }
-                if (!values.startsOn && values.endsOn) {
-                    return { ...variables, endsOn: values.endsOn };
-                }
-                return variables;
-            };
-            upsertProject({
-                variables: nullableDates(),
-            })
-            closeModal()
-        },
-    });
+			const nullableDates = () => {
+				if (values.startsOn && values.endsOn) {
+					return {
+						...variables,
+						endsOn: values.endsOn,
+						startsOn: values.startsOn,
+					};
+				}
+				if (values.startsOn && !values.endsOn) {
+					return { ...variables, startsOn: values.startsOn };
+				}
+				if (!values.startsOn && values.endsOn) {
+					return { ...variables, endsOn: values.endsOn };
+				}
+				return variables;
+			};
+			upsertProject({
+				variables: nullableDates(),
+			});
+			closeModal();
+		},
+	});
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        if (formik.dirty) {
-            formik.handleSubmit();
-        }
-    };
+	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		if (formik.dirty) {
+			formik.handleSubmit();
+		}
+	};
 
-    const handleClientChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        formik.handleChange(e);
-    };
+	const handleClientChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		formik.handleChange(e);
+	};
 
-    const handleClientSelect = (client: ClientType) => {
-        formik.setFieldValue("clientName", client.name);
-    };
+	const handleClientSelect = (client: ClientType) => {
+		formik.setFieldValue("clientName", client.name);
+	};
 
-    const handleClientBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
-        formik.handleBlur(e)
-        const inputValue = e.target.value
+	const handleClientBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
+		formik.handleBlur(e);
+		const inputValue = e.target.value;
 
-        if (inputValue) {
-            const existedClient = clientList?.find(
-                ({ name }: ClientType) => name === inputValue
-            );
-            if (!existedClient) {
-                setShowNewClientModal(true);
-            }
+		if (inputValue) {
+			const existedClient = clientList?.find(
+				({ name }: ClientType) => name === inputValue
+			);
+			if (!existedClient) {
+				setShowNewClientModal(true);
+			}
+		}
+	};
 
-        }
-    };
+	const handleNewClientCancel = () => {
+		setShowNewClientModal(false);
 
+		if (clientInputRef?.current) {
+			clientInputRef?.current.focus();
+		}
+	};
 
-    const handleNewClientCancel = () => {
-        setShowNewClientModal(false)
-
-        if (clientInputRef?.current) {
-            clientInputRef?.current.focus();
-        }
-    }
-
-    return (
-        <form onSubmit={handleSubmit} className='flex flex-col' >
-            <div className='flex flex-col mt-2 mb-2'>
-                <label className='py-1 text-tiny' >Project Name</label>
-                <input
-                    type="text"
-                    name="projectName"
-                    value={formik.values.projectName}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    className="h-10 px-2 rounded-sm shadow-top-input-shadow font-bold focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-huge text-contrastBlue min-w-[370px]"
-                    placeholder="Project Name"
-                />
-                {formik.touched.projectName && formik.errors.projectName ? (
-                    <p className="text-tiny px-2 text-red-500">{formik.errors.projectName}</p>
-                ) : null}
-            </div>
-            <div className='flex flex-col mt-1 mb-1'>
-                <label className='py-1 text-tiny'>Client</label>
-                <AutocompleteInput
-                    ref={clientInputRef}
-                    items={clientList}
-                    inputName="clientName"
-                    value={formik.values.clientName}
-                    onItemSelect={handleClientSelect}
-                    onChange={handleClientChange}
-                    onBlur={handleClientBlur}
-                    inputClassName="h-8 px-2 rounded-sm max-w-[370px]"
-                    listClassName='p-2'
-                    displayKey="name"
-                    placeholder="Client"
-                />
-            </div>
-            {formik.touched.clientName && formik.errors.clientName ? (
-                <p className="text-tiny px-2 text-red-500">{formik.errors.clientName}</p>
-            ) : null}
-            {showNewClientModal && (
-                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded-md shadow-md">
-                        <p className="mb-4">Is &quot;{formik.values.clientName}&quot; a new client?</p>
-                        <div className="flex justify-center">
-                            <button
-                                className="mr-2 px-4 py-2 text-tiny font-bold bg-tiffany rounded-sm text-white"
-                                onClick={() => setShowNewClientModal(false)}
-                            >
-                                Yes
-                            </button>
-                            <button
-                                className="px-4 py-2 text-tiny font-bold bg-contrastGrey rounded-sm text-white"
-                                onClick={() => handleNewClientCancel()}
-                            >
-                                No
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-            <div className='flex flex-col mt-1 mb-1'>
-                <label className='py-1 text-tiny'>Budget (optional)</label>
-                <input
-                    type="text"
-                    name="budget"
-                    disabled={true} //temporary
-                    value={formik.values.budget}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    className="h-6 px-2 text-tiny shadow-top-input-shadow font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none  text-contrastBlue max-w-[370px]"
-                    placeholder="Budget"
-                />
-                {formik.touched.budget && formik.errors.budget ? (
-                    <div className="text-tiny px-2 text-red-500">{formik.errors.budget}</div>
-                ) : null}
-            </div>
-            <div className='flex flex-col mt-1 mb-1'>
-                <label className='py-1 text-tiny'>Hours (optional)</label>
-                <input
-                    type="text"
-                    name="hours"
-                    value={formik.values.hours}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    className="h-6 px-2 text-tiny shadow-top-input-shadow font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none  text-contrastBlue max-w-[370px]"
-                    placeholder="Hours"
-                />
-                {formik.touched.hours && formik.errors.hours ? (
-                    <div className="text-tiny px-2 text-red-500">{formik.errors.hours}</div>
-                ) : null}
-            </div>
-            <div className='flex flex-row justify-between'>
-                <div className='flex flex-col mt-1 mb-2 mr-2 w-full'>
-                    <label className='py-1 text-tiny'>Start Date (optional)</label>
-                    <input
-                        type="date"
-                        name="startsOn"
-                        value={formik.values.startsOn}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        className="h-6 px-2 text-tiny shadow-top-input-shadow font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none  text-contrastBlue"
-                        placeholder="Start Date"
-                    />
-                    {formik.touched.hours && formik.errors.hours ? (
-                        <div className="text-tiny px-2 text-red-500">{formik.errors.hours}</div>
-                    ) : null}
-                </div>
-                <div className='flex flex-col mt-1 mb-2 w-full ml-2'>
-                    <label className='py-1 text-tiny'>Ends Date (optional)</label>
-                    <input
-                        type="date"
-                        name="endsOn"
-                        value={formik.values.endsOn}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        className="h-6 px-2 text-tiny shadow-top-input-shadow font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none  text-contrastBlue"
-                        placeholder="Ends On"
-                    />
-                    {formik.touched.hours && formik.errors.endsOn ? (
-                        <div className="text-tiny px-2 text-red-500">{formik.errors.endsOn}</div>
-                    ) : null}
-                </div>
-            </div>
-            <button
-                type='submit'
-                className='w-full h-10 text-tiny font-bold bg-tiffany rounded-sm text-white pt-1 mb-4 mt-2'
-                disabled={!formik.isValid}
-            >
-                Save
-            </button>
-            <button onClick={closeModal} className='w-full h-10 text-tiny font-bold bg-contrastGrey rounded-sm text-white py-1 mb-1'>Cancel</button>
-        </form >
-    );
+	return (
+		<form onSubmit={handleSubmit} className="flex flex-col">
+			<div className="flex flex-col mt-2 mb-2">
+				<label className="py-1 text-tiny">Project Name</label>
+				<input
+					type="text"
+					name="projectName"
+					value={formik.values.projectName}
+					onChange={formik.handleChange}
+					onBlur={formik.handleBlur}
+					className="h-10 px-2 rounded-sm shadow-top-input-shadow font-bold focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-huge text-contrastBlue min-w-[370px]"
+					placeholder="Project Name"
+				/>
+				{formik.touched.projectName && formik.errors.projectName ? (
+					<p className="text-tiny px-2 text-red-500">
+						{formik.errors.projectName}
+					</p>
+				) : null}
+			</div>
+			<div className="flex flex-col mt-1 mb-1">
+				<label className="py-1 text-tiny">Client</label>
+				<AutocompleteInput
+					ref={clientInputRef}
+					items={clientList}
+					inputName="clientName"
+					value={formik.values.clientName}
+					onItemSelect={handleClientSelect}
+					onChange={handleClientChange}
+					onBlur={handleClientBlur}
+					inputClassName="h-8 px-2 rounded-sm max-w-[370px]"
+					listClassName="p-2"
+					displayKey="name"
+					placeholder="Client"
+				/>
+			</div>
+			{formik.touched.clientName && formik.errors.clientName ? (
+				<p className="text-tiny px-2 text-red-500">
+					{formik.errors.clientName}
+				</p>
+			) : null}
+			{showNewClientModal && (
+				<div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+					<div className="bg-white p-6 rounded-md shadow-md">
+						<p className="mb-4">
+							Is &quot;{formik.values.clientName}&quot; a new client?
+						</p>
+						<div className="flex justify-center">
+							<button
+								className="mr-2 px-4 py-2 text-tiny font-bold bg-tiffany rounded-sm text-white"
+								onClick={() => setShowNewClientModal(false)}
+							>
+								Yes
+							</button>
+							<button
+								className="px-4 py-2 text-tiny font-bold bg-contrastGrey rounded-sm text-white"
+								onClick={() => handleNewClientCancel()}
+							>
+								No
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+			<div className="flex flex-col mt-1 mb-1">
+				<label className="py-1 text-tiny">Budget (optional)</label>
+				<input
+					type="text"
+					name="budget"
+					disabled={true} //temporary
+					value={formik.values.budget}
+					onChange={formik.handleChange}
+					onBlur={formik.handleBlur}
+					className="h-6 px-2 text-tiny shadow-top-input-shadow font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none  text-contrastBlue max-w-[370px]"
+					placeholder="Budget"
+				/>
+				{formik.touched.budget && formik.errors.budget ? (
+					<div className="text-tiny px-2 text-red-500">
+						{formik.errors.budget}
+					</div>
+				) : null}
+			</div>
+			<div className="flex flex-col mt-1 mb-1">
+				<label className="py-1 text-tiny">Hours (optional)</label>
+				<input
+					type="text"
+					name="hours"
+					value={formik.values.hours}
+					onChange={formik.handleChange}
+					onBlur={formik.handleBlur}
+					className="h-6 px-2 text-tiny shadow-top-input-shadow font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none  text-contrastBlue max-w-[370px]"
+					placeholder="Hours"
+				/>
+				{formik.touched.hours && formik.errors.hours ? (
+					<div className="text-tiny px-2 text-red-500">
+						{formik.errors.hours}
+					</div>
+				) : null}
+			</div>
+			<div className="flex flex-row justify-between">
+				<div className="flex flex-col mt-1 mb-2 mr-2 w-full">
+					<label className="py-1 text-tiny">Start Date (optional)</label>
+					<CustomDateInput
+						name="startsOn"
+						errorString="Invalid start date format. Please use dd/Mon/yr."
+						value={formik.values.startsOn}
+						onChange={(value) => formik.setFieldValue("startsOn", value)}
+						onBlur={() => formik.setFieldTouched("startsOn", true)}
+						setError={(error) => formik.setFieldError("startsOn", error)}
+					/>
+					{formik.touched.hours && formik.errors.hours ? (
+						<div className="text-tiny px-2 text-red-500">
+							{formik.errors.hours}
+						</div>
+					) : null}
+				</div>
+				<div className="flex flex-col mt-1 mb-2 w-full ml-2">
+                <label className="py-1 text-tiny">Ends Date (optional)</label>
+						<CustomDateInput
+							name="endsOn"
+							errorString="Invalid end date format. Please use dd/Mon/yr."
+							value={formik.values.endsOn}
+							onChange={(value) => formik.setFieldValue("endsOn", value)}
+							onBlur={() => formik.setFieldTouched("endsOn", true)}
+							setError={(error) => formik.setFieldError("endsOn", error)}
+						/>
+					{formik.touched.hours && formik.errors.endsOn ? (
+						<div className="text-tiny px-2 text-red-500">
+							{formik.errors.endsOn}
+						</div>
+					) : null}
+				</div>
+			</div>
+			<button
+				type="submit"
+				className="w-full h-10 text-tiny font-bold bg-tiffany rounded-sm text-white pt-1 mb-4 mt-2"
+				disabled={!formik.isValid}
+			>
+				Save
+			</button>
+			<button
+				onClick={closeModal}
+				className="w-full h-10 text-tiny font-bold bg-contrastGrey rounded-sm text-white py-1 mb-1"
+			>
+				Cancel
+			</button>
+		</form>
+	);
 };
 
 export default NewProjectForm;

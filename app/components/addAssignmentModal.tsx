@@ -2,12 +2,12 @@
 import { useState, ReactNode } from "react";
 import { Field, Formik, FormikValues } from "formik";
 
-import ProjectDatepicker from "./projectDatepicker";
 import { useMutation } from "@apollo/client";
 import { ProjectType, UserType } from "../typeInterfaces";
 import { UPSERT_ASSIGNMENT } from "../gqlQueries";
 import { useUserDataContext } from "../contexts/userDataContext";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
+import CustomDateInput from "./customDateInput";
 
 interface AddAssignmentModalProps {
 	user?: UserType;
@@ -15,33 +15,37 @@ interface AddAssignmentModalProps {
 	closeModal: () => void;
 }
 
-const AddAssignmentModal = ({ closeModal, user, project }: AddAssignmentModalProps) => {
+const AddAssignmentModal = ({
+	closeModal,
+	user,
+	project,
+}: AddAssignmentModalProps) => {
 	const [selectedProject, setSelectedProject] = useState<Partial<ProjectType>>(
 		{}
 	);
 
-	const { userList, refetchUserList } = useUserDataContext()
-	const { projectList, refetchProjectList } = useProjectsDataContext()
+	const { userList, refetchUserList } = useUserDataContext();
+	const { projectList, refetchProjectList } = useProjectsDataContext();
 
 	const autoFillAssignmentValues = {
-		dates: {
-			endsOn: project?.endsOn || "",
-			startsOn: project?.startsOn || "",
-		},
+		endsOn: project?.endsOn || "",
+		startsOn: project?.startsOn || "",
 		hours: 0,
 		projectId: project?.id,
 		status: false,
 		userId: "",
 	};
 	const autoFillUserValues = {
-		dates: { endsOn: "", startsOn: "" },
+		endsOn: "",
+		startsOn: "",
 		hours: 0,
 		projectId: "",
 		status: false,
 		userId: user?.id,
 	};
 	const newAssignmentInitialValues = {
-		dates: { endsOn: "", startsOn: "" },
+		endsOn: "",
+		startsOn: "",
 		hours: 0,
 		projectId: "",
 		status: false,
@@ -65,7 +69,8 @@ const AddAssignmentModal = ({ closeModal, user, project }: AddAssignmentModalPro
 		projectId,
 		userId,
 		status,
-		dates,
+		startsOn,
+		endsOn,
 		hours,
 	}: FormikValues) => {
 		const variables = {
@@ -75,18 +80,18 @@ const AddAssignmentModal = ({ closeModal, user, project }: AddAssignmentModalPro
 			estimatedWeeklyHours: hours,
 		};
 		const nullableDates = () => {
-			if (dates.startsOn && dates.endsOn) {
+			if (startsOn && endsOn) {
 				return {
 					...variables,
-					endsOn: dates.endsOn,
-					startsOn: dates.startsOn,
+					endsOn,
+					startsOn,
 				};
 			}
-			if (dates.startsOn && !dates.endsOn) {
-				return { ...variables, startsOn: dates.startsOn };
+			if (startsOn && !endsOn) {
+				return { ...variables, startsOn };
 			}
-			if (!dates.startsOn && dates.endsOn) {
-				return { ...variables, endsOn: dates.endsOn };
+			if (!startsOn && endsOn) {
+				return { ...variables, endsOn };
 			}
 			return variables;
 		};
@@ -97,7 +102,7 @@ const AddAssignmentModal = ({ closeModal, user, project }: AddAssignmentModalPro
 				refetchUserList();
 				refetchProjectList();
 			}
-			closeModal()
+			closeModal();
 		});
 	};
 	const validateForm = (values: FormikValues) => {
@@ -113,12 +118,12 @@ const AddAssignmentModal = ({ closeModal, user, project }: AddAssignmentModalPro
 				errors.projectId = "Must select a valid Project";
 			}
 		}
-		if (values.dates) {
-			const startDate = new Date(values.dates.startsOn);
-			const endDate = new Date(values.dates.endsOn);
+		if (values.startsOn && values.endsOn) {
+			const startDate = new Date(values.startsOn);
+			const endDate = new Date(values.endsOn);
 
 			if (startDate && endDate && startDate > endDate) {
-				errors.dates = { endsOn: "Start must be before end" };
+				errors.endsOn = "Start must be before end";
 			}
 		}
 		return errors;
@@ -151,6 +156,9 @@ const AddAssignmentModal = ({ closeModal, user, project }: AddAssignmentModalPro
 											handleChange,
 											values,
 											setErrors,
+											setFieldError,
+											setFieldValue,
+											setFieldTouched,
 											handleSubmit,
 											handleBlur,
 											errors,
@@ -176,7 +184,8 @@ const AddAssignmentModal = ({ closeModal, user, project }: AddAssignmentModalPro
 																<>
 																	<option key="TBD" value="">
 																		TBD
-																	</option>,
+																	</option>
+																	,
 																	{userList?.map((user: UserType) => (
 																		<option
 																			key={`${user.id} + ${user.name}`}
@@ -205,17 +214,15 @@ const AddAssignmentModal = ({ closeModal, user, project }: AddAssignmentModalPro
 																id="projectId"
 															>
 																<option value={""}>SELECT</option>
-																{projectList?.map(
-																	(project: ProjectType) => (
-																		<option
-																			key={`${project.id} + ${project.name}`}
-																			value={project.id}
-																		>
-																			{" "}
-																			{project.name}
-																		</option>
-																	)
-																)}
+																{projectList?.map((project: ProjectType) => (
+																	<option
+																		key={`${project.id} + ${project.name}`}
+																		value={project.id}
+																	>
+																		{" "}
+																		{project.name}
+																	</option>
+																))}
 															</Field>
 														</label>
 													</div>
@@ -245,13 +252,36 @@ const AddAssignmentModal = ({ closeModal, user, project }: AddAssignmentModalPro
 															</div>
 														</div>
 													</div>
-													<Field
-														selectedProject={selectedProject}
-														handleBlur={handleBlur}
-														name="dates"
-														component={ProjectDatepicker}
-														assignmentView={true}
-													/>
+													<label className="block mb-2">
+														Start Date
+														<CustomDateInput
+															name="startsOn"
+															errorString="Invalid start date format. Please use dd/Mon/yr."
+															value={values.startsOn}
+															onChange={(value) =>
+																setFieldValue("startsOn", value)
+															}
+															onBlur={() => setFieldTouched("startsOn", true)}
+															setError={(error) =>
+																setFieldError("startsOn", error)
+															}
+														/>
+													</label>
+													<label className="block mb-2">
+														End Date
+														<CustomDateInput
+															name="endsOn"
+															errorString="Invalid end date format. Please use dd/Mon/yr."
+															value={values.endsOn}
+															onChange={(value) =>
+																setFieldValue("endsOn", value)
+															}
+															onBlur={() => setFieldTouched("endsOn", true)}
+															setError={(error) =>
+																setFieldError("endsOn", error)
+															}
+														/>
+													</label>
 												</div>
 												{/* SECTION 3 */}
 												<div className="flex mb-4 justify-between">
@@ -272,7 +302,7 @@ const AddAssignmentModal = ({ closeModal, user, project }: AddAssignmentModalPro
 															type="button"
 															className="p-2 text-sm font-semibold leading-6 text-gray-900"
 															onClick={() => {
-																closeModal()
+																closeModal();
 																setErrors({});
 															}}
 														>
@@ -285,13 +315,13 @@ const AddAssignmentModal = ({ closeModal, user, project }: AddAssignmentModalPro
 														>
 															Save
 														</button>
-														{errors.dates &&
-															(touched.dates?.startsOn ||
-																touched.dates?.endsOn) && (
-																<div className="text-red-500">
-																	{errors.dates?.endsOn as ReactNode}
-																</div>
-															)}
+														{errors.startsOn ||
+															(errors.endsOn &&
+																(touched.startsOn || touched.endsOn) && (
+																	<div className="text-red-500">
+																		{errors.endsOn as ReactNode}
+																	</div>
+																))}
 														{errors.userId && touched.userId && (
 															<div className="text-red-500">
 																{errors.userId as ReactNode}

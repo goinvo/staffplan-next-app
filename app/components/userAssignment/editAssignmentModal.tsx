@@ -1,12 +1,12 @@
 "use client";
 import { ReactNode } from "react";
 import { Field, Formik, FormikValues } from "formik";
-import ProjectDatepicker from "../projectDatepicker";
 import { useMutation } from "@apollo/client";
 import { AssignmentType, ProjectType, UserType } from "../../typeInterfaces";
 import { UPSERT_ASSIGNMENT } from "../../gqlQueries";
 import { useUserDataContext } from "../../contexts/userDataContext";
 import { useProjectsDataContext } from "../../contexts/projectsDataContext";
+import CustomDateInput from "../customDateInput";
 
 interface EditAssignmentModalProps {
 	user?: UserType;
@@ -15,19 +15,23 @@ interface EditAssignmentModalProps {
 	closeModal: () => void;
 }
 
-const EditAssignmentModal = ({ closeModal, assignment,project }: EditAssignmentModalProps) => {
-	const { refetchUserList } = useUserDataContext()
-	const { refetchProjectList } = useProjectsDataContext()
+const EditAssignmentModal = ({
+	closeModal,
+	assignment,
+	project,
+}: EditAssignmentModalProps) => {
+	const { refetchUserList } = useUserDataContext();
+	const { refetchProjectList } = useProjectsDataContext();
 
-	const projectId = project ? project.id : assignment.project.id
+	const projectId = project ? project.id : assignment.project.id;
 	const initialValues = {
-		dates: {
-			endsOn: assignment?.endsOn || "",
-			startsOn: assignment?.startsOn || "",
-		},
-		hours: assignment.estimatedWeeklyHours ? assignment.estimatedWeeklyHours : 0,
+		endsOn: assignment?.endsOn || "",
+		startsOn: assignment?.startsOn || "",
+		hours: assignment.estimatedWeeklyHours
+			? assignment.estimatedWeeklyHours
+			: 0,
 		assignmentId: assignment?.id,
-        projectId: projectId,
+		projectId: projectId,
 		status: assignment.status === "active" ? true : false,
 		userId: assignment.assignedUser.id,
 	};
@@ -37,33 +41,34 @@ const EditAssignmentModal = ({ closeModal, assignment,project }: EditAssignmentM
 	] = useMutation(UPSERT_ASSIGNMENT);
 
 	const onSubmitUpsert = ({
+		projectId,
 		assignmentId,
-        projectId,
 		userId,
 		status,
-		dates,
+		startsOn,
+		endsOn,
 		hours,
 	}: FormikValues) => {
 		const variables = {
 			id: assignmentId,
-            projectId:projectId,
+			projectId: projectId,
 			userId: userId,
 			status: status ? "active" : "proposed",
 			estimatedWeeklyHours: hours,
 		};
 		const nullableDates = () => {
-			if (dates.startsOn && dates.endsOn) {
+			if (startsOn && endsOn) {
 				return {
 					...variables,
-					endsOn: dates.endsOn,
-					startsOn: dates.startsOn,
+					endsOn,
+					startsOn,
 				};
 			}
-			if (dates.startsOn && !dates.endsOn) {
-				return { ...variables, startsOn: dates.startsOn };
+			if (startsOn && !endsOn) {
+				return { ...variables, startsOn };
 			}
-			if (!dates.startsOn && dates.endsOn) {
-				return { ...variables, endsOn: dates.endsOn };
+			if (!startsOn && endsOn) {
+				return { ...variables, endsOn };
 			}
 			return variables;
 		};
@@ -74,7 +79,7 @@ const EditAssignmentModal = ({ closeModal, assignment,project }: EditAssignmentM
 				refetchUserList();
 				refetchProjectList();
 			}
-			closeModal()
+			closeModal();
 		});
 	};
 	const validateForm = (values: FormikValues) => {
@@ -111,6 +116,9 @@ const EditAssignmentModal = ({ closeModal, assignment,project }: EditAssignmentM
 											setErrors,
 											handleSubmit,
 											handleBlur,
+											setFieldError,
+											setFieldValue,
+											setFieldTouched,
 											errors,
 											touched,
 											isValid,
@@ -144,13 +152,36 @@ const EditAssignmentModal = ({ closeModal, assignment,project }: EditAssignmentM
 															</div>
 														</div>
 													</div>
-													<Field
-														selectedProject={assignment.project}
-														handleBlur={handleBlur}
-														name="dates"
-														component={ProjectDatepicker}
-														assignmentView={true}
-													/>
+													<label className="block mb-2">
+														Start Date
+														<CustomDateInput
+															name="startsOn"
+															errorString="Invalid start date format. Please use dd/Mon/yr."
+															value={values.startsOn}
+															onChange={(value) =>
+																setFieldValue("startsOn", value)
+															}
+															onBlur={() => setFieldTouched("startsOn", true)}
+															setError={(error) =>
+																setFieldError("startsOn", error)
+															}
+														/>
+													</label>
+													<label className="block mb-2">
+														End Date
+														<CustomDateInput
+															name="endsOn"
+															errorString="Invalid end date format. Please use dd/Mon/yr."
+															value={values.endsOn}
+															onChange={(value) =>
+																setFieldValue("endsOn", value)
+															}
+															onBlur={() => setFieldTouched("endsOn", true)}
+															setError={(error) =>
+																setFieldError("endsOn", error)
+															}
+														/>
+													</label>
 												</div>
 												{/* SECTION 2 */}
 												<div className="flex mb-4 justify-between">
@@ -171,7 +202,7 @@ const EditAssignmentModal = ({ closeModal, assignment,project }: EditAssignmentM
 															type="button"
 															className="p-2 text-sm font-semibold leading-6 text-gray-900"
 															onClick={() => {
-																closeModal()
+																closeModal();
 																setErrors({});
 															}}
 														>
@@ -184,11 +215,11 @@ const EditAssignmentModal = ({ closeModal, assignment,project }: EditAssignmentM
 														>
 															Save
 														</button>
-														{errors.dates &&
-															(touched.dates?.startsOn ||
-																touched.dates?.endsOn) && (
+														{errors &&
+															(touched.startsOn ||
+																touched.endsOn) && (
 																<div className="text-red-500">
-																	{errors.dates?.endsOn as ReactNode}
+																	{errors.endsOn as ReactNode}
 																</div>
 															)}
 														{errors.userId && touched.userId && (

@@ -58,7 +58,7 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({ name, value, o
                 value={manualInput}
                 onChange={handleInputChange}
                 onBlur={handleBlur}
-                placeholder="dd.LLL.yy"
+                placeholder="dd/Mon/yr"
                 className="h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-r-0 border-gray-300 outline-none"
             />
             <CalendarIcon className="absolute right-1 h-4 w-4 text-black" />
