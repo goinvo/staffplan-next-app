@@ -17,9 +17,9 @@ export const AllUserLabel = ({ user, clickHandler }: AllUserLabelProps) => {
 					/>
 				</div>
 				<button className="sm:px-2 px-1 sm:whitespace-nowrap" onClick={() => clickHandler(user)}>{user.name}</button>
-				<div className="hover:cursor-pointer ml-auto sm:flex hidden">
+				{/* <div className="hover:cursor-pointer ml-auto sm:flex hidden">
 					<EllipsisPeopleMenu user={user} />
-				</div>
+				</div> */}
 			</div>
 		</td >
 	);
