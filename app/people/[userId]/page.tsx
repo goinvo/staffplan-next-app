@@ -33,7 +33,7 @@ const UserPage: React.FC = () => {
 	const onComplete = () => {
 		setAddAssignmentVisible(false);
 	};
-	const columnsHeaderTitles = [{ title: 'Client', showIcon: true }, { title: 'Project', showIcon: false }]
+	const columnsHeaderTitles = [{ title: 'Client', showIcon: true }, { title: 'Projects', showIcon: false }]
 	return (
 		<>
 			{singleUserPage && userList.length ? (
