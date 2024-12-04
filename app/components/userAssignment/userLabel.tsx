@@ -218,10 +218,9 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 
 	];
 	return (
-		<div className={`sm:ml-auto ml-0 w-full sm:w-24 flex justify-between items-center ${isFirstClient ? "mb-4 sm:mb-0" : ''}`}>
+		<div className={`w-full ${isAssignmentProposed ? "sm:w-[38%]" : "sm:w-[43%]" } sm:mr-0 mr-2 flex justify-between items-start ${isFirstClient ? "mb-4 sm:mb-0" : ''}`}>
 			<button
-				className={`lg:pl-5 md:ml-2 lg:ml-0 pt-0 sm:pt-2 ${isAssignmentProposed ? "sm:pl-4" : "sm:pl-2"
-					} font-bold flex items-center justify-start text-contrastBlue text-start`}
+				className={`md:ml-2 lg:ml-0 pt-0 sm:pt-2  font-bold flex items-center justify-start text-contrastBlue text-start`}
 				onClick={() => clickHandler(assignment)}
 			>
 				{assignment.project.name}
