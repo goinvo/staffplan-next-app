@@ -21,8 +21,8 @@ const EllipsisDropdownMenu: React.FC<DropdownMenuProps> = ({
 }) => {
 	const dropdownSelectedItemClass = (isActive: boolean) => {
 		return isActive
-			? "px-4 py-2 block hover:text-tiffany hover:cursor-pointer text-sm"
-			: "text-gray-900 block px-4 py-2 text-sm";
+			? "block hover:text-tiffany hover:cursor-pointer text-sm"
+			: "text-gray-900 block text-sm";
 	};
 	return (
 		<Menu as="div" className="relative inline-block text-left z-15">

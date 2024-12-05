@@ -125,7 +125,7 @@ export const ProjectUserLabel = ({
 		{
 			component: (
 				<button
-					className="text-gray-900 block px-4 py-2 text-sm"
+					className="text-gray-900 w-full block px-8 py-4 text-sm text-left"
 					onClick={() =>
 						openModal(
 							<EditAssignmentModal
@@ -145,7 +145,7 @@ export const ProjectUserLabel = ({
 			component: (
 				<button
 					onClick={handleDeleteAssignmentClick}
-					className="text-gray-900 block px-4 py-2 text-sm"
+					className="text-gray-900 w-full block px-8 py-4 text-sm text-left"
 				>
 					Delete
 				</button>

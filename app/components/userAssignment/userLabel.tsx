@@ -192,7 +192,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 		{
 			component: (
 				<button
-					className="block px-4 py-2 text-sm"
+					className="block w-full px-8 py-4 text-sm text-left"
 					onClick={() =>
 						openModal(
 							<EditAssignmentModal
@@ -208,11 +208,11 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 			show: true,
 		},
 		{
-			component: <button onClick={handleArchiveAssignmentClick} className="block px-4 py-2 text-sm">Archive</button>,
+			component: <button onClick={handleArchiveAssignmentClick} className="block w-full px-8 py-4 text-sm text-left">Archive</button>,
 			show: showArchiveButton,
 		},
 		{
-			component: <button onClick={handleDeleteAssignmentClick} className="block px-4 py-2 text-sm">Delete</button>,
+			component: <button onClick={handleDeleteAssignmentClick} className="block w-full px-8 py-4 text-sm text-left">Delete</button>,
 			show: showDeleteButton,
 		},
 

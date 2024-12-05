@@ -36,8 +36,8 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 
 	const dropdownSelectedItemClass = (isActive: boolean) =>
 		isActive
-			? "px-4 py-2 block hover:text-accentgreen hover:cursor-pointer text-sm"
-			: "text-gray-900 block px-4 py-2 text-sm";
+			? "w-full px-4 py-2 block hover:text-accentgreen hover:cursor-pointer text-sm text-left"
+			: "text-gray-900 block w-full px-4 py-2 text-sm text-left";
 	const [
 		upsertProject,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
@@ -226,7 +226,7 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 
 						</MenuItem>
 						<MenuItem>
-							<button className="px-4 py-2 text-sm hover:text-accentgreen border-none" onClick={downloadCSV}>
+							<button className="w-full px-4 py-2 text-sm text-left hover:text-accentgreen border-none" onClick={downloadCSV}>
 								Export CSV
 							</button>
 						</MenuItem>
