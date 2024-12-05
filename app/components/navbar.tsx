@@ -43,15 +43,15 @@ const Navbar: React.FC = () => {
 	];
 	const ellipsisDropdownMenuOptions = [
 		{
-			component: <Link href={"https://github.com/goinvo/staffplan-next-app"}>{"Open Source"}</Link>,
+			component: <Link href={"https://github.com/goinvo/staffplan-next-app"} className="px-4 py-2 block">{"Open Source"}</Link>,
 			show: true,
 		},
 		{
-			component: <Link href={`${homepageUrl}/settings/profile`}>{"Settings"}</Link>,
+			component: <Link href={`${homepageUrl}/settings/profile`} className="px-4 py-2 block">{"Settings"}</Link>,
 			show: true,
 		},
 		{
-			component: <Link href={`${homepageUrl}/sign_out`}>{"Sign Out"}</Link>,
+			component: <Link href={`${homepageUrl}/sign_out`} className="px-4 py-2 block">{"Sign Out"}</Link>,
 			show: true,
 		},
 	];
