@@ -93,7 +93,7 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<
                         {filteredItems.map(item => (
                             <li
                                 key={String(item.id)}
-                                className={`hover:bg-gray-200 cursor-pointer ${listClassName}`}
+                                className={`hover:bg-gray-200 cursor-pointer text-left px-1 ${listClassName}`}
                                 onMouseDown={() => handleItemSelect(item)}
                             >
                                 {String(item[displayKey])}
