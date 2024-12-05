@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 import { SlPencil } from "react-icons/sl";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
@@ -51,6 +52,10 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     const [isEditing, setIsEditing] = useState(false);
     const { setDateRange, scrollToTodayFunction } = useGeneralDataContext();
     const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } = calculateTotalHoursPerWeek(assignments as AssignmentType[], months)
+    const pathname = usePathname();
+
+    const isStaffPlanPAge = pathname.includes('people') && pathname.split('/').length === 3
+    const isProjectsPage = pathname.includes('projects')
 
     const nextWeek = () => {
         setDateRange(getNextWeeksPerView(months));
@@ -139,14 +144,15 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                     <div className='sm:flex hidden  flex-row justify-between items-start'>
                         {columnHeaderTitles?.map((el, i) => {
                             return (
-                                <div key={el.title} className={`w-24 flex ${!el.showIcon ? 'mx-auto md:pl-2 lg:pl-0' : ''} items-center justify-start text-start ${el.onClick ? 'cursor-pointer' : ''}`} onClick={el?.onClick}>
+                                <div key={el.title} className={`flex  items-center justify-start text-start ${((isProjectsPage && i === 0) && "w-[45%]") || ((isProjectsPage && i === 1) && "w-[45%] lg:pl-0 pl-[5px]" ) || ((isStaffPlanPAge && i === 0) && "w-[36%]") || ((isStaffPlanPAge && i === 1) && "w-[55%] sm:pl-[8px] md:pl-[14px] lg:pl-0 pl-[14px]") || "w-24"}
+                                ${el.onClick ? 'cursor-pointer' : ''}`} onClick={el?.onClick}>
                                     {el.showIcon && (
                                         <div className='mr-1 transform -translate-x-0.5'><PlusIcon className='w-4 h-4' /></div>
                                     )}
                                     <span>{el.title}</span>
                                 </div>)
                         })}
-                        <IconButton className='-m-1 sm:ml-2 lg:ml-0 text-black flex items-center justify-center' onClick={prevWeek} Icon={ChevronLeftIcon} iconSize={'h6 w-6'} />
+                        <IconButton className={`-m-1 sm:ml-2 lg:ml-0 text-black flex items-center justify-center`} onClick={prevWeek} Icon={ChevronLeftIcon} iconSize={'h6 w-6'} />
                     </div>
                 </th>
                 {months?.map((month) => {

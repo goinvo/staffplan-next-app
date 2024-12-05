@@ -27,7 +27,7 @@ const EllipsisDropdownMenu: React.FC<DropdownMenuProps> = ({
 	return (
 		<Menu as="div" className="relative inline-block text-left z-15">
 			<MenuButton
-				className={`flex items-center text-3xl ${textColor} hover:text-gray-300 sm:p-2 rounded-full ellipsismenu focus:outline-none ${menuPositioning}`}
+				className={`flex items-center text-3xl ${textColor} hover:text-gray-300 sm:py-2 sm:px-1 rounded-full ellipsismenu focus:outline-none ${menuPositioning}`}
 			/>
 
 			<Transition
