@@ -229,7 +229,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 			{showActionsButton &&
 				<EllipsisDropdownMenu
 					options={assignmentDropMenuOptions}
-					textColor={"text-gray-900"}
+					textColor={"actionbar-text-accent"}
 				/>
 			}
 		</div>
