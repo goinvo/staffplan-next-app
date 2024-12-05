@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
+import {  useRouter } from "next/navigation";
 import { useFormik, FormikValues } from "formik";
 import { useMutation } from "@apollo/client";
 
@@ -18,6 +19,7 @@ interface NewProjectFormProps {
 }
 
 const NewProjectForm = ({ closeModal }: NewProjectFormProps) => {
+	const router = useRouter()
 	const { setUserList } = useUserDataContext();
 	const { clientList, setClientList, refetchClientList } =
 		useClientDataContext();
@@ -56,6 +58,7 @@ const NewProjectForm = ({ closeModal }: NewProjectFormProps) => {
 					)
 				);
 				setProjectList((prev) => [...prev, upsertProject]);
+				router.push(`/projects/${upsertProject.id}`)
 			}
 		},
 	});
