@@ -164,7 +164,7 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 			id="add-dropdown"
 			data-testid="add-dropdown"
 		>
-			<MenuButton className="relative z-1 actionbar-text-accent w-full h-full rounded-full flex justify-center items-center ellipsismenu text-2xl"></MenuButton>
+			<MenuButton className="relative z-1 actionbar-text-accent hover:text-gray-900 w-full h-full rounded-full flex justify-center items-center ellipsismenu text-2xl"></MenuButton>
 
 			<Transition
 				as={Fragment}
