@@ -629,7 +629,11 @@ export const tabbingAndArrowNavigation = (
     }
     case "Tab": {
       event.preventDefault();
-      moveToNextInput();
+      if (event.shiftKey) {
+        moveToPrevInput();
+      } else {
+        moveToNextInput();
+      }
       break;
     }
 
