@@ -129,11 +129,35 @@ export const isBeforeWeek = (week: number, month: MonthsDataType) => {
   return false;
 };
 
-export const showMonthAndYear = (year: number, monthLabel: string) => {
-  if (monthLabel === "1") {
-    return DateTime.local(year, parseInt(monthLabel), 1).toFormat("MMM yyyy");
+export const getStartAndEndDatesOfWeek = (year: number, month: number, weekNumber: number) => {
+  const firstDayOfMonth = DateTime.fromObject({ year, month, day: 1 });
+
+  const weekdayOfFirstDay = firstDayOfMonth.weekday;
+
+  const offsetToFirstMonday = weekdayOfFirstDay === 1 ? 0 : 8 - weekdayOfFirstDay;
+
+  const firstMondayOfMonth = firstDayOfMonth.plus({ days: offsetToFirstMonday });
+
+  const startOfWeek = firstMondayOfMonth.plus({ weeks: weekNumber - 1 });
+
+  const endOfWeek = startOfWeek.plus({ days: 6 });
+
+  const startDate = startOfWeek.startOf('day');
+  const endDate = endOfWeek;
+
+  return {
+      startDate: startDate.toFormat("dd.MMM"),
+      endDate: endDate.toFormat("dd.MMM"),
+  };
+}
+
+export const showMonthAndYear = (year: number, monthLabel: string, weekNumber: number) => {
+  if (monthLabel === "1" && weekNumber === 2) {
+    return DateTime.local(year, parseInt(monthLabel), 1).toFormat("yyyy");
   }
-  return DateTime.local(year, parseInt(monthLabel), 1).toFormat("MMM");
+  if (weekNumber === 1) {
+    return DateTime.local(year, parseInt(monthLabel), 1).toFormat("MMM");
+  }
 };
 
 export const calculateTotalHoursPerWeek = (

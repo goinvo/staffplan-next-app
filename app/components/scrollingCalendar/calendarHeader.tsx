@@ -13,7 +13,7 @@ import IconButton from '../iconButton';
 
 import { useGeneralDataContext } from '@/app/contexts/generalContext';
 import { AssignmentType, MonthsDataType, ProjectSummaryInfoItem, ProjectType } from '@/app/typeInterfaces';
-import { calculateTotalHoursPerWeek, isBeforeWeek, showMonthAndYear, getNextWeeksPerView, getPrevWeeksPerView, currentWeek, currentYear } from './helpers';
+import { calculateTotalHoursPerWeek, isBeforeWeek, showMonthAndYear, getNextWeeksPerView, getPrevWeeksPerView, currentWeek, currentYear, getStartAndEndDatesOfWeek } from './helpers';
 import ViewsMenu from '../viewsMenu/viewsMenu';
 import EditFormController from './editFormController';
 import DraggableDates from '../projectAssignment/draggableProjectDates';
@@ -157,13 +157,23 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                 </th>
                 {months?.map((month) => {
                     return month.weeks.map((week, index) => {
+                        const { startDate, endDate } = getStartAndEndDatesOfWeek(month.year, Number(month.monthLabel), week.weekNumberOfTheMonth)
+                        const weekDateForTooltip = `${startDate} to ${endDate}`
+
                         const isCurrentWeek = currentWeek === week.weekNumberOfTheYear && currentYear === month.year
                         return (
                             <th key={`${month.monthLabel}-${index}`} className={`relative py-2 px-1 font-normal text-contrastBlue ${isCurrentWeek ? 'bg-selectedColumnBg' : ''}`}>
-                                <div className={`flex flex-col items-center sm:text-base text-2xl sm:w-[34px] w-[68px] ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year ? 'font-bold' : 'font-normal'}`}>
-                                    <span>{`W${week.weekNumberOfTheMonth}`}</span>
-                                    <span className={`${week.weekNumberOfTheMonth !== 1 ? 'sm:hidden' : ''}`}>
-                                        {showMonthAndYear(month.year, month.monthLabel)}
+                                <div className={`relative group flex flex-col items-center sm:text-base text-2xl sm:w-[34px] w-[68px] ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year ? 'font-bold' : 'font-normal'}`}>
+                                    <span>
+                                        {`W${week.weekNumberOfTheMonth}`}
+                                        <span className='absolute w-[70px] top-[27px] left-1/2 -translate-x-1/2 text-[8px] leading-5 text-white font-normal bg-contrastBlue rounded-md opacity-0 z-10 pointer-events-none group-hover:opacity-100 transition-opacity duration-200'
+                                        >
+                                            {weekDateForTooltip}
+                                            <div className="block h-[11px] w-[11px] bg-contrastBlue  absolute top-[-5px] left-1/2 -translate-x-1/2 transform rotate-[135deg] clip-triangle rounded-bl-[0.5em]"></div>
+                                        </span>
+                                    </span>
+                                    <span className={`${week.weekNumberOfTheMonth === 1 || week.weekNumberOfTheMonth === 2 ? '' : 'sm:hidden'}`}>
+                                        {showMonthAndYear(month.year, month.monthLabel, week.weekNumberOfTheMonth)}
                                     </span>
                                 </div>
                             </th>)
