@@ -82,7 +82,7 @@ const ProjectPage: React.FC = () => {
 		const endDate = singleProjectPage?.endsOn ? DateTime.fromISO(singleProjectPage.endsOn) : null;
 
 		if (!startDate && !endDate) {
-			return 'Start Date - End Date';
+			return;
 		}
 		const formattedStartDate = startDate?.toFormat('d.MMM')
 		const formattedEndDate = endDate?.toFormat('d.MMM')
@@ -120,7 +120,15 @@ const ProjectPage: React.FC = () => {
 		{ label: 'Actual', value: totalBurnedPerProject, show: true },
 		{ label: 'Delta', value: getDeltaValue(), show: !!singleProjectPage?.hours }
 	]
-	const projectInfoSubtitle = `${singleProjectPage?.client?.name}, budget, ${singleProjectPage?.hours || 0}h, ${selectedProjectDates()}`
+
+	const projectInfoSubtitle = [
+		singleProjectPage?.client?.name,
+		singleProjectPage?.hours ? `${singleProjectPage.hours}h` : null,
+		selectedProjectDates()
+	]
+	.filter(Boolean)
+	.join(', ');
+
 	return (
 		<>
 			{singleProjectPage && projectList.length ? (
