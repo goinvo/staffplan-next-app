@@ -161,7 +161,7 @@ export const ProjectUserLabel = ({
 					{showEllipsisMenu && (
 						<EllipsisDropdownMenu
 							options={assignmentDropMenuOptions}
-							textColor={"actionbar-text-accent"}
+							textColor={"actionbar-text-accent hover:text-contrastGrey"}
 							menuPositioning="relative -top-2.5"
 						/>
 					)}
