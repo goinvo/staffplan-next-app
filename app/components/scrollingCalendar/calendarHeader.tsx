@@ -15,7 +15,7 @@ import { useGeneralDataContext } from '@/app/contexts/generalContext';
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { AssignmentType, MonthsDataType, ProjectSummaryInfoItem, ProjectType } from '@/app/typeInterfaces';
-import { calculateTotalHoursPerWeek, isBeforeWeek, showMonthAndYear, getNextWeeksPerView, getPrevWeeksPerView, currentWeek, currentYear, getStartAndEndDatesOfWeek } from './helpers';
+import { calculateTotalHoursPerWeek, isBeforeWeek, showMonthAndYear, getNextWeeksPerView, getPrevWeeksPerView, currentWeek, currentYear, getStartAndEndDatesOfWeek, isTodayInRange } from './helpers';
 import ViewsMenu from '../viewsMenu/viewsMenu';
 import EditFormController from './editFormController';
 import DraggableDates from '../projectAssignment/draggableProjectDates';
@@ -56,6 +56,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     initialSorting
 }) => {
     const [isEditing, setIsEditing] = useState(false);
+    const [isTodayInView, setIsTodayInView] = useState(false)
     const [sortedBy, setSortedBy] = useState(initialSorting);
     const { setDateRange, scrollToTodayFunction } = useGeneralDataContext();
     const { setSortOrder: setSortOrderForPeople, setSortBy: setSortByForPeople  } = useUserDataContext();
@@ -67,6 +68,10 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     const isProjectPage = pathname.includes("projects") && pathname.split('/').length === 3;
     const isProjectsPage = pathname.includes('projects');
     const isPeoplePage = pathname.includes("people");
+
+    useEffect(() => {
+        setIsTodayInView(isTodayInRange(months)); 
+    }, [months]);
 
     useEffect(() => {
         if (isStaffPlanPage) {
@@ -142,7 +147,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     }
 
     return (
-        <thead>
+        <thead className='relative'>
             <tr className="pl-5 border-bottom bg-contrastBlue min-h-28 text-white sm:flex hidden">
                 <th className={`flex w-1/2 sm:w-1/3 px-0 py-5 ${isEditing ? 'lg:mr-0' : 'lg:mr-1'}`}>
                     {isEditing ? (
@@ -201,13 +206,6 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                     });
                 })}
                 <th className="pr-4 pl-2 py-2 w-1/2 sm:w-1/6">
-                    <div className="sm:flex hidden flex-row justify-between">
-                        <button
-                            onClick={scrollToTodayFunction}
-                        >
-                            Today
-                        </button>
-                    </div>
                 </th>
             </tr>
             <tr className="flex sm:justify-normal justify-between border-b border-gray-300 pl-5">
@@ -330,6 +328,13 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                     </div>
                 </th>
             </tr>
+            <button
+                className={`absolute -top-[12px] left-1/2 transform -translate-x-1/2 bg-[#AFB3BF] text-[#151F33] rounded-[3px] px-[10px] py-[2px] shadow-[0_4px_4px_0_rgba(0,0,0,0.25)]
+                    opacity-0 pointer-events-none ${!isTodayInView ? 'opacity-100 pointer-events-auto' : ''} transition-opacity duration-300 `}
+                onClick={scrollToTodayFunction}
+            >
+                Today
+            </button>
         </thead >
     )
 }
