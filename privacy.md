@@ -1,4 +1,4 @@
-Privacy Policy
+## Privacy Policy
 
 We value your privacy and believe in shared ownership of your data. Here’s how we handle it:
 
@@ -8,7 +8,7 @@ We value your privacy and believe in shared ownership of your data. Here’s how
 	4.	Your Rights: You can access, update, or delete your data anytime by contacting us.
 	5.	Legal Compliance: We're attempting to follow all applicable privacy laws (like GDPR and CCPA) to keep your rights respected.
 
-Terms of Use
+## Terms of Use
 
 	1.	Open Source: The software is licensed under Apache 2.0. Feel free to use, share, and improve—just follow the license rules.
 	2.	Data Respect: Data is co-owned by you and us. Treat it responsibly.
@@ -20,4 +20,4 @@ Terms of Use
 	8.	User Contributions: Contributions to the code are welcome! Follow open-source best practices and don’t submit malicious code.
 	9.	Legal Compliance: Don’t use the software in ways that violate the law, including export controls or regulations.
 
-Let’s build and use StaffPlan responsibly—together!
+Let’s build and use StaffPlan responsibly—together.
