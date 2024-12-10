@@ -120,9 +120,9 @@ export const UserAssignmentRow = ({
 	const isFirstRow = rowIndex === 0;
 	const isLastRow = rowIndex === totalRows - 1;
 	const rowClasses = mergeClasses(
-		'flex sm:justify-normal justify-between bg-white-300 hover:bg-hoverGrey pl-5',
-		{ 'border-t border-gray-300': isFirstClient && filterByClient && !isFirstRow },
-		{ 'border-b border-gray-300': !filterByClient || isLastRow },
+		'flex sm:justify-normal justify-between bg-white-300 hover:bg-hoverGrey pl-5 border-t border-gray-300',
+		/* { 'border-t border-gray-300': isFirstClient && filterByClient && !isFirstRow },
+		{ 'border-b border-gray-300': !filterByClient || isLastRow }, */
 		{ 'bg-diagonal-stripes': isAssignmentProposed }
 	);
 
@@ -137,12 +137,13 @@ export const UserAssignmentRow = ({
 					className='flex sm:flex-row flex-col w-full justify-between items-start '
 				>
 					<div className={`${isTempProject ? '' : 'sm:w-[35%]'} ${isFirstClient ? 'mb-1' : ''}`}>
-						{viewsFilterSingleUser === 'byClient' && isFirstClient && isFirstMonth && (
+						{/* {viewsFilterSingleUser === 'byClient' && isFirstClient && isFirstMonth && (
 							<ClientLabel assignment={assignment} selectedUser={selectedUser} />
 						)}
 						{viewsFilterSingleUser !== 'byClient' && isFirstMonth && (
 							<ClientLabel assignment={assignment} selectedUser={selectedUser} />
-						)}
+						)} */}
+						{!isTempProject && <ClientLabel assignment={assignment} selectedUser={selectedUser} />}
 					</div>
 					{isFirstMonth && (
 						isTempProject ? (

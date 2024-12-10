@@ -10,13 +10,20 @@ export const AllProjectLabel = ({
 	clickHandler,
 	undoRowRef,
 }: AllProjectLabelProps) => {
-	const { setShowOneClientProjects } = useProjectsDataContext()
+	const { showOneClientProjects, setShowOneClientProjects } = useProjectsDataContext()
+
 	return (
 		<div className="flex justify-between items-start sm:flex-row flex-col pt-2">
 			<IconButton
 				className={'text-contrastBlue w-auto sm:w-[45%] sm:flex hidden text-start transform -translate-x-0.5'}
 				Icon={PlusIcon} iconSize='h-4 w-4' text={project.client.name}
-				onClick={() => setShowOneClientProjects(project.client.id.toString())} />
+				onClick={() => {
+					if (showOneClientProjects === project.client.id.toString()) {
+						setShowOneClientProjects('')
+					} else {
+						setShowOneClientProjects(project.client.id.toString());
+					}
+				}} />
 			<span className="sm:hidden block mr-2">{project.client.name}</span>
 			<button
 				onClick={() => clickHandler(project)}

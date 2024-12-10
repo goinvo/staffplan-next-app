@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
@@ -12,30 +12,35 @@ import ColumnChart from '../columnChart';
 import IconButton from '../iconButton';
 
 import { useGeneralDataContext } from '@/app/contexts/generalContext';
+import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
+import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { AssignmentType, MonthsDataType, ProjectSummaryInfoItem, ProjectType } from '@/app/typeInterfaces';
 import { calculateTotalHoursPerWeek, isBeforeWeek, showMonthAndYear, getNextWeeksPerView, getPrevWeeksPerView, currentWeek, currentYear, getStartAndEndDatesOfWeek } from './helpers';
 import ViewsMenu from '../viewsMenu/viewsMenu';
 import EditFormController from './editFormController';
 import DraggableDates from '../projectAssignment/draggableProjectDates';
+import { SORT_ORDER } from './constants';
 
 interface ColumnHeaderTitle {
     title: string;
     showIcon: boolean;
+    onIconClick?: () => void;
     onClick?: () => void;
 }
 
 type CalendarHeaderProps = {
-    assignments: AssignmentType[] | AssignmentType | ProjectType[] | ProjectType,
-    months: MonthsDataType[],
-    avatarUrl?: string,
-    title?: string,
-    userName?: string,
-    editable?: boolean,
-    projectInfo?: string,
-    columnHeaderTitles: ColumnHeaderTitle[],
-    draggableDates?: boolean,
-    projectSummaryInfo?: ProjectSummaryInfoItem[];
-}
+  assignments: AssignmentType[] | AssignmentType | ProjectType[] | ProjectType;
+  months: MonthsDataType[];
+  avatarUrl?: string;
+  title?: string;
+  userName?: string;
+  editable?: boolean;
+  projectInfo?: string;
+  columnHeaderTitles: ColumnHeaderTitle[];
+  draggableDates?: boolean;
+  projectSummaryInfo?: ProjectSummaryInfoItem[];
+  initialSorting: { title: string; sort: SORT_ORDER };
+};
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     assignments,
@@ -47,15 +52,70 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     projectInfo,
     columnHeaderTitles,
     draggableDates = false,
-    projectSummaryInfo
+    projectSummaryInfo,
+    initialSorting
 }) => {
     const [isEditing, setIsEditing] = useState(false);
+    const [sortedBy, setSortedBy] = useState(initialSorting);
     const { setDateRange, scrollToTodayFunction } = useGeneralDataContext();
+    const { setSortOrder: setSortOrderForPeople, setSortBy: setSortByForPeople  } = useUserDataContext();
+    const { setSortOrder: setSortOrderForProjects, setSortBy: setSortByForProjects, setSortOrderSingleProject } = useProjectsDataContext();
     const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } = calculateTotalHoursPerWeek(assignments as AssignmentType[], months)
     const pathname = usePathname();
 
-    const isStaffPlanPAge = pathname.includes('people') && pathname.split('/').length === 3
-    const isProjectsPage = pathname.includes('projects')
+    const isStaffPlanPage = pathname.includes('people') && pathname.split('/').length === 3;
+    const isProjectPage = pathname.includes("projects") && pathname.split('/').length === 3;
+    const isProjectsPage = pathname.includes('projects');
+    const isPeoplePage = pathname.includes("people");
+
+    useEffect(() => {
+        if (isStaffPlanPage) {
+            setSortOrderForPeople(sortedBy.sort);
+            setSortByForPeople(sortedBy.title);
+
+            localStorage.setItem(
+              "staffPlanPageSorting",
+              JSON.stringify({
+                title: sortedBy.title,
+                sort: sortedBy.sort,
+              })
+            );
+        }
+        if (isProjectsPage) {
+            setSortOrderForProjects(sortedBy.sort);
+            setSortByForProjects(sortedBy.title);
+
+            localStorage.setItem(
+              "projectsPageSorting",
+              JSON.stringify({
+                title: sortedBy.title,
+                sort: sortedBy.sort,
+              })
+            );
+          }
+        if (isPeoplePage) {
+            setSortOrderForPeople(sortedBy.sort);
+
+            localStorage.setItem(
+              "peoplePageSorting",
+              JSON.stringify({
+                title: "People",
+                sort: sortedBy.sort,
+              })
+            );
+        }
+        if (isProjectPage) {
+            setSortOrderSingleProject(sortedBy.sort);
+
+            localStorage.setItem(
+              "projectPageSorting",
+              JSON.stringify({
+                title: "People",
+                sort: sortedBy.sort,
+              })
+            );
+        }
+    }, [sortedBy]);
 
     const nextWeek = () => {
         setDateRange(getNextWeeksPerView(months));
@@ -68,6 +128,18 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     const hasActualHoursForWeek = (year: number, week: number) => {
         return !!totalActualHours[`${year}-${week}`];
     };
+
+    const handleSorting = (title: string) => {
+        if (sortedBy.title !== title) {
+            setSortedBy({ title, sort: SORT_ORDER.ASC });
+        } else {
+            if (sortedBy.sort === SORT_ORDER.ASC) {
+                setSortedBy({ ...sortedBy, sort: SORT_ORDER.DESC });
+            } else {
+                setSortedBy({ ...sortedBy, sort: SORT_ORDER.ASC });
+            }
+        }
+    }
 
     return (
         <thead>
@@ -130,7 +202,6 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                 })}
                 <th className="pr-4 pl-2 py-2 w-1/2 sm:w-1/6">
                     <div className="sm:flex hidden flex-row justify-between">
-                        <ViewsMenu />
                         <button
                             onClick={scrollToTodayFunction}
                         >
@@ -144,13 +215,65 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                     <div className='sm:flex hidden  flex-row justify-between items-start'>
                         {columnHeaderTitles?.map((el, i) => {
                             return (
-                                <div key={el.title} className={`flex  items-center justify-start text-start ${((isProjectsPage && i === 0) && "w-[45%]") || ((isProjectsPage && i === 1) && "w-[45%] lg:pl-0 pl-[5px]" ) || ((isStaffPlanPAge && i === 0) && "w-[36%]") || ((isStaffPlanPAge && i === 1) && "w-[55%] sm:pl-[8px] md:pl-[14px] lg:pl-0 pl-[14px]") || "w-24"}
-                                ${el.onClick ? 'cursor-pointer' : ''}`} onClick={el?.onClick}>
-                                    {el.showIcon && (
-                                        <div className='mr-1 transform -translate-x-0.5'><PlusIcon className='w-4 h-4' /></div>
-                                    )}
-                                    <span>{el.title}</span>
-                                </div>)
+                              <div
+                                key={el.title}
+                                className={`flex  items-center justify-start text-start ${
+                                  (isProjectsPage && i === 0 && "w-[45%]") ||
+                                  (isProjectsPage &&
+                                    i === 1 &&
+                                    "w-[45%] lg:pl-0 pl-[5px]") ||
+                                  (isStaffPlanPage && i === 0 && "w-[36%]") ||
+                                  (isStaffPlanPage &&
+                                    i === 1 &&
+                                    "w-[55%] sm:pl-[8px] md:pl-[14px] lg:pl-0 pl-[14px]") ||
+                                  "w-24"
+                                }
+                                `}
+                              >
+                                {el.showIcon && (
+                                  <div
+                                    className={`mr-1 transform -translate-x-0.5 ${
+                                      el.onIconClick ? "cursor-pointer" : ""
+                                    }`}
+                                    onClick={el?.onIconClick}
+                                  >
+                                    <PlusIcon className="w-4 h-4" />
+                                  </div>
+                                )}
+                                <div
+                                  className="flex  items-center justify-start text-start cursor-pointer"
+                                  onClick={() => {
+                                    if (el?.onClick) {
+                                      el.onClick();
+                                    }
+                                    handleSorting(el.title);
+                                  }}
+                                >
+                                  <span>{el.title}</span>
+                                  <div
+                                    className={`transform ${
+                                      sortedBy.title !== el.title
+                                        ? "-rotate-90"
+                                        : ""
+                                    } 
+                                  ${
+                                    sortedBy.title === el.title &&
+                                    sortedBy.sort === SORT_ORDER.ASC
+                                      ? "-rotate-90"
+                                      : ""
+                                  } 
+                                  ${
+                                    sortedBy.title === el.title &&
+                                    sortedBy.sort === SORT_ORDER.DESC
+                                      ? "rotate-90"
+                                      : ""
+                                  } transition-transform duration-300 ease-in-out`}
+                                  >
+                                    <ChevronLeftIcon className="w-4 h-4" />
+                                  </div>
+                                </div>
+                              </div>
+                            );
                         })}
                         <IconButton className={`-m-1 sm:ml-2 lg:ml-0 text-black flex items-center justify-center`} onClick={prevWeek} Icon={ChevronLeftIcon} iconSize={'h6 w-6'} />
                     </div>

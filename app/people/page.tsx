@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import withApollo from "@/lib/withApollo";
 
 import { AssignmentType, UserType } from "../typeInterfaces";
@@ -7,8 +7,18 @@ import { LoadingSpinner } from "../components/loadingSpinner";
 import { ScrollingCalendar } from "../components/scrollingCalendar/scrollingCalendar";
 import { AllUserRow } from "../components/allUsers/allUserRow";
 import { useUserDataContext } from "../contexts/userDataContext";
+import { SORT_ORDER } from "../components/scrollingCalendar/constants";
 
 const PeopleView: React.FC = () => {
+  const [initialSorting, setInitialSorting] = useState<{title: string; sort: SORT_ORDER}>(() => {
+    if (typeof window !== "undefined" && localStorage) {
+      const savedInitialSorting = localStorage.getItem("peoplePageSorting");
+      return savedInitialSorting
+        ? JSON.parse(savedInitialSorting)
+        : { title: "People", sort: SORT_ORDER.ASC };
+    }
+  });
+
 	const { userList } = useUserDataContext();
 
 	const columnHeaderTitles = [{ title: 'People', showIcon: true }]
@@ -21,26 +31,31 @@ const PeopleView: React.FC = () => {
 	const allAssignments = getAllAssignments(userList)
 
 	return (
-		<>
-			{userList.length ? (
-				<ScrollingCalendar title='People' columnHeaderTitles={columnHeaderTitles} assignments={allAssignments}>
-					{userList?.map((user: UserType, index: number) => {
-						return (
-							<AllUserRow
-								key={index}
-								user={user}
-								monthData={{ monthLabel: "", year: 0 }}
-								isFirstMonth={true}
-								isLastMonth={true}
-							/>
-						);
-					})}
-				</ScrollingCalendar>
-			) : (
-				<LoadingSpinner />
-			)}
-		</>
-	);
+    <>
+      {userList.length ? (
+        <ScrollingCalendar
+          title="People"
+          columnHeaderTitles={columnHeaderTitles}
+          assignments={allAssignments}
+          initialSorting={initialSorting}
+        >
+          {userList?.map((user: UserType, index: number) => {
+            return (
+              <AllUserRow
+                key={index}
+                user={user}
+                monthData={{ monthLabel: "", year: 0 }}
+                isFirstMonth={true}
+                isLastMonth={true}
+              />
+            );
+          })}
+        </ScrollingCalendar>
+      ) : (
+        <LoadingSpinner />
+      )}
+    </>
+  );
 };
 
 export default withApollo(PeopleView);

@@ -4,10 +4,11 @@ import { useApolloClient, useQuery } from "@apollo/client";
 
 import { ProjectType, AssignmentType, UndoableModifiedProject } from "../typeInterfaces";
 import { GET_ALL_PROJECTS_DATA } from "../gqlQueries";
-import { sortProjectList, sortSingleProject } from "../helperFunctions";
+import { sortProjectList, sortProjectListByOrder, sortSingleProject, sortSingleProjectByOrder } from "../helperFunctions";
 import { useGeneralDataContext } from "./generalContext";
 import { useTaskQueue } from "../hooks/useTaskQueue";
 import useBeforeUnload from "../hooks/useBeforeUnload";
+import { SORT_ORDER } from "../components/scrollingCalendar/constants";
 
 type EnqueueTimerParams = {
   project: ProjectType;
@@ -20,15 +21,24 @@ type EnqueueTimerParams = {
 export interface ProjectsDataContextType {
   projectList: ProjectType[] | [];
   singleProjectPage: ProjectType;
+  sortOrder: SORT_ORDER;
+  sortBy: string;
+  sortOrderSingleProject: SORT_ORDER;
   viewsFilterProject: string;
   filteredProjectList: ProjectType[] | [];
   sortedSingleProjectAssignments: AssignmentType[];
   viewsFilterSingleProject: string;
-  projectsWithUndoActions: UndoableModifiedProject[]
+  projectsWithUndoActions: UndoableModifiedProject[];
+  showOneClientProjects: string;
   undoModifyProject: (projectId: number) => void;
   setViewsFilterSingleProject: React.Dispatch<React.SetStateAction<string>>;
   setProjectList: React.Dispatch<React.SetStateAction<ProjectType[] | []>>;
-  setFilteredProjectList: React.Dispatch<React.SetStateAction<ProjectType[] | []>>;
+  setFilteredProjectList: React.Dispatch<
+    React.SetStateAction<ProjectType[] | []>
+  >;
+  setSortOrder: React.Dispatch<React.SetStateAction<SORT_ORDER>>;
+  setSortBy: React.Dispatch<React.SetStateAction<string>>;
+  setSortOrderSingleProject: React.Dispatch<React.SetStateAction<SORT_ORDER>>;
   setViewsFilterProject: React.Dispatch<React.SetStateAction<string>>;
   setSingleProjectPage: React.Dispatch<React.SetStateAction<ProjectType>>;
   refetchProjectList: () => void;
@@ -58,6 +68,9 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
   const [projectList, setProjectList] = useState<ProjectType[] | []>([]);
   const [filteredProjectList, setFilteredProjectList] = useState<ProjectType[] | []>([])
   const [singleProjectPage, setSingleProjectPage] = useState<any>(null);
+  const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASC);
+  const [sortBy, setSortBy] = useState<string>("Projects");
+  const [sortOrderSingleProject, setSortOrderSingleProject] = useState<SORT_ORDER>(SORT_ORDER.ASC);
   const [viewsFilterProject, setViewsFilterProject] = useState<string>("abcProjectName")
   const [viewsFilterSingleProject, setViewsFilterSingleProject] = useState<string>("abcUserName")
   const [projectsWithUndoActions, setProjectsWithUndoActions] = useState<UndoableModifiedProject[]>([]);
@@ -89,7 +102,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
 
   const sortedAndFilteredProjects = useMemo(() => {
     if (!projectList.length) return [];
-    const sortedList = sortProjectList(viewsFilterProject, projectList);
+    const sortedList = sortProjectListByOrder(sortOrder, sortBy, projectList);
     if (sortedList) {
       const filteredByClient = showOneClientProjects
         ? sortedList.filter((project: ProjectType) => project.client.id.toString() === showOneClientProjects)
@@ -100,7 +113,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
 
       return finalFilteredList;
     }
-  }, [projectList, viewsFilterProject, showArchivedProjects, showOneClientProjects]);
+  }, [projectList, sortOrder, sortBy, showArchivedProjects, showOneClientProjects]);
 
   useEffect(() => {
     if (sortedAndFilteredProjects) {
@@ -111,11 +124,8 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
 
   const sortedSingleProjectAssignments = useMemo(() => {
     const assignments = singleProjectPage?.assignments || [];
-    return sortSingleProject(
-      viewsFilterSingleProject,
-      assignments
-    );
-  }, [viewsFilterSingleProject, singleProjectPage]);
+    return sortSingleProjectByOrder(sortOrderSingleProject, assignments);
+  }, [sortOrderSingleProject, singleProjectPage]);
 
   const refetchProjectList = () => {
     client
@@ -183,19 +193,26 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
         projectList,
         viewsFilterProject,
         singleProjectPage,
+        sortOrder,
+        sortBy,
+        sortOrderSingleProject,
         filteredProjectList,
         sortedSingleProjectAssignments,
         viewsFilterSingleProject,
         projectsWithUndoActions,
+        showOneClientProjects,
         undoModifyProject,
         enqueueTimer,
+        setSortOrder,
+        setSortBy,
+        setSortOrderSingleProject,
         setViewsFilterSingleProject,
         setFilteredProjectList,
         setProjectList,
         setViewsFilterProject,
         setSingleProjectPage,
         refetchProjectList,
-        setShowOneClientProjects
+        setShowOneClientProjects,
       }}
     >
       {children}
