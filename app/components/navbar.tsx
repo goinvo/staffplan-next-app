@@ -75,7 +75,7 @@ const Navbar: React.FC = () => {
 					onClick={() =>
 						openModal(<NewPersonAndProjectModal closeModal={closeModal} />)
 					}
-					iconSize="sm:block hidden h-8 w-8 rounded-md text-contrastGrey"
+					iconSize="sm:block hidden h-8 w-8 rounded-md text-contrastGrey hover:text-white"
 					className="px-8"
 				/>
 			</div>
@@ -103,7 +103,7 @@ const Navbar: React.FC = () => {
 				</div>
 				<EllipsisDropdownMenu
 					options={ellipsisDropdownMenuOptions}
-					textColor={"text-white"}
+					textColor={"text-contrastGrey hover:text-white"}
 				/>
 				{/* Temporary commented */}
 				{/* <div className="h-4 w-4">

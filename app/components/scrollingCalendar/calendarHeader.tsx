@@ -291,7 +291,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                               </div>
                             );
                         })}
-                        <IconButton className={`-m-1 sm:ml-2 lg:ml-0 text-black flex items-center justify-center`} onClick={prevWeek} Icon={ChevronLeftIcon} iconSize={'h6 w-6'} />
+                        <IconButton className={`-m-1 sm:ml-2 lg:ml-0 text-black flex items-center justify-center hover:text-contrastGrey`} onClick={prevWeek} Icon={ChevronLeftIcon} iconSize={'h6 w-6'} />
                     </div>
                 </th>
                 {months?.map((month) => {
@@ -321,7 +321,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                 })}
                 <th className="pl-0 pr-4 pt-1 pb-2 font-normal align-top w-1/2 sm:w-1/6">
                     <div className='flex flex-row items-start'>
-                        <IconButton className='sm:flex hidden pt-[2px] text-contrastBlue items-center justify-center'
+                        <IconButton className='sm:flex hidden pt-[2px] text-contrastBlue items-center justify-center hover:text-contrastGrey'
                             onClick={nextWeek}
                             Icon={ChevronRightIcon}
                             iconSize={'h6 w-6'} />
