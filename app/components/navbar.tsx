@@ -63,7 +63,7 @@ const Navbar: React.FC = () => {
 						key={link.href}
 						href={link.href}
 						className={`inline-flex items-center text-base sm:px-4 px-1 sm:py-2 py-1 rounded-md whitespace-nowrap ${link.isActive
-							? "bg-contrastBlue font-semibold"
+							? "bg-contrastBlue"
 							: "hover:bg-contrastBlue"
 							}`}
 					>
