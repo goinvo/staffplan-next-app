@@ -206,6 +206,24 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                     });
                 })}
                 <th className="pr-4 pl-2 py-2 w-1/2 sm:w-1/6">
+                    {projectSummaryInfo?.length && (<div className='sm:flex hidden justify-center flex-col pl-8 max-w-fit pt-1'>
+                            {projectSummaryInfo?.map((sum, index) =>
+                                (sum.show) ? (
+                                    <div
+                                        key={index}
+                                        className="flex relative justify-between space-x-0.5 font-normal "
+                                    >
+                                        <label className={`pr-1 text-sm leading-[18px] whitespace-nowrap`}>
+                                            {sum.label}
+                                        </label>
+                                        <span className="font-bold text-sm leading-[18px] mr-auto">
+                                            {sum.value}
+                                            <span className="font-normal text-sm leading-[18px] pl-1">hrs</span>
+                                        </span>
+                                    </div>
+                                ) : null
+                            )}
+                        </div>)}
                 </th>
             </tr>
             <tr className="flex sm:justify-normal justify-between border-b border-gray-300 pl-5">
@@ -307,24 +325,6 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                             onClick={nextWeek}
                             Icon={ChevronRightIcon}
                             iconSize={'h6 w-6'} />
-                        {projectSummaryInfo?.length && (<div className='sm:flex hidden justify-center flex-col pl-4 max-w-fit pt-1'>
-                            {projectSummaryInfo?.map((sum, index) =>
-                                (sum.show) ? (
-                                    <div
-                                        key={index}
-                                        className="flex relative justify-between space-x-0.5"
-                                    >
-                                        <label className={`text-sm pr-1 whitespace-nowrap`}>
-                                            {sum.label}
-                                        </label>
-                                        <span className="font-bold text-sm mr-auto">
-                                            {sum.value}
-                                            <span className="text-sm font-normal pl-1">hrs</span>
-                                        </span>
-                                    </div>
-                                ) : null
-                            )}
-                        </div>)}
                     </div>
                 </th>
             </tr>
