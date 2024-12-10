@@ -31,9 +31,12 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({ name, value, o
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const rawValue = e.target.value;
         setManualInput(rawValue);
-
+        if(rawValue.length === 0) {
+            onChange(null);
+            setError(undefined);
+            return;
+        }
         const parsedDate = DateTime.fromFormat(rawValue, "dd.LLL.yy");
-
         if (parsedDate.isValid) {
             const isoDate = parsedDate.toISODate();
             onChange(isoDate);
@@ -43,6 +46,11 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({ name, value, o
 
     const handleBlur = () => {
         const parsedDate = DateTime.fromFormat(manualInput, "dd.LLL.yy");
+        if(manualInput.length === 0) {
+            onChange(null);
+            setError(undefined);
+            return;
+        }
         if (!parsedDate.isValid) {
             setError(errorString || 'Invalid Date');
         } else {

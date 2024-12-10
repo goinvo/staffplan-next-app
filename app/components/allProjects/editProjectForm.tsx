@@ -122,6 +122,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		},
 		validate: validateForm,
 		onSubmit: async (values) => {
+			console.log(values,' values')
 			let clientId = clientList?.find(
 				(client) =>
 					client.name.toLowerCase() === values.clientName.toLowerCase()
