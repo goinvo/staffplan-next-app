@@ -5,7 +5,7 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import { AssignmentType, ClientType, UserType } from "../../typeInterfaces";
 import IconButton from "../iconButton";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
-import { sortSingleUser } from "@/app/helperFunctions";
+import { sortSingleUserByOrder } from "@/app/helperFunctions";
 
 interface ClientLabelProps {
 	assignment: AssignmentType;
@@ -13,7 +13,7 @@ interface ClientLabelProps {
 }
 
 export const ClientLabel = ({ assignment }: ClientLabelProps) => {
-	const { singleUserPage, setSingleUserPage, viewsFilterSingleUser } = useUserDataContext()
+	const { singleUserPage, setSingleUserPage, sortOrder, sortBy } = useUserDataContext()
 
 	const activeTempProject = singleUserPage?.assignments.some(a => {
 		return a.project.client.id === assignment.project.client.id &&
@@ -54,10 +54,10 @@ export const ClientLabel = ({ assignment }: ClientLabelProps) => {
 
 		// Add new assignment and then sort
 		const updatedAssignments = [...singleUserPage.assignments, newAssignment];
-		const sortedAssignments = sortSingleUser(viewsFilterSingleUser, {
-			...singleUserPage,
-			assignments: updatedAssignments
-		});
+		const sortedAssignments = sortSingleUserByOrder(sortOrder, sortBy, {
+      ...singleUserPage,
+      assignments: updatedAssignments,
+    });
 
 		setSingleUserPage(sortedAssignments);
 	};

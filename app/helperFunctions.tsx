@@ -7,6 +7,7 @@ import {
 	WorkWeekBlockMemberType,
 	ClassValue
 } from "./typeInterfaces";
+import { SORT_ORDER } from "./components/scrollingCalendar/constants";
 import _ from "lodash";
 import { DateTime, Interval } from "luxon";
 import { calculateWeeklyHoursForCSV, calculateWeeklyHoursPerProjectForCSV, groupAndSumWeeksByMonthForUsers, sortWeeklyHoursByDate, weekNumberToDateRange } from "./components/scrollingCalendar/helpers";
@@ -533,6 +534,41 @@ export const drawBar = (
 		/>
 	);
 };
+
+export const sortSingleProjectByOrder = (
+  sortOrder: SORT_ORDER,
+  assignments: AssignmentType[]
+) => {
+  const arrayToSort = assignments?.length ? [...assignments] : [];
+  if (sortOrder === SORT_ORDER.ASC) {
+    return arrayToSort.sort((a, b) => {
+      const userA = a.assignedUser ? a.assignedUser.name.toLowerCase() : "";
+      const userB = b.assignedUser ? b.assignedUser.name.toLowerCase() : "";
+      if (userA < userB) {
+        return -1;
+      }
+      if (userA > userB) {
+        return 1;
+      }
+      return 0;
+    });
+  }
+  if (sortOrder === SORT_ORDER.DESC) {
+    return arrayToSort.sort((a, b) => {
+      const userA = a.assignedUser ? a.assignedUser.name.toLowerCase() : "";
+      const userB = b.assignedUser ? b.assignedUser.name.toLowerCase() : "";
+      if (userA < userB) {
+        return 1;
+      }
+      if (userA > userB) {
+        return -1;
+      }
+      return 0;
+    });
+  }
+  return assignments;
+};
+
 export const sortSingleProject = (sortMethod: string, assignments: AssignmentType[]) => {
 	const arrayToSort = assignments?.length ? [...assignments] : [];
 	if (sortMethod === "abcUserName") {
@@ -585,24 +621,86 @@ export const sortSingleProject = (sortMethod: string, assignments: AssignmentTyp
 	return assignments;
 };
 
+export const sortProjectListByOrder = (
+  sortOrder: SORT_ORDER,
+  sortBy: string,
+  projectList: ProjectType[]
+) => {
+  const arrayToSort = [...projectList];
+
+  if (sortBy === "Projects" && sortOrder === SORT_ORDER.ASC) {
+    return arrayToSort.sort((a, b) => {
+      const projectA = a.name.toLowerCase();
+      const projectB = b.name.toLowerCase();
+      if (projectA < projectB) {
+        return -1;
+      }
+      if (projectA > projectB) {
+        return 1;
+      }
+      return 0;
+    });
+  }
+  if (sortBy === "Projects" && sortOrder === SORT_ORDER.DESC) {
+    return arrayToSort.sort((a, b) => {
+      const projectA = a.name.toLowerCase();
+      const projectB = b.name.toLowerCase();
+      if (projectA < projectB) {
+        return 1;
+      }
+      if (projectA > projectB) {
+        return -1;
+      }
+      return 0;
+    });
+  }
+
+  if (sortBy === "Clients" && sortOrder === SORT_ORDER.ASC) {
+    return arrayToSort.sort((a, b) => {
+      const projectA = a.client.name.toLowerCase();
+      const projectB = b.client.name.toLowerCase();
+      if (projectA < projectB) {
+        return -1;
+      }
+      if (projectA > projectB) {
+        return 1;
+      }
+      return 0;
+    });
+  }
+  if (sortBy === "Clients" && sortOrder === SORT_ORDER.DESC) {
+    return arrayToSort.sort((a, b) => {
+      const projectA = a.client.name.toLowerCase();
+      const projectB = b.client.name.toLowerCase();
+      if (projectA < projectB) {
+        return 1;
+      }
+      if (projectA > projectB) {
+        return -1;
+      }
+      return 0;
+    });
+  }
+};
+
 export const sortProjectList = (
 	sortMethod: string,
 	projectList: ProjectType[]
 ) => {
 	const arrayToSort = [...projectList];
 	if (sortMethod === "abcProjectName") {
-		return arrayToSort.sort((a, b) => {
-			const projectA = a.name.toLowerCase();
-			const projectB = b.name.toLowerCase();
-			if (projectA < projectB) {
-				return -1;
-			}
-			if (projectA > projectB) {
-				return 1;
-			}
-			return 0;
-		});
-	}
+    	return arrayToSort.sort((a, b) => {
+      const projectA = a.name.toLowerCase();
+      const projectB = b.name.toLowerCase();
+      if (projectA < projectB) {
+        return -1;
+      }
+      if (projectA > projectB) {
+        return 1;
+      }
+      return 0;
+    });
+  }
 	if (sortMethod === "status") {
 		return arrayToSort.sort((a, b) => {
 			const projectA = a.status.toLowerCase();
@@ -652,6 +750,70 @@ export const sortProjectList = (
 	}
 };
 
+export const sortSingleUserByOrder = (
+  sortOrder: SORT_ORDER,
+  sortBy: string,
+  user: UserType
+) => {
+  const arrayToSort = user.assignments?.length ? [...user.assignments] : [];
+  const sortedAssignments = { ...user, assignments: arrayToSort };
+
+  if (sortBy === "Projects" && sortOrder === SORT_ORDER.ASC) {
+    sortedAssignments.assignments.sort((a, b) => {
+      const projectA = a.project.name.toLowerCase();
+      const projectB = b.project.name.toLowerCase();
+      if (projectA < projectB) {
+        return -1;
+      }
+      if (projectA > projectB) {
+        return 1;
+      }
+      return 0;
+    });
+  }
+  if (sortBy === "Projects" && sortOrder === SORT_ORDER.DESC) {
+    sortedAssignments.assignments.sort((a, b) => {
+      const projectA = a.project.name.toLowerCase();
+      const projectB = b.project.name.toLowerCase();
+      if (projectA < projectB) {
+        return 1;
+      }
+      if (projectA > projectB) {
+        return -1;
+      }
+      return 0;
+    });
+  }
+
+  if (sortBy === "Client" && sortOrder === SORT_ORDER.ASC) {
+    sortedAssignments.assignments.sort((a, b) => {
+      const projectA = a.project.client.name.toLowerCase();
+      const projectB = b.project.client.name.toLowerCase();
+      if (projectA < projectB) {
+        return -1;
+      }
+      if (projectA > projectB) {
+        return 1;
+      }
+      return 0;
+    });
+  }
+  if (sortBy === "Client" && sortOrder === SORT_ORDER.DESC) {
+    sortedAssignments.assignments.sort((a, b) => {
+      const projectA = a.project.client.name.toLowerCase();
+      const projectB = b.project.client.name.toLowerCase();
+      if (projectA < projectB) {
+        return 1;
+      }
+      if (projectA > projectB) {
+        return -1;
+      }
+      return 0;
+    });
+  }
+  return sortedAssignments;
+};
+
 export const sortSingleUser = (sortMethod: string, user: UserType) => {
 	const arrayToSort = user.assignments?.length ? [...user.assignments] : [];
 	const sortedAssignments = { ...user, assignments: arrayToSort };
@@ -699,6 +861,42 @@ export const sortSingleUser = (sortMethod: string, user: UserType) => {
 	}
 	return sortedAssignments;
 };
+
+export const sortUserListByOrder = (
+  sortOrder: SORT_ORDER,
+  userList: UserType[]
+) => {
+  const arrayToSort = [...userList];
+  if (sortOrder === SORT_ORDER.ASC) {
+    return arrayToSort.sort((a, b) => {
+      const userA = a.name.toLowerCase();
+      const userB = b.name.toLowerCase();
+      if (userA < userB) {
+        return -1;
+      }
+      if (userA > userB) {
+        return 1;
+      }
+      return 0;
+    });
+  }
+
+  if (sortOrder === SORT_ORDER.DESC) {
+    return arrayToSort.sort((a, b) => {
+      const userA = a.name.toLowerCase();
+      const userB = b.name.toLowerCase();
+      if (userA < userB) {
+        return 1;
+      }
+      if (userA > userB) {
+        return -1;
+      }
+      return 0;
+    });
+  }
+  return userList;
+};
+
 export const sortUserList = (sortMethod: string, userList: UserType[]) => {
 	const arrayToSort = [...userList];
 	if (sortMethod === "abcUserName") {

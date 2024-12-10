@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import React, { useEffect, useCallback, useRef } from "react";
+import React, { useEffect, useCallback, useRef, useState } from "react";
 import withApollo from "@/lib/withApollo";
 
 import { useMutation } from "@apollo/client";
@@ -12,6 +12,7 @@ import { ProjectAssignmentRow } from "@/app/components/projectAssignment/project
 import { DateTime } from "luxon";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { calculatePlanFromToday } from "@/app/components/scrollingCalendar/helpers";
+import { SORT_ORDER } from "@/app/components/scrollingCalendar/constants";
 
 
 
@@ -19,6 +20,16 @@ const ProjectPage: React.FC = () => {
 	const params = useParams();
 	const selectedProjectId = decodeURIComponent(params.projectId.toString());
 	const inputRefs = useRef<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>([]);
+
+	const [initialSorting, setInitialSorting] = useState<{title: string; sort: SORT_ORDER}>(() => {
+    if (typeof window !== "undefined" && localStorage) {
+      const savedInitialSorting = localStorage.getItem("projectPageSorting");
+      return savedInitialSorting
+        ? JSON.parse(savedInitialSorting)
+        : { title: "People", sort: SORT_ORDER.ASC };
+    }
+  });
+
 	const [
 		upsertAssignment,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
@@ -95,7 +106,7 @@ const ProjectPage: React.FC = () => {
 	}
 
 
-	const columnHeaderTitles = [{ title: 'People', showIcon: true, onClick: () => addNewAssignmentRow() }]
+	const columnHeaderTitles = [{ title: 'People', showIcon: true, onIconClick: () => addNewAssignmentRow() }]
 
 	const totalPlanPerProject = sortedSingleProjectAssignments?.reduce((total, assignment) => {
 		return total + calculatePlanFromToday(assignment);
@@ -122,41 +133,43 @@ const ProjectPage: React.FC = () => {
 	]
 	const projectInfoSubtitle = `${singleProjectPage?.client?.name}, budget, ${singleProjectPage?.hours || 0}h, ${selectedProjectDates()}`
 	return (
-		<>
-			{singleProjectPage && projectList.length ? (
-				<>
-					<ScrollingCalendar
-						columnHeaderTitles={columnHeaderTitles}
-						title={singleProjectPage.name}
-						projectInfo={projectInfoSubtitle}
-						assignments={sortedSingleProjectAssignments || []}
-						editable={true}
-						draggableDates={true}
-						projectSummaryInfo={projectSummaryInfo}
-					>
-						{sortedSingleProjectAssignments?.map((assignment: AssignmentType, rowIndex) => {
-							return (
-								<ProjectAssignmentRow
-									project={singleProjectPage}
-									key={`${assignment.id}`}
-									assignment={assignment}
-									monthData={{ monthLabel: "", year: 0 }}
-									isFirstMonth={true}
-									isLastMonth={true}
-									rowIndex={rowIndex}
-									totalRows={sortedSingleProjectAssignments?.length || 0}
-									inputRefs={inputRefs}
-								/>
-							);
-						}
-						)}
-					</ScrollingCalendar>
-				</>
-			) : (
-				<LoadingSpinner />
-			)}
-		</>
-	);
+    <>
+      {singleProjectPage && projectList.length ? (
+        <>
+          <ScrollingCalendar
+            columnHeaderTitles={columnHeaderTitles}
+            title={singleProjectPage.name}
+            projectInfo={projectInfoSubtitle}
+            assignments={sortedSingleProjectAssignments || []}
+            editable={true}
+            draggableDates={true}
+            projectSummaryInfo={projectSummaryInfo}
+            initialSorting={initialSorting}
+          >
+            {sortedSingleProjectAssignments?.map(
+              (assignment: AssignmentType, rowIndex) => {
+                return (
+                  <ProjectAssignmentRow
+                    project={singleProjectPage}
+                    key={`${assignment.id}`}
+                    assignment={assignment}
+                    monthData={{ monthLabel: "", year: 0 }}
+                    isFirstMonth={true}
+                    isLastMonth={true}
+                    rowIndex={rowIndex}
+                    totalRows={sortedSingleProjectAssignments?.length || 0}
+                    inputRefs={inputRefs}
+                  />
+                );
+              }
+            )}
+          </ScrollingCalendar>
+        </>
+      ) : (
+        <LoadingSpinner />
+      )}
+    </>
+  );
 };
 
 export default withApollo(ProjectPage);

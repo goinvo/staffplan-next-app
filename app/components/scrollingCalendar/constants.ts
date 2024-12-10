@@ -27,3 +27,8 @@ export enum PROJECT_DATES_TYPE {
   STARTS_ON = "startsOn",
   ENDS_ON = "endsOn",
 }
+
+export enum SORT_ORDER {
+  ASC = "sortAsc",
+  DESC = "sortDesc",
+}

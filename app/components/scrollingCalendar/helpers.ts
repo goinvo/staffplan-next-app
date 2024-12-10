@@ -129,6 +129,30 @@ export const isBeforeWeek = (week: number, month: MonthsDataType) => {
   return false;
 };
 
+export const isTodayInRange = (months: MonthsDataType[]): boolean => {
+  const getWeekOfMonth = (date: Date): number => {
+    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    const dayOfWeekOffset = startOfMonth.getDay();
+    const currentDay = date.getDate();
+
+    return Math.ceil((currentDay + dayOfWeekOffset) / 7);
+  };
+
+  const today = new Date();
+  const currentMonth = today.getMonth() + 1;
+  const currentYear = today.getFullYear();
+  const currentWeek = getWeekOfMonth(today);
+
+  return months.some(({ monthLabel, year, weeks }) => {
+    const month = parseInt(monthLabel, 10);
+    return (
+      year === currentYear &&
+      month === currentMonth &&
+      weeks.some((week) => week.weekNumberOfTheMonth === currentWeek)
+    );
+  });
+};
+
 export const getStartAndEndDatesOfWeek = (year: number, month: number, weekNumber: number) => {
   const firstDayOfMonth = DateTime.fromObject({ year, month, day: 1 });
 
