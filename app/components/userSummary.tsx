@@ -27,8 +27,9 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 		<td className="font-normal py-2 sm:pl-4 pl-0 pr-0 ml-1 sm:ml-0 w-1/2 sm:w-1/6">
 			{showSummaries && (
 				<div
-					className='pl-6 sm:flex hidden flex-col max-w-fit space-y-5'
+					className='pl-6 sm:flex hidden flex-col max-w-fit space-y-5 cursor-pointer'
 					onMouseLeave={() => showTooltip && setShowTooltip(false)}
+					onClick={() => setShowTooltip(!showTooltip)}
 				>
 					{summaries.map((sum, index) =>
 						(sum.value || sum.alwaysShow) ? (
@@ -37,8 +38,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 								className="sm:flex relative hidden justify-between space-x-0.5 mt-1"
 							>
 								<label
-									className={`text-sm pr-1 whitespace-nowrap ${sum.tooltip ? 'cursor-pointer' : ''}`}
-									onClick={() => sum.tooltip && setShowTooltip(!showTooltip)}>
+									className={`cursor-pointer text-sm pr-1 whitespace-nowrap`}>
 									{sum.label}
 								</label>
 								<span className="font-bold text-sm mr-auto">

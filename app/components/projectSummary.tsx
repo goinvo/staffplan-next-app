@@ -2,58 +2,41 @@ import React from 'react';
 import { DateTime } from 'luxon';
 import { ProjectSummaryProps } from '../typeInterfaces';
 import { useGeneralDataContext } from '../contexts/generalContext';
-import { calculatePlannedHoursPerProject } from './scrollingCalendar/helpers';
+import { calculatePlanFromToday, calculatePlannedHoursPerProject } from './scrollingCalendar/helpers';
 
 
 const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 	const { showSummaries } = useGeneralDataContext();
 
-	const plannedHours = calculatePlannedHoursPerProject(project)
+	const plannedHours = project.assignments?.reduce((total, assignment) => {
+		return total + calculatePlanFromToday(assignment);
+	}, 0);
 
-	const weeks = (): number => {
-		if (project.startsOn && project.endsOn) {
-			const startsOn = DateTime.fromISO(project.startsOn);
-			const endsOn = DateTime.fromISO(project.endsOn);
-			return Math.round(endsOn.diff(startsOn, 'weeks').weeks);
+	const burnedHours = project.assignments?.reduce((total, assignment) => {
+		return total + assignment.workWeeks.reduce(
+			(acc, curr) => acc + (curr.actualHours ?? 0),
+			0
+		);
+	}, 0);
+
+	const getDeltaValue = () => {
+		if (!project?.hours) {
+			return;
 		}
-		return 0;
-	};
-
-	const burnedHours = project.workWeeks?.reduce(
-		(acc, curr) => acc + (curr.actualHours ?? 0),
-		0
-	);
-
-	const shortHours = () => {
-		if (project.hours) {
-			return project.hours - ((burnedHours ?? 0) + (plannedHours ?? 0));
-		}
-	};
+		const delta = (plannedHours ?? 0) + (burnedHours ?? 0) - project?.hours
+		return delta > 0 ? `+${delta}` : `${delta}`;
+	}
 
 	const summaries = [
-		{ label: 'target', value: project.hours, unit: 'hrs' },
-		{ label: 'planned', value: plannedHours, unit: 'hrs', alwaysShow: true },
-		{ label: 'burned', value: burnedHours, unit: 'hrs', alwaysShow: true },
-		{ label: 'short', value: shortHours(), unit: 'hrs' },
+		{ label: 'Target', value: project.hours, unit: 'hrs' },
+		{ label: 'Planned', value: (plannedHours ?? 0) + (burnedHours ?? 0), unit: 'hrs', alwaysShow: true },
+		{ label: 'Burned', value: burnedHours, unit: 'hrs', alwaysShow: true },
+		{ label: 'Delta', value: getDeltaValue(), unit: 'hrs', alwaysShow: true },
 	];
-	const weeksAndFte = [
-		{ unit: 'FTE', value: project.fte, separator: weeks() > 0 ? ',' : '' },
-		{ unit: 'wks', value: weeks() }
-	]
 	return (
 		<td className="font-normal ml-auto py-2 pr-4 pl-0 sm:w-1/6 w-1/2 flex justify-center items-center">
 			{showSummaries && (
 				<div className='sm:flex hidden flex-col'>
-					<div className="flex justify-between w-full space-x-1">
-						{weeksAndFte.map((item, index) => (
-							item.value ? (
-								<div key={index} className="flex items-center space-x-1">
-									<span className="font-bold">{item.value}</span>
-									<label className="text-sm">{item.unit + (item.separator || '')}</label>
-								</div>
-							) : null
-						))}
-					</div>
 					{summaries.map((summary, index) =>
 						(summary.value || summary.alwaysShow) ? (
 							<div key={index} className="sm:flex hidden justify-between space-x-1">
