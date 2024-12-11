@@ -13,7 +13,7 @@ const RootLayoutContents: React.FC<{ children: React.ReactNode }> = ({ children 
         <ModalController />
         <Navbar />
         <Suspense>
-          <main className="flex-grow">{children}</main>
+          <main className="flex-1 timeline-grid-bg">{children}</main>
         </Suspense>
         <Footer />
       </AppProviders>
