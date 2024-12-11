@@ -279,4 +279,5 @@ export type ProjectSummaryInfoItem = {
 	label: string;
 	value?: string | number;
 	show: boolean;
+	tooltip?: string;
 };

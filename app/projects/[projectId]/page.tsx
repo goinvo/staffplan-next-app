@@ -107,10 +107,10 @@ const ProjectPage: React.FC = () => {
 
 
 	const columnHeaderTitles = [{ title: 'People', showIcon: true, onIconClick: () => addNewAssignmentRow() }]
-
 	const totalPlanPerProject = sortedSingleProjectAssignments?.reduce((total, assignment) => {
 		return total + calculatePlanFromToday(assignment);
 	}, 0);
+
 	const totalBurnedPerProject = sortedSingleProjectAssignments?.reduce((total, assignment) => {
 		return total + assignment.workWeeks.reduce(
 			(acc, curr) => acc + (curr.actualHours ?? 0),
@@ -127,9 +127,11 @@ const ProjectPage: React.FC = () => {
 	}
 	const projectSummaryInfo = [
 		{ label: 'Target', value: singleProjectPage?.hours, show: !!singleProjectPage?.hours },
-		{ label: 'Plan', value: totalPlanPerProject + totalBurnedPerProject, show: true },
-		{ label: 'Actual', value: totalBurnedPerProject, show: true },
-		{ label: 'Delta', value: getDeltaValue(), show: !!singleProjectPage?.hours }
+		{ label: 'Planned', value: totalPlanPerProject + totalBurnedPerProject, show: true,tooltip: `Planned = Burned (${totalBurnedPerProject}) + Planned (${totalPlanPerProject})` },
+		{ label: 'Burned', value: totalBurnedPerProject, show: true },
+		{ label: 'Delta', value: getDeltaValue(), show: !!singleProjectPage?.hours,
+			 tooltip: `Delta = Planned (${totalPlanPerProject}) + Burned (${totalBurnedPerProject}) - Target (${singleProjectPage?.hours})` 
+			}
 	]
 	const projectInfoSubtitle = `${singleProjectPage?.client?.name}, budget, ${singleProjectPage?.hours || 0}h, ${selectedProjectDates()}`
 	return (
