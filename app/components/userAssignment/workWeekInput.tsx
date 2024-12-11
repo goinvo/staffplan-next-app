@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useEffect } from "react";
-import { Formik, FormikValues } from "formik";
+import React, { useEffect, KeyboardEvent } from "react";
+import { Formik, FormikValues, FormikHelpers } from "formik";
 import { useMutation } from "@apollo/client";
 import { isNil } from "lodash";
 
@@ -39,6 +39,14 @@ interface FillForwardVariablesType {
 	assignmentId: string;
 	workWeeks?: WorkWeekValues[]
 }
+
+type HandlePressEnterOrEscape = (
+  event: KeyboardEvent<HTMLInputElement>, 
+  values: FormikValues,
+  setFieldValue: FormikHelpers<any>["setFieldValue"], 
+  fieldName: string, 
+  prevValue: number | string 
+) => void;
 
 export const WorkWeekInput = ({
 	assignment,
@@ -195,6 +203,14 @@ export const WorkWeekInput = ({
 		}
 	};
 
+	const handlePressEnterOrEscape: HandlePressEnterOrEscape = (event, values, setFieldValue, fieldName, prevValue) => {
+		if (event.key === "Enter") {
+      upsertWorkWeekValues(values);
+    }
+    if (event.key === "Escape") {
+      setFieldValue(fieldName, prevValue);
+    }
+	}
 
 	return (
 		<Formik
@@ -206,6 +222,7 @@ export const WorkWeekInput = ({
 				handleChange,
 				values,
 				handleBlur,
+				setFieldValue,
 				dirty
 			}) => (
 				<>
@@ -223,7 +240,13 @@ export const WorkWeekInput = ({
 						}}
 						onFillForwardClick={() => onFillForwardClick(cweek, year, Number(monthLabel), values)}
 						ref={(el: HTMLInputElement) => createEstimatedRef(el, rowIndex, cellIndex)}
-						onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => tabbingAndArrowNavigation(e, rowIndex, cellIndex, inputRefs, totalRows, false)}
+						onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+							if (dirty) {
+								handlePressEnterOrEscape(e, values, setFieldValue, 'estimatedHours', initialValues.estimatedHours);
+							}
+
+							tabbingAndArrowNavigation(e, rowIndex, cellIndex, inputRefs, totalRows, false)
+						}}
 					/>
 					{isPastOrCurrentWeek(cweek, year) && (
 						<CustomInput
@@ -239,7 +262,13 @@ export const WorkWeekInput = ({
 							}}
 							showFillForward={false}
 							ref={(el: HTMLInputElement) => createActualRef(el, rowIndex, cellIndex)}
-							onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => tabbingAndArrowNavigation(e, rowIndex, cellIndex, inputRefs, totalRows, true)}
+							onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+								if (dirty) {
+									handlePressEnterOrEscape(e, values, setFieldValue, 'actualHours', initialValues.actualHours);
+								}
+								tabbingAndArrowNavigation(e, rowIndex, cellIndex, inputRefs, totalRows, true)
+								
+							}}
 						/>
 					)}
 				</>
