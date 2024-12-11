@@ -72,7 +72,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 }) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const [isTodayInView, setIsTodayInView] = useState(false);
-    const [showTooltip, setShowTooltip] = useState(false);
+	const [showTooltip, setShowTooltip] = useState(false);
 	const [sortedBy, setSortedBy] = useState(initialSorting);
 	const { setDateRange, scrollToTodayFunction } = useGeneralDataContext();
 	const { setSortOrder: setSortOrderForPeople, setSortBy: setSortByForPeople } =
@@ -266,32 +266,36 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 				})}
 				<th className="pr-4 pl-2 py-2 w-1/2 sm:w-1/6">
 					{projectSummaryInfo?.length && (
-						<div className="sm:flex hidden justify-center flex-col pl-8 max-w-fit pt-1 cursor-pointer"
-                        onMouseLeave={() => showTooltip && setShowTooltip(false)}
-                        onClick={() => setShowTooltip(!showTooltip)}>
+						<div
+							className="sm:flex hidden justify-center flex-col pl-8 max-w-fit pt-1 cursor-pointer"
+							onMouseLeave={() => showTooltip && setShowTooltip(false)}
+							onClick={() => setShowTooltip(!showTooltip)}
+						>
 							{projectSummaryInfo?.map((sum, index) =>
 								sum.show ? (
 									<div
 										key={index}
-										className={`flex relative justify-between space-x-0.5 font-normal ${
-											sum.label === "Target" ? "border-b-2" : ""
-										} ${sum.label === "Delta" ? "border-t-2" : ""}`}
+										className={`flex relative justify-between items-center font-normal ${
+											sum.label === "Target" ? "border-b border-contrastGrey" : ""
+										} ${sum.label === "Delta" ? "border-t border-contrastGrey" : ""}`}
 									>
 										<label
-											className={`cursor-pointer pr-1 text-sm leading-[18px] whitespace-nowrap`}
+											className={`cursor-pointer text-sm leading-[18px] whitespace-nowrap text-right flex-shrink-0`}
+											style={{ width: "40px" }}
 										>
 											{sum.label}
 										</label>
-										<span className="font-bold text-sm leading-[18px] mr-auto">
+										<span className="font-bold text-sm leading-[18px] ml-2">
 											{sum.value}
 											<span className="font-normal text-sm leading-[18px] pl-1">
 												hrs
 											</span>
 										</span>
-                                        {sum.tooltip && showTooltip && (
-									<div className="absolute bottom-full right-0 bg-gray-700 text-white text-xs rounded px-2 py-1 z-10 shadow-lg min-w-40">
-										{sum.tooltip}
-									</div>)}
+										{sum.tooltip && showTooltip && (
+											<div className="absolute bottom-full right-0 bg-gray-700 text-white text-xs rounded px-2 py-1 z-10 shadow-lg min-w-40">
+												{sum.tooltip}
+											</div>
+										)}
 									</div>
 								) : null
 							)}

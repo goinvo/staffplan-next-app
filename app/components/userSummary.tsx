@@ -16,7 +16,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 
 	const { showSummaries } = useGeneralDataContext()
 
-	const planTooltip = `Plan = Actual (${burnedHours}) + Planned (${planHoursPerAssignment})`;
+	const planTooltip = `Plan = Actual (${burnedHours}) + Plan (${planHoursPerAssignment})`;
 
 	const summaries = [
 		{ label: 'Plan', value: burnedHours + planHoursPerAssignment, unit: 'hrs', tooltip: planTooltip, alwaysShow: true },
