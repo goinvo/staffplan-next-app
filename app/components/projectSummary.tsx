@@ -29,8 +29,8 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 
 	const summaries = [
 		{ label: 'Target', value: project.hours, unit: 'hrs' },
-		{ label: 'Planned', value: (plannedHours ?? 0) + (burnedHours ?? 0), unit: 'hrs', alwaysShow: true },
-		{ label: 'Burned', value: burnedHours, unit: 'hrs', alwaysShow: true },
+		{ label: 'Plan', value: (plannedHours ?? 0) + (burnedHours ?? 0), unit: 'hrs', alwaysShow: true },
+		{ label: 'Actual', value: burnedHours, unit: 'hrs', alwaysShow: true },
 		{ label: 'Delta', value: getDeltaValue(), unit: 'hrs', alwaysShow: true },
 	];
 	return (
