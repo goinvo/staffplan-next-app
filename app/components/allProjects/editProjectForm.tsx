@@ -369,7 +369,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 				</div>
 				<div className="flex w-full space-x-4">
 					<button
-						className={`sm:w-1/2 md:w-1/3 py-2 text-tiny text-center bg-contrastGrey rounded-sm text-white`}
+						className={`sm:w-1/2 md:w-1/3 py-2 text-tiny text-center bg-contrastGrey rounded-sm text-white hover:bg-accentgreen`}
 						onClick={() => onClose?.()}
 					>
 						Cancel
@@ -377,7 +377,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					<button
 						type="submit"
 						disabled={!formik.isValid}
-						className={`sm:w-1/2 md:w-2/3 py-2 text-tiny text-center bg-tiffany rounded-sm text-white`}
+						className={`sm:w-1/2 md:w-2/3 py-2 text-tiny text-center bg-tiffany hover:bg-accentgreen rounded-sm text-white`}
 					>
 						Done
 					</button>
@@ -392,13 +392,13 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 							</p>
 							<div className="flex justify-center">
 								<button
-									className="mr-2 px-4 py-2 text-tiny font-bold bg-tiffany rounded-sm text-white"
+									className="mr-2 px-4 py-2 text-tiny font-bold bg-tiffany hover:bg-accentgreen rounded-sm text-white"
 									onClick={() => setShowNewClientModal(false)}
 								>
 									Yes
 								</button>
 								<button
-									className="px-4 py-2 text-tiny font-bold bg-contrastGrey rounded-sm text-white"
+									className="px-4 py-2 text-tiny font-bold bg-contrastGrey hover:bg-contrastBlue rounded-sm text-white"
 									onClick={() => handleNewClientCancel()}
 								>
 									No

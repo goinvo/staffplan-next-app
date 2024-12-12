@@ -63,7 +63,7 @@ const Navbar: React.FC = () => {
 						key={link.href}
 						href={link.href}
 						className={`inline-flex items-center text-base sm:px-4 px-1 sm:py-2 py-1 rounded-md whitespace-nowrap ${link.isActive
-							? "bg-contrastBlue font-semibold"
+							? "bg-contrastBlue"
 							: "hover:bg-contrastBlue"
 							}`}
 					>
@@ -75,7 +75,7 @@ const Navbar: React.FC = () => {
 					onClick={() =>
 						openModal(<NewPersonAndProjectModal closeModal={closeModal} />)
 					}
-					iconSize="sm:block hidden h-8 w-8 rounded-md text-contrastGrey"
+					iconSize="sm:block hidden h-8 w-8 rounded-md text-contrastGrey hover:text-white"
 					className="px-8"
 				/>
 			</div>
@@ -103,7 +103,7 @@ const Navbar: React.FC = () => {
 				</div>
 				<EllipsisDropdownMenu
 					options={ellipsisDropdownMenuOptions}
-					textColor={"text-white"}
+					textColor={"text-contrastGrey hover:text-white"}
 				/>
 				{/* Temporary commented */}
 				{/* <div className="h-4 w-4">

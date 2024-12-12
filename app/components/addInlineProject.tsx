@@ -264,13 +264,13 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
                             <p className="mb-4">Is &quot;{formik.values.clientName}&quot; a new client?</p>
                             <div className="flex justify-center">
                                 <button
-                                    className="mr-2 px-4 py-2 text-tiny font-bold bg-tiffany rounded-sm text-white"
+                                    className="mr-2 px-4 py-2 text-tiny font-bold bg-tiffany hover:bg-accentgreen rounded-sm text-white"
                                     onClick={handleNewClientConfirm}
                                 >
                                     Yes
                                 </button>
                                 <button
-                                    className="px-4 py-2 text-tiny font-bold bg-contrastGrey rounded-sm text-white"
+                                    className="px-4 py-2 text-tiny font-bold hover:bg-contrastBlue bg-contrastGrey rounded-sm text-white"
                                     onClick={handleNewClientCancel}
                                 >
                                     No
