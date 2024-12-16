@@ -276,8 +276,8 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 									<div
 										key={index}
 										className={`flex relative justify-between items-center font-normal ${
-											sum.label === "Target" ? "border-b border-contrastGrey" : ""
-										} ${sum.label === "Delta" ? "border-t border-contrastGrey" : ""}`}
+											sum.label === "Target" ? "border-b border-contrastGrey border-opacity-20" : ""
+										} ${sum.label === "Delta" ? "border-t border-contrastGrey border-opacity-20" : ""}`}
 									>
 										<label
 											className={`cursor-pointer text-sm leading-[18px] whitespace-nowrap text-right flex-shrink-0`}
