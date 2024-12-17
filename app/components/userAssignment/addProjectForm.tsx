@@ -3,12 +3,13 @@
 import {
   ProjectType,
   ClientType,
+  UserType,
 } from "@/app/typeInterfaces";
 
 import React, { useRef, useEffect, useState } from "react";
 import { useFormik, FormikValues } from "formik";
 import { useMutation } from "@apollo/client";
-import { UPSERT_PROJECT, UPSERT_CLIENT } from "@/app/gqlQueries";
+import { UPSERT_PROJECT, UPSERT_CLIENT, UPSERT_ASSIGNMENT } from "@/app/gqlQueries";
 import ProjectSummary from "../projectSummary";
 import ColumnChart from "../columnChart";
 import {
@@ -23,7 +24,23 @@ import { useGeneralDataContext } from "@/app/contexts/generalContext";
 import { AutocompleteInput } from "../autocompleteInput";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 
-export const AddProjectForm = () => {
+type AddProjectFormProps = {
+  user: UserType;
+};
+
+type UpsertProjectVariables = {
+  clientId: string;
+  name: string;
+  assignments: [{ userId: string }];
+};
+
+type UpsertAssignmentVariables = {
+  projectId: string;
+  userId: string;
+  status: string;
+};
+
+export const AddProjectForm: React.FC<AddProjectFormProps> = ({user}) => {
   const clientInputRef = useRef<HTMLInputElement>(null);
   const projectInputRef = useRef<HTMLInputElement>(null);
 
@@ -31,28 +48,72 @@ export const AddProjectForm = () => {
   const [isNewProject, setIsNewProject] = useState(false);
 
   const { isAddNewProject, setIsAddNewProject } = useGeneralDataContext();
-  const { clientList, setClientList, refetchClientList } = useClientDataContext();
-  const { projectList, setProjectList, setNewProjectId } = useProjectsDataContext();
+  const { clientList, refetchClientList } = useClientDataContext();
+  const { projectList, setProjectList } = useProjectsDataContext();
+  const { setUserList, setNewProjectAssignmentId } = useUserDataContext();
+
+  const { id: currentUserId, assignments } = user;
+
   
-  const [
-    upsertClient,
-    { data: mutationData, loading: mutationLoading, error: mutationError },
-  ] = useMutation(UPSERT_CLIENT, {
+  const [upsertClient] = useMutation(UPSERT_CLIENT, {
     errorPolicy: "all",
-    onCompleted({ upsertClient }) {
-      setClientList([...clientList, upsertClient]);
+    onCompleted() {
+      refetchClientList();
     },
   });
-  
+
   const [upsertProject] = useMutation(UPSERT_PROJECT, {
     errorPolicy: "all",
     onCompleted({ upsertProject }) {
       if (upsertProject) {
         refetchClientList();
+        setNewProjectAssignmentId(Number(upsertProject.id));
 
-        setNewProjectId(Number(upsertProject.id));
-        setProjectList((prev) => [upsertProject, ...prev]);
+        setProjectList((prev) => [...prev, upsertProject]);
+        setUserList((prev) =>
+          prev.map((user) =>
+            user.id === upsertProject.assignments?.[0].assignedUser.id
+              ? {
+                  ...user,
+                  assignments: [
+                    ...user.assignments,
+                    ...upsertProject.assignments,
+                  ],
+                }
+              : user
+          )
+        );
       }
+    },
+  });
+
+  const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
+    errorPolicy: "all",
+    onCompleted({ upsertAssignment }) {
+      refetchClientList();
+      setNewProjectAssignmentId(Number(upsertAssignment?.project?.id));
+
+      setUserList((prev) =>
+        prev.map((user) =>
+          user.id === upsertAssignment.assignedUser.id
+            ? {
+                ...user,
+                assignments: [...user.assignments, upsertAssignment],
+              }
+            : user
+        )
+      );
+      setProjectList((prevProjectList) => {
+        return prevProjectList?.map((project) => {
+          if (project.id === upsertAssignment?.project?.id) {
+            return {
+              ...project,
+              assignments: [...(project.assignments || []), upsertAssignment],
+            };
+          }
+          return project;
+        });
+      });
     },
   });
 
@@ -65,29 +126,24 @@ export const AddProjectForm = () => {
     
   }, [isAddNewProject]);
 
-  const checkProjectNameExists = (
-    clientList: ClientType[],
-    projectList: ProjectType[],
-    clientName: string,
-    projectName: string
-  ): boolean => {
-    const currentClient = clientList.find((client) => client.name.toLowerCase() === clientName.toLowerCase().trimEnd());
+  const createNewProject = async (variables: UpsertProjectVariables) => {
+    await upsertProject({
+      variables,
+    });
+  };
 
-    if (projectName && currentClient) {
-      return projectList.some((project) => project.name.toLowerCase() === projectName.toLowerCase().trimEnd() && currentClient.id === project.client.id);
-    }
-
-    return false;
+  const addNewAssignmentWithExistingProject = async (
+    variables: UpsertAssignmentVariables
+  ) => {
+    await upsertAssignment({
+      variables,
+    });
   };
 
   const validateForm = (values: FormikValues) => {
     const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
     if (!values.clientName) errors.clientName = "Client is required";
     if (!values.projectName) errors.projectName = "Project name is required";
-    
-    if (values.projectName && checkProjectNameExists(clientList, projectList, values.clientName, values.projectName)) {
-      errors.projectName = "Project name already in use";
-    }
 
     return errors;
   };
@@ -96,11 +152,12 @@ export const AddProjectForm = () => {
     initialValues: {
       projectName: "",
       clientName: "",
+      projectList: projectList.filter((p) => !p.assignments?.some((a) => a?.assignedUser?.id === currentUserId)),
     },
     validate: validateForm,
     onSubmit: async (values) => {
       let clientId = clientList?.find(
-        ({ name }: ClientType) => name.toLowerCase() === values.clientName.toLowerCase().trimEnd()
+        ({ name }: ClientType) => name === values.clientName
       )?.id;
 
       if (!clientId) {
@@ -110,17 +167,36 @@ export const AddProjectForm = () => {
         clientId = data?.upsertClient?.id;
       }
 
-      const variables = {
-        clientId,
-        name: values.projectName,
-        hours: 0,
-      };
+      const foundProject = projectList.find(
+        (project) =>
+          project.name === values.projectName && project.client.id === clientId
+      );
 
-      upsertProject({
-        variables: variables,
-      });
+      if (foundProject) {
+        const projectInAssignments = assignments.some(
+          (assignment) => assignment.project.id === foundProject.id
+        );
 
-      setIsAddNewProject(false)
+        if (!projectInAssignments) {
+          const variables: UpsertAssignmentVariables = {
+            projectId: String(foundProject.id),
+            userId: String(currentUserId),
+            status: "proposed",
+          };
+
+          await addNewAssignmentWithExistingProject(variables);
+        }
+      } else {
+        const variables: UpsertProjectVariables = {
+          clientId: String(clientId),
+          name: values.projectName,
+          assignments: [{ userId: String(currentUserId) }],
+        };
+
+        await createNewProject(variables);
+      }
+
+      setIsAddNewProject(false);
     },
   });
   
@@ -158,16 +234,6 @@ export const AddProjectForm = () => {
           formik.setFieldError("clientName", "Client is required");
           return;
         }
-
-        const projectExists = checkProjectNameExists( clientList, projectList, formik.values.clientName, formik.values.projectName);
-
-        if (projectExists) {
-          formik.setFieldTouched("projectName", true, true);
-          formik.setFieldError("projectName", "Project name already in use");
-
-          projectInputRef.current?.focus();
-          return;
-        }
       }
 
       formik.handleSubmit();      
@@ -196,12 +262,30 @@ export const AddProjectForm = () => {
     } else {
       setIsNewClient(isNew)
     }
+
     formik.handleChange(e);
+  };
+
+  const handleClientBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const filteredProjects = formik.values.clientName
+      ? projectList.filter((p) =>
+        (p.client.name.toLowerCase() === formik.values.clientName.toLowerCase().trimEnd() && !p.assignments?.some((a) => a?.assignedUser?.id === currentUserId)))
+      : projectList.filter((p) => !p.assignments?.some((a) => a?.assignedUser?.id === currentUserId))
+    
+    formik.setFieldValue("projectList", filteredProjects);
+    formik.handleBlur(e)
+  }
+
+  const handleProjectSelect = (project: ProjectType) => {
+    const isNew = !projectList.some((c) => c.name === project.name);
+
+    setIsNewClient(isNew);
+    formik.setFieldValue("projectName", project.name);
   };
   
   const handleProjectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isNew = !projectList.some(project => project.name.toLowerCase() === e.target.value.toLowerCase().trimEnd())
-    
+
     if (!e.target.value) {
       setIsNewProject(false);
     } else {
@@ -248,23 +332,17 @@ export const AddProjectForm = () => {
       return;
     }
 
-    const projectExists = checkProjectNameExists(clientList,projectList,clientName,projectName);
-
-    if (projectExists) {
-      formik.setFieldTouched("projectName", true, true);
-      formik.setFieldError("projectName", "Project name already in use");
-
-      projectInputRef.current?.focus();
-      return;
-    }
-
     formik.handleSubmit();
   };
 
   return (
     <tr
       className={`sm:flex hidden w-full border-gray-300 transition-all duration-700 ease-in-out delay-100 
-          ${isAddNewProject ? "opacity-100 h-[100px] pointer-events-auto border-b" : "opacity-0 h-0 pointer-events-none border-b-0"}`}
+          ${
+            isAddNewProject
+              ? "opacity-100 h-[100px] pointer-events-auto border-b"
+              : "opacity-0 h-0 pointer-events-none border-b-0"
+          }`}
     >
       <td className="sm:block flex items-center pt-1 pb-2 px-0 font-normal align-top w-1/2 sm:w-1/3">
         <form
@@ -280,7 +358,7 @@ export const AddProjectForm = () => {
               value={formik.values.clientName}
               onItemSelect={handleClientSelect}
               onChange={handleClientChange}
-              onBlur={formik.handleBlur}
+              onBlur={handleClientBlur}
               inputClassName={`h-7 rounded-sm w-full ${
                 isNewClient && "pr-[38px]"
               }`}
@@ -295,23 +373,22 @@ export const AddProjectForm = () => {
             ) : null}
           </div>
           <div className="relative w-full max-w-[35%] pl-3 box-border">
-            <input
+            <AutocompleteInput
               ref={projectInputRef}
-              type="text"
-              name="projectName"
+              placeholder="Project name"
+              items={formik.values.projectList}
+              inputName="projectName"
               value={formik.values.projectName}
+              onItemSelect={handleProjectSelect}
               onChange={handleProjectChange}
               onBlur={formik.handleBlur}
-              className={`h-7 w-full px-2 ${
+              inputClassName={`h-7 rounded-sm w-full ${
                 isNewProject && "pr-[38px]"
-              } text-tiny font-bold placeholder:font-normal shadow-top-input-shadow rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-contrastBlue appearance-none`}
-              placeholder="Project Name"
+              }`}
+              listClassName="p-2"
+              displayKey="name"
+              isNewItem={isNewProject}
             />
-            {isNewProject && (
-              <span className="absolute top-[5px] right-[3px] px-1 pt-[3px] pb-1 text-white text-xs leading-[12px] bg-[#AFB3BF] rounded-[3px]">
-                new
-              </span>
-            )}
             {formik.touched.projectName && formik.errors.projectName ? (
               <p className="text-tiny px-2 text-red-500">
                 {formik.errors.projectName}
@@ -322,7 +399,7 @@ export const AddProjectForm = () => {
             type="submit"
             className="bg-tiffany px-3 rounded-[3px]"
             onClick={(e) => {
-              handleSaveClick(e)
+              handleSaveClick(e);
             }}
           >
             Save

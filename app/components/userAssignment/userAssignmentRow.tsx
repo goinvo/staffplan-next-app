@@ -43,7 +43,8 @@ export const UserAssignmentRow = ({
 	totalRows
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
-	const { refetchUserList, viewsFilterSingleUser, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
+	const { newProjectAssignmentId, setNewProjectAssignmentId, refetchUserList, viewsFilterSingleUser, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
+
 	const [showUndoRow, setShowUndoRow] = useState<boolean>(false);
 	const rowRef = useRef<HTMLTableRowElement>(null);
 	const undoRowRef = useRef<HTMLTableRowElement>(null);
@@ -57,6 +58,13 @@ export const UserAssignmentRow = ({
 			refetchUserList();
 		},
 	});
+
+	useEffect(() => {
+			if (newProjectAssignmentId) {
+				setTimeout(() => {setNewProjectAssignmentId(null)}, 1000)
+			}
+	}, [newProjectAssignmentId]);
+	
 	const handleProjectChange = (assignment: AssignmentType) => {
 		router.push("/projects/" + assignment.project.id);
 	};
@@ -116,21 +124,23 @@ export const UserAssignmentRow = ({
 	}
 
 
-	const filterByClient = viewsFilterSingleUser === 'byClient'
+	/* const filterByClient = viewsFilterSingleUser === 'byClient'
 	const isFirstRow = rowIndex === 0;
 	const isLastRow = rowIndex === totalRows - 1;
 	const rowClasses = mergeClasses(
-		'flex sm:justify-normal justify-between bg-white-300 hover:bg-hoverGrey pl-5 border-t border-gray-300',
-		/* { 'border-t border-gray-300': isFirstClient && filterByClient && !isFirstRow },
-		{ 'border-b border-gray-300': !filterByClient || isLastRow }, */
-		{ 'bg-diagonal-stripes': isAssignmentProposed }
-	);
+    "flex sm:justify-normal justify-between bg-white-300 hover:bg-hoverGrey pl-5 border-t border-gray-300",
+    { 'border-t border-gray-300': isFirstClient && filterByClient && !isFirstRow },
+		{ 'border-b border-gray-300': !filterByClient || isLastRow },
+		{ "bg-diagonal-stripes": isAssignmentProposed }
+  ); */
 
 	return (
 		<tr
 			ref={rowRef}
 			key={`assignment-${assignment.id}`}
-			className={rowClasses}
+			className={`flex sm:justify-normal justify-between bg-white-300 hover:bg-hoverGrey pl-5 border-t border-gray-300
+				${isAssignmentProposed ? 'bg-diagonal-stripes' : ''}
+				${newProjectAssignmentId === Number(assignment.project.id) ? 'animate-fadeInScale' : ''}`}
 		>
 			<td className={`pl-3 sm:px-0 py-1 sm:pt-1 sm:pb-2 font-normal align-top ${!isFirstClient ? 'sm:block flex items-center' : 'pt-5'} w-1/2 sm:w-1/3`}>
 				<div

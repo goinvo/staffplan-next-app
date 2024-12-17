@@ -75,7 +75,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     const [showTooltip, setShowTooltip] = useState(false);
 	const [sortedBy, setSortedBy] = useState(initialSorting);
 	const { setDateRange, scrollToTodayFunction } = useGeneralDataContext();
-	const { setSortOrder: setSortOrderForPeople, setSortBy: setSortByForPeople } =
+	const { setSortOrder: setSortOrderForPeople, setSortBy: setSortByForPeople, sortUserList } =
 		useUserDataContext();
 	const {
 		setSortOrder: setSortOrderForProjects,
@@ -94,8 +94,8 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 		pathname.includes("people") && pathname.split("/").length === 3;
 	const isProjectPage =
 		pathname.includes("projects") && pathname.split("/").length === 3;
-	const isProjectsPage = pathname.includes("projects");
-	const isPeoplePage = pathname.includes("people");
+	const isProjectsPage = pathname.includes("projects") && pathname.split("/").length === 2;
+	const isPeoplePage = pathname.includes("people") && pathname.split("/").length === 2;
 
 	useEffect(() => {
 		setIsTodayInView(isTodayInRange(months));
@@ -128,6 +128,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 		}
 		if (isPeoplePage) {
 			setSortOrderForPeople(sortedBy.sort);
+			sortUserList(sortedBy.sort);
 
 			localStorage.setItem(
 				"peoplePageSorting",
