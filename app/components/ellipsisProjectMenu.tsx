@@ -157,6 +157,7 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 		}
 
 	}
+	
 	return (
 		<Menu
 			as="div"
