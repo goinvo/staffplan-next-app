@@ -270,6 +270,15 @@ export const DELETE_ASSIGNMENT = gql`
 		}
 	}
 `;
+
+export const DELETE_PROJECT = gql`
+	mutation DeleteProject($projectId:ID!){
+		deleteProject(projectId:$projectId){
+		  id
+		}
+  	}
+`;
+
 export const UPSERT_ASSIGNMENT = gql`
 	mutation UpsertAssignment(
 		$id: ID
