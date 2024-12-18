@@ -264,10 +264,10 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 						);
 					});
 				})}
-				<th className="pr-4 pl-2 py-2 w-1/2 sm:w-1/6 relative flex items-end">
+				<th className="pr-4 pl-2 py-2 w-1/2 sm:w-1/6">
 					{projectSummaryInfo?.length && (
 						<div
-							className="flex flex-col justify-end pl-8 max-w-fit pt-1 cursor-pointer"
+							className="sm:flex hidden justify-center flex-col pl-8 max-w-fit pt-1 cursor-pointer"
 							onMouseLeave={() => showTooltip && setShowTooltip(false)}
 							onClick={() => setShowTooltip(!showTooltip)}
 						>
@@ -276,14 +276,8 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 									<div
 										key={index}
 										className={`flex relative justify-between items-center font-normal ${
-											sum.label === "Target"
-												? "border-b border-contrastGrey border-opacity-20"
-												: ""
-										} ${
-											sum.label === "Delta"
-												? "border-t border-contrastGrey border-opacity-20"
-												: ""
-										}`}
+											sum.label === "Target" ? "border-b border-contrastGrey" : ""
+										} ${sum.label === "Delta" ? "border-t border-contrastGrey" : ""}`}
 									>
 										<label
 											className={`cursor-pointer text-sm leading-[18px] whitespace-nowrap text-right flex-shrink-0`}
