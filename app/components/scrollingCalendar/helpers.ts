@@ -198,7 +198,7 @@ export const calculateTotalHoursPerWeek = (
   let maxProposedActualHours = 0;
   let maxProposedEstimatedHours = 0;
 
-  months.forEach((month) => {
+  months?.forEach((month) => {
     month.weeks.forEach((week) => {
       const key = `${month.year}-${week.weekNumberOfTheYear}`;
       totalActualHours[key] = totalActualHours[key] || 0;

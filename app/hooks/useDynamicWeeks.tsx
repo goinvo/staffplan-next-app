@@ -17,7 +17,7 @@ const useDynamicWeeks = ({ baseWidth, baseWeeksCount, pixelsPerWeek, isMobileChe
         if (isMobileCheck && width < 640) {
             return 1;
         }
-        const additionalWeeks = Math.floor((width - baseWidth) / pixelsPerWeek);
+        const additionalWeeks = Math.floor((width - baseWidth - 60) / pixelsPerWeek); // 60 px for extra space on the left side of the table
         let totalWeeks = baseWeeksCount + Math.max(0, additionalWeeks);
         if (minWeeks) {
             totalWeeks = Math.max(totalWeeks, minWeeks);

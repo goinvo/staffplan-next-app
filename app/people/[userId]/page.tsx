@@ -8,8 +8,10 @@ import { ScrollingCalendar } from "@/app/components/scrollingCalendar/scrollingC
 import { UserAssignmentRow } from "@/app/components/userAssignment/userAssignmentRow";
 import AddInlineProject from "@/app/components/addInlineProject";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
+import { useGeneralDataContext } from "@/app/contexts/generalContext";
 import ApproveHours from "@/app/components/userAssignment/approveHours";
 import ColumnChartsRow from "@/app/components/userAssignment/columnChartsRow";
+import { AddProjectForm } from "@/app/components/userAssignment/addProjectForm";
 import { SORT_ORDER } from "@/app/components/scrollingCalendar/constants";
 
 const UserPage: React.FC = () => {
@@ -25,7 +27,8 @@ const UserPage: React.FC = () => {
 	const [addAssignmentVisible, setAddAssignmentVisible] = useState(false);
 	const inputRefs = useRef<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>([]);
 
-	const { userList, singleUserPage, setSelectedUserData } = useUserDataContext();
+  const { userList, singleUserPage, setSelectedUserData } = useUserDataContext();
+  const { isAddNewProject, setIsAddNewProject } = useGeneralDataContext();
 
 	useEffect(() => {
 		if (userList.length) {
@@ -34,7 +37,11 @@ const UserPage: React.FC = () => {
 				setSelectedUserData(parseInt(userId));
 			}
 		}
-	}, [userList, params.userId, setSelectedUserData]);
+  }, [userList, params.userId, setSelectedUserData]);
+  
+  useEffect(() => {
+    return () => setIsAddNewProject(false);
+  }, []);
 
 	if (!userList.length) return <LoadingSpinner />;
 
@@ -42,7 +49,14 @@ const UserPage: React.FC = () => {
 	const onComplete = () => {
 		setAddAssignmentVisible(false);
 	};
-	const columnsHeaderTitles = [{ title: 'Client', showIcon: true }, { title: 'Projects', showIcon: false }]
+	const columnsHeaderTitles = [
+    { title: "Client", showIcon: false },
+    {
+      title: "Projects",
+      showIcon: true,
+      onIconClick: () => setIsAddNewProject(true),
+    },
+  ];
 	return (
     <>
       {singleUserPage && userList.length ? (
@@ -53,7 +67,12 @@ const UserPage: React.FC = () => {
           assignments={singleUserPage.assignments}
           initialSorting={initialSorting}
         >
-          {singleUserPage?.assignments?.map(
+          {[
+            <AddProjectForm
+              user={singleUserPage}
+              key="addForm"
+            />,
+            ...singleUserPage?.assignments?.map(
             (
               assignment: AssignmentType,
               rowIndex: number,
@@ -78,10 +97,9 @@ const UserPage: React.FC = () => {
                 />
               );
             }
-          )}
+          )]}
           <ApproveHours />
           <ColumnChartsRow />
-          {singleUserPage && <AddInlineProject user={singleUserPage} />}
         </ScrollingCalendar>
       ) : (
         <LoadingSpinner />

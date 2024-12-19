@@ -1,5 +1,5 @@
 "use client";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 import { ProjectType } from "../typeInterfaces";
 import { LoadingSpinner } from "../components/loadingSpinner";
@@ -7,6 +7,8 @@ import { ScrollingCalendar } from "../components/scrollingCalendar/scrollingCale
 import { AllProjectRow } from "../components/allProjects/allProjectRow";
 import { SORT_ORDER } from "../components/scrollingCalendar/constants";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
+import { useGeneralDataContext } from "../contexts/generalContext";
+import { AddProjectForm } from "../components/allProjects/addProjectForm";
 
 
 const ProjectsView: React.FC = () => {
@@ -19,19 +21,25 @@ const ProjectsView: React.FC = () => {
     }
   });
 
-	const { filteredProjectList, setShowOneClientProjects } = useProjectsDataContext();
+  const { filteredProjectList, setShowOneClientProjects } = useProjectsDataContext();
+  const { setIsAddNewProject } = useGeneralDataContext();
 
 	const columnHeaderTitles = [
     {
       title: "Clients",
-      showIcon: true,
+      showIcon: false,
       onClick: () => setShowOneClientProjects(""),
     },
-		{
-			title: "Projects",
-			showIcon: false,
-		},
+    {
+      title: "Projects",
+      showIcon: true,
+      onIconClick: () => setIsAddNewProject(true),
+    },
   ];
+
+  useEffect(() => {
+    return () => setIsAddNewProject(false)
+  }, [])
 
 	const assignments = filteredProjectList?.flatMap((project: ProjectType) => project.assignments || []);
 
@@ -44,8 +52,11 @@ const ProjectsView: React.FC = () => {
           assignments={assignments}
           initialSorting={initialSorting}
         >
-          {filteredProjectList?.map((project: ProjectType, index: number) => {
-            return (
+          {[
+            <AddProjectForm
+              key="addForm"
+            />,
+            ...filteredProjectList.map((project: ProjectType) => (
               <AllProjectRow
                 key={project.id}
                 project={project}
@@ -53,8 +64,8 @@ const ProjectsView: React.FC = () => {
                 isFirstMonth={true}
                 isLastMonth={true}
               />
-            );
-          })}
+            )),
+          ]}
         </ScrollingCalendar>
       ) : (
         <LoadingSpinner />

@@ -12,12 +12,14 @@ interface DropdownMenuProps {
 	options: { component: ReactNode; show?: boolean }[];
 	textColor: string;
 	menuPositioning?: string;
+	className?: string;
 }
 
 const EllipsisDropdownMenu: React.FC<DropdownMenuProps> = ({
 	options,
 	textColor,
-	menuPositioning
+	menuPositioning,
+	className
 }) => {
 	const dropdownSelectedItemClass = (isActive: boolean) => {
 		return isActive
@@ -27,7 +29,7 @@ const EllipsisDropdownMenu: React.FC<DropdownMenuProps> = ({
 	return (
 		<Menu as="div" className="relative inline-block text-left z-15">
 			<MenuButton
-				className={`flex items-center text-2xl ${textColor} hover:text-gray-900 sm:p-2 rounded-full ellipsismenu focus:outline-none ${menuPositioning}`}
+				className={`flex items-center text-2xl ${textColor} hover:text-gray-900 sm:p-2 rounded-full ellipsismenu focus:outline-none ${menuPositioning} ${className}`}
 			/>
 
 			<Transition

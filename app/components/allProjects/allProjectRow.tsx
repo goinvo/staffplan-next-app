@@ -30,7 +30,7 @@ export const AllProjectRow = ({
 	const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } =
 		calculateTotalHoursPerWeek(project.assignments as AssignmentType[], months as MonthsDataType[]);
 
-	const { projectsWithUndoActions, undoModifyProject } = useProjectsDataContext()
+	const { newProjectId, projectsWithUndoActions, setNewProjectId, undoModifyProject } = useProjectsDataContext()
 	const { animateRow } = useFadeInOutRow({ rowRef, setShowUndoRow, maxHeight: 102 });
 
 	const isModifiedProject = (projectId: number) =>
@@ -54,6 +54,12 @@ export const AllProjectRow = ({
 		}
 	}, [projectsWithUndoActions, project.id]);
 
+	useEffect(() => {
+    if (newProjectId) {
+      setTimeout(() => {setNewProjectId(null)}, 1000)
+		}
+	}, [newProjectId]);
+
 	if (showUndoRow && isModifiedProject(project.id)) {
 
 		return (
@@ -63,10 +69,9 @@ export const AllProjectRow = ({
 	}
 
 	return (
-		<tr ref={rowRef} key={`project-${project.id}`} className={`pl-5 flex sm:justify-normal justify-between border-b border-gray-300 hover:bg-hoverGrey ${project.status === 'proposed' ? 'bg-diagonal-stripes' :
-			''
-			}`}>
-			<td className='sm:block flex items-center pt-1 pb-2 px-0 font-normal align-top w-1/2 sm:w-1/3'>
+		<tr ref={rowRef} key={`project-${project.id}`} className={`pl-5 flex sm:justify-normal justify-between opacity-100 h-auto border-b border-gray-300 hover:bg-hoverGrey ${project.status === 'proposed' ? 'bg-diagonal-stripes' : ''}
+			delay-100 ${ newProjectId === Number(project.id) ? 'animate-fadeInScale' : ''}`}>
+			<td className='sm:block flex items-center pt-1 pb-2 px-0 font-normal align-top w-1/2 sm:w-2/5'>
 				{isFirstMonth && (
 					<AllProjectLabel undoRowRef={undoRowRef} clickHandler={handleProjectChange} project={project} />
 

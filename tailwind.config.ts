@@ -40,6 +40,15 @@ const config: Config = {
       backgroundSize: {
         "pencil-strokes": "4px 4px",
       },
+      keyframes: {
+        fadeInScale: {
+          "0%": { opacity: "0", height: "0" },
+          "100%": { opacity: "1", height: "100px" },
+        },
+      },
+      animation: {
+        fadeInScale: "fadeInScale 0.7s ease-in-out",
+      },
     },
   },
   plugins: [require("@tailwindcss/forms")],
