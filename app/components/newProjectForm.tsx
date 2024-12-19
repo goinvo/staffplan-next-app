@@ -221,13 +221,13 @@ const NewProjectForm = ({ closeModal }: NewProjectFormProps) => {
 						</p>
 						<div className="flex justify-center">
 							<button
-								className="mr-2 px-4 py-2 text-tiny font-bold bg-tiffany rounded-sm text-white"
+								className="mr-2 px-4 py-2 text-tiny font-bold bg-tiffany hover:bg-accentgreen rounded-sm text-white"
 								onClick={() => setShowNewClientModal(false)}
 							>
 								Yes
 							</button>
 							<button
-								className="px-4 py-2 text-tiny font-bold bg-contrastGrey rounded-sm text-white"
+								className="px-4 py-2 text-tiny font-bold bg-contrastGrey hover:bg-contrastBlue rounded-sm text-white"
 								onClick={() => handleNewClientCancel()}
 							>
 								No
@@ -307,14 +307,14 @@ const NewProjectForm = ({ closeModal }: NewProjectFormProps) => {
 			</div>
 			<button
 				type="submit"
-				className="w-full h-10 text-tiny font-bold bg-tiffany rounded-sm text-white pt-1 mb-4 mt-2"
+				className="w-full h-10 text-tiny font-bold bg-tiffany rounded-sm text-white pt-1 mb-4 mt-2 hover:bg-accentgreen"
 				disabled={!formik.isValid}
 			>
 				Save
 			</button>
 			<button
 				onClick={closeModal}
-				className="w-full h-10 text-tiny font-bold bg-contrastGrey rounded-sm text-white py-1 mb-1"
+				className="w-full h-10 text-tiny font-bold bg-contrastGrey hover:bg-contrastBlue rounded-sm text-white py-1 mb-1"
 			>
 				Cancel
 			</button>

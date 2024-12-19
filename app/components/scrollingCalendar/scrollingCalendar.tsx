@@ -68,7 +68,7 @@ export const ScrollingCalendar = ({
 	}, [dateRange, weeksCount]);
 
 	return (
-		<div className="min-h-screen h-auto timeline-grid-bg">
+		<div className="min-h-full timeline-grid-bg">
 			<table className="min-w-full timeline-grid-bg text-contrastBlue text-sm border-none">
 				<CalendarHeader
 					months={months}

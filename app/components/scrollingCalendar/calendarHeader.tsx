@@ -74,7 +74,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 
 	const [isEditing, setIsEditing] = useState(false);
 	const [isTodayInView, setIsTodayInView] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
+	const [showTooltip, setShowTooltip] = useState(false);
 	const [sortedBy, setSortedBy] = useState(initialSorting);
 	const { setHeaderTitleWidth, setDateRange, scrollToTodayFunction } = useGeneralDataContext();
 	const { setSortOrder: setSortOrderForPeople, setSortBy: setSortByForPeople, sortUserList } = useUserDataContext();
@@ -285,34 +285,44 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 						);
 					});
 				})}
-				<th className="pr-4 pl-2 py-2 w-1/2 sm:w-1/6">
+				<th className="pr-4 pl-2 py-2 w-1/2 sm:w-1/6 relative flex items-end">
 					{projectSummaryInfo?.length && (
-						<div className="sm:flex hidden justify-center flex-col pl-8 max-w-fit pt-1 cursor-pointer"
-                        onMouseLeave={() => showTooltip && setShowTooltip(false)}
-                        onClick={() => setShowTooltip(!showTooltip)}>
+						<div
+							className="flex flex-col justify-end pl-8 max-w-fit pt-1 cursor-pointer"
+							onMouseLeave={() => showTooltip && setShowTooltip(false)}
+							onClick={() => setShowTooltip(!showTooltip)}
+						>
 							{projectSummaryInfo?.map((sum, index) =>
 								sum.show ? (
 									<div
 										key={index}
-										className={`flex relative justify-between space-x-0.5 font-normal ${
-											sum.label === "Target" ? "border-b-2" : ""
-										} ${sum.label === "Delta" ? "border-t-2" : ""}`}
+										className={`flex relative justify-between items-center font-normal ${
+											sum.label === "Target"
+												? "border-b border-contrastGrey border-opacity-20"
+												: ""
+										} ${
+											sum.label === "Delta"
+												? "border-t border-contrastGrey border-opacity-20"
+												: ""
+										}`}
 									>
 										<label
-											className={`cursor-pointer pr-1 text-sm leading-[18px] whitespace-nowrap`}
+											className={`cursor-pointer text-sm leading-[18px] whitespace-nowrap text-right flex-shrink-0`}
+											style={{ width: "40px" }}
 										>
 											{sum.label}
 										</label>
-										<span className="font-bold text-sm leading-[18px] mr-auto">
+										<span className="font-bold text-sm leading-[18px] ml-2">
 											{sum.value}
 											<span className="font-normal text-sm leading-[18px] pl-1">
 												hrs
 											</span>
 										</span>
-                                        {sum.tooltip && showTooltip && (
-									<div className="absolute bottom-full right-0 bg-gray-700 text-white text-xs rounded px-2 py-1 z-10 shadow-lg min-w-40">
-										{sum.tooltip}
-									</div>)}
+										{sum.tooltip && showTooltip && (
+											<div className="absolute bottom-full right-0 bg-gray-700 text-white text-xs rounded px-2 py-1 z-10 shadow-lg min-w-40">
+												{sum.tooltip}
+											</div>
+										)}
 									</div>
 								) : null
 							)}
@@ -380,7 +390,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 							);
 						})}
 						<IconButton
-							className={`-m-1 sm:ml-0 lg:ml-0 text-black flex items-center justify-center`}
+							className={`-m-1 sm:ml-0 lg:ml-0 text-black flex items-center justify-center hover:text-contrastGrey`}
 							onClick={prevWeek}
 							Icon={ChevronLeftIcon}
 							iconSize={"h6 w-6"}
@@ -443,7 +453,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 				<th className="pl-0 pr-4 pt-1 pb-2 font-normal align-top w-1/2 sm:w-1/6">
 					<div className="flex flex-row items-start">
 						<IconButton
-							className="sm:flex hidden pt-[2px] text-contrastBlue items-center justify-center"
+							className="sm:flex hidden pt-[2px] text-contrastBlue items-center justify-center hover:text-contrastGrey"
 							onClick={nextWeek}
 							Icon={ChevronRightIcon}
 							iconSize={"h6 w-6"}

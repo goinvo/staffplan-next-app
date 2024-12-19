@@ -120,34 +120,33 @@ export const ProjectUserLabel = ({
 			refetchProjectList();
 		}
 	};
-
 	const assignmentDropMenuOptions = [
-		{
-			component: (
-				<button
-					className="text-gray-900 w-full block px-8 py-4 text-sm text-left"
-					onClick={() =>
-						openModal(
-							<EditAssignmentModal
-								assignment={assignment}
-								project={project}
-								closeModal={closeModal}
-							/>
-						)
-					}
-				>
-					Edit Assignment
-				</button>
-			),
-			show: canEditAssignment,
-		},
+		// {
+		// 	component: (
+		// 		<button
+		// 			className="text-gray-900 w-full block px-8 py-4 text-sm text-left"
+		// 			onClick={() =>
+		// 				openModal(
+		// 					<EditAssignmentModal
+		// 						assignment={assignment}
+		// 						project={project}
+		// 						closeModal={closeModal}
+		// 					/>
+		// 				)
+		// 			}
+		// 		>
+		// 			Edit Assignment
+		// 		</button>
+		// 	),
+		// 	show: canEditAssignment,
+		// },
 		{
 			component: (
 				<button
 					onClick={handleDeleteAssignmentClick}
-					className="text-gray-900 w-full block px-8 py-4 text-sm text-left"
+					className="text-red-400 w-full block px-1 py-1 text-sm text-left"
 				>
-					Delete
+					Delete {assignment.assignedUser ? assignment.assignedUser.name : "person"} from project
 				</button>
 			),
 			show: canDeleteAssignment,
@@ -157,6 +156,15 @@ export const ProjectUserLabel = ({
 	return (
 		<td className="px-0 pr-0 pt-2 pb-2 font-normal flex align-center sm:w-2/5 w-1/2">
 			<div className="flex flex-row justify-between sm:items-start items-center">
+			<div className="w-12 ml-auto sm:flex hidden">
+					{showEllipsisMenu && (
+						<EllipsisDropdownMenu
+							options={assignmentDropMenuOptions}
+							textColor={"actionbar-text-accent"}
+							menuPositioning="relative -top-2.5"
+						/>
+					)}
+				</div>
 				{isUserTBD && (
 					<AddPersonInline project={project} assignment={assignment} />
 				)}

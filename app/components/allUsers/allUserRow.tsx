@@ -61,7 +61,7 @@ export const AllUserRow = ({
 						</td>)
 				});
 			})}
-			<td className="flex items-center justify-center font-normal py-2 pr-4 pl-0 sm:w-1/6 w-1/2">
+			<td className="flex items-center justify-center font-normal py-2 pr-5 pl-0 sm:w-1/6 w-1/2">
 				{/* {viewer?.id === user.id && <IconButton className='text-transparentGrey sm:flex hidden'
 					onClick={() => console.log('On archive box btn click')}
 					Icon={ArchiveBoxIcon}
