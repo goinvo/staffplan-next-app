@@ -170,7 +170,10 @@ export const ProjectUserLabel = ({
 
 				<div className="w-48 font-bold flex text-contrastBlue w-full">
 					{!isUserTBD && (
-						<div className="py-2 relative overflow-hidden w-[38px] h-[28px]  aspect-w-38 aspect-h-28">
+						<div
+							className="py-2 relative overflow-hidden w-[38px] h-[28px]  aspect-w-38 aspect-h-28 hover:cursor-pointer"
+							onClick={() => clickHandler(assignment)}
+						>
 							<Image
 								src={assignment.assignedUser.avatarUrl}
 								className="rounded-md object-cover"
