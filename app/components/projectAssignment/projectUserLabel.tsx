@@ -49,7 +49,6 @@ export const ProjectUserLabel = ({
 	const canEditAssignment = viewer?.id === assignment.assignedUser?.id || !assignment.assignedUser;
 	const canDeleteAssignment = canAssignmentBeDeleted && (isAdminOrOwner || canEditAssignment);
 	const showEllipsisMenu = canEditAssignment || canDeleteAssignment;
-
 	const finalDeletingAssignment = () => {
 		const variables = {
 			assignmentId: assignment.id,
@@ -157,7 +156,7 @@ export const ProjectUserLabel = ({
 		<td className="px-0 pr-0 pt-2 pb-2 font-normal flex align-center sm:w-1/3 w-1/2">
 			<div className="flex flex-row justify-between sm:items-start items-center">
 			<div className="w-12 ml-auto sm:flex hidden">
-					{showEllipsisMenu && (
+					{canDeleteAssignment && (
 						<EllipsisDropdownMenu
 							options={assignmentDropMenuOptions}
 							textColor={"actionbar-text-accent"}
