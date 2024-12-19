@@ -142,11 +142,11 @@ export const UserAssignmentRow = ({
 				${isAssignmentProposed ? 'bg-diagonal-stripes' : ''}
 				${newProjectAssignmentId === Number(assignment.project.id) ? 'animate-fadeInScale' : ''}`}
 		>
-			<td className={`pl-3 sm:px-0 py-1 sm:pt-1 sm:pb-2 font-normal align-top ${!isFirstClient ? 'sm:block flex items-center' : 'pt-5'} w-1/2 sm:w-1/3`}>
+			<td className={`pl-3 sm:px-0 py-1 sm:pt-1 sm:pb-2 font-normal align-top ${!isFirstClient ? 'sm:block flex items-center' : 'pt-5'} w-1/2 sm:w-2/5`}>
 				<div
 					className='flex sm:flex-row flex-col w-full justify-between items-start '
 				>
-					<div className={`${isTempProject ? '' : 'sm:w-[35%]'} ${isFirstClient ? 'mb-1' : ''}`}>
+					<div className={`${isTempProject ? '' : 'sm:max-w-[70px] md:max-w-[90px] lg:max-w-[120px] w-full pl-[2px]'} ${isFirstClient ? 'mb-1' : ''}`}>
 						{/* {viewsFilterSingleUser === 'byClient' && isFirstClient && isFirstMonth && (
 							<ClientLabel assignment={assignment} selectedUser={selectedUser} />
 						)}
@@ -162,7 +162,7 @@ export const UserAssignmentRow = ({
 							<UserLabel assignment={assignment} selectedUser={selectedUser} clickHandler={handleProjectChange} undoRowRef={undoRowRef} isFirstClient={isFirstClient} />
 						)
 					)}
-					<div className={`text-contrastBlue sm:flex hidden pr-2 flex-col items-end  ${isAssignmentProposed ? "w-[22%]" : "w-[17%]"}`}>
+					<div className={`text-contrastBlue sm:flex hidden pr-2 sm:pr-1 md:pr-2 flex-col items-end  ${isAssignmentProposed ? "max-w-[75px] w-full" : "max-w-[55px] w-full"}`}>
 						<button className='pt-2 underline' onClick={onChangeStatusButtonClick}>
 							{isAssignmentProposed ? 'Proposed' : 'Signed'}
 						</button>

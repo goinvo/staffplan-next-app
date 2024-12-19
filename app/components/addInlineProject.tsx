@@ -220,7 +220,7 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
 
     return (
         <tr className={`pl-5 sm:flex hidden border-b border-gray-300 hover:bg-hoverGrey min-h-[100px]`}>
-            <td className='my-5 px-0 font-normal align-top max-w-1/3'>
+            <td className='my-5 px-0 font-normal align-top max-w-2/5'>
                 <form onSubmit={formik.handleSubmit} className="flex flex-row gap-4">
                     <div className="mr-1">
                         <AutocompleteInput

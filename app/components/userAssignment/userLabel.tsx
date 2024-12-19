@@ -218,9 +218,9 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 
 	];
 	return (
-		<div className={`w-full ${isAssignmentProposed ? "sm:w-[38%]" : "sm:w-[43%]" } sm:mr-0 mr-2 flex justify-between items-start ${isFirstClient ? "mb-4 sm:mb-0" : ''}`}>
+		<div className={`w-full ${isAssignmentProposed ? "sm:max-w-[154px] lg:max-w-[175px] w-full md:pl-1 lg:pl-2" : "sm:max-w-[174px] lg:max-w-[195px] w-full md:pl-1 lg:pl-2" } sm:mr-0 mr-2 flex justify-between items-start ${isFirstClient ? "mb-4 sm:mb-0" : ''}`}>
 			<button
-				className={`md:ml-2 lg:ml-0 pt-0 sm:pt-2  font-bold flex items-center justify-start text-contrastBlue text-start`}
+				className={`pt-0 sm:pt-2  font-bold flex items-center justify-start text-contrastBlue text-start`}
 				onClick={() => clickHandler(assignment)}
 			>
 				{assignment.project.name}
@@ -229,6 +229,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 				<EllipsisDropdownMenu
 					options={assignmentDropMenuOptions}
 					textColor={"actionbar-text-accent"}
+					className="!px-1 sm:!px-0 md:!px-1"
 				/>
 			}
 		</div>

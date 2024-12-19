@@ -3,34 +3,26 @@
 import {
   ProjectType,
   ClientType,
+  MonthsDataType,
 } from "@/app/typeInterfaces";
 
 import React, { useRef, useEffect, useState } from "react";
 import { useFormik, FormikValues } from "formik";
 import { useMutation } from "@apollo/client";
 import { UPSERT_PROJECT, UPSERT_CLIENT } from "@/app/gqlQueries";
-import ProjectSummary from "../projectSummary";
-import ColumnChart from "../columnChart";
-import {
-  calculateTotalHoursPerWeek,
-  isBeforeWeek,
-  currentWeek,
-  currentYear,
-} from "../scrollingCalendar/helpers";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { useClientDataContext } from "@/app/contexts/clientContext";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
 import { AutocompleteInput } from "../autocompleteInput";
-import { useUserDataContext } from "@/app/contexts/userDataContext";
 
-export const AddProjectForm = () => {
+export const AddProjectForm = ({months}: {months: MonthsDataType[]}) => {
   const clientInputRef = useRef<HTMLInputElement>(null);
   const projectInputRef = useRef<HTMLInputElement>(null);
 
   const [isNewClient, setIsNewClient] = useState(false);
   const [isNewProject, setIsNewProject] = useState(false);
 
-  const { isAddNewProject, setIsAddNewProject } = useGeneralDataContext();
+  const { headerTitleWidth, isAddNewProject, setIsAddNewProject } = useGeneralDataContext();
   const { clientList, setClientList, refetchClientList } = useClientDataContext();
   const { projectList, setProjectList, setNewProjectId } = useProjectsDataContext();
   
@@ -263,15 +255,18 @@ export const AddProjectForm = () => {
 
   return (
     <tr
-      className={`sm:flex hidden w-full border-gray-300 transition-all duration-700 ease-in-out delay-100 
+      className={`sm:flex hidden w-full pl-[10px] border-gray-300 transition-all duration-700 ease-in-out delay-100 
           ${isAddNewProject ? "opacity-100 h-[100px] pointer-events-auto border-b" : "opacity-0 h-0 pointer-events-none border-b-0"}`}
     >
-      <td className="sm:block flex items-center pt-1 pb-2 px-0 font-normal align-top w-1/2 sm:w-1/3">
+      <td
+        className="sm:block items-center pt-1 pb-2 px-0 font-normal align-top"
+        style={{ width: headerTitleWidth ?? "auto" }}
+      >
         <form
           onKeyDown={handleKeyDown}
           className="flex justify-between w-full h-10 pt-3 border"
         >
-          <div className="w-full max-w-[35%] pl-3">
+          <div className="w-full sm:max-w-[95px] md:max-w-[120px] lg:max-w-[130px]">
             <AutocompleteInput
               ref={clientInputRef}
               placeholder="Client"
@@ -289,12 +284,12 @@ export const AddProjectForm = () => {
               isNewItem={isNewClient}
             />
             {formik.touched.clientName && formik.errors.clientName ? (
-              <p className="text-tiny px-2 text-red-500">
+              <p className="text-[10px] leading-3 pt-1 px-2 text-red-500">
                 {formik.errors.clientName}
               </p>
             ) : null}
           </div>
-          <div className="relative w-full max-w-[35%] pl-3 box-border">
+          <div className="relative w-full sm:max-w-[140px] md:max-w-[152px] lg:max-w-[172px] sm:ml-[10px] md:ml-[10px] lg:ml-0 box-border">
             <input
               ref={projectInputRef}
               type="text"
@@ -313,42 +308,25 @@ export const AddProjectForm = () => {
               </span>
             )}
             {formik.touched.projectName && formik.errors.projectName ? (
-              <p className="text-tiny px-2 text-red-500">
+              <p className="text-[10px] leading-3 pt-1 px-2 text-red-500">
                 {formik.errors.projectName}
               </p>
             ) : null}
           </div>
-          <button
-            type="submit"
-            className="bg-tiffany px-3 rounded-[3px]"
-            onClick={(e) => {
-              handleSaveClick(e)
-            }}
-          >
-            Save
-          </button>
+          <div className="w-6"></div>
         </form>
       </td>
-      {/* {months?.map((month: MonthsDataType) =>
-        month.weeks.map((week) => {
-          const isCurrenWeek =
-            currentWeek === week.weekNumberOfTheYear &&
-            currentYear === month.year;
-          return (
-            <td
-              key={`${month.monthLabel}-${week.weekNumberOfTheYear}`}
-              className={`relative px-1 py-1 min-h-[100px] w-[42px] ${
-                isCurrenWeek ? "bg-selectedColumnBg font-bold" : ""
-              }`}
-            >
-            </td>
-          );
-        })
-      )} */}
-
-      {/* {isLastMonth && <ProjectSummary project={project} />} */}
-
-      <td className="w-2/3"></td>
+      <td className="sm:block items-center md:-ml-2 lg:-ml-5 pt-[17px] pb-2 px-0 font-normal align-top">
+        <button
+          type="button"
+          className="bg-tiffany px-3 py-1 rounded-[3px]"
+          onClick={(e) => {
+            handleSaveClick(e);
+          }}
+        >
+          Save
+        </button>
+      </td>
     </tr>
   );
 };

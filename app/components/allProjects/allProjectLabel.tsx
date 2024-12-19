@@ -28,7 +28,7 @@ export const AllProjectLabel = ({
       {/*  <span className="sm:hidden block mr-2">{project.client.name}</span> */}
 
       <span
-        className="block w-auto sm:w-[45%] sm:mr-0 mr-2 cursor-pointer"
+        className="block w-auto sm:max-w-[100px] md:max-w-[125px] lg:max-w-[135px] sm:w-full sm:mr-0 mr-2 cursor-pointer"
         onClick={() => {
           if (showOneClientProjects === project.client.id.toString()) {
             setShowOneClientProjects("");
@@ -41,11 +41,11 @@ export const AllProjectLabel = ({
       </span>
       <button
         onClick={() => clickHandler(project)}
-        className="w-auto sm:w-[45%] sm:mr-0 mr-2 sm:mt-0 mt-2 font-bold text-contrastBlue text-start"
+        className="w-auto sm:max-w-[150px] md:max-w-[160px] lg:max-w-[185px] sm:w-full sm:ml-1 lg:ml-0 sm:mr-0 mr-2 sm:mt-0 mt-2 font-bold text-contrastBlue text-start"
       >
         {project.name}
       </button>
-      <div className="sm:flex hidden justify-end w-[7%]">
+      <div className="sm:flex hidden justify-end w-auto">
         <EllipsisProjectMenu undoRowRef={undoRowRef} project={project} />
       </div>
     </div>

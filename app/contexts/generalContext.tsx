@@ -14,6 +14,7 @@ import {
 } from "../components/scrollingCalendar/helpers";
 
 export interface GeneralDataContextType {
+    headerTitleWidth: number | null;
     dateRange: string;
     isAddNewProject: boolean;
     viewer: ViewerType | null;
@@ -23,6 +24,7 @@ export interface GeneralDataContextType {
     showArchivedAssignments: boolean;
     rollupSort: string;
     assignmentSort: string;
+    setHeaderTitleWidth: React.Dispatch<React.SetStateAction<number | null>>;
     setIsAddNewProject: React.Dispatch<React.SetStateAction<boolean>>;
     setShowSummaries: React.Dispatch<React.SetStateAction<boolean>>;
     setShowArchivedProjects: React.Dispatch<React.SetStateAction<boolean>>;
@@ -54,6 +56,7 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
     children,
 }) => {
     const isClient = typeof window !== "undefined";
+    const [headerTitleWidth, setHeaderTitleWidth] = useState<number | null>(null);
     const [dateRange, setDateRange] = useState<string>(
         getStartOfPreviousWeek()
     );
@@ -95,6 +98,7 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
     return (
         <GeneralDataContext.Provider
             value={{
+                headerTitleWidth,
                 isAddNewProject,
                 viewer,
                 dateRange,
@@ -104,6 +108,7 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
                 showArchivedAssignments,
                 rollupSort,
                 assignmentSort,
+                setHeaderTitleWidth,
                 setIsAddNewProject,
                 setShowSummaries,
                 setShowArchivedProjects,
