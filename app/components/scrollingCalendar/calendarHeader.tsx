@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
@@ -70,13 +70,14 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	projectSummaryInfo,
 	initialSorting,
 }) => {
+	const headerTitleRef = useRef<HTMLTableCellElement>(null);
+
 	const [isEditing, setIsEditing] = useState(false);
 	const [isTodayInView, setIsTodayInView] = useState(true);
 	const [showTooltip, setShowTooltip] = useState(false);
 	const [sortedBy, setSortedBy] = useState(initialSorting);
-	const { setDateRange, scrollToTodayFunction } = useGeneralDataContext();
-	const { setSortOrder: setSortOrderForPeople, setSortBy: setSortByForPeople } =
-		useUserDataContext();
+	const { setHeaderTitleWidth, setDateRange, scrollToTodayFunction } = useGeneralDataContext();
+	const { setSortOrder: setSortOrderForPeople, setSortBy: setSortByForPeople, sortUserList } = useUserDataContext();
 	const {
 		setSortOrder: setSortOrderForProjects,
 		setSortBy: setSortByForProjects,
@@ -94,8 +95,27 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 		pathname.includes("people") && pathname.split("/").length === 3;
 	const isProjectPage =
 		pathname.includes("projects") && pathname.split("/").length === 3;
-	const isProjectsPage = pathname.includes("projects");
-	const isPeoplePage = pathname.includes("people");
+	const isProjectsPage = pathname.includes("projects") && pathname.split("/").length === 2;
+	const isPeoplePage = pathname.includes("people") && pathname.split("/").length === 2;
+
+	useEffect(() => {
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        setHeaderTitleWidth(entry.contentRect.width);
+      }
+    });
+
+    if (headerTitleRef.current) {
+			observer.observe(headerTitleRef.current);
+      setHeaderTitleWidth(headerTitleRef.current.getBoundingClientRect().width);
+    }
+
+    return () => {
+      if (headerTitleRef.current) {
+        observer.unobserve(headerTitleRef.current);
+      }
+    };
+  }, []);
 
 	useEffect(() => {
 		if (months.length) {
@@ -130,6 +150,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 		}
 		if (isPeoplePage) {
 			setSortOrderForPeople(sortedBy.sort);
+			sortUserList(sortedBy.sort);
 
 			localStorage.setItem(
 				"peoplePageSorting",
@@ -179,7 +200,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 		<thead className="relative">
 			<tr className="pl-5 border-bottom bg-contrastBlue min-h-28 text-white sm:flex hidden">
 				<th
-					className={`flex w-1/2 sm:w-1/3 px-0 py-5 ${
+					className={`flex w-1/2 sm:w-2/5 px-0 py-5 ${
 						isEditing ? "lg:mr-0" : "lg:mr-1"
 					}`}
 				>
@@ -306,19 +327,17 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 				</th>
 			</tr>
 			<tr className="flex sm:justify-normal justify-between border-b border-gray-300 pl-5">
-				<th className="px-0 pt-[10px] pb-2 font-normal align-top text-transparentGrey w-1/2 sm:w-1/3">
+				<th ref={headerTitleRef} className="px-0 pt-[10px] pb-2 font-normal align-top text-transparentGrey w-1/2 sm:w-2/5">
 					<div className="sm:flex hidden  flex-row justify-between items-start">
 						{columnHeaderTitles?.map((el, i) => {
 							return (
 								<div
 									key={el.title}
 									className={`flex  items-center justify-start text-start ${
-										(isProjectsPage && i === 0 && "w-[45%]") ||
-										(isProjectsPage && i === 1 && "w-[45%] lg:pl-0 pl-[5px]") ||
-										(isStaffPlanPage && i === 0 && "w-[36%]") ||
-										(isStaffPlanPage &&
-											i === 1 &&
-											"w-[55%] sm:pl-[8px] md:pl-[14px] lg:pl-0 pl-[14px]") ||
+										(isProjectsPage && i === 0 && "sm:max-w-[70px] md:max-w-[103px] lg:max-w-[110px] sm:w-full") ||
+										(isProjectsPage && i === 1 && "sm:max-w-[177px] md:max-w-[183px] lg:max-w-[200px] sm:w-full sm:pl-[13px] md:pl-[5px] lg:pl-0 pl-[5px]") ||
+										(isStaffPlanPage && i === 0 && "sm:max-w-[67px] md:max-w-[67px] lg:max-w-[95px] sm:w-full") ||
+										(isStaffPlanPage && i === 1 && "sm:max-w-[230px] md:max-w-[230px] lg:max-w-[250px] sm:w-full md:pl-[6px] lg:pl-[10px]") ||
 										"w-24"
 									}
                                 `}
@@ -367,7 +386,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 							);
 						})}
 						<IconButton
-							className={`-m-1 sm:ml-2 lg:ml-0 text-black flex items-center justify-center hover:text-contrastGrey`}
+							className={`-m-1 sm:ml-0 lg:ml-0 text-black flex items-center justify-center hover:text-contrastGrey`}
 							onClick={prevWeek}
 							Icon={ChevronLeftIcon}
 							iconSize={"h6 w-6"}

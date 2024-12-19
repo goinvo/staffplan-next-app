@@ -19,6 +19,7 @@ type EnqueueTimerParams = {
 };
 
 export interface ProjectsDataContextType {
+  newProjectId: number | null;
   projectList: ProjectType[] | [];
   singleProjectPage: ProjectType;
   sortOrder: SORT_ORDER;
@@ -30,6 +31,7 @@ export interface ProjectsDataContextType {
   viewsFilterSingleProject: string;
   projectsWithUndoActions: UndoableModifiedProject[];
   showOneClientProjects: string;
+  setNewProjectId: React.Dispatch<React.SetStateAction<number | null>>;
   undoModifyProject: (projectId: number) => void;
   setViewsFilterSingleProject: React.Dispatch<React.SetStateAction<string>>;
   setProjectList: React.Dispatch<React.SetStateAction<ProjectType[] | []>>;
@@ -65,6 +67,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
 }) => {
   const client = useApolloClient();
   const isClient = typeof window !== "undefined";
+  const [newProjectId, setNewProjectId] = useState<number | null>(null);
   const [projectList, setProjectList] = useState<ProjectType[] | []>([]);
   const [filteredProjectList, setFilteredProjectList] = useState<ProjectType[] | []>([])
   const [singleProjectPage, setSingleProjectPage] = useState<any>(null);
@@ -102,7 +105,14 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
 
   const sortedAndFilteredProjects = useMemo(() => {
     if (!projectList.length) return [];
-    const sortedList = sortProjectListByOrder(sortOrder, sortBy, projectList);
+    
+    const newProject = newProjectId ? projectList.filter((project) => Number(project.id) === newProjectId) : []
+    const projectListToSort = newProjectId
+      ? projectList.filter((project) => Number(project.id) !== newProjectId)
+      : projectList;
+    
+    const sortedList = sortProjectListByOrder(sortOrder, sortBy, projectListToSort);
+
     if (sortedList) {
       const filteredByClient = showOneClientProjects
         ? sortedList.filter((project: ProjectType) => project.client.id.toString() === showOneClientProjects)
@@ -111,7 +121,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
         ? filteredByClient.filter((project: ProjectType) => project.status !== "archived")
         : filteredByClient;
 
-      return finalFilteredList;
+      return [...newProject, ...finalFilteredList];
     }
   }, [projectList, sortOrder, sortBy, showArchivedProjects, showOneClientProjects]);
 
@@ -190,6 +200,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
   return (
     <ProjectsDataContext.Provider
       value={{
+        newProjectId,
         projectList,
         viewsFilterProject,
         singleProjectPage,
@@ -201,6 +212,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
         viewsFilterSingleProject,
         projectsWithUndoActions,
         showOneClientProjects,
+        setNewProjectId,
         undoModifyProject,
         enqueueTimer,
         setSortOrder,

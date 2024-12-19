@@ -84,11 +84,15 @@ export const ScrollingCalendar = ({
 					initialSorting={initialSorting}
 				/>
 				<tbody>
-					{React.Children.map(children, (child) =>
-						React.cloneElement(child as React.ReactElement<any>, {
-							months,
-						})
-					)}
+					{React.Children.toArray(children).map((child) => {
+						if (React.isValidElement(child)) {
+							return React.cloneElement(child as React.ReactElement<any>, {
+                months,
+              });
+						}
+						return child;
+					})}
+
 				</tbody>
 			</table>
 		</div>
