@@ -71,7 +71,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	initialSorting,
 }) => {
 	const [isEditing, setIsEditing] = useState(false);
-	const [isTodayInView, setIsTodayInView] = useState(false);
+	const [isTodayInView, setIsTodayInView] = useState(true);
 	const [showTooltip, setShowTooltip] = useState(false);
 	const [sortedBy, setSortedBy] = useState(initialSorting);
 	const { setDateRange, scrollToTodayFunction } = useGeneralDataContext();
@@ -98,7 +98,9 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	const isPeoplePage = pathname.includes("people");
 
 	useEffect(() => {
-		setIsTodayInView(isTodayInRange(months));
+		if (months.length) {
+			setIsTodayInView(isTodayInRange(months))
+		};
 	}, [months]);
 
 	useEffect(() => {
