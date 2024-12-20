@@ -92,14 +92,23 @@ const Navbar: React.FC = () => {
 			</div> */}
 			<div className="flex items-center sm:space-x-4 py-4 sm:ml-2">
 				<div>
-					<button
-						className="sm:inline-flex hidden items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue"
-						onClick={() =>
-							openModal(<AirTableFormModal closeModal={closeModal} />)
-						}
-					>
-						Feedback
-					</button>
+					{/* Temporary commented */}
+          {/* <button
+            className="sm:inline-flex hidden items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue"
+            onClick={() =>
+              openModal(<AirTableFormModal closeModal={closeModal} />)
+            }
+          >
+            Feedback
+          </button> */}
+          <Link
+            href='mailto:staffplan@goinvo.com'
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sm:inline-flex hidden items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue"
+          >
+            Feedback
+          </Link>
 				</div>
 				<EllipsisDropdownMenu
 					options={ellipsisDropdownMenuOptions}
