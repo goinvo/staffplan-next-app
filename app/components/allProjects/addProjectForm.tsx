@@ -3,7 +3,6 @@
 import {
   ProjectType,
   ClientType,
-  MonthsDataType,
 } from "@/app/typeInterfaces";
 
 import React, { useRef, useEffect, useState } from "react";
@@ -15,7 +14,7 @@ import { useClientDataContext } from "@/app/contexts/clientContext";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
 import { AutocompleteInput } from "../autocompleteInput";
 
-export const AddProjectForm = ({months}: {months: MonthsDataType[]}) => {
+export const AddProjectForm = () => {
   const clientInputRef = useRef<HTMLInputElement>(null);
   const projectInputRef = useRef<HTMLInputElement>(null);
 
