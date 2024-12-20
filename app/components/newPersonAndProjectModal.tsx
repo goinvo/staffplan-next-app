@@ -28,7 +28,7 @@ const NewPersonAndProjectModal = ({ closeModal }: ModalProps) => {
             </div>
 
             {/* {selectedView === 'person' && <NewPersonForm closeModal={closeModal} />} */}
-            {selectedView === 'project' && <NewProjectForm closeModal={closeModal} />}
+            {selectedView === 'project' && <NewProjectForm closeModal={closeModal} isModalView />}
         </>
     );
 };

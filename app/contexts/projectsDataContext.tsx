@@ -19,6 +19,7 @@ type EnqueueTimerParams = {
 };
 
 export interface ProjectsDataContextType {
+  isProjectDataLoading: boolean;
   projectList: ProjectType[] | [];
   singleProjectPage: ProjectType;
   sortOrder: SORT_ORDER;
@@ -30,6 +31,7 @@ export interface ProjectsDataContextType {
   viewsFilterSingleProject: string;
   projectsWithUndoActions: UndoableModifiedProject[];
   showOneClientProjects: string;
+  setIsProjectDataLoading: React.Dispatch<React.SetStateAction<boolean>>;
   undoModifyProject: (projectId: number) => void;
   setViewsFilterSingleProject: React.Dispatch<React.SetStateAction<string>>;
   setProjectList: React.Dispatch<React.SetStateAction<ProjectType[] | []>>;
@@ -65,6 +67,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
 }) => {
   const client = useApolloClient();
   const isClient = typeof window !== "undefined";
+  const [isProjectDataLoading, setIsProjectDataLoading] = useState(true)
   const [projectList, setProjectList] = useState<ProjectType[] | []>([]);
   const [filteredProjectList, setFilteredProjectList] = useState<ProjectType[] | []>([])
   const [singleProjectPage, setSingleProjectPage] = useState<any>(null);
@@ -90,6 +93,10 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
     skip: !isClient,
     errorPolicy: "all",
   });
+
+  useEffect(() => {
+    setIsProjectDataLoading(projectDataLoading);
+  }, [projectDataLoading])
 
   useEffect(() => {
     if (projectData && projectData.currentCompany?.projects) {
@@ -190,6 +197,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
   return (
     <ProjectsDataContext.Provider
       value={{
+        isProjectDataLoading,
         projectList,
         viewsFilterProject,
         singleProjectPage,
@@ -201,6 +209,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
         viewsFilterSingleProject,
         projectsWithUndoActions,
         showOneClientProjects,
+        setIsProjectDataLoading,
         undoModifyProject,
         enqueueTimer,
         setSortOrder,

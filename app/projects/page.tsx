@@ -1,5 +1,5 @@
 "use client";
-import React, {useState} from "react";
+import React, { useState } from "react";
 
 import { ProjectType } from "../typeInterfaces";
 import { LoadingSpinner } from "../components/loadingSpinner";
@@ -7,6 +7,7 @@ import { ScrollingCalendar } from "../components/scrollingCalendar/scrollingCale
 import { AllProjectRow } from "../components/allProjects/allProjectRow";
 import { SORT_ORDER } from "../components/scrollingCalendar/constants";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
+import CreateProjectForm from "../components/createProjectForm";
 
 
 const ProjectsView: React.FC = () => {
@@ -19,7 +20,8 @@ const ProjectsView: React.FC = () => {
     }
   });
 
-	const { filteredProjectList, setShowOneClientProjects } = useProjectsDataContext();
+  const { isProjectDataLoading, filteredProjectList, setShowOneClientProjects } = useProjectsDataContext();
+  
 
 	const columnHeaderTitles = [
     {
@@ -33,31 +35,31 @@ const ProjectsView: React.FC = () => {
 		},
   ];
 
-	const assignments = filteredProjectList?.flatMap((project: ProjectType) => project.assignments || []);
+  const assignments = filteredProjectList?.flatMap((project: ProjectType) => project.assignments || []);
 
 	return (
     <>
-      {filteredProjectList.length ? (
+      {isProjectDataLoading ? (
+        <LoadingSpinner />
+      ) : filteredProjectList.length ? (
         <ScrollingCalendar
           title="Projects"
           columnHeaderTitles={columnHeaderTitles}
           assignments={assignments}
           initialSorting={initialSorting}
         >
-          {filteredProjectList?.map((project: ProjectType, index: number) => {
-            return (
-              <AllProjectRow
-                key={project.id}
-                project={project}
-                monthData={{ monthLabel: "", year: 0 }}
-                isFirstMonth={true}
-                isLastMonth={true}
-              />
-            );
-          })}
+          {filteredProjectList.map((project: ProjectType, index: number) => (
+            <AllProjectRow
+              key={project.id}
+              project={project}
+              monthData={{ monthLabel: "", year: 0 }}
+              isFirstMonth={true}
+              isLastMonth={true}
+            />
+          ))}
         </ScrollingCalendar>
       ) : (
-        <LoadingSpinner />
+        <CreateProjectForm/>
       )}
     </>
   );
