@@ -166,7 +166,7 @@ export const UserAssignmentRow = ({
 						<button className='pt-2 underline' onClick={onChangeStatusButtonClick}>
 							{isAssignmentProposed ? 'Proposed' : 'Signed'}
 						</button>
-						<div className='pt-2'>
+						<div className='pt-5'>
 							Actual
 						</div>
 					</div>
