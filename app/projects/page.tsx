@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 
 import { ProjectType } from "../typeInterfaces";
 import { LoadingSpinner } from "../components/loadingSpinner";
@@ -8,6 +8,8 @@ import { AllProjectRow } from "../components/allProjects/allProjectRow";
 import { SORT_ORDER } from "../components/scrollingCalendar/constants";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
 import CreateProjectForm from "../components/createProjectForm";
+import { useGeneralDataContext } from "../contexts/generalContext";
+import { AddProjectForm } from "../components/allProjects/addProjectForm";
 
 
 const ProjectsView: React.FC = () => {
@@ -21,21 +23,26 @@ const ProjectsView: React.FC = () => {
   });
 
   const { isProjectDataLoading, filteredProjectList, setShowOneClientProjects } = useProjectsDataContext();
-  
+  const { setIsAddNewProject } = useGeneralDataContext();
 
 	const columnHeaderTitles = [
     {
       title: "Clients",
-      showIcon: true,
+      showIcon: false,
       onClick: () => setShowOneClientProjects(""),
     },
-		{
-			title: "Projects",
-			showIcon: false,
-		},
+    {
+      title: "Projects",
+      showIcon: true,
+      onIconClick: () => setIsAddNewProject(true),
+    },
   ];
 
-  const assignments = filteredProjectList?.flatMap((project: ProjectType) => project.assignments || []);
+  useEffect(() => {
+    return () => setIsAddNewProject(false)
+  }, [])
+
+	const assignments = filteredProjectList?.flatMap((project: ProjectType) => project.assignments || []);
 
 	return (
     <>
@@ -48,15 +55,20 @@ const ProjectsView: React.FC = () => {
           assignments={assignments}
           initialSorting={initialSorting}
         >
-          {filteredProjectList.map((project: ProjectType, index: number) => (
-            <AllProjectRow
-              key={project.id}
-              project={project}
-              monthData={{ monthLabel: "", year: 0 }}
-              isFirstMonth={true}
-              isLastMonth={true}
-            />
-          ))}
+          {[
+            <AddProjectForm
+              key="addForm"
+            />,
+            ...filteredProjectList.map((project: ProjectType) => (
+              <AllProjectRow
+                key={project.id}
+                project={project}
+                monthData={{ monthLabel: "", year: 0 }}
+                isFirstMonth={true}
+                isLastMonth={true}
+              />
+            )),
+          ]}
         </ScrollingCalendar>
       ) : (
         <CreateProjectForm/>

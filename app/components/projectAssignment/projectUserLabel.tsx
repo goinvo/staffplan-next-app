@@ -153,7 +153,7 @@ export const ProjectUserLabel = ({
 	];
 
 	return (
-		<td className="px-0 pr-0 pt-2 pb-2 font-normal flex align-center sm:w-1/3 w-1/2">
+		<td className="px-0 pr-0 pt-2 pb-2 font-normal flex align-center sm:w-2/5 w-1/2">
 			<div className="flex flex-row justify-between sm:items-start items-center">
 			<div className="w-12 ml-auto sm:flex hidden">
 					{canDeleteAssignment && (
@@ -170,7 +170,10 @@ export const ProjectUserLabel = ({
 
 				<div className="w-48 font-bold flex text-contrastBlue w-full">
 					{!isUserTBD && (
-						<div className="py-2 relative overflow-hidden w-[38px] h-[28px]  aspect-w-38 aspect-h-28">
+						<div
+							className="py-2 relative overflow-hidden w-[38px] h-[28px]  aspect-w-38 aspect-h-28 hover:cursor-pointer"
+							onClick={() => clickHandler(assignment)}
+						>
 							<Image
 								src={assignment.assignedUser.avatarUrl}
 								className="rounded-md object-cover"
