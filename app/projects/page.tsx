@@ -7,6 +7,7 @@ import { ScrollingCalendar } from "../components/scrollingCalendar/scrollingCale
 import { AllProjectRow } from "../components/allProjects/allProjectRow";
 import { SORT_ORDER } from "../components/scrollingCalendar/constants";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
+import CreateProjectForm from "../components/createProjectForm";
 import { useGeneralDataContext } from "../contexts/generalContext";
 import { AddProjectForm } from "../components/allProjects/addProjectForm";
 
@@ -21,7 +22,7 @@ const ProjectsView: React.FC = () => {
     }
   });
 
-  const { filteredProjectList, setShowOneClientProjects } = useProjectsDataContext();
+  const { isProjectDataLoading, filteredProjectList, setShowOneClientProjects } = useProjectsDataContext();
   const { setIsAddNewProject } = useGeneralDataContext();
 
 	const columnHeaderTitles = [
@@ -45,7 +46,9 @@ const ProjectsView: React.FC = () => {
 
 	return (
     <>
-      {filteredProjectList.length ? (
+      {isProjectDataLoading ? (
+        <LoadingSpinner />
+      ) : filteredProjectList.length ? (
         <ScrollingCalendar
           title="Projects"
           columnHeaderTitles={columnHeaderTitles}
@@ -68,7 +71,7 @@ const ProjectsView: React.FC = () => {
           ]}
         </ScrollingCalendar>
       ) : (
-        <LoadingSpinner />
+        <CreateProjectForm/>
       )}
     </>
   );

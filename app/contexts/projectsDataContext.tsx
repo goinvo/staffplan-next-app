@@ -19,6 +19,7 @@ type EnqueueTimerParams = {
 };
 
 export interface ProjectsDataContextType {
+  isProjectDataLoading: boolean;
   newProjectId: number | null;
   projectList: ProjectType[] | [];
   singleProjectPage: ProjectType;
@@ -31,6 +32,7 @@ export interface ProjectsDataContextType {
   viewsFilterSingleProject: string;
   projectsWithUndoActions: UndoableModifiedProject[];
   showOneClientProjects: string;
+  setIsProjectDataLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setNewProjectId: React.Dispatch<React.SetStateAction<number | null>>;
   undoModifyProject: (projectId: number) => void;
   setViewsFilterSingleProject: React.Dispatch<React.SetStateAction<string>>;
@@ -67,6 +69,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
 }) => {
   const client = useApolloClient();
   const isClient = typeof window !== "undefined";
+  const [isProjectDataLoading, setIsProjectDataLoading] = useState(true)
   const [newProjectId, setNewProjectId] = useState<number | null>(null);
   const [projectList, setProjectList] = useState<ProjectType[] | []>([]);
   const [filteredProjectList, setFilteredProjectList] = useState<ProjectType[] | []>([])
@@ -93,6 +96,10 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
     skip: !isClient,
     errorPolicy: "all",
   });
+
+  useEffect(() => {
+    setIsProjectDataLoading(projectDataLoading);
+  }, [projectDataLoading])
 
   useEffect(() => {
     if (projectData && projectData.currentCompany?.projects) {
@@ -200,6 +207,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
   return (
     <ProjectsDataContext.Provider
       value={{
+        isProjectDataLoading,
         newProjectId,
         projectList,
         viewsFilterProject,
@@ -212,6 +220,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
         viewsFilterSingleProject,
         projectsWithUndoActions,
         showOneClientProjects,
+        setIsProjectDataLoading,
         setNewProjectId,
         undoModifyProject,
         enqueueTimer,

@@ -16,9 +16,10 @@ import CustomDateInput from "./customDateInput";
 
 interface NewProjectFormProps {
 	closeModal: () => void;
+	isModalView: boolean;
 }
 
-const NewProjectForm = ({ closeModal }: NewProjectFormProps) => {
+const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 	const router = useRouter()
 	const { setUserList } = useUserDataContext();
 	const { clientList, setClientList, refetchClientList } =
@@ -312,12 +313,14 @@ const NewProjectForm = ({ closeModal }: NewProjectFormProps) => {
 			>
 				Save
 			</button>
-			<button
-				onClick={closeModal}
-				className="w-full h-10 text-tiny font-bold bg-contrastGrey hover:bg-contrastBlue rounded-sm text-white py-1 mb-1"
-			>
-				Cancel
-			</button>
+			{isModalView && (
+        <button
+          onClick={closeModal}
+          className="w-full h-10 text-tiny font-bold bg-contrastGrey hover:bg-contrastBlue rounded-sm text-white py-1 mb-1"
+        >
+          Cancel
+        </button>
+      )}
 		</form>
 	);
 };
