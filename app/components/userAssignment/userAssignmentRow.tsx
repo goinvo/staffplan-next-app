@@ -43,7 +43,8 @@ export const UserAssignmentRow = ({
 	totalRows
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
-	const { refetchUserList, sortBy, viewsFilterSingleUser, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
+	const { sortBy, newProjectAssignmentId, setNewProjectAssignmentId, refetchUserList, viewsFilterSingleUser, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
+
 	const [showUndoRow, setShowUndoRow] = useState<boolean>(false);
 	const rowRef = useRef<HTMLTableRowElement>(null);
 	const undoRowRef = useRef<HTMLTableRowElement>(null);
@@ -57,6 +58,13 @@ export const UserAssignmentRow = ({
 			refetchUserList();
 		},
 	});
+
+	useEffect(() => {
+			if (newProjectAssignmentId) {
+				setTimeout(() => {setNewProjectAssignmentId(null)}, 1000)
+			}
+	}, [newProjectAssignmentId]);
+	
 	const handleProjectChange = (assignment: AssignmentType) => {
 		router.push("/projects/" + assignment.project.id);
 	};
@@ -118,24 +126,28 @@ export const UserAssignmentRow = ({
 	const sortedByClient = sortBy === "Client";
 	const isFirstRow = rowIndex === 0;
 	const isLastRow = rowIndex === totalRows - 1;
-	const rowClasses = mergeClasses(
+	/* const rowClasses = mergeClasses(
 		'flex sm:justify-normal justify-between bg-white-300 hover:bg-hoverGrey pl-5',
 		{ 'border-t border-gray-300': isFirstClient && sortedByClient && !isFirstRow },
 		{ 'border-b border-gray-300': !sortedByClient || isLastRow },
 		{ 'bg-diagonal-stripes': isAssignmentProposed }
-	);
+	); */
 
 	return (
 		<tr
 			ref={rowRef}
 			key={`assignment-${assignment.id}`}
-			className={rowClasses}
+			className={`flex sm:justify-normal justify-between bg-white-300 hover:bg-hoverGrey pl-5
+				${isAssignmentProposed ? 'bg-diagonal-stripes' : ''}
+				${(isFirstClient && sortedByClient && !isFirstRow) ? 'border-t border-gray-300' : ''}
+				${(!sortedByClient || isLastRow) ? 'border-t border-gray-300' : ''}
+				${newProjectAssignmentId === Number(assignment.project.id) ? 'animate-fadeInScale' : ''}`}
 		>
-			<td className={`pl-3 sm:px-0 py-1 sm:pt-1 sm:pb-2 font-normal align-top ${!isFirstClient ? 'sm:block flex items-center' : 'pt-5'} w-1/2 sm:w-1/3`}>
+			<td className={`pl-3 sm:px-0 py-1 sm:pt-1 sm:pb-2 font-normal align-top ${!isFirstClient ? 'sm:block flex items-center' : 'pt-5'} w-1/2 sm:w-2/5`}>
 				<div
 					className='flex sm:flex-row flex-col w-full justify-between items-start '
 				>
-					<div className={`${isTempProject ? '' : 'sm:w-[35%]'} ${isFirstClient ? 'mb-1' : ''}`}>
+					<div className={`${isTempProject ? '' : 'sm:max-w-[70px] md:max-w-[90px] lg:max-w-[120px] w-full pl-[2px]'} ${isFirstClient ? 'mb-1' : ''}`}>
 						{sortedByClient && isFirstClient && isFirstMonth && (
 							<ClientLabel assignment={assignment} selectedUser={selectedUser} />
 						)}
@@ -151,7 +163,7 @@ export const UserAssignmentRow = ({
 							<UserLabel assignment={assignment} selectedUser={selectedUser} clickHandler={handleProjectChange} undoRowRef={undoRowRef} isFirstClient={isFirstClient} />
 						)
 					)}
-					<div className={`text-contrastBlue sm:flex hidden pr-2 flex-col items-end  ${isAssignmentProposed ? "w-[22%]" : "w-[17%]"}`}>
+					<div className={`text-contrastBlue sm:flex hidden pr-2 sm:pr-1 md:pr-2 flex-col items-end  ${isAssignmentProposed ? "max-w-[75px] w-full" : "max-w-[55px] w-full"}`}>
 						<button className='pt-2 underline' onClick={onChangeStatusButtonClick}>
 							{isAssignmentProposed ? 'Proposed' : 'Signed'}
 						</button>

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, forwardRef } from "react";
+import React, { useState, forwardRef, useEffect } from "react";
 
 interface AutocompleteProps<T> {
     items: T[];
@@ -16,6 +16,7 @@ interface AutocompleteProps<T> {
     listClassName?: string;
     value: string;
     tabIndex?: number
+    isNewItem?: boolean
 }
 
 export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<any>>(
@@ -32,10 +33,15 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<
         dropdownClassName = "",
         listClassName = "",
         value,
-        tabIndex
+        tabIndex,
+        isNewItem
     }, ref) => {
         const [filteredItems, setFilteredItems] = useState<any[]>(items);
         const [showDropdown, setShowDropdown] = useState<boolean>(false);
+
+        useEffect(() => {
+          setFilteredItems(items);
+        }, [items]);
 
         const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const inputValue = e.target.value.toLowerCase();
@@ -101,6 +107,11 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<
                         ))}
                     </ul>
                 )}
+                {isNewItem &&
+                    <span className="absolute top-[5px] right-[3px] px-1 pt-[3px] pb-1 text-white text-xs leading-[12px] bg-[#AFB3BF] rounded-[3px]">
+                        new
+                    </span>
+                }
             </div>
         );
     }
