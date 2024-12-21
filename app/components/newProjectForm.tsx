@@ -27,6 +27,7 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 	const { projectList, setProjectList } = useProjectsDataContext();
 
 	const { viewer } = useGeneralDataContext();
+	const [isNewClient, setIsNewClient] = useState(false);
 	const [showNewClientModal, setShowNewClientModal] = useState<boolean>(false);
 	const clientInputRef = useRef<HTMLInputElement>(null);
 
@@ -70,14 +71,14 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 		if (!values.projectName) errors.projectName = "Project name is required";
 
 		const currentClient = clientList.find(
-			(client: ClientType) => client.name === values.clientName
+			(client: ClientType) => client.name.toLowerCase() === values.clientName.toLowerCase().trimEnd()
 		);
 		if (values.projectName && currentClient) {
 			const projectNameExists = projectList.find(
-				(project: ProjectType) =>
-					project.name === values.projectName &&
-					currentClient.id === project.client.id
-			);
+        (project: ProjectType) =>
+          project.name.toLowerCase() === values.projectName.toLowerCase().trimEnd() &&
+          currentClient.id === project.client.id
+      );
 			if (projectNameExists) {
 				errors.projectName = "Project name already in use";
 			}
@@ -98,21 +99,21 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 		validate: validateForm,
 		onSubmit: async (values) => {
 			let clientId = clientList?.find(
-				({ name }: ClientType) => name === values.clientName
+				({ name }: ClientType) => name.toLowerCase() === values.clientName.toLowerCase().trimEnd()
 			)?.id;
 
 			if (!clientId) {
 				const { data } = await upsertClient({
-					variables: { name: values.clientName },
-				});
+          variables: { name: values.clientName.trimEnd() },
+        });
 				clientId = data?.upsertClient?.id;
 			}
 			const variables = {
-				clientId,
-				name: values.projectName,
-				hours: +values.hours,
-				assignments: [{ userId: viewer?.id }],
-			};
+        clientId,
+        name: values.projectName.trimEnd(),
+        hours: +values.hours,
+        assignments: [{ userId: viewer?.id }],
+      };
 
 			const nullableDates = () => {
 				if (values.startsOn && values.endsOn) {
@@ -145,10 +146,21 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 	};
 
 	const handleClientChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const isNew = !clientList.some(client => client.name.toLowerCase() === e.target.value.toLowerCase().trimEnd())
+
+    if (!e.target.value) {
+      setIsNewClient(false);
+    } else {
+      setIsNewClient(isNew)
+    }
+
 		formik.handleChange(e);
 	};
 
 	const handleClientSelect = (client: ClientType) => {
+		const isNew = !clientList.some((c) => c.name === client.name);
+
+    setIsNewClient(isNew);
 		formik.setFieldValue("clientName", client.name);
 	};
 
@@ -202,7 +214,8 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 					value={formik.values.clientName}
 					onItemSelect={handleClientSelect}
 					onChange={handleClientChange}
-					onBlur={handleClientBlur}
+					/* onBlur={handleClientBlur} */
+					isNewItem={isNewClient}
 					inputClassName="h-8 px-2 rounded-sm max-w-[370px]"
 					listClassName="p-2"
 					displayKey="name"
