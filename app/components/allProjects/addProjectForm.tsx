@@ -96,14 +96,14 @@ export const AddProjectForm = () => {
 
       if (!clientId) {
         const { data } = await upsertClient({
-          variables: { name: values.clientName },
+          variables: { name: values.clientName.trimEnd() },
         });
         clientId = data?.upsertClient?.id;
       }
 
       const variables = {
         clientId,
-        name: values.projectName,
+        name: values.projectName.trimEnd(),
         hours: 0,
       };
 
@@ -111,6 +111,8 @@ export const AddProjectForm = () => {
         variables: variables,
       });
 
+      formik.setFieldValue("clientName", '', false);
+      formik.setFieldValue("projectName", '', false);
       setIsAddNewProject(false)
     },
   });

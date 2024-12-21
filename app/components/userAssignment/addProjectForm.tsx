@@ -149,19 +149,19 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({user}) => {
     validate: validateForm,
     onSubmit: async (values) => {
       let clientId = clientList?.find(
-        ({ name }: ClientType) => name === values.clientName
+        ({ name }: ClientType) => name.toLowerCase() === values.clientName.toLowerCase().trimEnd()
       )?.id;
 
       if (!clientId) {
         const { data } = await upsertClient({
-          variables: { name: values.clientName },
+          variables: { name: values.clientName.trimEnd() },
         });
         clientId = data?.upsertClient?.id;
       }
 
       const foundProject = projectList.find(
         (project) =>
-          project.name === values.projectName && project.client.id === clientId
+          project.name.toLowerCase() === values.projectName.toLowerCase().trimEnd() && project.client.id === clientId
       );
 
       if (foundProject) {
@@ -181,13 +181,16 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({user}) => {
       } else {
         const variables: UpsertProjectVariables = {
           clientId: String(clientId),
-          name: values.projectName,
+          name: values.projectName.trimEnd(),
           assignments: [{ userId: String(currentUserId) }],
         };
 
         await createNewProject(variables);
       }
 
+      formik.setFieldValue("clientName", "", false);
+      formik.setFieldValue("projectName", "", false);
+      
       setIsAddNewProject(false);
     },
   });
@@ -271,7 +274,7 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({user}) => {
   const handleProjectSelect = (project: ProjectType) => {
     const isNew = !projectList.some((c) => c.name === project.name);
 
-    setIsNewClient(isNew);
+    setIsNewProject(isNew);
     formik.setFieldValue("projectName", project.name);
   };
   
