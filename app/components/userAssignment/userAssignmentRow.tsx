@@ -43,7 +43,7 @@ export const UserAssignmentRow = ({
 	totalRows
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
-	const { newProjectAssignmentId, setNewProjectAssignmentId, refetchUserList, viewsFilterSingleUser, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
+	const { sortBy, newProjectAssignmentId, setNewProjectAssignmentId, refetchUserList, viewsFilterSingleUser, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
 
 	const [showUndoRow, setShowUndoRow] = useState<boolean>(false);
 	const rowRef = useRef<HTMLTableRowElement>(null);
@@ -123,23 +123,24 @@ export const UserAssignmentRow = ({
 		)
 	}
 
-
-	/* const filterByClient = viewsFilterSingleUser === 'byClient'
+	const sortedByClient = sortBy === "Client";
 	const isFirstRow = rowIndex === 0;
 	const isLastRow = rowIndex === totalRows - 1;
-	const rowClasses = mergeClasses(
-    "flex sm:justify-normal justify-between bg-white-300 hover:bg-hoverGrey pl-5 border-t border-gray-300",
-    { 'border-t border-gray-300': isFirstClient && filterByClient && !isFirstRow },
-		{ 'border-b border-gray-300': !filterByClient || isLastRow },
-		{ "bg-diagonal-stripes": isAssignmentProposed }
-  ); */
+	/* const rowClasses = mergeClasses(
+		'flex sm:justify-normal justify-between bg-white-300 hover:bg-hoverGrey pl-5',
+		{ 'border-t border-gray-300': isFirstClient && sortedByClient && !isFirstRow },
+		{ 'border-b border-gray-300': !sortedByClient || isLastRow },
+		{ 'bg-diagonal-stripes': isAssignmentProposed }
+	); */
 
 	return (
 		<tr
 			ref={rowRef}
 			key={`assignment-${assignment.id}`}
-			className={`flex sm:justify-normal justify-between bg-white-300 hover:bg-hoverGrey pl-5 border-t border-gray-300
+			className={`flex sm:justify-normal justify-between bg-white-300 hover:bg-hoverGrey pl-5
 				${isAssignmentProposed ? 'bg-diagonal-stripes' : ''}
+				${(isFirstClient && sortedByClient && !isFirstRow) ? 'border-t border-gray-300' : ''}
+				${(!sortedByClient || isLastRow) ? 'border-t border-gray-300' : ''}
 				${newProjectAssignmentId === Number(assignment.project.id) ? 'animate-fadeInScale' : ''}`}
 		>
 			<td className={`pl-3 sm:px-0 py-1 sm:pt-1 sm:pb-2 font-normal align-top ${!isFirstClient ? 'sm:block flex items-center' : 'pt-5'} w-1/2 sm:w-2/5`}>
@@ -147,13 +148,13 @@ export const UserAssignmentRow = ({
 					className='flex sm:flex-row flex-col w-full justify-between items-start '
 				>
 					<div className={`${isTempProject ? '' : 'sm:max-w-[70px] md:max-w-[90px] lg:max-w-[120px] w-full pl-[2px]'} ${isFirstClient ? 'mb-1' : ''}`}>
-						{/* {viewsFilterSingleUser === 'byClient' && isFirstClient && isFirstMonth && (
+						{sortedByClient && isFirstClient && isFirstMonth && (
 							<ClientLabel assignment={assignment} selectedUser={selectedUser} />
 						)}
-						{viewsFilterSingleUser !== 'byClient' && isFirstMonth && (
+						{!sortedByClient && isFirstMonth && (
 							<ClientLabel assignment={assignment} selectedUser={selectedUser} />
-						)} */}
-						{!isTempProject && <ClientLabel assignment={assignment} selectedUser={selectedUser} />}
+						)}
+						{/* {!isTempProject && <ClientLabel assignment={assignment} selectedUser={selectedUser} />} */}
 					</div>
 					{isFirstMonth && (
 						isTempProject ? (

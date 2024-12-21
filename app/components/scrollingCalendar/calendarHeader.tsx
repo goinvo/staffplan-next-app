@@ -364,20 +364,20 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 										<span>{el.title}</span>
 										<div
 											className={`transform ${
-												sortedBy.title !== el.title ? "-rotate-90" : ""
+												sortedBy.title !== el.title ? "opacity-0 -rotate-90" : "opacity-100"
 											} 
-                                  ${
-																		sortedBy.title === el.title &&
-																		sortedBy.sort === SORT_ORDER.ASC
-																			? "-rotate-90"
-																			: ""
-																	} 
-                                  ${
-																		sortedBy.title === el.title &&
-																		sortedBy.sort === SORT_ORDER.DESC
-																			? "rotate-90"
-																			: ""
-																	} transition-transform duration-300 ease-in-out`}
+											${
+												sortedBy.title === el.title &&
+												sortedBy.sort === SORT_ORDER.ASC
+													? "-rotate-90"
+													: ""
+											} 
+											${
+												sortedBy.title === el.title &&
+												sortedBy.sort === SORT_ORDER.DESC
+													? "rotate-90"
+													: ""
+												} [transition:transform_0.3s_ease-in-out,opacity_0.2s_ease-in-out]`}
 										>
 											<ChevronLeftIcon className="w-4 h-4" />
 										</div>
