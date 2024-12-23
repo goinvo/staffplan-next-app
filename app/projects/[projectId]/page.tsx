@@ -127,10 +127,10 @@ const ProjectPage: React.FC = () => {
 	}
 	const projectSummaryInfo = [
 		{ label: 'Target', value: singleProjectPage?.hours, show: !!singleProjectPage?.hours },
-		{ label: 'Plan', value: totalPlanPerProject + totalBurnedPerProject, show: true,tooltip: `Plan = Actual (${totalBurnedPerProject}) + Plan (${totalPlanPerProject})` },
+		{ label: 'Plan', value: totalPlanPerProject + totalBurnedPerProject, show: true,tooltip: `Plan = Future Plan (${totalPlanPerProject}) + Actual (${totalBurnedPerProject})` },
 		{ label: 'Actual', value: totalBurnedPerProject, show: true },
 		{ label: 'Delta', value: getDeltaValue(), show: !!singleProjectPage?.hours,
-			 tooltip: `Delta = Plan (${totalPlanPerProject}) + Actual (${totalBurnedPerProject}) - Target (${singleProjectPage?.hours})` 
+			 tooltip: `Delta = Future Plan (${totalPlanPerProject}) + Actual (${totalBurnedPerProject}) - Target (${singleProjectPage?.hours})` 
 			}
 	]
 	const projectInfoSubtitle = `${singleProjectPage?.client?.name}, budget, ${singleProjectPage?.hours || 0}h, ${selectedProjectDates()}`
