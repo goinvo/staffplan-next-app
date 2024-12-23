@@ -35,13 +35,14 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 					(sum.value || sum.alwaysShow) ? (
 						<div
 							key={index}
-							className="sm:flex relative hidden justify-between items-center space-x-2 mt-1"
+							className="sm:flex justify-between space-x-1 cursor-pointer relative"
 						>
 							<label
-								className={`cursor-pointer text-sm pr-1 whitespace-nowrap flex-1 text-right`}>
+								className="cursor-pointer text-sm leading-[18px] whitespace-nowrap text-right flex-shrink-0
+									min-w-10">
 								{sum.label}
 							</label>
-							<span className="font-bold text-sm">
+							<span className="font-bold text-sm text-right min-w-20">
 								{sum.value}
 								<span className="text-sm font-normal pl-1">{sum.unit}</span>
 							</span>
