@@ -140,7 +140,7 @@ export const UserAssignmentRow = ({
 			className={`flex sm:justify-normal justify-between bg-white-300 hover:bg-hoverGrey pl-5
 				${isAssignmentProposed ? 'bg-diagonal-stripes' : ''}
 				${(isFirstClient && sortedByClient && !isFirstRow) ? 'border-t border-gray-300' : ''}
-				${(!sortedByClient || isLastRow) ? 'border-t border-gray-300' : ''}
+				${((!sortedByClient && isLastRow) || !sortedByClient) ? 'border-t border-gray-300' : ''}
 				${newProjectAssignmentId === Number(assignment.project.id) ? 'animate-fadeInScale' : ''}`}
 		>
 			<td className={`pl-3 sm:px-0 py-1 sm:pt-1 sm:pb-2 font-normal align-top ${!isFirstClient ? 'sm:block flex items-center' : 'pt-5'} w-1/2 sm:w-2/5`}>
