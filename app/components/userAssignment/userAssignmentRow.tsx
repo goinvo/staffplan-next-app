@@ -140,6 +140,7 @@ export const UserAssignmentRow = ({
 			className={`flex sm:justify-normal justify-between bg-white-300 hover:bg-hoverGrey pl-5
 				${isAssignmentProposed ? 'bg-diagonal-stripes' : ''}
 				${(isFirstClient && sortedByClient && !isFirstRow) ? 'border-t border-gray-300' : ''}
+				${(!sortedByClient && isFirstRow) ? 'border-t-0' : ''}
 				${(!sortedByClient || isLastRow) ? 'border-t border-gray-300' : ''}
 				${newProjectAssignmentId === Number(assignment.project.id) ? 'animate-fadeInScale' : ''}`}
 		>
