@@ -49,6 +49,20 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({ name, value, o
             setError(undefined);
         }
     };
+
+    const getCalendarValue = (): string => {
+      if (manualInput.trim() === "") {
+        return DateTime.now().toISODate();
+      }
+
+      const parsedDate = DateTime.fromFormat(manualInput, "dd.LLL.yy");
+      if (parsedDate.isValid) {
+        return parsedDate.toISODate();
+      }
+
+      return DateTime.now().toISODate();
+    };
+
     return (
         <div className="relative flex items-center w-full px-0">
             <input
@@ -64,6 +78,7 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({ name, value, o
             <CalendarIcon className="absolute right-1 h-4 w-4 text-black" />
             <input
                 type="date"
+                value={getCalendarValue()}
                 onChange={handleDateChange}
                 className={`absolute top-0 pr-0 pl-0 opacity-0 right-0 w-1/4 h-full`}
             />
