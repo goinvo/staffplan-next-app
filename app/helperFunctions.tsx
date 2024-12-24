@@ -762,55 +762,46 @@ export const sortSingleUserByOrder = (
     sortedAssignments.assignments.sort((a, b) => {
       const projectA = a.project.name.toLowerCase();
       const projectB = b.project.name.toLowerCase();
-      if (projectA < projectB) {
-        return -1;
-      }
-      if (projectA > projectB) {
-        return 1;
-      }
-      return 0;
+      return projectA.localeCompare(projectB);
     });
   }
   if (sortBy === "Projects" && sortOrder === SORT_ORDER.DESC) {
     sortedAssignments.assignments.sort((a, b) => {
       const projectA = a.project.name.toLowerCase();
       const projectB = b.project.name.toLowerCase();
-      if (projectA < projectB) {
-        return 1;
-      }
-      if (projectA > projectB) {
-        return -1;
-      }
-      return 0;
+      return projectB.localeCompare(projectA);
     });
   }
 
   if (sortBy === "Client" && sortOrder === SORT_ORDER.ASC) {
     sortedAssignments.assignments.sort((a, b) => {
-      const projectA = a.project.client.name.toLowerCase();
-      const projectB = b.project.client.name.toLowerCase();
-      if (projectA < projectB) {
-        return -1;
-      }
-      if (projectA > projectB) {
-        return 1;
-      }
-      return 0;
+      const clientA = a.project.client.name.toLowerCase();
+			const clientB = b.project.client.name.toLowerCase();
+			
+      if (clientA !== clientB) {
+        return clientA.localeCompare(clientB);
+			}
+			
+      const projectA = a.project.name.toLowerCase();
+      const projectB = b.project.name.toLowerCase();
+      return projectA.localeCompare(projectB);
     });
   }
   if (sortBy === "Client" && sortOrder === SORT_ORDER.DESC) {
     sortedAssignments.assignments.sort((a, b) => {
-      const projectA = a.project.client.name.toLowerCase();
-      const projectB = b.project.client.name.toLowerCase();
-      if (projectA < projectB) {
-        return 1;
+      const clientA = a.project.client.name.toLowerCase();
+			const clientB = b.project.client.name.toLowerCase();
+			
+      if (clientA !== clientB) {
+        return clientB.localeCompare(clientA);
       }
-      if (projectA > projectB) {
-        return -1;
-      }
-      return 0;
+
+      const projectA = a.project.name.toLowerCase();
+      const projectB = b.project.name.toLowerCase();
+      return projectA.localeCompare(projectB);
     });
   }
+
   return sortedAssignments;
 };
 
