@@ -113,6 +113,9 @@ export const AddProjectForm = () => {
 
       formik.setFieldValue("clientName", '', false);
       formik.setFieldValue("projectName", '', false);
+
+      setIsNewClient(false);
+      setIsNewProject(false);
       setIsAddNewProject(false)
     },
   });
@@ -170,7 +173,15 @@ export const AddProjectForm = () => {
   
   const handleClientSelect = (client: ClientType) => {
     const isNew = !clientList.some((c) => c.name === client.name);
+    const isNewProject = formik.values.projectName
+      ? !projectList.some(
+          (p) =>
+            p.name.toLowerCase() === formik.values.projectName.toLowerCase().trimEnd() &&
+            p.client.name.toLowerCase() === client.name.toLowerCase().trimEnd()
+        )
+      : false;
 
+    setIsNewProject(isNewProject);
     setIsNewClient(isNew);
     formik.setFieldValue("clientName", client.name, false);
 
@@ -183,17 +194,36 @@ export const AddProjectForm = () => {
   
   const handleClientChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isNew = !clientList.some(client => client.name.toLowerCase() === e.target.value.toLowerCase().trimEnd())
+    const isNewProject = formik.values.projectName
+      ? !projectList.some(
+          (p) =>
+            p.name.toLowerCase() === formik.values.projectName.toLowerCase().trimEnd() &&
+            p.client.name.toLowerCase() === e.target.value.toLowerCase().trimEnd()
+        )
+      : false;
 
     if (!e.target.value) {
       setIsNewClient(false);
+
+      if (formik.values.projectName) {
+        setIsNewProject(true);
+      }
     } else {
       setIsNewClient(isNew)
+
+      if (isNew) {
+        setIsNewProject(true);
+      } else {
+        setIsNewProject(isNewProject);
+      }
     }
     formik.handleChange(e);
   };
   
   const handleProjectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const isNew = !projectList.some(project => project.name.toLowerCase() === e.target.value.toLowerCase().trimEnd())
+    const isNew = formik.values.clientName
+      ? !projectList.some(project => project.name.toLowerCase() === e.target.value.toLowerCase().trimEnd())
+      : true
     
     if (!e.target.value) {
       setIsNewProject(false);

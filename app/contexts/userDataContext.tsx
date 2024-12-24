@@ -63,7 +63,7 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
     const [viewsFilterSingleUser, setViewsFilterSingleUser] = useState("byClient");
     const [assignmentsWithUndoActions, setAssignmentsWithUndoActions] = useState<UndoableModifiedAssignment[]>([]);
     const { enqueueTask } = useTaskQueue();
-    const { showArchivedProjects } = useGeneralDataContext();
+    const { showArchivedAssignments, viewer } = useGeneralDataContext();
 
     const { loading: userListLoading, error: userListError, data: userListData } = useQuery(GET_USER_LIST, {
         context: { headers: { cookie: isClient ? document.cookie : null } },
@@ -102,16 +102,16 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
                 ? selectedUser.assignments.filter((a) => Number(a.project.id) !== newProjectAssignmentId)
                 : selectedUser.assignments;
 
-            const filteredAssignments = showArchivedProjects
+            const filteredAssignments = showArchivedAssignments && viewer?.id.toString() === newSelectedId.toString()
                 ? assignmentsToSort
-                : assignmentsToSort.filter((a) => a.status !== "archived");
+                : assignmentsToSort.filter((a) => a.project.status !== "archived");
 
             const singleUser = sortSingleUserByOrder(sortOrder, sortBy, { ...selectedUser, assignments: filteredAssignments })
             const singleUserToSet = { ...singleUser, assignments: [...newAssignment, ...singleUser.assignments] };
 
             setSingleUserPage(singleUserToSet);
         },
-        [userList, showArchivedProjects, sortOrder, sortBy]
+        [userList, showArchivedAssignments, sortOrder, sortBy]
     );
 
     // Clear timeouts for all undoable modification assignments

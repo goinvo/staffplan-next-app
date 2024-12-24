@@ -13,6 +13,7 @@ import ApproveHours from "@/app/components/userAssignment/approveHours";
 import ColumnChartsRow from "@/app/components/userAssignment/columnChartsRow";
 import { AddProjectForm } from "@/app/components/userAssignment/addProjectForm";
 import { SORT_ORDER } from "@/app/components/scrollingCalendar/constants";
+import InlineButtonArchivedAssignments from "@/app/components/inlineButtonArchivedAssignments";
 
 const UserPage: React.FC = () => {
   const params = useParams();
@@ -27,20 +28,23 @@ const UserPage: React.FC = () => {
 	const [addAssignmentVisible, setAddAssignmentVisible] = useState(false);
 	const inputRefs = useRef<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>([]);
 
-  const { userList, singleUserPage, setSelectedUserData } = useUserDataContext();
-  const { isAddNewProject, setIsAddNewProject } = useGeneralDataContext();
+  const { userList, singleUserPage, setSelectedUserData, refetchUserList } = useUserDataContext();
+  const { setIsAddNewProject } = useGeneralDataContext();
 
 	useEffect(() => {
 		if (userList.length) {
 			const userId = decodeURIComponent(params?.userId?.toString());
-			if (userId) {
+      if (userId) {
 				setSelectedUserData(parseInt(userId));
 			}
 		}
   }, [userList, params.userId, setSelectedUserData]);
   
   useEffect(() => {
-    return () => setIsAddNewProject(false);
+    return () => {
+      setIsAddNewProject(false)
+      refetchUserList()
+    };
   }, []);
 
 	if (!userList.length) return <LoadingSpinner />;
@@ -97,7 +101,8 @@ const UserPage: React.FC = () => {
                 />
               );
             }
-          )]}
+            )]}
+          <InlineButtonArchivedAssignments/>
           <ApproveHours />
           <ColumnChartsRow />
         </ScrollingCalendar>

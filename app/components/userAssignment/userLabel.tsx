@@ -219,12 +219,19 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 	];
 	return (
 		<div className={`w-full ${isAssignmentProposed ? "sm:max-w-[154px] lg:max-w-[175px] w-full md:pl-1 lg:pl-2" : "sm:max-w-[174px] lg:max-w-[195px] w-full md:pl-1 lg:pl-2" } sm:mr-0 mr-2 flex justify-between items-start ${isFirstClient ? "mb-4 sm:mb-0" : ''}`}>
-			<button
-				className={`pt-0 sm:pt-2  font-bold flex items-center justify-start text-contrastBlue text-start`}
-				onClick={() => clickHandler(assignment)}
-			>
-				{assignment.project.name}
-			</button>
+			<div>
+        <button
+          className={`pt-0 sm:pt-2  font-bold flex items-center justify-start text-contrastBlue text-start`}
+          onClick={() => clickHandler(assignment)}
+        >
+          {assignment.project.name}
+        </button>
+        {assignment.project.status === "archived" && (
+          <span className="underline text-contrastBlue text-start">
+            &#40;Archived&#41;
+          </span>
+        )}
+      </div>
 			{showActionsButton &&
 				<EllipsisDropdownMenu
 					options={assignmentDropMenuOptions}

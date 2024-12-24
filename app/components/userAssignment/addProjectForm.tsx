@@ -32,17 +32,18 @@ type UpsertAssignmentVariables = {
   status: string;
 };
 
-export const AddProjectForm: React.FC<AddProjectFormProps> = ({user}) => {
+export const AddProjectForm: React.FC<AddProjectFormProps> = ({ user }) => {
   const clientInputRef = useRef<HTMLInputElement>(null);
   const projectInputRef = useRef<HTMLInputElement>(null);
 
   const [isNewClient, setIsNewClient] = useState(false);
   const [isNewProject, setIsNewProject] = useState(false);
+  const [isProjectArchived, setIsProjectArchived] = useState(false);
 
   const { headerTitleWidth, isAddNewProject, setIsAddNewProject } = useGeneralDataContext();
   const { clientList, refetchClientList } = useClientDataContext();
   const { projectList, setProjectList } = useProjectsDataContext();
-  const { setUserList, setNewProjectAssignmentId } = useUserDataContext();
+  const { setUserList, setNewProjectAssignmentId, setSelectedUserData } = useUserDataContext();
 
   const { id: currentUserId, assignments } = user;
 
@@ -131,11 +132,36 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({user}) => {
       variables,
     });
   };
+  const checkProjectNameExistsInStaffPlan = (
+      clientList: ClientType[],
+      projectList: ProjectType[],
+      clientName: string,
+      projectName: string,
+      userId: string,
+    ): boolean => {
+      const currentClient = clientList.find((client) => client.name.toLowerCase() === clientName.toLowerCase().trimEnd());
+  
+      if (projectName && currentClient && userId) {
+        return projectList.some(
+          (project) =>
+            project.client.id === currentClient.id && 
+            project.name.toLowerCase() === projectName.toLowerCase().trimEnd() &&
+            project.assignments?.some((a) => a?.assignedUser?.id?.toString() === userId)
+        );
+      }
+  
+      return false;
+    };
 
   const validateForm = (values: FormikValues) => {
     const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
     if (!values.clientName) errors.clientName = "Client is required";
     if (!values.projectName) errors.projectName = "Project name is required";
+
+    const user = currentUserId ? currentUserId.toString() : "";
+    if (values.projectName && checkProjectNameExistsInStaffPlan(clientList, projectList, values.clientName, values.projectName, user)) {
+      errors.projectName = "Project is already in the Staff plan";
+    }
 
     return errors;
   };
@@ -190,7 +216,11 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({user}) => {
 
       formik.setFieldValue("clientName", "", false);
       formik.setFieldValue("projectName", "", false);
+      formik.setFieldValue("projectList", "", false);
       
+      setIsNewClient(false)
+      setIsNewProject(false);
+      setIsProjectArchived(false);
       setIsAddNewProject(false);
     },
   });
@@ -229,16 +259,42 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({user}) => {
           formik.setFieldError("clientName", "Client is required");
           return;
         }
+
+        const user = currentUserId ? currentUserId.toString() : "";
+        const projectInStaffPlan = checkProjectNameExistsInStaffPlan(clientList, projectList, formik.values.clientName, formik.values.projectName, user);
+
+        if (projectInStaffPlan) {
+          formik.setFieldTouched("projectName", true, true);
+          formik.setFieldError("projectName", "Project is already in the Staff plan");
+          return;
+        }
       }
 
-      formik.handleSubmit();      
+      formik.handleSubmit();
     }
   };
   
   
   const handleClientSelect = (client: ClientType) => {
     const isNew = !clientList.some((c) => c.name === client.name);
+    const isNewProject = formik.values.projectName
+      ? !projectList.some(
+          (p) =>
+            p.name.toLowerCase() === formik.values.projectName.toLowerCase().trimEnd() &&
+            p.client.name.toLowerCase() === client.name.toLowerCase().trimEnd()
+        )
+      : false;
+    const isArchivedProject = formik.values.projectName
+      ? projectList.some(
+          (p) =>
+            p.name.toLowerCase() === formik.values.projectName.toLowerCase().trimEnd() &&
+            p.client.name.toLowerCase() === client.name.toLowerCase().trimEnd() &&
+            p.status === "archived"
+        )
+      : false;
 
+    setIsProjectArchived(isArchivedProject);
+    setIsNewProject(isNewProject);
     setIsNewClient(isNew);
     formik.setFieldValue("clientName", client.name, false);
 
@@ -251,11 +307,39 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({user}) => {
   
   const handleClientChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isNew = !clientList.some(client => client.name.toLowerCase() === e.target.value.toLowerCase().trimEnd())
+    const isNewProject = formik.values.projectName
+      ? !projectList.some(
+          (p) =>
+            p.name.toLowerCase() === formik.values.projectName.toLowerCase().trimEnd() &&
+            p.client.name.toLowerCase() === e.target.value.toLowerCase().trimEnd()
+        )
+      : false;
+    const isArchivedProject = formik.values.projectName
+      ? projectList.some(
+          (p) =>
+            p.name.toLowerCase() === formik.values.projectName.toLowerCase().trimEnd() &&
+            p.client.name.toLowerCase() === e.target.value.toLowerCase().trimEnd() &&
+            p.status === "archived"
+        )
+      : false;
 
     if (!e.target.value) {
       setIsNewClient(false);
+
+      if (formik.values.projectName) {
+        setIsNewProject(true);
+        setIsProjectArchived(false);
+      }
     } else {
-      setIsNewClient(isNew)
+      setIsNewClient(isNew);
+
+      if (isNew) {
+        setIsNewProject(true)
+        setIsProjectArchived(false)
+      } else {
+        setIsProjectArchived(isArchivedProject);
+        setIsNewProject(isNewProject);
+      }
     }
 
     formik.handleChange(e);
@@ -272,18 +356,37 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({user}) => {
   }
 
   const handleProjectSelect = (project: ProjectType) => {
-    const isNew = !projectList.some((c) => c.name === project.name);
+    const isNew = formik.values.clientName
+      ? !projectList.some((p) => p.name === project.name)
+      : true;
+    const isArchived = projectList.some(
+      (p) =>
+        p.name === project.name &&
+        p.client.name.toLowerCase() === formik.values.clientName.toLowerCase().trimEnd() &&
+        p.status === "archived"
+    );
 
+    setIsProjectArchived(isArchived);
     setIsNewProject(isNew);
     formik.setFieldValue("projectName", project.name);
   };
   
   const handleProjectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const isNew = !projectList.some(project => project.name.toLowerCase() === e.target.value.toLowerCase().trimEnd())
+    const isNew = formik.values.clientName
+      ? !projectList.some(project => project.name.toLowerCase() === e.target.value.toLowerCase().trimEnd())
+      : true
+    const isArchived = projectList.some(
+      (project) =>
+        project.name.toLowerCase() === e.target.value.toLowerCase().trimEnd() &&
+        project.client.name.toLowerCase() === formik.values.clientName.toLowerCase().trimEnd() &&
+        project.status === "archived"
+    );
 
     if (!e.target.value) {
       setIsNewProject(false);
+      setIsProjectArchived(false);
     } else {
+      setIsProjectArchived(isArchived);
       setIsNewProject(isNew);
     }
     formik.handleChange(e);
@@ -324,6 +427,15 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({user}) => {
       if (projectInputRef.current) {
         projectInputRef.current.focus();
       }
+      return;
+    }
+
+    const user = currentUserId ? currentUserId.toString() : ''
+    const projectInStaffPlan = checkProjectNameExistsInStaffPlan(clientList, projectList, clientName, projectName, user);
+
+    if (projectInStaffPlan) {
+      formik.setFieldTouched("projectName", true, true);
+      formik.setFieldError("projectName", "Project is already in the Staff plan");
       return;
     }
 
@@ -376,12 +488,11 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({user}) => {
               onItemSelect={handleProjectSelect}
               onChange={handleProjectChange}
               onBlur={formik.handleBlur}
-              inputClassName={`h-7 rounded-sm w-full ${
-                isNewProject && "pr-[38px]"
-              }`}
+              inputClassName={`h-7 rounded-sm w-full ${isNewProject && "pr-[38px]"} ${isProjectArchived && 'pr-[63x]'}`}
               listClassName="p-2"
               displayKey="name"
               isNewItem={isNewProject}
+              hasStatus={isProjectArchived ? "archived" : ""}
             />
             {formik.touched.projectName && formik.errors.projectName ? (
               <p className="text-[10px] leading-3 pt-1 px-2 text-red-500">

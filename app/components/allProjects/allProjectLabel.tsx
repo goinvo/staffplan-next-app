@@ -10,7 +10,7 @@ export const AllProjectLabel = ({
 	clickHandler,
 	undoRowRef,
 }: AllProjectLabelProps) => {
-	const { showOneClientProjects, setShowOneClientProjects } = useProjectsDataContext()
+  const { showOneClientProjects, setShowOneClientProjects } = useProjectsDataContext()
 
 	return (
     <div className="flex justify-between items-start sm:flex-row flex-col pt-2">
@@ -39,12 +39,19 @@ export const AllProjectLabel = ({
       >
         {project.client.name}
       </span>
-      <button
-        onClick={() => clickHandler(project)}
-        className="w-auto sm:max-w-[150px] md:max-w-[160px] lg:max-w-[185px] sm:w-full sm:ml-1 lg:ml-0 sm:mr-0 mr-2 sm:mt-0 mt-2 font-bold text-contrastBlue text-start"
-      >
-        {project.name}
-      </button>
+      <div className="block w-auto sm:max-w-[150px] md:max-w-[160px] lg:max-w-[185px] sm:w-full sm:ml-1 lg:ml-0 sm:mr-0 mr-2 sm:mt-0 mt-2">
+        <button
+          onClick={() => clickHandler(project)}
+          className="w-full font-bold text-contrastBlue text-start"
+        >
+          {project.name}
+        </button>
+        {project.status === "archived" && (
+          <span className="underline text-contrastBlue text-start">
+            &#40;Archived&#41;
+          </span>
+        )}
+      </div>
       <div className="sm:flex hidden justify-end w-auto">
         <EllipsisProjectMenu undoRowRef={undoRowRef} project={project} />
       </div>
