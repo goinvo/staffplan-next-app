@@ -35,7 +35,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 			value: (plannedHours ?? 0) + (burnedHours ?? 0),
 			unit: "hrs",
 			alwaysShow: true,
-			tooltip: `Plan = Actual (${burnedHours}) + Plan (${plannedHours})`,
+			tooltip: `Plan = Future Plan (${plannedHours}) + Actual (${burnedHours})`,
 		},
 		{ label: "Actual", value: burnedHours, unit: "hrs", alwaysShow: true },
 		{
@@ -43,7 +43,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 			value: getDeltaValue(),
 			unit: "hrs",
 			alwaysShow: true,
-			tooltip: `Delta = Plan (${
+			tooltip: `Delta = Future Plan (${
 				(plannedHours ?? 0) + (burnedHours ?? 0)
 			}) + Actual (${burnedHours}) - Target (${project.hours})`,
 		},
@@ -85,7 +85,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 									</span>
 								</span>
 								{summary.tooltip && showTooltip && (
-									<div className="absolute bottom-full right-0 bg-gray-700 text-white text-xs rounded px-2 py-1 z-50 shadow-lg min-w-40">
+									<div className="absolute top-full right-0 bg-gray-700 text-white text-xs rounded px-2 py-1 z-50 shadow-lg min-w-40">
 										{summary.tooltip}
 									</div>
 								)}

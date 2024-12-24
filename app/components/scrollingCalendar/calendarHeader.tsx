@@ -315,7 +315,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 											</span>
 										</span>
 										{sum.tooltip && showTooltip && (
-											<div className="absolute bottom-full right-0 bg-gray-700 text-white text-xs rounded px-2 py-1 z-10 shadow-lg min-w-40">
+											<div className="absolute top-full text-left right-0 bg-gray-700 text-white text-xs rounded px-2 py-1 z-10 shadow-lg min-w-40">
 												{sum.tooltip}
 											</div>
 										)}
