@@ -287,10 +287,10 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 						);
 					});
 				})}
-				<th className="pr-4 pl-2 py-2 w-1/2 sm:w-1/6">
+				<th className="pr-2 pl-2 py-2 w-1/2 sm:w-1/6">
 					{projectSummaryInfo?.length && (
 						<div
-							className="sm:flex hidden justify-center flex-col pl-8 max-w-fit pt-1 cursor-pointer"
+							className="sm:flex hidden justify-center flex-col pl-8 min-w-100 pt-1 cursor-pointer"
 							onMouseLeave={() => showTooltip && setShowTooltip(false)}
 							onClick={() => setShowTooltip(!showTooltip)}
 						>
