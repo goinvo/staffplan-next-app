@@ -12,7 +12,7 @@ import { WorkWeekInput } from "./workWeekInput";
 import { currentWeek, currentYear } from "../scrollingCalendar/helpers";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
-import { UNDO_ARCHIVED_OR_DELETED_PERSON } from "../constants/undoModifyStrings";
+import { UNDO_ARCHIVED_OR_DELETED_PERSON, UNDO_DELETED_PERSON_TITLE } from "../constants/undoModifyStrings";
 
 interface ProjectAssignmentRowProps {
 	project: ProjectType;
@@ -78,9 +78,10 @@ export const ProjectAssignmentRow = ({
 
 
 	if (showUndoRow && (isModifiedAssignment(assignment.id))) {
+		const name = assignment.assignedUser ? assignment.assignedUser.name.split(' ')[0] : "person"
 		return (
 			<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.id}`}>
-				<UndoRow onClick={handleUndoModifyAssignment} text={UNDO_ARCHIVED_OR_DELETED_PERSON} />
+				<UndoRow onClick={handleUndoModifyAssignment} title={UNDO_DELETED_PERSON_TITLE.replace("{name}",name)}/>
 			</tr>
 		)
 	}
