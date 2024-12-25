@@ -13,7 +13,7 @@ import { AllProjectLabel } from "./allProjectLabel";
 import ProjectSummary from "../projectSummary";
 import ColumnChart from "../columnChart";
 import { calculateTotalHoursPerWeek, isBeforeWeek, currentWeek, currentYear } from "../scrollingCalendar/helpers";
-import { UNDO_ARCHIVED_OR_DELETED_PROJECT } from "../constants/undoModifyStrings";
+import { UNDO_ARCHIVED_PROJECT_SUBTITLE, UNDO_ARCHIVED_PROJECT_TITLE } from "../constants/undoModifyStrings";
 import UndoRow from "../undoRow";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
@@ -64,7 +64,7 @@ export const AllProjectRow = ({
 
 		return (
 			<tr ref={undoRowRef} className="flex justify-center" key={`undo-${project.id}`}>
-				<UndoRow onClick={handleUndoModifyProject} text={UNDO_ARCHIVED_OR_DELETED_PROJECT} />
+				<UndoRow onClick={handleUndoModifyProject} title={UNDO_ARCHIVED_PROJECT_TITLE} subtitle={UNDO_ARCHIVED_PROJECT_SUBTITLE} />
 			</tr>)
 	}
 

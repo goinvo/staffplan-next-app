@@ -118,7 +118,7 @@ export const UserAssignmentRow = ({
 	if (showUndoRow && (isModifiedAssignment(assignment.id))) {
 		return (
 			<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.id}`}>
-				<UndoRow onClick={handleUndoModifyAssignment} text={UNDO_ARCHIVED_OR_DELETED_PROJECT} />
+				<UndoRow onClick={handleUndoModifyAssignment} title={UNDO_ARCHIVED_OR_DELETED_PROJECT} />
 			</tr>
 		)
 	}
