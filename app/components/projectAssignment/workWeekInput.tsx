@@ -173,7 +173,7 @@ export const WorkWeekInput = ({
 		};
 
 		const weekNumbersPerScreen = getWeekNumbersPerScreen(months)
-		const filteredWeeks = filterWeeksForFillForward(weekNumbersPerScreen, targetCweek, targetYear, targetMonth, assignment?.endsOn);
+		const filteredWeeks = filterWeeksForFillForward(weekNumbersPerScreen, targetCweek, targetYear, targetMonth, project?.endsOn);
 
 		variables.workWeeks = filteredWeeks.map(week => ({
 			cweek: week.cweek,
