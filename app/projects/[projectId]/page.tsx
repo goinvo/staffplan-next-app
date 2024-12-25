@@ -134,6 +134,7 @@ const ProjectPage: React.FC = () => {
 			}
 	]
 	const projectInfoSubtitle = `${singleProjectPage?.client?.name}, budget, ${singleProjectPage?.hours || 0}h, ${selectedProjectDates()}`
+	const projectStatus = singleProjectPage?.status
 	return (
     <>
       {singleProjectPage && projectList.length ? (
@@ -142,6 +143,7 @@ const ProjectPage: React.FC = () => {
             columnHeaderTitles={columnHeaderTitles}
             title={singleProjectPage.name}
             projectInfo={projectInfoSubtitle}
+            projectStatus={projectStatus}
             assignments={sortedSingleProjectAssignments || []}
             editable={true}
             draggableDates={true}

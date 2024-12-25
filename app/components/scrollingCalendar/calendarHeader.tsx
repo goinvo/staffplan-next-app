@@ -51,6 +51,7 @@ type CalendarHeaderProps = {
 	userName?: string;
 	editable?: boolean;
 	projectInfo?: string;
+	projectStatus?: string;
 	columnHeaderTitles: ColumnHeaderTitle[];
 	draggableDates?: boolean;
 	projectSummaryInfo?: ProjectSummaryInfoItem[];
@@ -65,6 +66,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	userName,
 	editable = false,
 	projectInfo,
+	projectStatus,
 	columnHeaderTitles,
 	draggableDates = false,
 	projectSummaryInfo,
@@ -226,13 +228,16 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 									</div>
 									{editable && (
 										<IconButton
-											className="py-1 pl-4"
+											className="py-1 pl-4 "
 											iconSize="w-4 h-4"
 											onClick={() => setIsEditing(true)}
 											Icon={SlPencil}
 										/>
 									)}
 								</div>
+								{projectStatus === "archived" && (
+                  <span className="text-sm font-normal underline">&#40;Archived&#41;</span>
+                )}
 								{projectInfo && (
 									<div className="text-left overflow-wrap break-word py-2 font-normal">
 										{projectInfo}
