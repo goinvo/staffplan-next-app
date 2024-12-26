@@ -129,6 +129,7 @@ export const GET_USER_LIST = gql`
 						name
 						startsOn
 						endsOn
+						status
 						client {
 							id
 							name
@@ -326,6 +327,7 @@ export const UPSERT_ASSIGNMENT = gql`
 				}
 				startsOn
 				endsOn
+				status
 			}
 		}
 	}

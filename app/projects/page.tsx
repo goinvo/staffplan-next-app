@@ -8,6 +8,7 @@ import { AllProjectRow } from "../components/allProjects/allProjectRow";
 import { SORT_ORDER } from "../components/scrollingCalendar/constants";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
 import CreateProjectForm from "../components/createProjectForm";
+import InlineButtonArchivedProject from "../components/inlineButtonArchivedProject";
 import { useGeneralDataContext } from "../contexts/generalContext";
 import { AddProjectForm } from "../components/allProjects/addProjectForm";
 
@@ -68,7 +69,8 @@ const ProjectsView: React.FC = () => {
                 isLastMonth={true}
               />
             )),
-          ]}
+            ]}
+            <InlineButtonArchivedProject/>
         </ScrollingCalendar>
       ) : (
         <CreateProjectForm/>

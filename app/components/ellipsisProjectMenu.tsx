@@ -240,8 +240,8 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 						}
 					>
 						{project.status === "archived"
-							? "Unarchive Project"
-							: "Archive Project"}
+							? "Unarchive Project for everyone"
+							: "Archive Project for everyone"}
 					</div>
 				</MenuItems>
 			</Transition>

@@ -67,6 +67,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		cost,
 	} = selectedProject as ProjectType;
 	const [archivedStatus, setArchivedStatus] = useState(status === "archived");
+	const [isArchiveProject, setIsArchiveProject] = useState(status === "archived");
 	const [showTooltip, setShowTooltip] = useState(false);
 	const [previousStatus] = useState(status);
 	const [showNewClientModal, setShowNewClientModal] = useState<boolean>(false);
@@ -76,9 +77,9 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		errorPolicy: "all",
 		onCompleted({ upsertProject }) {
 			refetchProjectList();
-			if (archivedStatus && !showArchivedProjects) {
-				router.push("/projects");
-			}
+			if (isArchiveProject && !showArchivedProjects) {
+        router.push("/projects");
+      }
 		},
 	});
 	const [
@@ -176,6 +177,18 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		}
 	};
 
+	const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const isChecked = event.target.checked;
+		setIsArchiveProject(isChecked);
+
+		const newStatus = !isArchiveProject
+      ? "archived"
+      : previousStatus !== "archived"
+      ? previousStatus
+      : "unconfirmed";
+		formik.setFieldValue("projectStatus", newStatus, false);
+  };
+
 	const handleClientSelect = (client: ClientType) => {
 		formik.setFieldValue("clientName", client.name);
 	};
@@ -223,7 +236,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 			onSubmit={handleSubmit}
 			className="flex flex-col space-y-2 my-2 text-contrastBlue w-full pr-2"
 		>
-			<div className="flex flex-col justify-start pl-1 w-full">
+			<div className="flex flex-col justify-start w-full">
 				<input
 					type="text"
 					name="projectName"
@@ -237,7 +250,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					<p className="pl-2 text-2xs text-left font-normal text-red-500">{formik.errors.projectName}</p>
 				) : null}
 			</div>
-			<div className="flex flex-col items-start space-x-0.5 w-full pl-2">
+			<div className="flex flex-col items-start space-x-0.5 w-full">
 				<div className="flex items-center w-full space-x-1 flex-grow">
 					<label
 						htmlFor="clientName"
@@ -263,7 +276,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					<p className="pl-14 text-2xs text-left font-normal text-red-500">{formik.errors.clientName}</p>
 				) : null}
 			</div>
-			<div className="flex items-center space-x-0.5 w-full pl-2">
+			<div className="flex items-center space-x-0.5 w-full">
 				<div className="flex items-center flex-grow space-x-1">
 					<label
 						htmlFor="budget"
@@ -279,7 +292,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 						onChange={formik.handleChange}
 						onBlur={formik.handleBlur}
 						id="budget"
-						className="h-6 w-full pl-1 max-w-[115px] shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none"
+						className="h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none"
 						placeholder="$USD"
 					/>
 					{formik.touched.budget && formik.errors.budget ? (
@@ -300,7 +313,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 						onChange={formik.handleChange}
 						onBlur={formik.handleBlur}
 						id="hours"
-						className="h-6 w-full pl-1 max-w-[115px] shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none"
+						className="h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none"
 						placeholder="Hours"
 					/>
 
@@ -309,7 +322,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					) : null}
 				</div>
 			</div>
-			<div className="flex items-center space-x-0.5 w-full pl-2">
+			<div className="flex items-center space-x-0.5 w-full">
 				<div className="flex items-center flex-grow space-x-1">
 					<label
 						htmlFor="startsOn"
@@ -317,7 +330,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					>
 						Starts
 					</label>
-					<div className="max-w-[115px]">
+					<div className="">
 						<CustomDateInput
 							name="startsOn"
 							errorString="Invalid start date format. Please use dd.MMM.yy."
@@ -336,7 +349,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					>
 						Ends
 					</label>
-					<div className="max-w-[115px]">
+					<div className="">
 						<CustomDateInput
 							name="endsOn"
 							errorString="Invalid end date format. Please use dd.MMM.yy."
@@ -352,8 +365,19 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 			</div>
 			{formik.errors.endsOn && <p className="pl-2 text-2xs text-left font-normal text-red-500">{formik.errors.endsOn}</p>}
 			{formik.errors.startsOn && <p className="pl-2 text-2xs text-left font-normal text-red-500">{formik.errors.startsOn}</p>}
-			<div className="flex items-center justify-between space-x-8 w-full pl-2 border-t border-grey-700 py-2">
-				<div className="relative flex items-center">
+			<label className="flex items-center justify-between space-x-0.5 cursor-pointer w-[208px]">
+        <input
+          type="checkbox"
+          checked={isArchiveProject}
+          onChange={handleCheckboxChange}
+          className="form-checkbox h-[11px] w-[11px] rounded-sm text-tiffany !ring-0 !ring-offset-0"
+        />
+        <span className="text-sm leading-[18px] text-white font-normal">
+          Archive project for everyone?
+        </span>
+      </label>
+			<div className="flex items-center justify-between space-x-8 w-full border-t border-grey-700 py-2">
+				{/* <div className="relative flex items-center">
 					<span
 						className={`py-2 text-tiny font-normal rounded-sm underline text-left  ${archivedStatus ? "text-tiffany" : "text-white"
 							} cursor-pointer`}
@@ -366,10 +390,10 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 							{ARCHIVED_PROJECT_WARNING}
 						</div>
 					)}
-				</div>
-				<div className="flex w-full space-x-4">
+				</div> */}
+				<div className="flex justify-between w-full space-x-4">
 					<button
-						className={`sm:w-1/2 md:w-1/3 py-2 text-tiny text-center bg-contrastGrey rounded-sm text-white hover:bg-accentgreen`}
+						className={`w-auto py-2 text-tiny text-center text-white font-normal underline`}
 						onClick={() => onClose?.()}
 					>
 						Cancel
@@ -377,9 +401,9 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					<button
 						type="submit"
 						disabled={!formik.isValid}
-						className={`sm:w-1/2 md:w-2/3 py-2 text-tiny text-center bg-tiffany hover:bg-accentgreen rounded-sm text-white`}
+						className={`w-auto py-2 px-8 text-tiny text-center bg-tiffany hover:bg-accentgreen rounded-sm text-white`}
 					>
-						Done
+						Save
 					</button>
 				</div>
 			</div>

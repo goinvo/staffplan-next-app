@@ -156,11 +156,12 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
         errorPolicy: "all",
       })
       .then((result) => {
-        const sortedProjectList = sortProjectList(
-          viewsFilterProject,
+        const sortedProjectList = sortProjectListByOrder(
+          sortOrder,
+          sortBy,
           result.data.currentCompany.projects
         );
-        if (!showArchivedProjects && sortedProjectList) {
+        if (showArchivedProjects && sortedProjectList) {
           return setProjectList(sortedProjectList);
         }
         setProjectList(

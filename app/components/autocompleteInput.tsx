@@ -17,6 +17,7 @@ interface AutocompleteProps<T> {
     value: string;
     tabIndex?: number
     isNewItem?: boolean
+    hasStatus?: string
 }
 
 export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<any>>(
@@ -34,7 +35,8 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<
         listClassName = "",
         value,
         tabIndex,
-        isNewItem
+        isNewItem,
+        hasStatus
     }, ref) => {
         const [filteredItems, setFilteredItems] = useState<any[]>(items);
         const [showDropdown, setShowDropdown] = useState<boolean>(false);
@@ -110,6 +112,11 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<
                 {isNewItem &&
                     <span className="absolute top-[5px] right-[3px] px-1 pt-[3px] pb-1 text-white text-xs leading-[12px] bg-[#AFB3BF] rounded-[3px]">
                         new
+                    </span>
+                }
+                {hasStatus && 
+                    <span className="absolute top-[5px] right-[3px] px-1 pt-[3px] pb-1 text-white text-xs leading-[12px] bg-[#AFB3BF] rounded-[3px]">
+                        {hasStatus}
                     </span>
                 }
             </div>
