@@ -166,7 +166,7 @@ export const UserAssignmentRow = ({
 					)}
 					<div className={`text-contrastBlue sm:flex hidden pr-2 sm:pr-1 md:pr-2 flex-col items-end  ${isAssignmentProposed ? "max-w-[75px] w-full" : "max-w-[55px] w-full"}`}>
 						<button className='pt-2 underline' onClick={onChangeStatusButtonClick}>
-							{isAssignmentProposed ? 'Proposed' : 'Signed'}
+							{isAssignmentProposed ? 'Proposed' : 'Plan'}
 						</button>
 						<div className='pt-5'>
 							Actual
