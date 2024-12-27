@@ -1,8 +1,20 @@
 "use client";
-import React, { BaseSyntheticEvent, Fragment, useState, RefObject, useCallback } from "react";
-import { Menu, MenuItem, MenuButton, MenuItems, Transition } from "@headlessui/react";
+import React, {
+	BaseSyntheticEvent,
+	Fragment,
+	useState,
+	RefObject,
+	useCallback,
+} from "react";
+import {
+	Menu,
+	MenuItem,
+	MenuButton,
+	MenuItems,
+	Transition,
+} from "@headlessui/react";
 
-import { UPSERT_PROJECT } from "../gqlQueries";
+import { DELETE_PROJECT, UPSERT_PROJECT } from "../gqlQueries";
 import { useApolloClient, useMutation } from "@apollo/client";
 import { useRouter } from "next/navigation";
 import { convertProjectToCSV } from "../helperFunctions";
@@ -13,15 +25,22 @@ import { ProjectType, UndoableModifiedProject } from "../typeInterfaces";
 import { useFadeInOutRow } from "../hooks/useFadeInOutRow";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
 interface EllipsisProjectMenuProps {
-	project: ProjectType
+	project: ProjectType;
 	undoRowRef: RefObject<HTMLTableRowElement>;
 }
 
-export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisProjectMenuProps) {
+export default function EllipsisProjectMenu({
+	project,
+	undoRowRef,
+}: EllipsisProjectMenuProps) {
 	const { openModal, closeModal } = useModal();
-	const client = useApolloClient()
-	const { animateRow } = useFadeInOutRow({ rowRef: undoRowRef, minHeight: 0, heightStep: 2 })
-	const { enqueueTimer } = useProjectsDataContext()
+	const client = useApolloClient();
+	const { animateRow } = useFadeInOutRow({
+		rowRef: undoRowRef,
+		minHeight: 0,
+		heightStep: 2,
+	});
+	const { enqueueTimer } = useProjectsDataContext();
 
 	const router = useRouter();
 	const {
@@ -41,7 +60,17 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 	const [
 		upsertProject,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
-	] = useMutation(UPSERT_PROJECT, { errorPolicy: "all", fetchPolicy: 'no-cache' });
+	] = useMutation(UPSERT_PROJECT, {
+		errorPolicy: "all",
+		fetchPolicy: "no-cache",
+	});
+	const [
+		deleteProject,
+		{ data: deleteProjectData, loading: deleteProjectLoading, error: deleteProjectError },
+	] = useMutation(DELETE_PROJECT, {
+		errorPolicy: "all",
+		fetchPolicy: "no-cache",
+	});
 	const handleProjectChange = () => {
 		router.push(`projects/${id}`);
 	};
@@ -81,50 +110,52 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 
 	const downloadCSV = () => {
 		const csv = convertProjectToCSV(project);
-		const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+		const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
 		const url = URL.createObjectURL(blob);
-		const link = document.createElement('a');
+		const link = document.createElement("a");
 		link.href = url;
-		link.setAttribute('download', `${project.name}.csv`);
+		link.setAttribute("download", `${project.name}.csv`);
 		document.body.appendChild(link);
 		link.click();
 		document.body.removeChild(link);
 	};
 	const undoArchivedStatus = useCallback(
 		async (projectsWithUndoActions: UndoableModifiedProject[]) => {
-			const projectBeforeModified = projectsWithUndoActions.find((p: UndoableModifiedProject) => p.project.id === project.id)
+			const projectBeforeModified = projectsWithUndoActions.find(
+				(p: UndoableModifiedProject) => p.project.id === project.id
+			);
 			const variables = {
 				id: project?.id,
 				name: project?.name,
 				clientId: project?.client?.id,
-				status: projectBeforeModified?.project.status || 'confirmed'
+				status: projectBeforeModified?.project.status || "confirmed",
 			};
 			try {
 				await upsertProject({ variables });
 			} catch (error) {
-				console.error('Error updating project:', error);
+				console.error("Error updating project:", error);
 			}
 		},
 		[]
 	);
 	const updateCache = async () => {
-		await animateRow(true)
+		await animateRow(true);
 		client.cache.modify({
 			id: client.cache.identify({ __typename: "Project", id: project.id }),
 			fields: {
 				status() {
-					return 'archived';
+					return "archived";
 				},
 			},
 		});
-	}
+	};
 	const handleArchiveItemClick = async (projectStatus: string) => {
-		if (projectStatus === 'archived') {
+		if (projectStatus === "archived") {
 			const variables = {
 				id: project.id,
 				name: project.name,
 				clientId: project.client.id,
-				status: "unconfirmed"
+				status: "unconfirmed",
 			};
 			const { data } = await upsertProject({ variables });
 			if (data) {
@@ -143,21 +174,50 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 			id: project.id,
 			name: project.name,
 			clientId: project.client.id,
-			status: 'archived'
+			status: "archived",
 		};
 		try {
 			const response = await upsertProject({ variables });
 			if (response && response.data) {
-				const updatedProject = response.data.upsertProject
-				const undoAction = (projectsWithUndoActions: UndoableModifiedProject[]) => { undoArchivedStatus(projectsWithUndoActions) }
-				enqueueTimer({ project, updatedProject, finalAction: updateCache, undoAction });
+				const updatedProject = response.data.upsertProject;
+				const undoAction = (
+					projectsWithUndoActions: UndoableModifiedProject[]
+				) => {
+					undoArchivedStatus(projectsWithUndoActions);
+				};
+				enqueueTimer({
+					project,
+					updatedProject,
+					finalAction: updateCache,
+					undoAction,
+				});
 			}
 		} catch (error) {
-			console.error('Error updating project:', error);
+			console.error("Error updating project:", error);
 		}
-
+	};
+	const handleDeleteProjectClick = async (projectId: number) => {
+		const variables = {
+			id: projectId,
+		};
+		// const { data } = await deleteProject({ variables });
+		// if (data) {
+		// 	client.cache.modify({
+		// 		id: client.cache.identify({ __typename: "Project", id: id }),
+		// 		fields: {
+		// 			status() {
+		// 				return data.upsertProject.status;
+		// 			},
+		// 		},
+		// 	});
+		// }
+		try {
+			await deleteProject({ variables });
+		} catch (error) {
+			console.error("Error deleting project:", error);
+		}
 	}
-	
+
 	return (
 		<Menu
 			as="div"
@@ -206,7 +266,14 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 						<MenuItem>
 							{({ active }) => (
 								<button
-									onClick={() => openModal(<AddProjectModal project={project} closeModal={closeModal} />)}
+									onClick={() =>
+										openModal(
+											<AddProjectModal
+												project={project}
+												closeModal={closeModal}
+											/>
+										)
+									}
 									className={dropdownSelectedItemClass(active)}
 								>
 									Edit Project
@@ -218,16 +285,23 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 								<button
 									className={dropdownSelectedItemClass(active)}
 									onClick={() =>
-										openModal(<AddAssignmentModal project={project} closeModal={closeModal} />)
+										openModal(
+											<AddAssignmentModal
+												project={project}
+												closeModal={closeModal}
+											/>
+										)
 									}
 								>
 									Add Person
 								</button>
 							)}
-
 						</MenuItem>
 						<MenuItem>
-							<button className="w-full px-4 py-2 text-sm text-left hover:text-accentgreen border-none" onClick={downloadCSV}>
+							<button
+								className="w-full px-4 py-2 text-sm text-left hover:text-accentgreen border-none"
+								onClick={downloadCSV}
+							>
 								Export CSV
 							</button>
 						</MenuItem>
@@ -243,6 +317,13 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 							? "Unarchive Project for everyone"
 							: "Archive Project for everyone"}
 					</div>
+					{project.canBeDeleted ? (
+						<div
+						onClick={() => handleDeleteProjectClick(project.id)} 
+						className="text-orange-500 block px-4 py-2 text-sm hover:text-accentgreen hover:border-b-2 hover:cursor-pointer hover:border-gray-200">
+							Delete Project
+						</div>
+					) : null}
 				</MenuItems>
 			</Transition>
 		</Menu>

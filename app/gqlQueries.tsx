@@ -208,6 +208,7 @@ export const GET_ALL_PROJECTS_DATA = gql`
 			id
 			projects {
 				id
+				canBeDeleted
 				name
 				status
 				paymentFrequency

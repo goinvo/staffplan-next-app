@@ -63,6 +63,7 @@ export interface EllipsisProjectMenuProps {
 export interface ProjectType {
 	isTempProject?: boolean;
 	endsOn: string | null;
+	canBeDeleted?: boolean;
 	id: number;
 	name: string;
 	client: ClientType;
