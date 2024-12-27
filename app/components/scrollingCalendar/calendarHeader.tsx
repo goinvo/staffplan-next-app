@@ -33,7 +33,6 @@ import {
 	getStartAndEndDatesOfWeek,
 	isTodayInRange,
 } from "./helpers";
-import ViewsMenu from "../viewsMenu/viewsMenu";
 import EditFormController from "./editFormController";
 import DraggableDates from "../projectAssignment/draggableProjectDates";
 import { SORT_ORDER } from "./constants";
@@ -223,7 +222,6 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 		setShowOneClientProjects("");
     router.push("/projects");
 	}
-
 	return (
 		<thead className="relative">
 			<tr className="pl-5 border-bottom bg-contrastBlue min-h-28 text-white sm:flex hidden">
@@ -477,7 +475,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 									}`}
 								>
 									<span>
-										{`W${week.weekNumberOfTheMonth}`}
+										{week.weekStartDate}
 										<span className="absolute w-[70px] top-[27px] left-1/2 -translate-x-1/2 text-[8px] leading-5 text-white font-normal bg-contrastBlue rounded-md opacity-0 z-10 pointer-events-none group-hover:opacity-100 transition-opacity duration-200">
 											{weekDateForTooltip}
 											<div className="block h-[11px] w-[11px] bg-contrastBlue  absolute top-[-5px] left-1/2 -translate-x-1/2 transform rotate-[135deg] clip-triangle rounded-bl-[0.5em]"></div>

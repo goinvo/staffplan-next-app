@@ -252,6 +252,7 @@ export interface MonthsDataType {
 	monthLabel: string;
 	year: number;
 	weeks: {
+		weekStartDate: number;
 		weekNumberOfTheYear: number,
 		weekNumberOfTheMonth: number,
 	}[]
