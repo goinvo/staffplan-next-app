@@ -1,5 +1,6 @@
 "use client";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { ProjectType } from "../typeInterfaces";
 import { LoadingSpinner } from "../components/loadingSpinner";
@@ -14,6 +15,9 @@ import { AddProjectForm } from "../components/allProjects/addProjectForm";
 
 
 const ProjectsView: React.FC = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
 	const [initialSorting, setInitialSorting] = useState<{title: string; sort: SORT_ORDER}>(() => {
     if (typeof window !== "undefined" && localStorage) {
       const savedInitialSorting = localStorage.getItem("projectsPageSorting");
@@ -23,15 +27,19 @@ const ProjectsView: React.FC = () => {
     }
   });
 
-  const { isProjectDataLoading, filteredProjectList, setShowOneClientProjects } = useProjectsDataContext();
+  const { isProjectDataLoading, filteredProjectList, showOneClientProjects, setShowOneClientProjects } = useProjectsDataContext();
   const { setIsAddNewProject } = useGeneralDataContext();
 
 	const columnHeaderTitles = [
-    {
-      title: "Clients",
-      showIcon: false,
-      onClick: () => setShowOneClientProjects(""),
-    },
+    ...(!showOneClientProjects
+      ? [
+          {
+            title: "Clients",
+            showIcon: false,
+            onClick: () => setShowOneClientProjects(""),
+          },
+        ]
+      : []),
     {
       title: "Projects",
       showIcon: true,
@@ -40,6 +48,10 @@ const ProjectsView: React.FC = () => {
   ];
 
   useEffect(() => {
+    if (searchParams.has("client")) {
+      router.push("/projects");
+    }
+    
     return () => setIsAddNewProject(false)
   }, [])
 
