@@ -45,9 +45,14 @@ const config: Config = {
           "0%": { opacity: "0", height: "0" },
           "100%": { opacity: "1", height: "100px" },
         },
+        fadeOutScale: {
+          "0%": { opacity: "1", height: "100px" },
+          "100%": { opacity: "0", height: "0" },
+        },
       },
       animation: {
         fadeInScale: "fadeInScale 0.7s ease-in-out",
+        fadeOutScale: 'fadeOutScale 0.7s ease-in-out',
       },
     },
   },

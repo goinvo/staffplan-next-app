@@ -81,7 +81,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
   const [viewsFilterSingleProject, setViewsFilterSingleProject] = useState<string>("abcUserName")
   const [projectsWithUndoActions, setProjectsWithUndoActions] = useState<UndoableModifiedProject[]>([]);
   const [showOneClientProjects, setShowOneClientProjects] = useState<string>('')
-  const { showArchivedProjects, showArchivedAssignments } = useGeneralDataContext()
+  const { isFirstShowArchivedProjects, showArchivedProjects, showArchivedAssignments } = useGeneralDataContext()
   const { enqueueTask } = useTaskQueue();
   const {
     loading: projectDataLoading,
@@ -124,9 +124,14 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
       const filteredByClient = showOneClientProjects
         ? sortedList.filter((project: ProjectType) => project.client.id.toString() === showOneClientProjects)
         : sortedList;
+      
+      const filteredArchivedProjects = isFirstShowArchivedProjects
+        ? [...filteredByClient.filter((project: ProjectType) => project.status !== "archived"), ...filteredByClient.filter((project: ProjectType) => project.status === "archived")]
+        : filteredByClient
+      
       const finalFilteredList = !showArchivedProjects
         ? filteredByClient.filter((project: ProjectType) => project.status !== "archived")
-        : filteredByClient;
+        : filteredArchivedProjects
 
       return [...newProject, ...finalFilteredList];
     }
