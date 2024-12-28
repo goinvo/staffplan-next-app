@@ -1,5 +1,6 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import React, { useEffect, useState, useRef } from "react";
 import withApollo from "@/lib/withApollo";
 import { AssignmentType } from "../../typeInterfaces";
@@ -16,7 +17,10 @@ import { SORT_ORDER } from "@/app/components/scrollingCalendar/constants";
 import InlineButtonArchivedAssignments from "@/app/components/inlineButtonArchivedAssignments";
 
 const UserPage: React.FC = () => {
+  const router = useRouter();
   const params = useParams();
+  const pathname = usePathname();
+
   const [initialSorting, setInitialSorting] = useState<{title: string; sort: SORT_ORDER}>(() => {
     if (typeof window !== "undefined" && localStorage) {
       const savedInitialSorting = localStorage.getItem("staffPlanPageSorting");
@@ -25,11 +29,17 @@ const UserPage: React.FC = () => {
         : { title: "Client", sort: SORT_ORDER.ASC };
     }
   });
+
 	const [addAssignmentVisible, setAddAssignmentVisible] = useState(false);
 	const inputRefs = useRef<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>([]);
 
   const { userList, singleUserPage, setSelectedUserData, refetchUserList } = useUserDataContext();
-  const { setIsAddNewProject } = useGeneralDataContext();
+  const { viewer, setIsAddNewProject } = useGeneralDataContext();
+
+  const homepageUrl = process.env.NEXT_PUBLIC_NODE_ENV
+    ? "http://localhost:3000"
+    : "https://app.staffplan.com";
+  const isMyStaffPlan = pathname.split("/").pop() === viewer?.id.toString();
 
 	useEffect(() => {
 		if (userList.length) {
@@ -70,6 +80,8 @@ const UserPage: React.FC = () => {
           userName={singleUserPage.name}
           assignments={singleUserPage.assignments}
           initialSorting={initialSorting}
+          editable={isMyStaffPlan}
+          onClick={isMyStaffPlan ? () => router.push(`${homepageUrl}/settings/profile`) : undefined}
         >
           {[
             <AddProjectForm

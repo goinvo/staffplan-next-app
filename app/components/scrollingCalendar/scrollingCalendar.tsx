@@ -26,6 +26,7 @@ interface ScrollingCalendarProps {
 	draggableDates?: boolean;
 	projectSummaryInfo?: ProjectSummaryInfoItem[];
 	initialSorting: { title: string, sort: SORT_ORDER };
+	onClick?: () => void;
 }
 
 export const ScrollingCalendar = ({
@@ -41,6 +42,7 @@ export const ScrollingCalendar = ({
 	draggableDates,
 	projectSummaryInfo,
 	initialSorting,
+	onClick,
 }: ScrollingCalendarProps) => {
 	const [months, setMonths] = useState<MonthsDataType[]>([]);
 	const { dateRange, setDateRange } = useGeneralDataContext();
@@ -85,6 +87,7 @@ export const ScrollingCalendar = ({
 					draggableDates={draggableDates}
 					projectSummaryInfo={projectSummaryInfo}
 					initialSorting={initialSorting}
+					onClick={onClick}
 				/>
 				<tbody>
 					{React.Children.toArray(children).map((child) => {
