@@ -58,6 +58,7 @@ type CalendarHeaderProps = {
 	draggableDates?: boolean;
 	projectSummaryInfo?: ProjectSummaryInfoItem[];
 	initialSorting: { title: string; sort: SORT_ORDER };
+	onClick?: () => void;
 };
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
@@ -73,6 +74,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	draggableDates = false,
 	projectSummaryInfo,
 	initialSorting,
+	onClick
 }) => {
 	const headerTitleRef = useRef<HTMLTableCellElement>(null);
 
@@ -279,7 +281,13 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 										<IconButton
 											className="py-1 pl-4 "
 											iconSize="w-4 h-4"
-											onClick={() => setIsEditing(true)}
+											onClick={() => {
+												if (onClick) {
+													onClick()
+												} else {
+													setIsEditing(true);
+												}
+											}}
 											Icon={SlPencil}
 										/>
 									)}
