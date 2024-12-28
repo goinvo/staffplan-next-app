@@ -27,8 +27,8 @@ const ProjectsView: React.FC = () => {
     }
   });
 
-  const { isProjectDataLoading, filteredProjectList, showOneClientProjects, setShowOneClientProjects } = useProjectsDataContext();
-  const { setIsAddNewProject } = useGeneralDataContext();
+  const { isProjectDataLoading, filteredProjectList, showOneClientProjects, setShowOneClientProjects, refetchProjectList } = useProjectsDataContext();
+  const { isFirstShowArchivedProjects, isFirstHideArchivedProjects, setIsAddNewProject, setIsFirstShowArchivedProjects, setIsFirstHideArchivedProjects } = useGeneralDataContext();
 
 	const columnHeaderTitles = [
     ...(!showOneClientProjects
@@ -46,6 +46,21 @@ const ProjectsView: React.FC = () => {
       onIconClick: () => setIsAddNewProject(true),
     },
   ];
+
+  useEffect(() => {
+    if (isFirstShowArchivedProjects) {
+      setTimeout(() => {
+        setIsFirstShowArchivedProjects(false)
+      }, 700)
+    }
+
+    if (isFirstHideArchivedProjects) {
+      setTimeout(() => {
+        setIsFirstHideArchivedProjects(false);
+      }, 700);
+    }
+
+  }, [isFirstShowArchivedProjects, isFirstHideArchivedProjects])
 
   useEffect(() => {
     if (searchParams.has("client")) {

@@ -59,7 +59,7 @@ export const AllProjectLabel = ({
           {project.name}
         </button>
         {project.status === "archived" && (
-          <span className="underline text-contrastBlue text-start">
+          <span className="block underline text-contrastBlue text-start">
             &#40;Archived&#41;
           </span>
         )}

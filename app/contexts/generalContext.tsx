@@ -19,6 +19,8 @@ export interface GeneralDataContextType {
     isAddNewProject: boolean;
     viewer: ViewerType | null;
     showSummaries: boolean;
+    isFirstShowArchivedProjects: boolean;
+    isFirstHideArchivedProjects: boolean;
     showArchivedProjects: boolean;
     showInactiveUsers: boolean;
     showArchivedAssignments: boolean;
@@ -27,6 +29,8 @@ export interface GeneralDataContextType {
     setHeaderTitleWidth: React.Dispatch<React.SetStateAction<number | null>>;
     setIsAddNewProject: React.Dispatch<React.SetStateAction<boolean>>;
     setShowSummaries: React.Dispatch<React.SetStateAction<boolean>>;
+    setIsFirstShowArchivedProjects: React.Dispatch<React.SetStateAction<boolean>>
+    setIsFirstHideArchivedProjects: React.Dispatch<React.SetStateAction<boolean>>
     setShowArchivedProjects: React.Dispatch<React.SetStateAction<boolean>>;
     setShowInactiveUsers: React.Dispatch<React.SetStateAction<boolean>>;
     setShowArchivedAssignments: React.Dispatch<React.SetStateAction<boolean>>;
@@ -63,6 +67,8 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
     const [isAddNewProject, setIsAddNewProject] = useState(false)
     const [viewer, setViewer] = useState<ViewerType | null>(null);
     const [showSummaries, setShowSummaries] = useState<boolean>(true);
+    const [isFirstShowArchivedProjects, setIsFirstShowArchivedProjects] = useState<boolean>(false);
+    const [isFirstHideArchivedProjects, setIsFirstHideArchivedProjects] = useState<boolean>(false);
     const [showArchivedProjects, setShowArchivedProjects] = useState<boolean>(false);
     const [showInactiveUsers, setShowInactiveUsers] = useState<boolean>(false);
     const [showArchivedAssignments, setShowArchivedAssignments] = useState<boolean>(false);
@@ -103,6 +109,8 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
                 viewer,
                 dateRange,
                 showSummaries,
+                isFirstShowArchivedProjects,
+                isFirstHideArchivedProjects,
                 showArchivedProjects,
                 showInactiveUsers,
                 showArchivedAssignments,
@@ -111,6 +119,8 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
                 setHeaderTitleWidth,
                 setIsAddNewProject,
                 setShowSummaries,
+                setIsFirstShowArchivedProjects,
+                setIsFirstHideArchivedProjects,
                 setShowArchivedProjects,
                 setShowInactiveUsers,
                 setShowArchivedAssignments,
