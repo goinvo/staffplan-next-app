@@ -37,6 +37,7 @@ import EditFormController from "./editFormController";
 import DraggableDates from "../projectAssignment/draggableProjectDates";
 import { SORT_ORDER } from "./constants";
 import { useClientDataContext } from "@/app/contexts/clientContext";
+import { useKeyboardNavigation } from "@/app/hooks/useKeyboardNavigation";
 
 interface ColumnHeaderTitle {
 	title: string;
@@ -111,6 +112,13 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 		pathname.includes("projects") && pathname.split("/").length === 3;
 	const isProjectsPage = pathname.includes("projects") && pathname.split("/").length === 2;
 	const isPeoplePage = pathname.includes("people") && pathname.split("/").length === 2;
+
+	useKeyboardNavigation({
+    getNextWeeksPerView,
+		getPrevWeeksPerView,
+		setDateRange,
+    months,
+  });
 
 	useEffect(() => {
     const observer = new ResizeObserver((entries) => {

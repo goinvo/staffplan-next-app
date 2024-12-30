@@ -10,6 +10,7 @@ import { CustomInput } from "../cutomInput";
 import { assignmentContainsCWeek, isPastOrCurrentWeek, filterWeeksForFillForward, getWeekNumbersPerScreen, currentWeek, currentYear, tabbingAndArrowNavigation, updateProjectAssignments, updateUserAssignments, updateOrInsertWorkWeek, updateOrInsertWorkWeekInProject } from "../scrollingCalendar/helpers";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
+import { useGeneralDataContext } from "@/app/contexts/generalContext";
 
 interface WorkWeekInputProps {
 	withinProjectDates?: boolean;
@@ -117,8 +118,8 @@ export const WorkWeekInput = ({
 	});
 
 	const { userList, setUserList } = useUserDataContext()
-
 	const { projectList, setProjectList } = useProjectsDataContext();
+	const { setIsWorkWeekInputInFocus } = useGeneralDataContext();
 
 	useEffect(() => {
 		const currentWeekExists = months?.some(month =>
@@ -221,8 +222,10 @@ export const WorkWeekInput = ({
 							name="estimatedHours"
 							id={`estHours-${assignment?.id}-${cweek}-${year}`}
 							onChange={handleChange}
+							onFocus={() => setIsWorkWeekInputInFocus(true)}
 							onBlur={(e) => {
 								handleBlur("estimatedHours");
+								setIsWorkWeekInputInFocus(false);
 								if (dirty) {
 									upsertWorkWeekValues(values);
 								}
@@ -241,8 +244,10 @@ export const WorkWeekInput = ({
 							name="actualHours"
 							id={`actHours-${assignment?.id}-${cweek}-${year}`}
 							onChange={handleChange}
+							onFocus={() => setIsWorkWeekInputInFocus(true)}
 							onBlur={(e) => {
 								handleBlur("actualHours");
+								setIsWorkWeekInputInFocus(false);
 								if (dirty) {
 									upsertWorkWeekValues(values);
 								}
