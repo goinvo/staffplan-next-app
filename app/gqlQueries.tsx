@@ -437,6 +437,62 @@ export const UPSERT_PROJECT = gql`
   }
 `;
 
+export const UPSERT_PROJECT_WITH_INPUT = gql`
+  mutation UpsertProjectWithInput($input: ProjectAttributes!) {
+    upsertProjectWithInput(input: $input) {
+      id
+      client {
+        id
+        name
+        avatarUrl
+      }
+      name
+      status
+      cost
+      paymentFrequency
+      startsOn
+      endsOn
+      hours
+      fte
+      rateType
+      hourlyRate
+      workWeeks {
+        actualHours
+        estimatedHours
+        cweek
+        year
+      }
+      assignments {
+        id
+        startsOn
+        endsOn
+        status
+        estimatedWeeklyHours
+        canBeDeleted
+        workWeeks {
+          actualHours
+          estimatedHours
+          cweek
+          year
+        }
+        assignedUser {
+          id
+          name
+          avatarUrl
+        }
+        project {
+          id
+          name
+          client {
+            name
+            id
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const UPSERT_WORKWEEK = gql`
 	mutation UpsertWorkWeek(
 		$assignmentId: ID!
