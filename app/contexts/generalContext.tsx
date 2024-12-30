@@ -19,6 +19,7 @@ export interface GeneralDataContextType {
     isAddNewProject: boolean;
     viewer: ViewerType | null;
     showSummaries: boolean;
+    isWorkWeekInputInFocus: boolean;
     isFirstShowArchivedProjects: boolean;
     isFirstHideArchivedProjects: boolean;
     showArchivedProjects: boolean;
@@ -29,6 +30,7 @@ export interface GeneralDataContextType {
     setHeaderTitleWidth: React.Dispatch<React.SetStateAction<number | null>>;
     setIsAddNewProject: React.Dispatch<React.SetStateAction<boolean>>;
     setShowSummaries: React.Dispatch<React.SetStateAction<boolean>>;
+    setIsWorkWeekInputInFocus: React.Dispatch<React.SetStateAction<boolean>>;
     setIsFirstShowArchivedProjects: React.Dispatch<React.SetStateAction<boolean>>
     setIsFirstHideArchivedProjects: React.Dispatch<React.SetStateAction<boolean>>
     setShowArchivedProjects: React.Dispatch<React.SetStateAction<boolean>>;
@@ -67,6 +69,7 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
     const [isAddNewProject, setIsAddNewProject] = useState(false)
     const [viewer, setViewer] = useState<ViewerType | null>(null);
     const [showSummaries, setShowSummaries] = useState<boolean>(true);
+    const [isWorkWeekInputInFocus, setIsWorkWeekInputInFocus] = useState<boolean>(false);
     const [isFirstShowArchivedProjects, setIsFirstShowArchivedProjects] = useState<boolean>(false);
     const [isFirstHideArchivedProjects, setIsFirstHideArchivedProjects] = useState<boolean>(false);
     const [showArchivedProjects, setShowArchivedProjects] = useState<boolean>(false);
@@ -109,6 +112,7 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
                 viewer,
                 dateRange,
                 showSummaries,
+                isWorkWeekInputInFocus,
                 isFirstShowArchivedProjects,
                 isFirstHideArchivedProjects,
                 showArchivedProjects,
@@ -119,6 +123,7 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
                 setHeaderTitleWidth,
                 setIsAddNewProject,
                 setShowSummaries,
+                setIsWorkWeekInputInFocus,
                 setIsFirstShowArchivedProjects,
                 setIsFirstHideArchivedProjects,
                 setShowArchivedProjects,
