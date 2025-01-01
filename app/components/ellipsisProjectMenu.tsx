@@ -196,27 +196,24 @@ export default function EllipsisProjectMenu({
 			console.error("Error updating project:", error);
 		}
 	};
+	
 	const handleDeleteProjectClick = async (projectId: number) => {
-		const variables = {
-			id: projectId,
-		};
-		// const { data } = await deleteProject({ variables });
-		// if (data) {
-		// 	client.cache.modify({
-		// 		id: client.cache.identify({ __typename: "Project", id: id }),
-		// 		fields: {
-		// 			status() {
-		// 				return data.upsertProject.status;
-		// 			},
-		// 		},
-		// 	});
-		// }
+		const variables = { projectId: projectId };
+	  
 		try {
-			await deleteProject({ variables });
+		  const { data } = await deleteProject({ variables });
+	  
+		  if (data) {
+			const projectCacheId = client.cache.identify({ __typename: "Project", id: projectId });
+			client.cache.evict({ id: projectCacheId });
+	  
+			client.cache.gc();
+		  }
 		} catch (error) {
-			console.error("Error deleting project:", error);
+		  console.error("Error deleting project:", error);
 		}
-	}
+	  };
+	  
 
 	return (
 		<Menu
