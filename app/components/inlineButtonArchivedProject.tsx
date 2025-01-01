@@ -6,10 +6,12 @@ import { useGeneralDataContext } from "../contexts/generalContext";
 
 const InlineButtonArchivedProject: React.FC = () => {
 
-  const { showArchivedProjects, setShowArchivedProjects } = useGeneralDataContext();
-  const { projectList } = useProjectsDataContext();
+  const { showArchivedProjects, setShowArchivedProjects, setIsFirstShowArchivedProjects, setIsFirstHideArchivedProjects } = useGeneralDataContext();
+  const { showOneClientProjects, projectList } = useProjectsDataContext();
 
-  const archivedProjects = projectList.filter((p) => p.status === "archived");
+  const archivedProjects = showOneClientProjects
+    ? projectList.filter((p) => (p.client.id.toString() === showOneClientProjects && p.status === "archived"))
+    : projectList.filter((p) => p.status === "archived");
 
   const label = showArchivedProjects
     ? `Hide ${archivedProjects.length} archived ${archivedProjects.length > 1 ? 'projects' : 'project'}`
@@ -21,7 +23,18 @@ const InlineButtonArchivedProject: React.FC = () => {
         <div className="h-[100px] w-full">
           <button
             className="ml-5 mt-2 py-1"
-            onClick={() => setShowArchivedProjects(!showArchivedProjects)}
+            onClick={() => {
+              
+              if (showArchivedProjects) {
+                setIsFirstHideArchivedProjects(true);
+                setTimeout(() => {setShowArchivedProjects(false)}, 600)
+              }
+              
+              if (!showArchivedProjects) {
+                setIsFirstShowArchivedProjects(true);
+                setShowArchivedProjects(true);
+              }
+            }}
           >
             {label}
           </button>

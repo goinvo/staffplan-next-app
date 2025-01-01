@@ -12,6 +12,7 @@ import { assignmentContainsCWeek, isPastOrCurrentWeek, filterWeeksForFillForward
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import useIsMobile from "@/app/hooks/useIsMobileWidth";
+import { useGeneralDataContext } from "@/app/contexts/generalContext";
 
 
 interface WorkWeekInputProps {
@@ -123,6 +124,7 @@ export const WorkWeekInput = ({
 	});
 	const { userList, setUserList } = useUserDataContext()
 	const { projectList, setProjectList } = useProjectsDataContext();
+	const { setIsWorkWeekInputInFocus } = useGeneralDataContext();
 
 	useEffect(() => {
 		const currentWeekExists = months?.some(month =>
@@ -232,8 +234,10 @@ export const WorkWeekInput = ({
 						name="estimatedHours"
 						id={`estHours-${assignment?.id}-${cweek}-${year}`}
 						onChange={handleChange}
+						onFocus={() => setIsWorkWeekInputInFocus(true)}
 						onBlur={(e) => {
 							handleBlur("estimatedHours");
+							setIsWorkWeekInputInFocus(false);
 							if (dirty) {
 								upsertWorkWeekValues(values);
 							}
@@ -253,9 +257,11 @@ export const WorkWeekInput = ({
 							value={values.actualHours}
 							name="actualHours"
 							id={`actHours-${assignment?.id}-${cweek}-${year}`}
+							onFocus={() => setIsWorkWeekInputInFocus(true)}
 							onChange={handleChange}
 							onBlur={(e) => {
 								handleBlur("actualHours");
+								setIsWorkWeekInputInFocus(false);
 								if (dirty) {
 									upsertWorkWeekValues(values);
 								}

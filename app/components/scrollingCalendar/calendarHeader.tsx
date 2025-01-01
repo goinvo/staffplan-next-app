@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import { SlPencil } from "react-icons/sl";
+import { RxArrowLeft } from "react-icons/rx";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { PlusIcon } from "@heroicons/react/24/outline";
@@ -31,10 +33,11 @@ import {
 	getStartAndEndDatesOfWeek,
 	isTodayInRange,
 } from "./helpers";
-import ViewsMenu from "../viewsMenu/viewsMenu";
 import EditFormController from "./editFormController";
 import DraggableDates from "../projectAssignment/draggableProjectDates";
 import { SORT_ORDER } from "./constants";
+import { useClientDataContext } from "@/app/contexts/clientContext";
+import { useKeyboardNavigation } from "@/app/hooks/useKeyboardNavigation";
 
 interface ColumnHeaderTitle {
 	title: string;
@@ -56,6 +59,7 @@ type CalendarHeaderProps = {
 	draggableDates?: boolean;
 	projectSummaryInfo?: ProjectSummaryInfoItem[];
 	initialSorting: { title: string; sort: SORT_ORDER };
+	onClick?: () => void;
 };
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
@@ -71,6 +75,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	draggableDates = false,
 	projectSummaryInfo,
 	initialSorting,
+	onClick
 }) => {
 	const headerTitleRef = useRef<HTMLTableCellElement>(null);
 
@@ -78,9 +83,14 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	const [isTodayInView, setIsTodayInView] = useState(true);
 	const [showTooltip, setShowTooltip] = useState(false);
 	const [sortedBy, setSortedBy] = useState(initialSorting);
+	const [currentClient, setCurrentClient] = useState('')
+
 	const { setHeaderTitleWidth, setDateRange, scrollToTodayFunction } = useGeneralDataContext();
 	const { setSortOrder: setSortOrderForPeople, setSortBy: setSortByForPeople, sortUserList } = useUserDataContext();
+	const { clientList } = useClientDataContext();
 	const {
+		showOneClientProjects,
+		setShowOneClientProjects,
 		setSortOrder: setSortOrderForProjects,
 		setSortBy: setSortByForProjects,
 		setSortOrderSingleProject,
@@ -91,7 +101,10 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 		proposedEstimatedHours,
 		maxTotalHours,
 	} = calculateTotalHoursPerWeek(assignments as AssignmentType[], months);
+
+	const router = useRouter();
 	const pathname = usePathname();
+	const searchParams = useSearchParams();
 
 	const isStaffPlanPage =
 		pathname.includes("people") && pathname.split("/").length === 3;
@@ -99,6 +112,13 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 		pathname.includes("projects") && pathname.split("/").length === 3;
 	const isProjectsPage = pathname.includes("projects") && pathname.split("/").length === 2;
 	const isPeoplePage = pathname.includes("people") && pathname.split("/").length === 2;
+
+	useKeyboardNavigation({
+    getNextWeeksPerView,
+		getPrevWeeksPerView,
+		setDateRange,
+    months,
+  });
 
 	useEffect(() => {
     const observer = new ResizeObserver((entries) => {
@@ -124,6 +144,15 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 			setIsTodayInView(isTodayInRange(months))
 		};
 	}, [months]);
+
+	useEffect(() => {
+		if (showOneClientProjects) {
+			const client = clientList.find((c) => c.id.toString() === showOneClientProjects)?.name || '';
+			setCurrentClient(client);
+		} else {
+			setCurrentClient('')
+		}
+  }, [showOneClientProjects]);
 
 	useEffect(() => {
 		if (isStaffPlanPage) {
@@ -198,6 +227,11 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 			}
 		}
 	};
+
+	const returnToProjects = () => {
+		setShowOneClientProjects("");
+    router.push("/projects");
+	}
 	return (
 		<thead className="relative">
 			<tr className="pl-5 border-bottom bg-contrastBlue min-h-28 text-white sm:flex hidden">
@@ -223,14 +257,45 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 							)}
 							<div className="flex flex-col items-start">
 								<div className="flex items-center">
-									<div className="text-huge text-left overflow-wrap break-word leading-snug">
-										{title || userName}
-									</div>
+										{searchParams.has("client") && currentClient ? (
+                    <div>
+                      <div className="flex">
+                        <IconButton
+                          className="pr-2 pb-[1px]"
+                          iconSize="w-3 h-3"
+														onClick={() => returnToProjects()}
+                          Icon={RxArrowLeft}
+                        />
+                        <div className="text-base font-normal">Projects</div>
+                      </div>
+
+                      <div className="flex pl-[19px]">
+                        <span className="text-huge text-left overflow-wrap break-word leading-snug">
+                          {currentClient}
+                        </span>
+                        <IconButton
+                          className="pt-1 pb-[2px] pl-3"
+                          iconSize="w-4 h-4"
+                          Icon={SlPencil}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-huge text-left overflow-wrap break-word leading-snug">
+                      {title || userName}
+                    </div>
+                  )}
 									{editable && (
 										<IconButton
 											className="py-1 pl-4 "
 											iconSize="w-4 h-4"
-											onClick={() => setIsEditing(true)}
+											onClick={() => {
+												if (onClick) {
+													onClick()
+												} else {
+													setIsEditing(true);
+												}
+											}}
 											Icon={SlPencil}
 										/>
 									)}
@@ -426,7 +491,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 									}`}
 								>
 									<span>
-										{`W${week.weekNumberOfTheMonth}`}
+										{week.weekStartDate}
 										<span className="absolute w-[70px] top-[27px] left-1/2 -translate-x-1/2 text-[8px] leading-5 text-white font-normal bg-contrastBlue rounded-md opacity-0 z-10 pointer-events-none group-hover:opacity-100 transition-opacity duration-200">
 											{weekDateForTooltip}
 											<div className="block h-[11px] w-[11px] bg-contrastBlue  absolute top-[-5px] left-1/2 -translate-x-1/2 transform rotate-[135deg] clip-triangle rounded-bl-[0.5em]"></div>

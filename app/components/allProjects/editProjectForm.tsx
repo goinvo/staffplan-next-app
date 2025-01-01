@@ -7,7 +7,7 @@ import { useMutation } from "@apollo/client";
 import { DateTime } from "luxon";
 
 import { ProjectType, ClientType } from "../../typeInterfaces";
-import { UPSERT_PROJECT, UPSERT_CLIENT } from "@/app/gqlQueries";
+import { UPSERT_CLIENT, UPSERT_PROJECT_WITH_INPUT } from "@/app/gqlQueries";
 import { AutocompleteInput } from "../autocompleteInput";
 import { useClientDataContext } from "@/app/contexts/clientContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
@@ -73,15 +73,15 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 	const [showNewClientModal, setShowNewClientModal] = useState<boolean>(false);
 	const clientInputRef = useRef<HTMLInputElement>(null);
 
-	const [upsertProject] = useMutation(UPSERT_PROJECT, {
-		errorPolicy: "all",
-		onCompleted({ upsertProject }) {
-			refetchProjectList();
-			if (isArchiveProject && !showArchivedProjects) {
+	const [upsertProjectWithInput] = useMutation(UPSERT_PROJECT_WITH_INPUT, {
+    errorPolicy: "all",
+    onCompleted({ upsertProjectWithInput }) {
+      refetchProjectList();
+      if (isArchiveProject && !showArchivedProjects) {
         router.push("/projects");
       }
-		},
-	});
+    },
+  });
 	const [
 		upsertClient,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
@@ -114,8 +114,8 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 			clientId: clientId,
 			budget: "",
 			hours: hours,
-			startsOn: startsOnDefaultValue || '',
-			endsOn: endsOn || endsOnDateDefaultValue || '',
+			startsOn: startsOn || '',
+			endsOn: endsOn || '',
 			projectStatus: status,
 			rateType: rateType ? rateType : "fixed",
 			hourlyRate: hourlyRate && hourlyRate > 0 ? hourlyRate : 0,
@@ -134,21 +134,22 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 				});
 				clientId = data?.upsertClient?.id;
 			}
-			const variables = {
-				id: id,
-				clientId: clientId,
-				name: values.projectName,
-				hours: +values.hours,
-				...(values.startsOn && { startsOn: values.startsOn }),
-				...(values.endsOn && { endsOn: values.endsOn }),
-				status: values.projectStatus,
-				rateType: values.rateType,
-				hourlyRate: values.hourlyRate,
-				cost: values.cost,
+			const input = {
+        id: id,
+        clientId: clientId,
+        name: values.projectName,
+        hours: +values.hours,
+        startsOn: values.startsOn || null,
+        endsOn: values.endsOn || null,
+        status: values.projectStatus,
+        rateType: values.rateType,
+        hourlyRate: values.hourlyRate,
+        cost: values.cost,
 			};
-			await upsertProject({
-				variables,
-			});
+
+      await upsertProjectWithInput({
+        variables: { input },
+      });
 
 			onClose?.();
 		},
@@ -292,7 +293,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 						onChange={formik.handleChange}
 						onBlur={formik.handleBlur}
 						id="budget"
-						className="h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none"
+						className="h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none disabled:shadow-none disabled:bg-white/60 disabled:text-gray-500 disabled:cursor-not-allowed"
 						placeholder="$USD"
 					/>
 					{formik.touched.budget && formik.errors.budget ? (
@@ -333,7 +334,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					<div className="">
 						<CustomDateInput
 							name="startsOn"
-							errorString="Invalid start date format. Please use dd.MMM.yy."
+							errorString="Invalid start date format. Please use dd/Mon/yr."
 							value={formik.values.startsOn}
 							onChange={(value) => formik.setFieldValue("startsOn", value)}
 							onBlur={() => formik.setFieldTouched("startsOn", true)}
@@ -352,7 +353,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					<div className="">
 						<CustomDateInput
 							name="endsOn"
-							errorString="Invalid end date format. Please use dd.MMM.yy."
+							errorString="Invalid end date format. Please use dd/Mon/yr."
 							value={formik.values.endsOn}
 							onChange={(value) => formik.setFieldValue("endsOn", value)}
 							onBlur={() => formik.setFieldTouched("endsOn", true)}
@@ -376,7 +377,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
           Archive project for everyone?
         </span>
       </label>
-			<div className="flex items-center justify-between space-x-8 w-full border-t border-grey-700 py-2">
+			<div className="flex items-center justify-between space-x-8 w-full border-t border-gray-600 py-2">
 				{/* <div className="relative flex items-center">
 					<span
 						className={`py-2 text-tiny font-normal rounded-sm underline text-left  ${archivedStatus ? "text-tiffany" : "text-white"
