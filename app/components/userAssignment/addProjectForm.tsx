@@ -23,7 +23,7 @@ type AddProjectFormProps = {
 type UpsertProjectVariables = {
   clientId: string;
   name: string;
-  assignments: [{ userId: string }];
+  assignments: [{ userId: string,status:string }];
 };
 
 type UpsertAssignmentVariables = {
@@ -208,7 +208,7 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({ user }) => {
         const variables: UpsertProjectVariables = {
           clientId: String(clientId),
           name: values.projectName.trimEnd(),
-          assignments: [{ userId: String(currentUserId) }],
+          assignments: [{ userId: String(currentUserId), status: "proposed" }],
         };
 
         await createNewProject(variables);
@@ -441,7 +441,6 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({ user }) => {
 
     formik.handleSubmit();
   };
-
   return (
     <tr
       className={`sm:flex hidden w-full pl-[10px] border-gray-300 transition-all duration-700 ease-in-out delay-100 

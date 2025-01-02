@@ -283,7 +283,6 @@ export const AddProjectForm = () => {
 
     formik.handleSubmit();
   };
-
   return (
     <tr
       className={`sm:flex hidden w-full pl-[10px] border-gray-300 transition-all duration-700 ease-in-out delay-100 

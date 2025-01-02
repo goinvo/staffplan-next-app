@@ -19,7 +19,7 @@ type AddInlineProjectProps = {
 type UpsertProjectVariables = {
     clientId: string,
     name: string,
-    assignments: [{ userId: string }]
+    assignments: [{ userId: string, status:string }]
 }
 
 type UpsertAssignmentVariables = {
@@ -169,16 +169,14 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
                         userId: String(id),
                         status: 'proposed'
                     };
-
                     await addNewAssignmentWithExistingProject(variables);
                 }
             } else {
                 const variables: UpsertProjectVariables = {
                     clientId: String(clientId),
                     name: values.projectName,
-                    assignments: [{ userId: String(id) }],
+                    assignments: [{ userId: String(id), status: 'proposed' }],
                 };
-
                 await createNewProject(variables);
             }
             setConfirmedClientToCreate(false);
@@ -218,7 +216,6 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
         formik.handleBlur(e);
         formik.submitForm()
     }
-
     return (
         <tr className={`pl-5 sm:flex hidden border-b border-gray-300 hover:bg-hoverGrey min-h-[100px]`}>
             <td className='my-5 px-0 font-normal align-top max-w-2/5'>
