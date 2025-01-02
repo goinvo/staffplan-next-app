@@ -40,7 +40,7 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 			setClientList([...clientList, upsertClient]);
 		},
 	});
-
+	const { setIsInputInFocus } = useGeneralDataContext();
 	const [upsertProject] = useMutation(UPSERT_PROJECT, {
 		errorPolicy: "all",
 		onCompleted({ upsertProject }) {
@@ -195,7 +195,11 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 					name="projectName"
 					value={formik.values.projectName}
 					onChange={formik.handleChange}
-					onBlur={formik.handleBlur}
+					onFocus={()=>setIsInputInFocus(true)}
+					onBlur={(e) => {
+						formik.handleBlur(e);
+						setIsInputInFocus(false);
+					  }}
 					className="h-10 px-2 rounded-sm shadow-top-input-shadow font-bold focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-huge text-contrastBlue min-w-[370px]"
 					placeholder="Project Name"
 				/>

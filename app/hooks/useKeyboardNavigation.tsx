@@ -18,7 +18,7 @@ export const useKeyboardNavigation = ({
 }: KeyboardNavigation) => {
   const router = useRouter();
 
-  const { viewer, isWorkWeekInputInFocus } = useGeneralDataContext();
+  const { viewer, isInputInFocus } = useGeneralDataContext();
 
   useEffect(() => {
     if (!viewer || months.length === 0) return;
@@ -26,20 +26,23 @@ export const useKeyboardNavigation = ({
     const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.key.toLowerCase()) {
         case "m":
+          if(isInputInFocus) return;
           router.push(`/people/${encodeURIComponent(viewer.id)}`);
           break;
         case "p":
+          if(isInputInFocus) return;
           router.push(`/projects`);
           break;
         case "e":
+          if(isInputInFocus) return;
           router.push(`/people`);
           break;
         case "arrowright":
-          if (!isWorkWeekInputInFocus) setDateRange(getNextWeeksPerView(months));
+          if (!isInputInFocus) setDateRange(getNextWeeksPerView(months));
 
           break;
         case "arrowleft":
-          if (!isWorkWeekInputInFocus) setDateRange(getPrevWeeksPerView(months));
+          if (!isInputInFocus) setDateRange(getPrevWeeksPerView(months));
 
           break;
         default:
@@ -51,5 +54,5 @@ export const useKeyboardNavigation = ({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [router, isWorkWeekInputInFocus, months]);
+  }, [router, isInputInFocus, months]);
 };
