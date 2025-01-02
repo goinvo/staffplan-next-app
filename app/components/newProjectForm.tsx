@@ -112,7 +112,7 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
         clientId,
         name: values.projectName.trimEnd(),
         hours: +values.hours,
-        assignments: [{ userId: viewer?.id }],
+        assignments: [{ userId: viewer?.id, status:'proposed' }],
       };
 
 			const nullableDates = () => {
