@@ -10,6 +10,7 @@ import { UPSERT_PROJECT, UPSERT_CLIENT, UPSERT_ASSIGNMENT } from "@/app/gqlQueri
 import { useUserDataContext } from "../contexts/userDataContext";
 import { useClientDataContext } from "../contexts/clientContext";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
+import { useGeneralDataContext } from "../contexts/generalContext";
 
 type AddInlineProjectProps = {
     user: UserType
@@ -18,7 +19,7 @@ type AddInlineProjectProps = {
 type UpsertProjectVariables = {
     clientId: string,
     name: string,
-    assignments: [{ userId: string }]
+    assignments: [{ userId: string, status:string }]
 }
 
 type UpsertAssignmentVariables = {
@@ -34,7 +35,7 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
     const { setUserList } = useUserDataContext()
     const { clientList, refetchClientList } = useClientDataContext()
     const { projectList, setProjectList } = useProjectsDataContext();
-
+    const { setIsInputInFocus } = useGeneralDataContext();
     const { id, assignments } = user;
 
     const [upsertClient] = useMutation(UPSERT_CLIENT, {
@@ -168,16 +169,14 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
                         userId: String(id),
                         status: 'proposed'
                     };
-
                     await addNewAssignmentWithExistingProject(variables);
                 }
             } else {
                 const variables: UpsertProjectVariables = {
                     clientId: String(clientId),
                     name: values.projectName,
-                    assignments: [{ userId: String(id) }],
+                    assignments: [{ userId: String(id), status: 'proposed' }],
                 };
-
                 await createNewProject(variables);
             }
             setConfirmedClientToCreate(false);
@@ -217,7 +216,6 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
         formik.handleBlur(e);
         formik.submitForm()
     }
-
     return (
         <tr className={`pl-5 sm:flex hidden border-b border-gray-300 hover:bg-hoverGrey min-h-[100px]`}>
             <td className='my-5 px-0 font-normal align-top max-w-2/5'>
@@ -249,7 +247,11 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
                             type="text"
                             value={formik.values.projectName}
                             onChange={formik.handleChange}
-                            onBlur={handleProjectNameBlur}
+                            onFocus={() => setIsInputInFocus(true)}
+                            onBlur={(e) => {
+                                handleProjectNameBlur(e)
+                                setIsInputInFocus(false)
+                            }}
                             className="py-2 max-w-[185px] max-h-[28px] text-tiny font-bold shadow-top-input-shadow rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-contrastBlue"
                             placeholder="Project Name"
                         />

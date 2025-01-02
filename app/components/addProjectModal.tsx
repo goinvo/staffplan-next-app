@@ -64,7 +64,6 @@ const AddProjectModal = ({ project, closeModal }: AddProjectModalProps) => {
 	});
 
 	const onSubmitUpsert = (values: FormikValues) => {
-		console.log(values, "VALUES");
 		const variables = {
 			id: values.id,
 			clientId: values.client,

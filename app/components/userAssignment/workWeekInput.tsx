@@ -124,7 +124,7 @@ export const WorkWeekInput = ({
 	});
 	const { userList, setUserList } = useUserDataContext()
 	const { projectList, setProjectList } = useProjectsDataContext();
-	const { setIsWorkWeekInputInFocus } = useGeneralDataContext();
+	const { setIsInputInFocus } = useGeneralDataContext();
 
 	useEffect(() => {
 		const currentWeekExists = months?.some(month =>
@@ -234,10 +234,10 @@ export const WorkWeekInput = ({
 						name="estimatedHours"
 						id={`estHours-${assignment?.id}-${cweek}-${year}`}
 						onChange={handleChange}
-						onFocus={() => setIsWorkWeekInputInFocus(true)}
+						onFocus={() => setIsInputInFocus(true)}
 						onBlur={(e) => {
 							handleBlur("estimatedHours");
-							setIsWorkWeekInputInFocus(false);
+							setIsInputInFocus(false);
 							if (dirty) {
 								upsertWorkWeekValues(values);
 							}
@@ -257,11 +257,11 @@ export const WorkWeekInput = ({
 							value={values.actualHours}
 							name="actualHours"
 							id={`actHours-${assignment?.id}-${cweek}-${year}`}
-							onFocus={() => setIsWorkWeekInputInFocus(true)}
+							onFocus={() => setIsInputInFocus(true)}
 							onChange={handleChange}
 							onBlur={(e) => {
 								handleBlur("actualHours");
-								setIsWorkWeekInputInFocus(false);
+								setIsInputInFocus(false);
 								if (dirty) {
 									upsertWorkWeekValues(values);
 								}
