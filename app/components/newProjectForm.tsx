@@ -254,7 +254,7 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 					</div>
 				</div>
 			)}
-			<div className="flex flex-col mt-1 mb-1">
+			{/* <div className="flex flex-col mt-1 mb-1">
 				<label className="py-1 text-tiny">Budget (optional)</label>
 				<input
 					type="text"
@@ -271,7 +271,7 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 						{formik.errors.budget}
 					</div>
 				) : null}
-			</div>
+			</div> */}
 			<div className="flex flex-col mt-1 mb-1">
 				<label className="py-1 text-tiny">Hours (optional)</label>
 				<input
