@@ -17,7 +17,7 @@ import { AutocompleteInput } from "../autocompleteInput";
 export const AddProjectForm = () => {
   const clientInputRef = useRef<HTMLInputElement>(null);
   const projectInputRef = useRef<HTMLInputElement>(null);
-
+  const {setIsInputInFocus} = useGeneralDataContext();
   const [isNewClient, setIsNewClient] = useState(false);
   const [isNewProject, setIsNewProject] = useState(false);
 
@@ -326,7 +326,11 @@ export const AddProjectForm = () => {
               name="projectName"
               value={formik.values.projectName}
               onChange={handleProjectChange}
-              onBlur={formik.handleBlur}
+              onFocus={()=>setIsInputInFocus(true)}
+              onBlur={(e)=> {
+                setIsInputInFocus(false)
+                formik.handleBlur(e)
+              }}
               className={`h-7 w-full px-2 ${
                 isNewProject && "pr-[38px]"
               } text-tiny font-bold placeholder:font-normal shadow-top-input-shadow rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-contrastBlue appearance-none`}

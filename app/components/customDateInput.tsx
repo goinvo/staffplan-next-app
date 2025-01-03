@@ -3,6 +3,7 @@
 import { CalendarIcon } from "@heroicons/react/24/solid";
 import { useState, useEffect, useRef } from "react";
 import { DateTime } from "luxon";
+import { useGeneralDataContext } from "../contexts/generalContext";
 
 interface CustomDateInputProps {
     name: string;
@@ -16,7 +17,7 @@ interface CustomDateInputProps {
 export const CustomDateInput: React.FC<CustomDateInputProps> = ({ name, value, onChange, setError, onBlur, errorString }) => {
     const [manualInput, setManualInput] = useState<string>("");
     const textInputRef = useRef<HTMLInputElement>(null);
-
+    const {setIsInputInFocus} = useGeneralDataContext();
     useEffect(() => {
         setManualInput(value ? DateTime.fromISO(value).toFormat("dd.LLL.yy") : "");
     }, [value]);
@@ -47,7 +48,7 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({ name, value, o
 
     const handleBlur = () => {
         const parsedDate = DateTime.fromFormat(manualInput, "dd.LLL.yy");
-
+        setIsInputInFocus(false);
         if (!manualInput) {
             return setError(undefined);
         }
@@ -75,6 +76,7 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({ name, value, o
                 name={`${name}`}
                 value={manualInput}
                 onChange={handleInputChange}
+                onFocus={()=>setIsInputInFocus(true)}
                 onBlur={handleBlur}
                 placeholder="dd/Mon/yr"
                 className="h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-r-0 border-gray-300 outline-none"

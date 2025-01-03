@@ -279,7 +279,11 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 					name="hours"
 					value={formik.values.hours}
 					onChange={formik.handleChange}
-					onBlur={formik.handleBlur}
+					onFocus={()=>setIsInputInFocus(true)}
+					onBlur={(e)=> {
+						setIsInputInFocus(false)
+						formik.handleBlur(e)
+					}}
 					className="h-6 px-2 text-tiny shadow-top-input-shadow font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none  text-contrastBlue max-w-[370px]"
 					placeholder="Hours"
 				/>

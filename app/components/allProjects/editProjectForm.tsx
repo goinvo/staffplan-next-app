@@ -14,19 +14,17 @@ import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
 import CustomDateInput from "../customDateInput";
 import { ARCHIVED_PROJECT_WARNING } from "../constants/archivedStatusStrings";
+import { set } from "lodash";
 
 interface EditFormProps {
 	onClose?: () => void;
 }
 
 const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
-	const { refetchClientList, clientList } = useClientDataContext()
-
-	const {
-		projectList,
-		refetchProjectList,
-	} = useProjectsDataContext();
-	const { showArchivedProjects } = useGeneralDataContext()
+	const { refetchClientList, clientList } = useClientDataContext();
+	const { setIsInputInFocus } = useGeneralDataContext();
+	const { projectList, refetchProjectList } = useProjectsDataContext();
+	const { showArchivedProjects } = useGeneralDataContext();
 	const params = useParams();
 	const router = useRouter();
 	const selectedProjectId = decodeURIComponent(params.projectId.toString());
@@ -38,7 +36,9 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		if (!values.clientName) errors.clientName = "Client is required";
 		if (!values.projectName) errors.projectName = "Project name is required";
 
-		const currentClient = clientList.find((client: ClientType) => client.name === values.clientName);
+		const currentClient = clientList.find(
+			(client: ClientType) => client.name === values.clientName
+		);
 		if (values.projectName && currentClient) {
 			const projectNameExists = projectList.find(
 				(project: ProjectType) =>
@@ -52,7 +52,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		}
 
 		return errors;
-	}
+	};
 
 	const {
 		name,
@@ -67,21 +67,23 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		cost,
 	} = selectedProject as ProjectType;
 	const [archivedStatus, setArchivedStatus] = useState(status === "archived");
-	const [isArchiveProject, setIsArchiveProject] = useState(status === "archived");
+	const [isArchiveProject, setIsArchiveProject] = useState(
+		status === "archived"
+	);
 	const [showTooltip, setShowTooltip] = useState(false);
 	const [previousStatus] = useState(status);
 	const [showNewClientModal, setShowNewClientModal] = useState<boolean>(false);
 	const clientInputRef = useRef<HTMLInputElement>(null);
 
 	const [upsertProjectWithInput] = useMutation(UPSERT_PROJECT_WITH_INPUT, {
-    errorPolicy: "all",
-    onCompleted({ upsertProjectWithInput }) {
-      refetchProjectList();
-      if (isArchiveProject && !showArchivedProjects) {
-        router.push("/projects");
-      }
-    },
-  });
+		errorPolicy: "all",
+		onCompleted({ upsertProjectWithInput }) {
+			refetchProjectList();
+			if (isArchiveProject && !showArchivedProjects) {
+				router.push("/projects");
+			}
+		},
+	});
 	const [
 		upsertClient,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
@@ -105,8 +107,10 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		};
 	}, [onClose]);
 
-	const startsOnDefaultValue = startsOn || DateTime.now().toISODate()
-	const endsOnDateDefaultValue = DateTime.fromISO(startsOnDefaultValue).plus({ months: 3 }).toISODate()
+	const startsOnDefaultValue = startsOn || DateTime.now().toISODate();
+	const endsOnDateDefaultValue = DateTime.fromISO(startsOnDefaultValue)
+		.plus({ months: 3 })
+		.toISODate();
 	const formik = useFormik({
 		initialValues: {
 			projectName: name || "",
@@ -114,8 +118,8 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 			clientId: clientId,
 			budget: "",
 			hours: hours,
-			startsOn: startsOn || '',
-			endsOn: endsOn || '',
+			startsOn: startsOn || "",
+			endsOn: endsOn || "",
 			projectStatus: status,
 			rateType: rateType ? rateType : "fixed",
 			hourlyRate: hourlyRate && hourlyRate > 0 ? hourlyRate : 0,
@@ -135,21 +139,21 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 				clientId = data?.upsertClient?.id;
 			}
 			const input = {
-        id: id,
-        clientId: clientId,
-        name: values.projectName,
-        hours: +values.hours,
-        startsOn: values.startsOn || null,
-        endsOn: values.endsOn || null,
-        status: values.projectStatus,
-        rateType: values.rateType,
-        hourlyRate: values.hourlyRate,
-        cost: values.cost,
+				id: id,
+				clientId: clientId,
+				name: values.projectName,
+				hours: +values.hours,
+				startsOn: values.startsOn || null,
+				endsOn: values.endsOn || null,
+				status: values.projectStatus,
+				rateType: values.rateType,
+				hourlyRate: values.hourlyRate,
+				cost: values.cost,
 			};
 
-      await upsertProjectWithInput({
-        variables: { input },
-      });
+			await upsertProjectWithInput({
+				variables: { input },
+			});
 
 			onClose?.();
 		},
@@ -169,8 +173,8 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		const newStatus = !archivedStatus
 			? "archived"
 			: previousStatus !== "archived"
-				? previousStatus
-				: "unconfirmed";
+			? previousStatus
+			: "unconfirmed";
 		formik.setFieldValue("projectStatus", newStatus, false);
 		if (!archivedStatus) {
 			setShowTooltip(true);
@@ -183,12 +187,12 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		setIsArchiveProject(isChecked);
 
 		const newStatus = !isArchiveProject
-      ? "archived"
-      : previousStatus !== "archived"
-      ? previousStatus
-      : "unconfirmed";
+			? "archived"
+			: previousStatus !== "archived"
+			? previousStatus
+			: "unconfirmed";
 		formik.setFieldValue("projectStatus", newStatus, false);
-  };
+	};
 
 	const handleClientSelect = (client: ClientType) => {
 		formik.setFieldValue("clientName", client.name);
@@ -243,12 +247,18 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					name="projectName"
 					value={formik.values.projectName}
 					onChange={formik.handleChange}
-					onBlur={formik.handleBlur}
+					onFocus={() => setIsInputInFocus(true)}
+					onBlur={(e) => {
+						setIsInputInFocus(false);
+						formik.handleBlur(e);
+					}}
 					className="h-10 px-2 rounded-sm shadow-top-input-shadow focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-huge w-full"
 					placeholder="Project Name"
 				/>
 				{formik.touched.projectName && formik.errors.projectName ? (
-					<p className="pl-2 text-2xs text-left font-normal text-red-500">{formik.errors.projectName}</p>
+					<p className="pl-2 text-2xs text-left font-normal text-red-500">
+						{formik.errors.projectName}
+					</p>
 				) : null}
 			</div>
 			<div className="flex flex-col items-start space-x-0.5 w-full">
@@ -274,7 +284,9 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					/>
 				</div>
 				{formik.touched.clientName && formik.errors.clientName ? (
-					<p className="pl-14 text-2xs text-left font-normal text-red-500">{formik.errors.clientName}</p>
+					<p className="pl-14 text-2xs text-left font-normal text-red-500">
+						{formik.errors.clientName}
+					</p>
 				) : null}
 			</div>
 			<div className="flex items-center space-x-0.5 w-full">
@@ -312,7 +324,11 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 						name="hours"
 						value={formik.values.hours}
 						onChange={formik.handleChange}
-						onBlur={formik.handleBlur}
+						onFocus={() => setIsInputInFocus(true)}
+						onBlur={(e) => {
+							setIsInputInFocus(false);
+							formik.handleBlur(e);
+						}}
 						id="hours"
 						className="h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none"
 						placeholder="Hours"
@@ -341,7 +357,6 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 							setError={(error) => formik.setFieldError("startsOn", error)}
 						/>
 					</div>
-
 				</div>
 				<div className="flex items-center space-x-1 flex-grow">
 					<label
@@ -364,19 +379,27 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					</div>
 				</div>
 			</div>
-			{formik.errors.endsOn && <p className="pl-2 text-2xs text-left font-normal text-red-500">{formik.errors.endsOn}</p>}
-			{formik.errors.startsOn && <p className="pl-2 text-2xs text-left font-normal text-red-500">{formik.errors.startsOn}</p>}
+			{formik.errors.endsOn && (
+				<p className="pl-2 text-2xs text-left font-normal text-red-500">
+					{formik.errors.endsOn}
+				</p>
+			)}
+			{formik.errors.startsOn && (
+				<p className="pl-2 text-2xs text-left font-normal text-red-500">
+					{formik.errors.startsOn}
+				</p>
+			)}
 			<label className="flex items-center justify-between space-x-0.5 cursor-pointer w-[208px]">
-        <input
-          type="checkbox"
-          checked={isArchiveProject}
-          onChange={handleCheckboxChange}
-          className="form-checkbox h-[11px] w-[11px] rounded-sm text-tiffany !ring-0 !ring-offset-0"
-        />
-        <span className="text-sm leading-[18px] text-white font-normal">
-          Archive project for everyone?
-        </span>
-      </label>
+				<input
+					type="checkbox"
+					checked={isArchiveProject}
+					onChange={handleCheckboxChange}
+					className="form-checkbox h-[11px] w-[11px] rounded-sm text-tiffany !ring-0 !ring-offset-0"
+				/>
+				<span className="text-sm leading-[18px] text-white font-normal">
+					Archive project for everyone?
+				</span>
+			</label>
 			<div className="flex items-center justify-between space-x-8 w-full border-t border-gray-600 py-2">
 				{/* <div className="relative flex items-center">
 					<span
@@ -408,39 +431,38 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					</button>
 				</div>
 			</div>
-			{
-				showNewClientModal && (
-					<div className="fixed inset-0 font-normal bg-gray-800 bg-opacity-50 flex justify-center items-center z-10">
-						<div className="bg-white p-6 rounded-md shadow-md">
-							<p className="mb-4">
-								Is &quot;{formik.values.clientName}&quot; a new client?
-							</p>
-							<div className="flex justify-center">
-								<button
-									className="mr-2 px-4 py-2 text-tiny font-bold bg-tiffany hover:bg-accentgreen rounded-sm text-white"
-									onClick={() => setShowNewClientModal(false)}
-								>
-									Yes
-								</button>
-								<button
-									className="px-4 py-2 text-tiny font-bold bg-contrastGrey hover:bg-contrastBlue rounded-sm text-white"
-									onClick={() => handleNewClientCancel()}
-								>
-									No
-								</button>
-							</div>
+			{showNewClientModal && (
+				<div className="fixed inset-0 font-normal bg-gray-800 bg-opacity-50 flex justify-center items-center z-10">
+					<div className="bg-white p-6 rounded-md shadow-md">
+						<p className="mb-4">
+							Is &quot;{formik.values.clientName}&quot; a new client?
+						</p>
+						<div className="flex justify-center">
+							<button
+								className="mr-2 px-4 py-2 text-tiny font-bold bg-tiffany hover:bg-accentgreen rounded-sm text-white"
+								onClick={() => setShowNewClientModal(false)}
+							>
+								Yes
+							</button>
+							<button
+								className="px-4 py-2 text-tiny font-bold bg-contrastGrey hover:bg-contrastBlue rounded-sm text-white"
+								onClick={() => handleNewClientCancel()}
+							>
+								No
+							</button>
 						</div>
 					</div>
-				)
-			}
-		</form >
+				</div>
+			)}
+		</form>
 	);
 };
 
 export default EditProjectForm;
 
 // temporary commented
-{/* <div className="flex flex-row justify-between mb-4 pb-2 border-b-4">
+{
+	/* <div className="flex flex-row justify-between mb-4 pb-2 border-b-4">
 				<div className="w-1/3 -mr-1 flex flex-col">
 					<div className="block flex items-center">
 						<input
@@ -528,4 +550,5 @@ export default EditProjectForm;
 				</div>
 				<div>
 				</div>
-			</div> */}
+			</div> */
+}
