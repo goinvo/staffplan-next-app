@@ -3,9 +3,7 @@
 import React from 'react';
 import { useFormik } from 'formik';
 import { useParams } from "next/navigation";
-
 import { IoCheckmarkCircle } from "react-icons/io5";
-
 import ImageUploader from '../imageUploader';
 import IconButton from '../iconButton';
 import { UserType } from '../../typeInterfaces'

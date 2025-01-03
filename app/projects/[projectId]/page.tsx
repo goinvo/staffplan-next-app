@@ -2,7 +2,6 @@
 import { useParams } from "next/navigation";
 import React, { useEffect, useCallback, useRef, useState } from "react";
 import withApollo from "@/lib/withApollo";
-
 import { useMutation } from "@apollo/client";
 import { UPSERT_ASSIGNMENT } from "../../gqlQueries";
 import { ProjectType, AssignmentType } from "../../typeInterfaces";

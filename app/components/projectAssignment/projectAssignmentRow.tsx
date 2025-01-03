@@ -12,7 +12,7 @@ import { WorkWeekInput } from "./workWeekInput";
 import { currentWeek, currentYear } from "../scrollingCalendar/helpers";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
-import { UNDO_ARCHIVED_OR_DELETED_PERSON, UNDO_DELETED_PERSON_TITLE } from "../constants/undoModifyStrings";
+import { UNDO_DELETED_PERSON_TITLE } from "../constants/undoModifyStrings";
 
 interface ProjectAssignmentRowProps {
 	project: ProjectType;

@@ -4,7 +4,6 @@ import React, { useState, useRef } from "react";
 import {  useRouter } from "next/navigation";
 import { useFormik, FormikValues } from "formik";
 import { useMutation } from "@apollo/client";
-
 import { UPSERT_PROJECT, UPSERT_CLIENT } from "@/app/gqlQueries";
 import { ClientType, ProjectType } from "../typeInterfaces";
 import { AutocompleteInput } from "./autocompleteInput";

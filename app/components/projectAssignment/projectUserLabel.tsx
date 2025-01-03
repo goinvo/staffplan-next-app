@@ -1,6 +1,5 @@
-'use client'
+'use client';
 import Image from "next/image";
-import React from "react";
 
 import { DELETE_ASSIGNMENT, UPSERT_ASSIGNMENT } from "../../gqlQueries";
 import { ProjectLabelProps } from "@/app/typeInterfaces";
@@ -8,7 +7,6 @@ import { AddPersonInline } from "../addPersonInline";
 import { useMutation } from "@apollo/client";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import EllipsisDropdownMenu from "../ellipsisDropdownMenu";
-import EditAssignmentModal from "../userAssignment/editAssignmentModal";
 import { useModal } from "@/app/contexts/modalContext";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
 import { useUserDataContext } from "@/app/contexts/userDataContext";

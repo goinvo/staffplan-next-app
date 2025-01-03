@@ -1,7 +1,6 @@
 "use client";
-import React, { BaseSyntheticEvent, Fragment, useState, RefObject, useCallback } from "react";
+import { BaseSyntheticEvent, Fragment, useState, RefObject, useCallback } from "react";
 import { Menu, MenuItem, MenuButton, MenuItems, Transition } from "@headlessui/react";
-
 import { UPSERT_PROJECT } from "../gqlQueries";
 import { useApolloClient, useMutation } from "@apollo/client";
 import { useRouter } from "next/navigation";

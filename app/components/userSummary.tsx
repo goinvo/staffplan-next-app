@@ -1,6 +1,5 @@
 'use client'
 import React, { useState } from "react";
-
 import { UserSummaryProps } from "../typeInterfaces";
 import { useGeneralDataContext } from '../contexts/generalContext';
 import { calculatePlanFromToday } from "./scrollingCalendar/helpers";

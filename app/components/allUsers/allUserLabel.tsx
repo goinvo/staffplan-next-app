@@ -1,7 +1,5 @@
 import Image from "next/image";
-import React from "react";
 import { AllUserLabelProps } from "../../typeInterfaces";
-import EllipsisPeopleMenu from "../ellipsisPeopleMenu";
 
 export const AllUserLabel = ({ user, clickHandler }: AllUserLabelProps) => {
 	return (

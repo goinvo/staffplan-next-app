@@ -2,7 +2,6 @@
 
 import React, { useState, useRef } from "react";
 import { useFormik } from 'formik';
-
 import { ClientType, UserType } from "@/app/typeInterfaces";
 import { AutocompleteInput } from "./autocompleteInput";
 import { useMutation } from "@apollo/client";

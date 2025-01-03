@@ -1,5 +1,4 @@
-"use client";
-
+"use client";;
 import React, { useState, useRef, useEffect } from "react";
 import { FormikValues, useFormik } from "formik";
 import { useParams, useRouter } from "next/navigation";
@@ -13,8 +12,6 @@ import { useClientDataContext } from "@/app/contexts/clientContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
 import CustomDateInput from "../customDateInput";
-import { ARCHIVED_PROJECT_WARNING } from "../constants/archivedStatusStrings";
-import { set } from "lodash";
 
 interface EditFormProps {
 	onClose?: () => void;

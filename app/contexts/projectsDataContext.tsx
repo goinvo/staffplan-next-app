@@ -1,10 +1,9 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from "react";
 import { useApolloClient, useQuery } from "@apollo/client";
-
 import { ProjectType, AssignmentType, UndoableModifiedProject } from "../typeInterfaces";
 import { GET_ALL_PROJECTS_DATA } from "../gqlQueries";
-import { sortProjectList, sortProjectListByOrder, sortSingleProject, sortSingleProjectByOrder } from "../helperFunctions";
+import { sortProjectListByOrder, sortSingleProjectByOrder } from "../helperFunctions";
 import { useGeneralDataContext } from "./generalContext";
 import { useTaskQueue } from "../hooks/useTaskQueue";
 import useBeforeUnload from "../hooks/useBeforeUnload";

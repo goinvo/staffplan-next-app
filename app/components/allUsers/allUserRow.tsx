@@ -6,13 +6,9 @@ import {
 	AllUserRowProps,
 } from "@/app/typeInterfaces";
 
-import React from "react";
-import { ArchiveBoxIcon } from "@heroicons/react/24/outline";
-
 import { AllUserLabel } from "./allUserLabel";
 import ColumnChart from "../columnChart";
 import { calculateTotalHoursPerWeek, currentYear, currentWeek, isBeforeWeek } from "../scrollingCalendar/helpers";
-import IconButton from "../iconButton";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
 
 export const AllUserRow = ({

@@ -1,9 +1,6 @@
-import React from "react";
 import { useRouter } from "next/navigation";
-import { PlusIcon } from "@heroicons/react/24/solid";
 import { AllProjectLabelProps } from "../../typeInterfaces";
 import EllipsisProjectMenu from "../ellipsisProjectMenu";
-import IconButton from "../iconButton";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 
 export const AllProjectLabel = ({

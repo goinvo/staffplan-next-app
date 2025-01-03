@@ -1,7 +1,6 @@
 // components/ActionBar.tsx
 import React from "react";
 import AddDropdown from "./addDropdown";
-import { FaSortAmountDown, FaExpand, FaFilter, FaSearch } from "react-icons/fa";
 import ViewsMenu from "./viewsMenu/viewsMenu";
 import Image from "next/image";
 import { useParams } from "next/navigation";

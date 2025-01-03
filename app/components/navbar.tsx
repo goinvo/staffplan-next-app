@@ -1,15 +1,12 @@
-"use client";
-
+"use client";;
 import React from "react";
 import Link from "next/link";
 import { FaSquarePlus } from "react-icons/fa6";
 import { usePathname } from "next/navigation";
 import { LoadingSpinner } from "./loadingSpinner";
-
 import IconButton from "./iconButton";
 import NewPersonAndProjectModal from "./newPersonAndProjectModal";
 import { useModal } from "../contexts/modalContext";
-import AirTableFormModal from "./airTableFormModal";
 import { useGeneralDataContext } from "../contexts/generalContext";
 import EllipsisDropdownMenu from "./ellipsisDropdownMenu";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";

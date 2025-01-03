@@ -1,4 +1,4 @@
-"use client";
+"use client";;
 import { useRouter } from "next/navigation";
 import { useParams, usePathname } from "next/navigation";
 import React, { useEffect, useState, useRef } from "react";
@@ -7,7 +7,6 @@ import { AssignmentType } from "../../typeInterfaces";
 import { LoadingSpinner } from "@/app/components/loadingSpinner";
 import { ScrollingCalendar } from "@/app/components/scrollingCalendar/scrollingCalendar";
 import { UserAssignmentRow } from "@/app/components/userAssignment/userAssignmentRow";
-import AddInlineProject from "@/app/components/addInlineProject";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
 import ApproveHours from "@/app/components/userAssignment/approveHours";

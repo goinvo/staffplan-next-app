@@ -4,7 +4,7 @@ import { useApolloClient, useQuery } from "@apollo/client";
 import { UserType, AssignmentType, UndoableModifiedAssignment } from "../typeInterfaces";
 import { SORT_ORDER } from "../components/scrollingCalendar/constants";
 import { GET_USER_LIST } from "../gqlQueries";
-import { sortSingleUser, sortSingleUserByOrder, sortUserList, sortUserListByOrder } from "../helperFunctions";
+import { sortSingleUserByOrder, sortUserListByOrder } from "../helperFunctions";
 import { useGeneralDataContext } from "./generalContext";
 import { useTaskQueue } from '../hooks/useTaskQueue'
 import useBeforeUnload from "../hooks/useBeforeUnload";

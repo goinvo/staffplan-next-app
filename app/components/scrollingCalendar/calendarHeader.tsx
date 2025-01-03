@@ -3,16 +3,13 @@ import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { usePathname, useSearchParams } from "next/navigation";
-
 import { SlPencil } from "react-icons/sl";
 import { RxArrowLeft } from "react-icons/rx";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { PlusIcon } from "@heroicons/react/24/outline";
-
 import ColumnChart from "../columnChart";
 import IconButton from "../iconButton";
-
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { useUserDataContext } from "@/app/contexts/userDataContext";

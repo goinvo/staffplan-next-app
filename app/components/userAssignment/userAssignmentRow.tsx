@@ -1,9 +1,7 @@
-'use client'
-
+'use client';
 import React, { useState, useRef, useEffect } from "react";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
-
 import UserSummary from "../userSummary";
 import { UserLabel } from "./userLabel";
 import { WorkWeekInput } from "./workWeekInput";
@@ -17,7 +15,6 @@ import { useUserDataContext } from "@/app/contexts/userDataContext";
 import UndoRow from "../undoRow";
 import { UNDO_ARCHIVED_OR_DELETED_PROJECT } from "../constants/undoModifyStrings";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
-import { mergeClasses } from "@/app/helperFunctions";
 
 interface UserAssignmentRowProps {
 	assignment: AssignmentType;

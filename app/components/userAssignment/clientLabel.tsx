@@ -1,9 +1,5 @@
-'use client'
-import React from "react";
-
-import { PlusIcon } from "@heroicons/react/24/solid";
+'use client';
 import { AssignmentType, ClientType, UserType } from "../../typeInterfaces";
-import IconButton from "../iconButton";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { sortSingleUserByOrder } from "@/app/helperFunctions";
 

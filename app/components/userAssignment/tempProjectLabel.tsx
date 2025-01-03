@@ -3,7 +3,6 @@
 import React, { useMemo } from "react";
 import { useMutation } from "@apollo/client";
 import { useFormik } from "formik";
-
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { UPSERT_PROJECT, UPSERT_ASSIGNMENT } from "@/app/gqlQueries";

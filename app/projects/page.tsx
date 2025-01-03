@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-
 import { ProjectType } from "../typeInterfaces";
 import { LoadingSpinner } from "../components/loadingSpinner";
 import { ScrollingCalendar } from "../components/scrollingCalendar/scrollingCalendar";

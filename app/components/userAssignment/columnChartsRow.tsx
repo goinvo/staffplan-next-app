@@ -2,10 +2,8 @@
 
 import React from "react";
 import { MonthsDataType, AssignmentType } from "@/app/typeInterfaces";
-
 import { calculateTotalHoursPerWeek, getWeeksPerScreen, isBeforeWeek } from "../scrollingCalendar/helpers";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
-
 import ColumnChart from "../columnChart";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
 import useDynamicWeeks from "@/app/hooks/useDynamicWeeks";
