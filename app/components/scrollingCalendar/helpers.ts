@@ -198,7 +198,7 @@ export const calculateTotalHoursPerWeek = (
   let maxProposedActualHours = 0;
   let maxProposedEstimatedHours = 0;
 
-  months.forEach((month) => {
+  months?.forEach((month) => {
     month.weeks.forEach((week) => {
       const key = `${month.year}-${week.weekNumberOfTheYear}`;
       totalActualHours[key] = totalActualHours[key] || 0;
@@ -364,6 +364,7 @@ export const getEndDateInterval = (
 export const getWeeksPerScreen = (startDate: string, amountOfWeeks: number) => {
   if (!startDate) return [];
   const start = DateTime.fromISO(startDate);
+
   // Cause on initial screen load we start from previous week date
   if (amountOfWeeks === 1) {
     const nextMonday = DateTime.fromISO(startDate)
@@ -385,20 +386,22 @@ export const getWeeksPerScreen = (startDate: string, amountOfWeeks: number) => {
           {
             weekNumberOfTheYear,
             weekNumberOfTheMonth,
+            weekStartDate: nextMonday.day,
           },
         ],
       },
     ];
   }
+
   const endDateString = getEndDateInterval(startDate, amountOfWeeks);
   if (!endDateString) return [];
-
   const end = DateTime.fromISO(endDateString);
 
   const weeksByMonthMap: {
     [key: string]: {
       weekNumberOfTheYear: number;
       weekNumberOfTheMonth: number;
+      weekStartDate: number; 
     }[];
   } = {};
 
@@ -409,20 +412,24 @@ export const getWeeksPerScreen = (startDate: string, amountOfWeeks: number) => {
 
       const weekNumberOfTheYear = day.weekNumber;
       const weekNumberOfTheMonth = Math.ceil(day.day / 7);
+      const weekStartDate = day.day; 
 
       if (day.month === 12 && weekNumberOfTheYear === 1) {
         weeksByMonthMap[month].push({
           weekNumberOfTheYear: 53,
           weekNumberOfTheMonth,
+          weekStartDate,
         });
       } else {
         weeksByMonthMap[month].push({
           weekNumberOfTheYear,
           weekNumberOfTheMonth,
+          weekStartDate,
         });
       }
     }
   }
+
   const weeksByMonth = Object.keys(weeksByMonthMap).map((month) => {
     const [monthName, year] = month.split(" ");
     return {
@@ -434,6 +441,7 @@ export const getWeeksPerScreen = (startDate: string, amountOfWeeks: number) => {
 
   return weeksByMonth;
 };
+
 
 export const getPrevWeeksPerView = (months: MonthsDataType[]): string => {
   let amountOfWeeks = 0;

@@ -12,7 +12,7 @@ import { WorkWeekInput } from "./workWeekInput";
 import { currentWeek, currentYear } from "../scrollingCalendar/helpers";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
-import { UNDO_ARCHIVED_OR_DELETED_PERSON } from "../constants/undoModifyStrings";
+import { UNDO_ARCHIVED_OR_DELETED_PERSON, UNDO_DELETED_PERSON_TITLE } from "../constants/undoModifyStrings";
 
 interface ProjectAssignmentRowProps {
 	project: ProjectType;
@@ -78,9 +78,10 @@ export const ProjectAssignmentRow = ({
 
 
 	if (showUndoRow && (isModifiedAssignment(assignment.id))) {
+		const name = assignment.assignedUser ? assignment.assignedUser.name.split(' ')[0] : "person"
 		return (
 			<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.id}`}>
-				<UndoRow onClick={handleUndoModifyAssignment} text={UNDO_ARCHIVED_OR_DELETED_PERSON} />
+				<UndoRow onClick={handleUndoModifyAssignment} title={UNDO_DELETED_PERSON_TITLE.replace("{name}",name)}/>
 			</tr>
 		)
 	}
@@ -108,7 +109,7 @@ export const ProjectAssignmentRow = ({
 					const isCurrentWeek = currentWeek === week.weekNumberOfTheYear && currentYear === month.year
 					return (
 						<td key={`${month.monthLabel}-${week.weekNumberOfTheYear}-${monthIndex}`}
-							className={`relative px-1 min-h-[100px] py-1 font-normal ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year && 'bg-selectedColumnBg'}`}
+							className={`relative px-1 py-1 font-normal ${currentWeek === week.weekNumberOfTheYear && currentYear === month.year && 'bg-selectedColumnBg'}`}
 						>
 							<div
 								className={`flex flex-col sm:justify-normal justify-center h-full sm:space-y-3 ${isCurrentWeek ? 'font-bold' : 'font-normal'}`}>

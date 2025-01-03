@@ -14,15 +14,25 @@ import {
 } from "../components/scrollingCalendar/helpers";
 
 export interface GeneralDataContextType {
+    headerTitleWidth: number | null;
     dateRange: string;
+    isAddNewProject: boolean;
     viewer: ViewerType | null;
     showSummaries: boolean;
+    isInputInFocus: boolean;
+    isFirstShowArchivedProjects: boolean;
+    isFirstHideArchivedProjects: boolean;
     showArchivedProjects: boolean;
     showInactiveUsers: boolean;
     showArchivedAssignments: boolean;
     rollupSort: string;
     assignmentSort: string;
+    setHeaderTitleWidth: React.Dispatch<React.SetStateAction<number | null>>;
+    setIsAddNewProject: React.Dispatch<React.SetStateAction<boolean>>;
     setShowSummaries: React.Dispatch<React.SetStateAction<boolean>>;
+    setIsInputInFocus: React.Dispatch<React.SetStateAction<boolean>>;
+    setIsFirstShowArchivedProjects: React.Dispatch<React.SetStateAction<boolean>>
+    setIsFirstHideArchivedProjects: React.Dispatch<React.SetStateAction<boolean>>
     setShowArchivedProjects: React.Dispatch<React.SetStateAction<boolean>>;
     setShowInactiveUsers: React.Dispatch<React.SetStateAction<boolean>>;
     setShowArchivedAssignments: React.Dispatch<React.SetStateAction<boolean>>;
@@ -52,11 +62,16 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
     children,
 }) => {
     const isClient = typeof window !== "undefined";
+    const [headerTitleWidth, setHeaderTitleWidth] = useState<number | null>(null);
     const [dateRange, setDateRange] = useState<string>(
         getStartOfPreviousWeek()
     );
+    const [isAddNewProject, setIsAddNewProject] = useState(false)
     const [viewer, setViewer] = useState<ViewerType | null>(null);
     const [showSummaries, setShowSummaries] = useState<boolean>(true);
+    const [isInputInFocus, setIsInputInFocus] = useState<boolean>(false);
+    const [isFirstShowArchivedProjects, setIsFirstShowArchivedProjects] = useState<boolean>(false);
+    const [isFirstHideArchivedProjects, setIsFirstHideArchivedProjects] = useState<boolean>(false);
     const [showArchivedProjects, setShowArchivedProjects] = useState<boolean>(false);
     const [showInactiveUsers, setShowInactiveUsers] = useState<boolean>(false);
     const [showArchivedAssignments, setShowArchivedAssignments] = useState<boolean>(false);
@@ -88,19 +103,28 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
         }
     }, [viewerData]);
 
-
     return (
         <GeneralDataContext.Provider
             value={{
+                headerTitleWidth,
+                isAddNewProject,
                 viewer,
                 dateRange,
                 showSummaries,
+                isInputInFocus,
+                isFirstShowArchivedProjects,
+                isFirstHideArchivedProjects,
                 showArchivedProjects,
                 showInactiveUsers,
                 showArchivedAssignments,
                 rollupSort,
                 assignmentSort,
+                setHeaderTitleWidth,
+                setIsAddNewProject,
                 setShowSummaries,
+                setIsInputInFocus,
+                setIsFirstShowArchivedProjects,
+                setIsFirstHideArchivedProjects,
                 setShowArchivedProjects,
                 setShowInactiveUsers,
                 setShowArchivedAssignments,

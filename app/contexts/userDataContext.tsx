@@ -17,6 +17,7 @@ type EnqueueTimerParams = {
     finalApiCall?: () => void;
 };
 export interface UserDataContextType {
+    newProjectAssignmentId: number | null;
     userList: UserType[] | [];
     singleUserPage: UserType | null;
     sortOrder: SORT_ORDER;
@@ -24,6 +25,7 @@ export interface UserDataContextType {
     viewsFilterPeople: string;
     viewsFilterSingleUser: string;
     assignmentsWithUndoActions: UndoableModifiedAssignment[]
+    setNewProjectAssignmentId: React.Dispatch<React.SetStateAction<number | null>>;
     undoModifyAssignment: (assignmentId: number) => void;
     setViewsFilterSingleUser: React.Dispatch<React.SetStateAction<string>>;
     setUserList: React.Dispatch<React.SetStateAction<UserType[] | []>>;
@@ -32,6 +34,7 @@ export interface UserDataContextType {
     setViewsFilterPeople: React.Dispatch<React.SetStateAction<string>>;
     setSingleUserPage: React.Dispatch<React.SetStateAction<UserType | null>>;
     refetchUserList: () => void;
+    sortUserList: (sorting: SORT_ORDER) => void;
     setSelectedUserData: (id: number) => void;
     handleFinalDelete: (assignment: AssignmentType) => void;
     enqueueTimer: (params: EnqueueTimerParams) => void;
@@ -51,6 +54,7 @@ export const useUserDataContext = () => {
 export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: any }> = ({ children }) => {
     const client = useApolloClient();
     const isClient = typeof window !== "undefined";
+    const [newProjectAssignmentId, setNewProjectAssignmentId] = useState<number | null>(null);
     const [userList, setUserList] = useState<UserType[] | []>([]);
     const [singleUserPage, setSingleUserPage] = useState<UserType | null>(null);
     const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASC);
@@ -59,7 +63,7 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
     const [viewsFilterSingleUser, setViewsFilterSingleUser] = useState("byClient");
     const [assignmentsWithUndoActions, setAssignmentsWithUndoActions] = useState<UndoableModifiedAssignment[]>([]);
     const { enqueueTask } = useTaskQueue();
-    const { showArchivedProjects } = useGeneralDataContext();
+    const { showArchivedAssignments, viewer } = useGeneralDataContext();
 
     const { loading: userListLoading, error: userListError, data: userListData } = useQuery(GET_USER_LIST, {
         context: { headers: { cookie: isClient ? document.cookie : null } },
@@ -68,19 +72,24 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
     });
 
     useEffect(() => {
-      if (userListData) {
+        if (userListData) {
         const sortedUserList = sortUserListByOrder(sortOrder, userListData.currentCompany.users);
         setUserList(sortedUserList);
       }
-    }, [userListData, sortOrder]);
+    }, [userListData]);
+
+    const sortUserList = (sorting: SORT_ORDER) => {
+        const sortedUserList = sortUserListByOrder(sorting, userListData.currentCompany.users);
+        setUserList(sortedUserList);
+    }
 
     const refetchUserList = useCallback(() => {
         client.query({ query: GET_USER_LIST, context: { headers: { cookie: isClient ? document.cookie : null } }, errorPolicy: "all" })
             .then((result) => {
-                const sortedUserList = sortUserList(viewsFilterPeople, result.data.currentCompany.users);
+                const sortedUserList = sortUserListByOrder(sortOrder, result.data.currentCompany.users);
                 setUserList(sortedUserList);
             });
-    }, [client, viewsFilterPeople]);
+    }, [client]);
 
     const setSelectedUserData = useCallback(
         (newSelectedId: number) => {
@@ -88,13 +97,21 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
             const selectedUser = userList.find((user) => user.id?.toString() === newSelectedId.toString());
             if (!selectedUser) return;
 
-            const filteredAssignments = showArchivedProjects
-                ? selectedUser.assignments
-                : selectedUser.assignments.filter((a) => a.status !== "archived");
+            const newAssignment = newProjectAssignmentId ? selectedUser.assignments.filter(a => Number(a.project.id) === newProjectAssignmentId) : []
+            const assignmentsToSort = newProjectAssignmentId
+                ? selectedUser.assignments.filter((a) => Number(a.project.id) !== newProjectAssignmentId)
+                : selectedUser.assignments;
 
-            setSingleUserPage(sortSingleUserByOrder(sortOrder, sortBy, { ...selectedUser, assignments: filteredAssignments }));
+            const filteredAssignments = showArchivedAssignments && viewer?.id.toString() === newSelectedId.toString()
+                ? assignmentsToSort
+                : assignmentsToSort.filter((a) => a.project.status !== "archived");
+
+            const singleUser = sortSingleUserByOrder(sortOrder, sortBy, { ...selectedUser, assignments: filteredAssignments })
+            const singleUserToSet = { ...singleUser, assignments: [...newAssignment, ...singleUser.assignments] };
+
+            setSingleUserPage(singleUserToSet);
         },
-        [userList, showArchivedProjects, sortOrder, sortBy]
+        [userList, showArchivedAssignments, sortOrder, sortBy]
     );
 
     // Clear timeouts for all undoable modification assignments
@@ -135,6 +152,7 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
     return (
         <UserDataContext.Provider
             value={{
+                newProjectAssignmentId,
                 userList,
                 singleUserPage,
                 sortOrder,
@@ -142,6 +160,7 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
                 viewsFilterPeople,
                 viewsFilterSingleUser,
                 assignmentsWithUndoActions,
+                setNewProjectAssignmentId,
                 handleFinalDelete,
                 undoModifyAssignment,
                 setViewsFilterSingleUser,
@@ -151,6 +170,7 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
                 setUserList,
                 setSingleUserPage,
                 refetchUserList,
+                sortUserList,
                 setSelectedUserData,
                 enqueueTimer,
             }}

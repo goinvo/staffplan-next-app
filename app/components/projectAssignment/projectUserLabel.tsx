@@ -145,7 +145,7 @@ export const ProjectUserLabel = ({
 					onClick={handleDeleteAssignmentClick}
 					className="text-red-400 w-full block px-1 py-1 text-sm text-left"
 				>
-					Delete {assignment.assignedUser ? assignment.assignedUser.name : "person"} from project
+					Delete {assignment.assignedUser ? assignment.assignedUser.name.split(' ')[0] : "person"} from project
 				</button>
 			),
 			show: canDeleteAssignment,
@@ -153,17 +153,8 @@ export const ProjectUserLabel = ({
 	];
 
 	return (
-		<td className="px-0 pr-0 pt-2 pb-2 font-normal flex align-center sm:w-1/3 w-1/2">
+		<td className="px-0 pr-0 pt-2 pb-2 font-normal flex align-center sm:w-2/5 w-1/2">
 			<div className="flex flex-row justify-between sm:items-start items-center">
-			<div className="w-12 ml-auto sm:flex hidden">
-					{canDeleteAssignment && (
-						<EllipsisDropdownMenu
-							options={assignmentDropMenuOptions}
-							textColor={"actionbar-text-accent"}
-							menuPositioning="relative -top-2.5"
-						/>
-					)}
-				</div>
 				{isUserTBD && (
 					<AddPersonInline project={project} assignment={assignment} />
 				)}
@@ -191,10 +182,19 @@ export const ProjectUserLabel = ({
 						)}
 					</div>
 				</div>
+				<div className="w-12 ml-auto sm:flex hidden">
+					{canDeleteAssignment && (
+						<EllipsisDropdownMenu
+							options={assignmentDropMenuOptions}
+							textColor={"actionbar-text-accent"}
+							menuPositioning="relative -top-2.5"
+						/>
+					)}
+				</div>
 			</div>
 			<div className="text-contrastBlue sm:flex hidden flex-col space-y-3 ml-auto px-2 items-end max-w-[60px]">
 				<button className="pt-1 underline" onClick={onChangeStatusButtonClick}>
-					{assignment.status === "proposed" ? "Proposed" : "Signed"}
+					{assignment.status === "proposed" ? "Proposed" : "Plan"}
 				</button>
 				<div className="pt-2">Actual</div>
 			</div>

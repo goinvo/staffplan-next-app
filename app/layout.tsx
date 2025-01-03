@@ -8,6 +8,9 @@ const open_sans = Open_Sans({ subsets: ["latin"] });
 export const metadata: Metadata = {
 	title: "StaffPlan",
 	description: "StaffPlan",
+	icons: {
+    icon: '/favicon.png',
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

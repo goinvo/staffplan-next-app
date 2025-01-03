@@ -12,9 +12,18 @@ import { useModal } from "../contexts/modalContext";
 import AirTableFormModal from "./airTableFormModal";
 import { useGeneralDataContext } from "../contexts/generalContext";
 import EllipsisDropdownMenu from "./ellipsisDropdownMenu";
+import { useProjectsDataContext } from "../contexts/projectsDataContext";
+
+type Link = {
+  href: string;
+  label: string;
+  isActive: boolean | RegExpMatchArray | null;
+  onClick?: () => void;
+};
 
 const Navbar: React.FC = () => {
 	const { viewer } = useGeneralDataContext();
+	const { showOneClientProjects, setShowOneClientProjects } = useProjectsDataContext()
 	const fullPathName = usePathname();
 	const pathname = usePathname().split("/")[1];
 	const { openModal, closeModal } = useModal();
@@ -28,19 +37,27 @@ const Navbar: React.FC = () => {
 	const homepageUrl = process.env.NEXT_PUBLIC_NODE_ENV
 		? "http://localhost:3000"
 		: "https://app.staffplan.com";
-	const links = [
-		{
-			href: `/people/${myPlanUrl()}`,
-			label: "My StaffPlan",
-			isActive: myStaffPlanCheck,
-		},
-		{
-			href: "/people",
-			label: "People",
-			isActive: pathname === "people" && !myStaffPlanCheck,
-		},
-		{ href: "/projects", label: "Projects", isActive: pathname === "projects" },
-	];
+	const links: Link[] = [
+    {
+      href: `/people/${myPlanUrl()}`,
+      label: "My StaffPlan",
+      isActive: myStaffPlanCheck,
+    },
+    {
+      href: "/people",
+      label: "People",
+      isActive: pathname === "people" && !myStaffPlanCheck,
+    },
+    {
+      href: "/projects",
+      label: "Projects",
+      isActive: pathname === "projects",
+      ...(showOneClientProjects
+        ? { onClick: () => setShowOneClientProjects("") }
+        : {}),
+    },
+  ];
+	
 	const ellipsisDropdownMenuOptions = [
 		{
 			component: <Link href={"https://github.com/goinvo/staffplan-next-app"} className="px-4 py-2 block" rel="noopener noreferrer" target="_blank">{"Open Source"}</Link>,
@@ -66,6 +83,11 @@ const Navbar: React.FC = () => {
 							? "bg-contrastBlue"
 							: "hover:bg-contrastBlue"
 							}`}
+						onClick={() => {
+							if (link.onClick) {
+                link.onClick();
+              }
+						}}
 					>
 						{link.label}
 					</Link>
@@ -92,14 +114,23 @@ const Navbar: React.FC = () => {
 			</div> */}
 			<div className="flex items-center sm:space-x-4 py-4 sm:ml-2">
 				<div>
-					<button
-						className="sm:inline-flex hidden items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue"
-						onClick={() =>
-							openModal(<AirTableFormModal closeModal={closeModal} />)
-						}
-					>
-						Feedback
-					</button>
+					{/* Temporary commented */}
+          {/* <button
+            className="sm:inline-flex hidden items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue"
+            onClick={() =>
+              openModal(<AirTableFormModal closeModal={closeModal} />)
+            }
+          >
+            Feedback
+          </button> */}
+          <Link
+            href='mailto:staffplan@goinvo.com'
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sm:inline-flex hidden items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue"
+          >
+            Feedback
+          </Link>
 				</div>
 				<EllipsisDropdownMenu
 					options={ellipsisDropdownMenuOptions}

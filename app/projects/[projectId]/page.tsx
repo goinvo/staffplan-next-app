@@ -99,16 +99,26 @@ const ProjectPage: React.FC = () => {
 		const endDate = singleProjectPage?.endsOn ? DateTime.fromISO(singleProjectPage.endsOn) : null;
 
 		if (!startDate && !endDate) {
-			return 'Start Date - End Date';
+			return '';
 		}
 		const formattedStartDate = startDate?.toFormat('d.MMM')
 		const formattedEndDate = endDate?.toFormat('d.MMM')
 		const startYear = startDate?.year || ''
 		const endYear = endDate?.year || ''
-		if (startDate && startYear && startYear !== endYear) {
-			return `${formattedStartDate}.${startYear}-${formattedEndDate || 'End Date'} ${endYear}`;
+
+		if (startDate && !endDate) {
+			return `Starts ${formattedStartDate}.${startYear}`;
 		}
-		return `${formattedStartDate || 'Start Date'}-${formattedEndDate}.${endYear}`;
+
+		if (!startDate && endDate) {
+      return `Ends  ${formattedEndDate}.${endYear}`;
+    }
+
+		if (startYear !== endYear) {
+			return `${formattedStartDate}.${startYear} — ${formattedEndDate}.${endYear}`
+		}
+
+		return `${formattedStartDate} — ${formattedEndDate}.${endYear}`;
 	}
 
 
@@ -133,13 +143,14 @@ const ProjectPage: React.FC = () => {
 	}
 	const projectSummaryInfo = [
 		{ label: 'Target', value: singleProjectPage?.hours, show: !!singleProjectPage?.hours },
-		{ label: 'Plan', value: totalPlanPerProject + totalBurnedPerProject, show: true,tooltip: `Plan = Actual (${totalBurnedPerProject}) + Plan (${totalPlanPerProject})` },
+		{ label: 'Plan', value: totalPlanPerProject + totalBurnedPerProject, show: true,tooltip: `Plan = Future Plan (${totalPlanPerProject}) + Actual (${totalBurnedPerProject})` },
 		{ label: 'Actual', value: totalBurnedPerProject, show: true },
 		{ label: 'Delta', value: getDeltaValue(), show: !!singleProjectPage?.hours,
-			 tooltip: `Delta = Plan (${totalPlanPerProject}) + Actual (${totalBurnedPerProject}) - Target (${singleProjectPage?.hours})` 
+			 tooltip: `Delta = Future Plan (${totalPlanPerProject}) + Actual (${totalBurnedPerProject}) - Target (${singleProjectPage?.hours})` 
 			}
 	]
-	const projectInfoSubtitle = `${singleProjectPage?.client?.name}, budget, ${singleProjectPage?.hours || 0}h, ${selectedProjectDates()}`
+	const projectInfoSubtitle = `${singleProjectPage?.client?.name}, ${selectedProjectDates()}`.trimEnd().replace(/,$/, "")
+	const projectStatus = singleProjectPage?.status;
 	return (
     <>
       {singleProjectPage && projectList.length ? (
@@ -148,6 +159,7 @@ const ProjectPage: React.FC = () => {
             columnHeaderTitles={columnHeaderTitles}
             title={singleProjectPage.name}
             projectInfo={projectInfoSubtitle}
+            projectStatus={projectStatus}
             assignments={sortedSingleProjectAssignments || []}
             editable={true}
             draggableDates={true}

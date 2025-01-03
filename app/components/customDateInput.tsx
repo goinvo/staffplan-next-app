@@ -32,6 +32,10 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({ name, value, o
         const rawValue = e.target.value;
         setManualInput(rawValue);
 
+        if (!rawValue) {
+            onChange(rawValue);
+        }
+
         const parsedDate = DateTime.fromFormat(rawValue, "dd.LLL.yy");
 
         if (parsedDate.isValid) {
@@ -43,12 +47,26 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({ name, value, o
 
     const handleBlur = () => {
         const parsedDate = DateTime.fromFormat(manualInput, "dd.LLL.yy");
+
+        if (!manualInput) {
+            return setError(undefined);
+        }
         if (!parsedDate.isValid) {
             setError(errorString || 'Invalid Date');
         } else {
             setError(undefined);
         }
     };
+
+    const getCalendarValue = (): string => {
+      const parsedDate = DateTime.fromFormat(manualInput, "dd.LLL.yy");
+      if (parsedDate.isValid) {
+        return parsedDate.toISODate();
+      }
+
+      return '';
+    };
+
     return (
         <div className="relative flex items-center w-full px-0">
             <input
@@ -64,6 +82,7 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({ name, value, o
             <CalendarIcon className="absolute right-1 h-4 w-4 text-black" />
             <input
                 type="date"
+                value={getCalendarValue()}
                 onChange={handleDateChange}
                 className={`absolute top-0 pr-0 pl-0 opacity-0 right-0 w-1/4 h-full`}
             />

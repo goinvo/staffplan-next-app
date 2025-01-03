@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState, forwardRef } from "react";
+import React, { useState, forwardRef, useEffect } from "react";
+import { useGeneralDataContext } from "../contexts/generalContext";
 
 interface AutocompleteProps<T> {
     items: T[];
@@ -16,6 +17,8 @@ interface AutocompleteProps<T> {
     listClassName?: string;
     value: string;
     tabIndex?: number
+    isNewItem?: boolean
+    hasStatus?: string
 }
 
 export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<any>>(
@@ -32,11 +35,17 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<
         dropdownClassName = "",
         listClassName = "",
         value,
-        tabIndex
+        tabIndex,
+        isNewItem,
+        hasStatus
     }, ref) => {
         const [filteredItems, setFilteredItems] = useState<any[]>(items);
         const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
+        useEffect(() => {
+          setFilteredItems(items);
+        }, [items]);
+        const {setIsInputInFocus} = useGeneralDataContext();
         const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const inputValue = e.target.value.toLowerCase();
 
@@ -80,8 +89,14 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<
                     type="text"
                     name={inputName}
                     onChange={handleInputChange}
-                    onFocus={handleInputFocus}
-                    onBlur={handleBlur}
+                    onFocus={()=> {
+                        handleInputFocus()
+                        setIsInputInFocus(true)
+                    }}
+                    onBlur={(e) => {
+                        handleBlur(e)
+                        setIsInputInFocus(false)
+                    }}
                     autoComplete="off"
                     className={`px-2 text-tiny shadow-top-input-shadow rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-contrastBlue appearance-none ${inputClassName}`}
                     placeholder={placeholder}
@@ -101,6 +116,16 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<
                         ))}
                     </ul>
                 )}
+                {isNewItem &&
+                    <span className="absolute top-[5px] right-[3px] px-1 pt-[3px] pb-1 text-white text-xs leading-[12px] bg-[#AFB3BF] rounded-[3px]">
+                        new
+                    </span>
+                }
+                {hasStatus && 
+                    <span className="absolute top-[5px] right-[3px] px-1 pt-[3px] pb-1 text-white text-xs leading-[12px] bg-[#AFB3BF] rounded-[3px]">
+                        {hasStatus}
+                    </span>
+                }
             </div>
         );
     }

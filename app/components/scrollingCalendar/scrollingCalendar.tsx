@@ -21,10 +21,12 @@ interface ScrollingCalendarProps {
 	avatarUrl?: string;
 	userName?: string;
 	projectInfo?: string;
+	projectStatus?: string;
 	editable?: boolean;
 	draggableDates?: boolean;
 	projectSummaryInfo?: ProjectSummaryInfoItem[];
 	initialSorting: { title: string, sort: SORT_ORDER };
+	onClick?: () => void;
 }
 
 export const ScrollingCalendar = ({
@@ -35,10 +37,12 @@ export const ScrollingCalendar = ({
 	avatarUrl,
 	userName,
 	projectInfo,
+	projectStatus,
 	editable,
 	draggableDates,
 	projectSummaryInfo,
 	initialSorting,
+	onClick,
 }: ScrollingCalendarProps) => {
 	const [months, setMonths] = useState<MonthsDataType[]>([]);
 	const { dateRange, setDateRange } = useGeneralDataContext();
@@ -78,17 +82,23 @@ export const ScrollingCalendar = ({
 					userName={userName}
 					title={title}
 					projectInfo={projectInfo}
+					projectStatus={projectStatus}
 					editable={editable}
 					draggableDates={draggableDates}
 					projectSummaryInfo={projectSummaryInfo}
 					initialSorting={initialSorting}
+					onClick={onClick}
 				/>
 				<tbody>
-					{React.Children.map(children, (child) =>
-						React.cloneElement(child as React.ReactElement<any>, {
-							months,
-						})
-					)}
+					{React.Children.toArray(children).map((child) => {
+						if (React.isValidElement(child)) {
+							return React.cloneElement(child as React.ReactElement<any>, {
+                months,
+              });
+						}
+						return child;
+					})}
+
 				</tbody>
 			</table>
 		</div>

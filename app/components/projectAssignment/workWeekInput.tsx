@@ -10,6 +10,7 @@ import { CustomInput } from "../cutomInput";
 import { assignmentContainsCWeek, isPastOrCurrentWeek, filterWeeksForFillForward, getWeekNumbersPerScreen, currentWeek, currentYear, tabbingAndArrowNavigation, updateProjectAssignments, updateUserAssignments, updateOrInsertWorkWeek, updateOrInsertWorkWeekInProject } from "../scrollingCalendar/helpers";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
+import { useGeneralDataContext } from "@/app/contexts/generalContext";
 
 interface WorkWeekInputProps {
 	withinProjectDates?: boolean;
@@ -117,8 +118,8 @@ export const WorkWeekInput = ({
 	});
 
 	const { userList, setUserList } = useUserDataContext()
-
 	const { projectList, setProjectList } = useProjectsDataContext();
+	const { setIsInputInFocus } = useGeneralDataContext();
 
 	useEffect(() => {
 		const currentWeekExists = months?.some(month =>
@@ -173,7 +174,7 @@ export const WorkWeekInput = ({
 		};
 
 		const weekNumbersPerScreen = getWeekNumbersPerScreen(months)
-		const filteredWeeks = filterWeeksForFillForward(weekNumbersPerScreen, targetCweek, targetYear, targetMonth, assignment?.endsOn);
+		const filteredWeeks = filterWeeksForFillForward(weekNumbersPerScreen, targetCweek, targetYear, targetMonth, project?.endsOn);
 
 		variables.workWeeks = filteredWeeks.map(week => ({
 			cweek: week.cweek,
@@ -221,8 +222,10 @@ export const WorkWeekInput = ({
 							name="estimatedHours"
 							id={`estHours-${assignment?.id}-${cweek}-${year}`}
 							onChange={handleChange}
+							onFocus={() => setIsInputInFocus(true)}
 							onBlur={(e) => {
 								handleBlur("estimatedHours");
+								setIsInputInFocus(false);
 								if (dirty) {
 									upsertWorkWeekValues(values);
 								}
@@ -241,8 +244,10 @@ export const WorkWeekInput = ({
 							name="actualHours"
 							id={`actHours-${assignment?.id}-${cweek}-${year}`}
 							onChange={handleChange}
+							onFocus={() => setIsInputInFocus(true)}
 							onBlur={(e) => {
 								handleBlur("actualHours");
+								setIsInputInFocus(false);
 								if (dirty) {
 									upsertWorkWeekValues(values);
 								}
