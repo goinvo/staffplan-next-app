@@ -205,7 +205,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 					Edit Assignment
 				</button>
 			),
-			show: true,
+			show: false,
 		},
 		{
 			component: <button onClick={handleArchiveAssignmentClick} className="block w-full px-8 py-4 text-sm text-left">Archive</button>,
