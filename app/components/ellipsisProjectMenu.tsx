@@ -1,5 +1,5 @@
 "use client";
-import React, { BaseSyntheticEvent, Fragment, useState, RefObject, useCallback } from "react";
+import React, { BaseSyntheticEvent, Fragment, RefObject, useCallback } from "react";
 import { Menu, MenuItem, MenuButton, MenuItems, Transition } from "@headlessui/react";
 
 import { UPSERT_PROJECT } from "../gqlQueries";
@@ -27,12 +27,8 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 	const {
 		client: { id: clientId },
 		name,
-		id,
-		status,
+		id
 	} = project;
-	const [confirmed, setConfirmed] = useState(
-		status === "confirmed" ? true : false
-	);
 
 	const dropdownSelectedItemClass = (isActive: boolean) =>
 		isActive
@@ -178,31 +174,6 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 			>
 				<MenuItems className="absolute left-0 top-full transform -translate-y-2/3 z-50 ml-9 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 					<div className="py-1 border-b-2">
-						<label className="ml-3 inline-block pl-[0.15rem] hover:cursor-pointer text-gray-900 px-4 py-2 text-sm">
-							<input
-								className="mr-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-neutral-300 
-																		hover:checked:bg-accentgreen
-																		before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-neutral-100 after:shadow-[0_0px_3px_0_rgb(0_0_0_/_7%),_0_2px_2px_0_rgb(0_0_0_/_4%)] after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-accentgreen checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ml-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-accentgreen checked:after:shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),_0_2px_2px_0_rgba(0,0,0,0.14),_0_1px_5px_0_rgba(0,0,0,0.12)] checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[3px_-1px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:border-accentgreen checked:focus:bg-accentgreen checked:focus:before:ml-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-neutral-600 dark:after:bg-neutral-400 dark:checked:bg-accentgreen dark:checked:after:bg-accentgreen dark:focus:before:shadow-[3px_-1px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca]"
-								type="checkbox"
-								name="status"
-								checked={confirmed}
-								onChange={(e) => {
-									setConfirmed(!confirmed);
-									onSubmitUpsert(e);
-								}}
-							/>
-							{confirmed ? "Confirmed" : "Unconfirmed"}
-						</label>
-						<MenuItem>
-							{({ active }) => (
-								<p
-									className={dropdownSelectedItemClass(active)}
-									onClick={handleProjectChange}
-								>
-									View Project Plan
-								</p>
-							)}
-						</MenuItem>
 						<MenuItem>
 							{({ active }) => (
 								<button
@@ -212,19 +183,6 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 									Edit Project
 								</button>
 							)}
-						</MenuItem>
-						<MenuItem>
-							{({ active }) => (
-								<button
-									className={dropdownSelectedItemClass(active)}
-									onClick={() =>
-										openModal(<AddAssignmentModal project={project} closeModal={closeModal} />)
-									}
-								>
-									Add Person
-								</button>
-							)}
-
 						</MenuItem>
 						<MenuItem>
 							<button className="w-full px-4 py-2 text-sm text-left hover:text-accentgreen border-none" onClick={downloadCSV}>
