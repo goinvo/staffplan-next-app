@@ -63,7 +63,7 @@ const ProjectsView: React.FC = () => {
   }, [isFirstShowArchivedProjects, isFirstHideArchivedProjects])
 
   useEffect(() => {
-    if (searchParams.has("client")) {
+    if (!showOneClientProjects && searchParams.has("client")) {
       router.push("/projects");
     }
     

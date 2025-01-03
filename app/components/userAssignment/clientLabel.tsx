@@ -6,6 +6,8 @@ import { AssignmentType, ClientType, UserType } from "../../typeInterfaces";
 import IconButton from "../iconButton";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { sortSingleUserByOrder } from "@/app/helperFunctions";
+import { useRouter } from "next/navigation";
+import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 
 interface ClientLabelProps {
 	assignment: AssignmentType;
@@ -13,6 +15,8 @@ interface ClientLabelProps {
 }
 
 export const ClientLabel = ({ assignment }: ClientLabelProps) => {
+	const router = useRouter();
+	const { showOneClientProjects, setShowOneClientProjects } = useProjectsDataContext()
 	const { singleUserPage, setSingleUserPage, sortOrder, sortBy } = useUserDataContext()
 
 	const activeTempProject = singleUserPage?.assignments.some(a => {
@@ -61,7 +65,10 @@ export const ClientLabel = ({ assignment }: ClientLabelProps) => {
 
 		setSingleUserPage(sortedAssignments);
 	};
-
+	const handleClientNameClick = (client: string) => {
+		const encodedClient = client.replace(/[\s,]/g, "_");
+		router.push(`/projects?client=${encodeURIComponent(encodedClient)}`);
+	  };
 	return (
 		<>
 			{/* <IconButton
@@ -72,7 +79,14 @@ export const ClientLabel = ({ assignment }: ClientLabelProps) => {
 						handleClientClick(assignment.project.client)
 					}
 				}} /> */}
-			<div className="text-contrastBlue sm:flex hidden items-center justify-start sm:pt-2 pl-0 text-start transform -translate-x-0.5">
+			<div className="text-contrastBlue sm:flex hidden items-center justify-start sm:pt-2 pl-0 text-start transform -translate-x-0.5 cursor-pointer" onClick={() => {
+          if (showOneClientProjects === assignment.project.client.id.toString()) {
+            setShowOneClientProjects("");
+          } else {
+            handleClientNameClick(assignment.project.client.name);
+            setShowOneClientProjects(assignment.project.client.id.toString());
+          }
+        }}>
         {assignment.project.client.name}
       </div>
 			<div className="sm:hidden flex items-center relative" onClick={() => {
