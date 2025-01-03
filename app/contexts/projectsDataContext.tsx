@@ -19,6 +19,7 @@ type EnqueueTimerParams = {
 };
 
 export interface ProjectsDataContextType {
+  newAssignedUsersId: number[];
   projectList: ProjectType[] | [];
   singleProjectPage: ProjectType;
   sortOrder: SORT_ORDER;
@@ -30,6 +31,7 @@ export interface ProjectsDataContextType {
   viewsFilterSingleProject: string;
   projectsWithUndoActions: UndoableModifiedProject[];
   showOneClientProjects: string;
+  setNewAssignedUsersId: React.Dispatch<React.SetStateAction<number[]>>;
   undoModifyProject: (projectId: number) => void;
   setViewsFilterSingleProject: React.Dispatch<React.SetStateAction<string>>;
   setProjectList: React.Dispatch<React.SetStateAction<ProjectType[] | []>>;
@@ -65,6 +67,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
 }) => {
   const client = useApolloClient();
   const isClient = typeof window !== "undefined";
+  const [newAssignedUsersId, setNewAssignedUsersId] = useState<number[]>([]);
   const [projectList, setProjectList] = useState<ProjectType[] | []>([]);
   const [filteredProjectList, setFilteredProjectList] = useState<ProjectType[] | []>([])
   const [singleProjectPage, setSingleProjectPage] = useState<any>(null);
@@ -123,9 +126,22 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
   }, [sortedAndFilteredProjects]);
 
   const sortedSingleProjectAssignments = useMemo(() => {
-    const assignments = singleProjectPage?.assignments || [];
-    return sortSingleProjectByOrder(sortOrderSingleProject, assignments);
-  }, [sortOrderSingleProject, singleProjectPage]);
+    const assignments = (singleProjectPage?.assignments || []) as AssignmentType[];
+
+    const assignmentsTBD = assignments.filter((a) => !a?.assignedUser);
+    const assignmentsNotToSort = assignments
+      .filter((a) => (a?.assignedUser && newAssignedUsersId.includes(Number(a?.assignedUser?.id))))
+      .sort((a, b) => {
+        const indexA = newAssignedUsersId.indexOf(Number(a?.assignedUser?.id));
+        const indexB = newAssignedUsersId.indexOf(Number(b?.assignedUser?.id));
+        return indexB - indexA;
+      });
+    const assignmentsToSort = assignments.filter((a) => (a?.assignedUser && !newAssignedUsersId.includes(Number(a?.assignedUser?.id))));
+
+    const assignmentsToSet = [...assignmentsTBD, ...assignmentsNotToSort, ...sortSingleProjectByOrder(sortOrderSingleProject, assignmentsToSort)];
+
+    return assignmentsToSet
+  }, [sortOrderSingleProject, singleProjectPage, newAssignedUsersId.length]);
 
   const refetchProjectList = () => {
     client
@@ -190,6 +206,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
   return (
     <ProjectsDataContext.Provider
       value={{
+        newAssignedUsersId,
         projectList,
         viewsFilterProject,
         singleProjectPage,
@@ -201,6 +218,7 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
         viewsFilterSingleProject,
         projectsWithUndoActions,
         showOneClientProjects,
+        setNewAssignedUsersId,
         undoModifyProject,
         enqueueTimer,
         setSortOrder,
