@@ -55,12 +55,14 @@ const ProjectPage: React.FC = () => {
 	});
 
 	const {
-		projectList,
-		sortedSingleProjectAssignments,
-		singleProjectPage,
-		setSingleProjectPage,
-		setProjectList
-	} = useProjectsDataContext();
+    projectList,
+    sortedSingleProjectAssignments,
+    singleProjectPage,
+    newAssignedUsersId,
+    setSingleProjectPage,
+    setProjectList,
+    setNewAssignedUsersId,
+  } = useProjectsDataContext();
 
 	const addNewAssignmentRow = useCallback(async () => {
 		const variables = {
@@ -87,6 +89,10 @@ const ProjectPage: React.FC = () => {
 		selectedProjectId,
 		setSingleProjectPage
 	]);
+
+	useEffect(() => {
+			return () => setNewAssignedUsersId([]);
+		}, [])
 
 	const selectedProjectDates = () => {
 		const startDate = singleProjectPage?.startsOn ? DateTime.fromISO(singleProjectPage.startsOn) : null;

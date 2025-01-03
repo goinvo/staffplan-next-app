@@ -89,6 +89,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	const { setSortOrder: setSortOrderForPeople, setSortBy: setSortByForPeople, sortUserList } = useUserDataContext();
 	const { clientList } = useClientDataContext();
 	const {
+		setNewAssignedUsersId,
 		showOneClientProjects,
 		setShowOneClientProjects,
 		setSortOrder: setSortOrderForProjects,
@@ -192,6 +193,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 			);
 		}
 		if (isProjectPage) {
+			setNewAssignedUsersId([])
 			setSortOrderSingleProject(sortedBy.sort);
 
 			localStorage.setItem(

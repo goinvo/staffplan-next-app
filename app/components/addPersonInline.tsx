@@ -17,13 +17,14 @@ export const AddPersonInline = ({ project, assignment }: AddPersonInlineProps) =
 
     const { userList, setUserList } = useUserDataContext()
 
-    const { setProjectList } = useProjectsDataContext();
+    const { setProjectList, newAssignedUsersId, setNewAssignedUsersId } = useProjectsDataContext();
     const [selectedUserId, setSelectedUserId] = useState<string>("");
 
     const [upsertAssignment, { loading: mutationLoading }] = useMutation(UPSERT_ASSIGNMENT, {
         errorPolicy: "all",
         onCompleted: async ({ upsertAssignment }) => {
             if (upsertAssignment) {
+                setNewAssignedUsersId([...newAssignedUsersId, (Number(upsertAssignment.assignedUser.id))]);
                 setProjectList((prevProjectList) => {
                     return prevProjectList?.map((project) => {
                         if (project.id === upsertAssignment?.project?.id) {
