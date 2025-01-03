@@ -254,7 +254,7 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 					</div>
 				</div>
 			)}
-			<div className="flex flex-col mt-1 mb-1">
+			{/* <div className="flex flex-col mt-1 mb-1">
 				<label className="py-1 text-tiny">Budget (optional)</label>
 				<input
 					type="text"
@@ -271,7 +271,7 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 						{formik.errors.budget}
 					</div>
 				) : null}
-			</div>
+			</div> */}
 			<div className="flex flex-col mt-1 mb-1">
 				<label className="py-1 text-tiny">Hours (optional)</label>
 				<input
@@ -279,7 +279,11 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 					name="hours"
 					value={formik.values.hours}
 					onChange={formik.handleChange}
-					onBlur={formik.handleBlur}
+					onFocus={()=>setIsInputInFocus(true)}
+					onBlur={(e)=> {
+						setIsInputInFocus(false)
+						formik.handleBlur(e)
+					}}
 					className="h-6 px-2 text-tiny shadow-top-input-shadow font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none  text-contrastBlue max-w-[370px]"
 					placeholder="Hours"
 				/>
