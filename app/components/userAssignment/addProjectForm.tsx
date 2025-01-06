@@ -505,7 +505,7 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({ user }) => {
       <td className="sm:block items-center sm:-ml-5 md:-ml-3 lg:-ml-8 pt-[17px] pb-2 px-0 font-normal align-top">
         <button
           type="submit"
-          className="bg-tiffany px-3 py-1 rounded-[3px]"
+          className="bg-tiffany px-3 py-1 rounded-[3px] text-white font-bold"
           onClick={(e) => {
             handleSaveClick(e);
           }}

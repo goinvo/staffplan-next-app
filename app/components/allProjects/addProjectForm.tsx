@@ -353,7 +353,7 @@ export const AddProjectForm = () => {
       <td className="sm:block items-center md:-ml-2 lg:-ml-5 pt-[17px] pb-2 px-0 font-normal align-top">
         <button
           type="button"
-          className="bg-tiffany px-3 py-1 rounded-[3px]"
+          className="bg-tiffany px-3 py-1 rounded-[3px] text-white font-bold"
           onClick={(e) => {
             handleSaveClick(e);
           }}
