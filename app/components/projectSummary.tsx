@@ -43,8 +43,8 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 			value: getDeltaValue(),
 			unit: "hrs",
 			alwaysShow: project.hours,
-			tooltip: `Delta = Plan (${
-				(plannedHours ?? 0) + (burnedHours ?? 0)
+			tooltip: `Delta = Future Plan (${
+				(plannedHours ?? 0)
 			}) + Actual (${burnedHours}) - Target (${project.hours})`,
 		},
 	];
