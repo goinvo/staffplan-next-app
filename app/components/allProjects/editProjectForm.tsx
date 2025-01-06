@@ -168,6 +168,17 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		}
 	};
 
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			if (formik.dirty) {
+				formik.handleSubmit();
+      } else {
+        onClose?.();
+      }
+		}
+	}
+
 	const handleArchiveButtonClick = () => {
 		setArchivedStatus(!archivedStatus);
 		const newStatus = !archivedStatus
@@ -240,6 +251,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		<form
 			onSubmit={handleSubmit}
 			className="flex flex-col space-y-2 my-2 text-contrastBlue w-full pr-2"
+			onKeyDown={handleKeyDown}
 		>
 			<div className="flex flex-col justify-start w-full">
 				<input
