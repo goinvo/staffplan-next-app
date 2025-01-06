@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { usePathname, useSearchParams } from "next/navigation";
 
+import { useMutation } from "@apollo/client";
 import { SlPencil } from "react-icons/sl";
 import { RxArrowLeft } from "react-icons/rx";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
@@ -38,6 +39,8 @@ import DraggableDates from "../projectAssignment/draggableProjectDates";
 import { SORT_ORDER } from "./constants";
 import { useClientDataContext } from "@/app/contexts/clientContext";
 import { useKeyboardNavigation } from "@/app/hooks/useKeyboardNavigation";
+import { UPSERT_PROJECT_WITH_INPUT } from "@/app/gqlQueries";
+
 
 interface ColumnHeaderTitle {
 	title: string;
@@ -53,6 +56,7 @@ type CalendarHeaderProps = {
 	title?: string;
 	userName?: string;
 	editable?: boolean;
+	project?: ProjectType;
 	projectInfo?: string;
 	projectStatus?: string;
 	columnHeaderTitles: ColumnHeaderTitle[];
@@ -69,6 +73,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	title,
 	userName,
 	editable = false,
+	project,
 	projectInfo,
 	projectStatus,
 	columnHeaderTitles,
@@ -95,6 +100,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 		setSortOrder: setSortOrderForProjects,
 		setSortBy: setSortByForProjects,
 		setSortOrderSingleProject,
+		refetchProjectList,
 	} = useProjectsDataContext();
 	const {
 		totalActualHours,
@@ -106,6 +112,12 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
+
+	const {
+    client: { id: clientId } = {},
+    name,
+    id,
+  } = project || {};
 
 	const isStaffPlanPage =
 		pathname.includes("people") && pathname.split("/").length === 3;
@@ -119,7 +131,24 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 		getPrevWeeksPerView,
 		setDateRange,
     months,
-  });
+	});
+	
+	const [upsertProjectWithInput] = useMutation(UPSERT_PROJECT_WITH_INPUT, {
+    errorPolicy: "all",
+    onCompleted({ upsertProjectWithInput }) {
+      refetchProjectList();
+    },
+	});
+	
+	const handleUnarchiveProject = async () => {
+		const input = {
+			id: id,
+			name: name,
+			clientId: clientId,
+			status: "unconfirmed",
+		};
+		await upsertProjectWithInput({ variables: { input } });
+	}
 
 	useEffect(() => {
     const observer = new ResizeObserver((entries) => {
@@ -303,7 +332,13 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 									)}
 								</div>
 								{projectStatus === "archived" && (
-                  <span className="text-sm font-normal underline">&#40;Archived&#41;</span>
+										<span className="group relative text-sm font-normal underline cursor-pointer"
+										onClick={() => handleUnarchiveProject()}>
+											&#40;Archived&#41;
+											<span className="absolute -top-[8px] left-[110%] w-32 py-1 timeline-grid-bg rounded-[3px] text-xs text-contrastBlue leading-[14px] pointer-events-none opacity-0 transition-all duration-200 ease-linear group-hover:opacity-100">
+												Unarchive project for everyone
+											</span>
+										</span>
                 )}
 								{projectInfo && (
 									<div className="text-left overflow-wrap break-word py-2 font-normal">

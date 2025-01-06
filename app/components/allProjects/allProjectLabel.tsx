@@ -8,7 +8,8 @@ import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 
 export const AllProjectLabel = ({
 	project,
-	clickHandler,
+  clickHandler,
+  handleUnarchiveProject,
 	undoRowRef,
 }: AllProjectLabelProps) => {
   const router = useRouter();
@@ -48,7 +49,7 @@ export const AllProjectLabel = ({
         {project.client.name}
       </span>}
       <div
-        className={`block w-auto sm:max-w-[150px] md:max-w-[160px] lg:max-w-[185px] sm:w-full sm:ml-1 lg:ml-0 sm:mr-0 mr-2 sm:mt-0 mt-2 ${
+        className={`flex flex-col w-auto sm:max-w-[150px] md:max-w-[160px] lg:max-w-[185px] sm:w-full sm:ml-1 lg:ml-0 sm:mr-0 mr-2 sm:mt-0 mt-2 ${
           showOneClientProjects ? "sm:max-w-max md:max-w-max lg:max-w-max  sm:mr-3" : ""
         }`}
       >
@@ -59,8 +60,10 @@ export const AllProjectLabel = ({
           {project.name}
         </button>
         {project.status === "archived" && (
-          <span className="block underline text-contrastBlue text-start">
+          <span className="group relative inline w-fit underline text-contrastBlue text-start cursor-pointer"
+            onClick={() => handleUnarchiveProject(project)}>
             &#40;Archived&#41;
+            <span className="absolute top-[110%] -left-[34px] w-32 py-1 rounded-[3px] bg-contrastBlue text-white text-xs leading-[14px] text-center opacity-0 pointer-events-none transition-all duration-200 ease-linear group-hover:opacity-100">Unarchive project for everyone</span>
           </span>
         )}
       </div>

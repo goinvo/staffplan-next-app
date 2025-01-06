@@ -22,6 +22,7 @@ export interface AllUserAccumulatorProps {
 export interface AllProjectLabelProps {
 	project: ProjectType;
 	clickHandler: (project: ProjectType) => void;
+	handleUnarchiveProject: (project: ProjectType) => void;
 	undoRowRef: RefObject<HTMLTableRowElement>;
 }
 

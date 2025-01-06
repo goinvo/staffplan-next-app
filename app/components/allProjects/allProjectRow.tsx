@@ -9,6 +9,7 @@ import {
 
 import React, { useRef, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@apollo/client";
 import { AllProjectLabel } from "./allProjectLabel";
 import ProjectSummary from "../projectSummary";
 import ColumnChart from "../columnChart";
@@ -18,6 +19,8 @@ import UndoRow from "../undoRow";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
+import { UPSERT_PROJECT_WITH_INPUT } from "@/app/gqlQueries";
+
 export const AllProjectRow = ({
 	project,
 	isFirstMonth,
@@ -31,10 +34,17 @@ export const AllProjectRow = ({
 	const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } =
 		calculateTotalHoursPerWeek(project.assignments as AssignmentType[], months as MonthsDataType[]);
 
-	const { newProjectId, projectsWithUndoActions, setNewProjectId, undoModifyProject } = useProjectsDataContext()
+	const { newProjectId, projectsWithUndoActions, setNewProjectId, undoModifyProject, refetchProjectList } = useProjectsDataContext()
 	const { isFirstShowArchivedProjects, isFirstHideArchivedProjects } = useGeneralDataContext();
 	const { animateRow } = useFadeInOutRow({ rowRef, setShowUndoRow, maxHeight: 102 });
 
+	const [upsertProjectWithInput] = useMutation(UPSERT_PROJECT_WITH_INPUT, {
+			errorPolicy: "all",
+			onCompleted({ upsertProjectWithInput }) {
+				refetchProjectList();
+			},
+	});
+	
 	const isModifiedProject = (projectId: number) =>
 		projectsWithUndoActions.some((item) => item.project.id === projectId);
 	const handleProjectChange = (project: ProjectType) => {
@@ -50,6 +60,17 @@ export const AllProjectRow = ({
 		setShowUndoRow(false)
 		setTimeout(() => animateRow(false), 10);
 	}
+
+	const handleUnarchiveProject = async (project: ProjectType) => {
+    const input = {
+      id: project.id,
+      name: project.name,
+      clientId: project.client.id,
+      status: "unconfirmed",
+    };
+    await upsertProjectWithInput({ variables: { input } });
+  };
+
 	useEffect(() => {
 		if (isModifiedProject(project.id)) {
 			animateRow(true);
@@ -76,7 +97,7 @@ export const AllProjectRow = ({
 			${isFirstHideArchivedProjects && project.status === 'archived' ? 'animate-fadeOutScale' : ''}`}> 
 			<td className='sm:block flex items-center pt-1 pb-2 px-0 font-normal align-top w-1/2 sm:w-2/5'>
 				{isFirstMonth && (
-					<AllProjectLabel undoRowRef={undoRowRef} clickHandler={handleProjectChange} project={project} />
+					<AllProjectLabel undoRowRef={undoRowRef} clickHandler={handleProjectChange} project={project} handleUnarchiveProject={handleUnarchiveProject} />
 
 				)}
 			</td>
