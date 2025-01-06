@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {  useRouter } from "next/navigation";
 import { useFormik, FormikValues } from "formik";
+import { DateTime } from "luxon";
 import { useMutation } from "@apollo/client";
 
 import { UPSERT_PROJECT, UPSERT_CLIENT } from "@/app/gqlQueries";
@@ -29,6 +30,9 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 	const { viewer } = useGeneralDataContext();
 	const [isNewClient, setIsNewClient] = useState(false);
 	const [showNewClientModal, setShowNewClientModal] = useState<boolean>(false);
+
+	const startsOnRef = useRef<null | string>(null);
+	const endsOnRef = useRef<null | string>(null);
 	const clientInputRef = useRef<HTMLInputElement>(null);
 
 	const [
@@ -70,9 +74,32 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 		if (!values.clientName) errors.clientName = "Client is required";
 		if (!values.projectName) errors.projectName = "Project name is required";
 
+		if (startsOnRef.current) {
+			const dateFromISO = DateTime.fromISO(startsOnRef.current);
+			const parsedDate = DateTime.fromFormat(startsOnRef.current, "dd.LLL.yy");
+
+			if (!dateFromISO.isValid && !parsedDate.isValid) {
+				errors.startsOn = "Invalid start date format. Please use dd/Mon/yr.";
+			} else {
+				delete errors.startsOn;
+			}
+		}
+
+		if (endsOnRef.current) {
+      const dateFromISO = DateTime.fromISO(endsOnRef.current);
+      const parsedDate = DateTime.fromFormat(endsOnRef.current, "dd.LLL.yy");
+
+      if (!dateFromISO.isValid && !parsedDate.isValid) {
+        errors.endsOn = "Invalid end date format. Please use dd/Mon/yr.";
+      } else {
+        delete errors.endsOn;
+      }
+    }
+
 		const currentClient = clientList.find(
-			(client: ClientType) => client.name.toLowerCase() === values.clientName.toLowerCase().trimEnd()
-		);
+      (client: ClientType) =>
+        client.name.toLowerCase() === values.clientName.toLowerCase().trimEnd()
+    );
 		if (values.projectName && currentClient) {
 			const projectNameExists = projectList.find(
         (project: ProjectType) =>
@@ -195,7 +222,7 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 					name="projectName"
 					value={formik.values.projectName}
 					onChange={formik.handleChange}
-					onFocus={()=>setIsInputInFocus(true)}
+					onFocus={() => setIsInputInFocus(true)}
 					onBlur={(e) => {
 						formik.handleBlur(e);
 						setIsInputInFocus(false);
@@ -218,7 +245,7 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 					value={formik.values.clientName}
 					onItemSelect={handleClientSelect}
 					onChange={handleClientChange}
-					/* onBlur={handleClientBlur} */
+					onBlur={formik.handleBlur}
 					isNewItem={isNewClient}
 					inputClassName="h-8 px-2 rounded-sm max-w-[370px]"
 					listClassName="p-2"
@@ -231,7 +258,7 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 					{formik.errors.clientName}
 				</p>
 			) : null}
-			{showNewClientModal && (
+			{/* {showNewClientModal && (
 				<div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
 					<div className="bg-white p-6 rounded-md shadow-md">
 						<p className="mb-4">
@@ -253,7 +280,7 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 						</div>
 					</div>
 				</div>
-			)}
+			)} */}
 			{/* <div className="flex flex-col mt-1 mb-1">
 				<label className="py-1 text-tiny">Budget (optional)</label>
 				<input
@@ -273,14 +300,14 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 				) : null}
 			</div> */}
 			<div className="flex flex-col mt-1 mb-1">
-				<label className="py-1 text-tiny">Hours (optional)</label>
+				<label className="py-1 text-tiny">Target Hours (optional)</label>
 				<input
 					type="text"
 					name="hours"
 					value={formik.values.hours}
 					onChange={formik.handleChange}
 					onBlur={formik.handleBlur}
-					className="h-6 px-2 text-tiny shadow-top-input-shadow font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none  text-contrastBlue max-w-[370px]"
+					className="h-8 px-2 text-tiny shadow-top-input-shadow font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none  text-contrastBlue max-w-[370px]"
 					placeholder="Hours"
 				/>
 				{formik.touched.hours && formik.errors.hours ? (
@@ -296,13 +323,23 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 						name="startsOn"
 						errorString="Invalid start date format. Please use dd/Mon/yr."
 						value={formik.values.startsOn}
-						onChange={(value) => formik.setFieldValue("startsOn", value)}
+						onChange={(value) => {
+							startsOnRef.current = value
+							formik.setFieldValue("startsOn", value)
+						}}
 						onBlur={() => formik.setFieldTouched("startsOn", true)}
-						setError={(error) => formik.setFieldError("startsOn", error)}
+						setError={(error) => {
+							formik.setFieldError("startsOn", error)
+							formik.setFieldTouched("startsOn", true, false);
+						}}
+						setDate={(value) => {
+							startsOnRef.current = value;
+						}}
+						classNameForTextInput='h-8'
 					/>
-					{formik.touched.hours && formik.errors.hours ? (
+					{formik.touched.startsOn && formik.errors.startsOn ? (
 						<div className="text-tiny px-2 text-red-500">
-							{formik.errors.hours}
+							{formik.errors.startsOn}
 						</div>
 					) : null}
 				</div>
@@ -312,11 +349,21 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 							name="endsOn"
 							errorString="Invalid end date format. Please use dd/Mon/yr."
 							value={formik.values.endsOn}
-							onChange={(value) => formik.setFieldValue("endsOn", value)}
+							onChange={(value) => {
+								endsOnRef.current = value;
+								formik.setFieldValue("endsOn", value)
+							}}
 							onBlur={() => formik.setFieldTouched("endsOn", true)}
-							setError={(error) => formik.setFieldError("endsOn", error)}
+							setError={(error) => {
+									formik.setFieldError("endsOn", error)
+									formik.setFieldTouched("endsOn", true, false);
+							}}
+							setDate={(value) => {
+								endsOnRef.current = value
+							}}
+							classNameForTextInput='h-8'
 						/>
-					{formik.touched.hours && formik.errors.endsOn ? (
+					{formik.touched.endsOn && formik.errors.endsOn ? (
 						<div className="text-tiny px-2 text-red-500">
 							{formik.errors.endsOn}
 						</div>

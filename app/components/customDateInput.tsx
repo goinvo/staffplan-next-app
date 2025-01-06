@@ -11,9 +11,11 @@ interface CustomDateInputProps {
     onChange: (value: string) => void;
     onBlur?: () => void;
     setError: (error: string | undefined) => void;
+    setDate?: (value: string) => void;
+    classNameForTextInput?: string;
 }
 
-export const CustomDateInput: React.FC<CustomDateInputProps> = ({ name, value, onChange, setError, onBlur, errorString }) => {
+export const CustomDateInput: React.FC<CustomDateInputProps> = ({ name, value, onChange, setError, onBlur, setDate, errorString, classNameForTextInput }) => {
     const [manualInput, setManualInput] = useState<string>("");
     const textInputRef = useRef<HTMLInputElement>(null);
 
@@ -25,6 +27,7 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({ name, value, o
         const isoDate = e.target.value;
         onChange(isoDate);
         setManualInput(DateTime.fromISO(isoDate).toFormat("dd.LLL.yy"));
+        if (setDate) setDate(DateTime.fromISO(isoDate).toFormat("dd.LLL.yy"));
         setError(undefined)
     };
 
@@ -34,7 +37,10 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({ name, value, o
 
         if (!rawValue) {
             onChange(rawValue);
+            if (setDate) setDate(rawValue);
         }
+
+        if (setDate) setDate(rawValue);
 
         const parsedDate = DateTime.fromFormat(rawValue, "dd.LLL.yy");
 
@@ -77,7 +83,7 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({ name, value, o
                 onChange={handleInputChange}
                 onBlur={handleBlur}
                 placeholder="dd/Mon/yr"
-                className="h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-r-0 border-gray-300 outline-none"
+                className={`h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-r-0 border-gray-300 outline-none ${classNameForTextInput}`}
             />
             <CalendarIcon className="absolute right-1 h-4 w-4 text-black" />
             <input

@@ -12,6 +12,7 @@ import AddProjectModal from "./addProjectModal";
 import { ProjectType, UndoableModifiedProject } from "../typeInterfaces";
 import { useFadeInOutRow } from "../hooks/useFadeInOutRow";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
+import EditProjectModal from "./editProjectModal";
 interface EllipsisProjectMenuProps {
 	project: ProjectType
 	undoRowRef: RefObject<HTMLTableRowElement>;
@@ -206,7 +207,7 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 						<MenuItem>
 							{({ active }) => (
 								<button
-									onClick={() => openModal(<AddProjectModal project={project} closeModal={closeModal} />)}
+									onClick={() => openModal(<EditProjectModal project={project} closeModal={closeModal} isModalView />)}
 									className={dropdownSelectedItemClass(active)}
 								>
 									Edit Project
