@@ -158,6 +158,7 @@ const ProjectPage: React.FC = () => {
           <ScrollingCalendar
             columnHeaderTitles={columnHeaderTitles}
             title={singleProjectPage.name}
+            project={singleProjectPage}
             projectInfo={projectInfoSubtitle}
             projectStatus={projectStatus}
             assignments={sortedSingleProjectAssignments || []}
