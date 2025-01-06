@@ -14,11 +14,11 @@ const NewPersonAndProjectModal = ({ closeModal }: ModalProps) => {
     return (
         <>
             <div className='flex flex-row justify-center'>
-                <button
+                {/* <button
                     className={`h-10 w-[170px] rounded-sm m-auto text-tiny border border-lightGrey ${selectedView === 'project' ? 'bg-lightGrey font-bold' : ''}`}
                     onClick={() => setSelectedView('project')}
                 >New project
-                </button>
+                </button> */}
                 {/* <button
                     className={`h-10 w-[170px] rounded-sm mr-auto ml-3 text-tiny border border-contrastGrey ${selectedView === 'person' ? 'bg-contrastGrey font-bold' : ''}`}
                     onClick={() => setSelectedView('person')}
