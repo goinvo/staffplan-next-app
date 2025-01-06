@@ -15,6 +15,7 @@ interface AutocompleteProps<T> {
     inputClassName?: string;
     dropdownClassName?: string;
     listClassName?: string;
+    badgeClassName?: string;
     value: string;
     tabIndex?: number
     isNewItem?: boolean
@@ -34,6 +35,7 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<
         inputClassName = "",
         dropdownClassName = "",
         listClassName = "",
+        badgeClassName = "",
         value,
         tabIndex,
         isNewItem,
@@ -117,12 +119,12 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<
                     </ul>
                 )}
                 {isNewItem &&
-                    <span className="absolute top-[5px] right-[3px] px-1 pt-[3px] pb-1 text-white text-xs leading-[12px] bg-[#AFB3BF] rounded-[3px]">
+                    <span className={`absolute top-[5px] right-[3px] px-1 pt-[3px] pb-1 text-white text-xs leading-[12px] bg-[#AFB3BF] rounded-[3px] ${badgeClassName}`}>
                         new
                     </span>
                 }
                 {hasStatus && 
-                    <span className="absolute top-[5px] right-[3px] px-1 pt-[3px] pb-1 text-white text-xs leading-[12px] bg-[#AFB3BF] rounded-[3px]">
+                    <span className={`absolute top-[5px] right-[3px] px-1 pt-[3px] pb-1 text-white text-xs leading-[12px] bg-[#AFB3BF] rounded-[3px] ${badgeClassName}`}>
                         {hasStatus}
                     </span>
                 }
