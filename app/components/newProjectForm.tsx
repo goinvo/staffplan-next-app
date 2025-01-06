@@ -249,6 +249,7 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 					isNewItem={isNewClient}
 					inputClassName="h-8 px-2 rounded-sm max-w-[370px]"
 					listClassName="p-2"
+					badgeClassName="top-[7px] right-[7px]"
 					displayKey="name"
 					placeholder="Client"
 				/>
