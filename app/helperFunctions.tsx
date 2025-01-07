@@ -535,6 +535,8 @@ export const drawBar = (
 	);
 };
 
+export const blockInvalidChar = (e: React.KeyboardEvent<HTMLInputElement>, invalidChars: string[]) => invalidChars.includes(e.key) && e.preventDefault();
+
 export const sortSingleProjectByOrder = (
   sortOrder: SORT_ORDER,
   assignments: AssignmentType[]
