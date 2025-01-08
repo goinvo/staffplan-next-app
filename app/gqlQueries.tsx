@@ -355,6 +355,18 @@ export const UPSERT_CLIENT = gql`
 	}
 `;
 
+export const UPSERT_CLIENT_WITH_INPUT = gql`
+  mutation UpsertClientWithInput($input: ClientAttributes!) {
+    upsertClientWithInput(input: $input) {
+      id
+      name
+      description
+      status
+      avatarUrl
+    }
+  }
+`;
+
 export const UPSERT_PROJECT = gql`
   mutation UpsertProjectUpdate(
     $id: ID
