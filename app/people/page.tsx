@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import withApollo from "@/lib/withApollo";
 
 import { useRouter } from "next/navigation";
@@ -10,6 +10,7 @@ import { AllUserRow } from "../components/allUsers/allUserRow";
 import { useUserDataContext } from "../contexts/userDataContext";
 import { SORT_ORDER } from "../components/scrollingCalendar/constants";
 import { useGeneralDataContext } from "../contexts/generalContext";
+import InlineButtonInactiveUser from "../components/inlineButtonInActiveUser";
 
 const PeopleView: React.FC = () => {
   const router = useRouter();
@@ -27,8 +28,22 @@ const PeopleView: React.FC = () => {
     }
   });
 
-  const { userList } = useUserDataContext();
-  const { viewer } = useGeneralDataContext();
+  const { filteredUserList } = useUserDataContext();
+  const { viewer, isFirstShowInactiveUsers, isFirstHideInactiveUsers, setIsFirstShowInactiveUsers, setIsFirstHideInactiveUsers } = useGeneralDataContext();
+
+  useEffect(() => {
+    if (isFirstShowInactiveUsers) {
+      setTimeout(() => {
+        setIsFirstShowInactiveUsers(false);
+      }, 700);
+    }
+
+    if (isFirstHideInactiveUsers) {
+      setTimeout(() => {
+        setIsFirstHideInactiveUsers(false);
+      }, 700);
+    }
+  }, [isFirstShowInactiveUsers, isFirstHideInactiveUsers]);
 
 	const columnHeaderTitles = [
     {
@@ -44,19 +59,20 @@ const PeopleView: React.FC = () => {
 		return users?.flatMap(user =>
 			user.assignments.filter(assignment => assignment.status !== 'archived')
 		);
-	};
-	const allAssignments = getAllAssignments(userList)
+  };
+  
+  const allAssignments = getAllAssignments(filteredUserList);
 
 	return (
     <>
-      {userList.length ? (
+      {filteredUserList.length ? (
         <ScrollingCalendar
           title="People"
           columnHeaderTitles={columnHeaderTitles}
           assignments={allAssignments}
           initialSorting={initialSorting}
         >
-          {userList?.map((user: UserType, index: number) => {
+          {filteredUserList?.map((user: UserType, index: number) => {
             return (
               <AllUserRow
                 key={index}
@@ -67,6 +83,7 @@ const PeopleView: React.FC = () => {
               />
             );
           })}
+          <InlineButtonInactiveUser />
         </ScrollingCalendar>
       ) : (
         <LoadingSpinner />

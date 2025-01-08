@@ -141,6 +141,7 @@ export interface UserType {
 	name: string;
 	assignments: AssignmentType[];
 	avatarUrl: string;
+	isActive: boolean;
 }
 
 export interface UserAssignmentDataMapType {

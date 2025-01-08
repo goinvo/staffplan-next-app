@@ -113,6 +113,7 @@ export const GET_USER_LIST = gql`
 				id
 				name
 				avatarUrl
+				isActive
 				assignments {
 					id
 					startsOn
@@ -223,6 +224,7 @@ export const GET_ALL_PROJECTS_DATA = gql`
 						name
 						id
 						avatarUrl
+						isActive
 					}
 					canBeDeleted
 					id

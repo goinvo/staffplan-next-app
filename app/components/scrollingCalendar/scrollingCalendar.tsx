@@ -20,6 +20,7 @@ interface ScrollingCalendarProps {
 	title?: string;
 	avatarUrl?: string;
 	userName?: string;
+	isActiveUser?: boolean;
 	project?: ProjectType;
 	projectInfo?: string;
 	projectStatus?: string;
@@ -37,6 +38,7 @@ export const ScrollingCalendar = ({
 	title,
 	avatarUrl,
 	userName,
+	isActiveUser,
 	project,
 	projectInfo,
 	projectStatus,
@@ -82,6 +84,7 @@ export const ScrollingCalendar = ({
 					columnHeaderTitles={columnHeaderTitles}
 					avatarUrl={avatarUrl}
 					userName={userName}
+					isActiveUser={isActiveUser}
 					title={title}
 					project={project}
 					projectInfo={projectInfo}

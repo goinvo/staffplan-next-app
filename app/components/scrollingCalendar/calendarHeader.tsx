@@ -55,6 +55,7 @@ type CalendarHeaderProps = {
 	avatarUrl?: string;
 	title?: string;
 	userName?: string;
+	isActiveUser?: boolean;
 	editable?: boolean;
 	project?: ProjectType;
 	projectInfo?: string;
@@ -72,6 +73,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	avatarUrl,
 	title,
 	userName,
+	isActiveUser = true,
 	editable = false,
 	project,
 	projectInfo,
@@ -211,7 +213,6 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 		}
 		if (isPeoplePage) {
 			setSortOrderForPeople(sortedBy.sort);
-			sortUserList(sortedBy.sort);
 
 			localStorage.setItem(
 				"peoplePageSorting",
@@ -313,7 +314,8 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                     </div>
                   ) : (
                     <div className="text-huge text-left overflow-wrap break-word leading-snug">
-                      {title || userName}
+												{title || userName}
+												{!isActiveUser && <span className="block text-sm leading-[14px] font-normal">&#40;Deactivated&#41;</span>}
                     </div>
                   )}
 									{editable && (

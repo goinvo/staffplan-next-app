@@ -78,6 +78,7 @@ const UserPage: React.FC = () => {
           columnHeaderTitles={columnsHeaderTitles}
           avatarUrl={singleUserPage.avatarUrl}
           userName={singleUserPage.name}
+          isActiveUser={singleUserPage.isActive}
           assignments={singleUserPage.assignments}
           initialSorting={initialSorting}
           editable={isMyStaffPlan}
