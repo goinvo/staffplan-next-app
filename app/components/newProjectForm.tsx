@@ -214,6 +214,19 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 		}
 	};
 
+	const handleSaveClick = (values: FormikValues) => {
+		const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
+
+		if (!values.clientName) {
+			formik.setFieldTouched("clientName", true);
+			errors.clientName = "Client is required";
+		}
+		if (!values.projectName) {
+			formik.setFieldTouched("projectName", true);
+			errors.projectName = "Project name is required";
+		}
+	};
+
 	return (
 		<form onSubmit={handleSubmit} className="flex flex-col">
 			<div className="flex flex-col mt-2 mb-2">
@@ -383,8 +396,8 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 			</div>
 			<button
 				type="submit"
+				onClick={() => handleSaveClick(formik.values)}
 				className="w-full h-10 text-tiny font-bold bg-tiffany rounded-sm text-white pt-1 mb-4 mt-2 hover:bg-accentgreen"
-				disabled={!formik.isValid}
 			>
 				Save
 			</button>
