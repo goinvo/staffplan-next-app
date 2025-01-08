@@ -12,6 +12,7 @@ import { AutocompleteInput } from "../autocompleteInput";
 import { useClientDataContext } from "@/app/contexts/clientContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
+import { blockInvalidChar } from "@/app/helperFunctions";
 import CustomDateInput from "../customDateInput";
 import { ARCHIVED_PROJECT_WARNING } from "../constants/archivedStatusStrings";
 import { set } from "lodash";
@@ -332,17 +333,22 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 						Hours
 					</label>
 					<input
-						type="text"
+						type="number"
 						name="hours"
-						value={formik.values.hours}
+						value={formik.values.hours.toString()}
 						onChange={formik.handleChange}
+						onKeyDown={(e) => {
+						const invalidChars = ["e", "E", "+", "-", ".", ","];
+						blockInvalidChar(e, invalidChars);
+					}}
 						onFocus={() => setIsInputInFocus(true)}
 						onBlur={(e) => {
 							setIsInputInFocus(false);
 							formik.handleBlur(e);
 						}}
 						id="hours"
-						className="h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none"
+						className="h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none
+						[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 						placeholder="Hours"
 					/>
 

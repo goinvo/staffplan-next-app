@@ -13,6 +13,7 @@ import { useUserDataContext } from "../contexts/userDataContext";
 import { useClientDataContext } from "../contexts/clientContext";
 import { useGeneralDataContext } from "../contexts/generalContext";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
+import { blockInvalidChar } from "../helperFunctions";
 import CustomDateInput from "./customDateInput";
 
 interface NewProjectFormProps {
@@ -303,16 +304,21 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 			<div className="flex flex-col mt-1 mb-1">
 				<label className="py-1 text-tiny">Target Hours (optional)</label>
 				<input
-					type="text"
+					type="number"
 					name="hours"
-					value={formik.values.hours}
+					value={formik.values.hours.toString()}
 					onChange={formik.handleChange}
+					onKeyDown={(e) => {
+						const invalidChars = ["e", "E", "+", "-", ".", ","];
+						blockInvalidChar(e, invalidChars);
+					}}
 					onFocus={()=>setIsInputInFocus(true)}
 					onBlur={(e)=> {
 						setIsInputInFocus(false)
 						formik.handleBlur(e)
 					}}
-					className="h-8 px-2 text-tiny shadow-top-input-shadow font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none  text-contrastBlue max-w-[370px]"
+					className="h-8 px-2 text-tiny shadow-top-input-shadow font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none  text-contrastBlue max-w-[370px]
+					[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 					placeholder="Hours"
 				/>
 				{formik.touched.hours && formik.errors.hours ? (
