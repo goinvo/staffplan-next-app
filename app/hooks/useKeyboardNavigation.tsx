@@ -21,35 +21,41 @@ export const useKeyboardNavigation = ({
   const router = useRouter();
 
   const { openModal, closeModal } = useModal();
-  const { viewer, isInputInFocus } = useGeneralDataContext();
+  const { viewer } = useGeneralDataContext();
 
   useEffect(() => {
     if (!viewer || months.length === 0) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement;
+      const isInteractiveElement =
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable;
+
+      if (isInteractiveElement) {
+        return;
+      }
+
       switch (event.key.toLowerCase()) {
         case "m":
-          if (isInputInFocus) return;
           router.push(`/people/${encodeURIComponent(viewer.id)}`);
           break;
         case "p":
-          if (isInputInFocus) return;
           router.push(`/projects`);
           break;
         case "e":
-          if (isInputInFocus) return;
           router.push(`/people`);
           break;
         case "n":
-          if (isInputInFocus) return;
           openModal(<NewPersonAndProjectModal closeModal={closeModal} />);
           break;
         case "arrowright":
-          if (!isInputInFocus) setDateRange(getNextWeeksPerView(months));
+          setDateRange(getNextWeeksPerView(months));
 
           break;
         case "arrowleft":
-          if (!isInputInFocus) setDateRange(getPrevWeeksPerView(months));
+          setDateRange(getPrevWeeksPerView(months));
 
           break;
         default:
@@ -61,5 +67,5 @@ export const useKeyboardNavigation = ({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [router, isInputInFocus, months]);
+  }, [router, months]);
 };

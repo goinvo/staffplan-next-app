@@ -22,7 +22,6 @@ interface EditFormProps {
 
 const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 	const { refetchClientList, clientList } = useClientDataContext();
-	const { setIsInputInFocus } = useGeneralDataContext();
 	const { projectList, refetchProjectList } = useProjectsDataContext();
 	const { showArchivedProjects } = useGeneralDataContext();
 	const params = useParams();
@@ -259,11 +258,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 					name="projectName"
 					value={formik.values.projectName}
 					onChange={formik.handleChange}
-					onFocus={() => setIsInputInFocus(true)}
-					onBlur={(e) => {
-						setIsInputInFocus(false);
-						formik.handleBlur(e);
-					}}
+					onBlur={formik.handleBlur}
 					className="h-10 px-2 rounded-sm shadow-top-input-shadow focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-huge w-full"
 					placeholder="Project Name"
 				/>
@@ -336,11 +331,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 						name="hours"
 						value={formik.values.hours}
 						onChange={formik.handleChange}
-						onFocus={() => setIsInputInFocus(true)}
-						onBlur={(e) => {
-							setIsInputInFocus(false);
-							formik.handleBlur(e);
-						}}
+						onBlur={formik.handleBlur}
 						id="hours"
 						className="h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none"
 						placeholder="Hours"

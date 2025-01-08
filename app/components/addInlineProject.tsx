@@ -35,7 +35,6 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
     const { setUserList } = useUserDataContext()
     const { clientList, refetchClientList } = useClientDataContext()
     const { projectList, setProjectList } = useProjectsDataContext();
-    const { setIsInputInFocus } = useGeneralDataContext();
     const { id, assignments } = user;
 
     const [upsertClient] = useMutation(UPSERT_CLIENT, {
@@ -247,11 +246,7 @@ const AddInlineProject: React.FC<AddInlineProjectProps> = ({ user }) => {
                             type="text"
                             value={formik.values.projectName}
                             onChange={formik.handleChange}
-                            onFocus={() => setIsInputInFocus(true)}
-                            onBlur={(e) => {
-                                handleProjectNameBlur(e)
-                                setIsInputInFocus(false)
-                            }}
+                            onBlur={handleProjectNameBlur}
                             className="py-2 max-w-[185px] max-h-[28px] text-tiny font-bold shadow-top-input-shadow rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-contrastBlue"
                             placeholder="Project Name"
                         />
