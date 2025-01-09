@@ -85,6 +85,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	const headerTitleRef = useRef<HTMLTableCellElement>(null);
 
 	const [isEditing, setIsEditing] = useState(false);
+	const [isClientEditing, setIsClientEditing] = useState(false);
 	const [isTodayInView, setIsTodayInView] = useState(true);
 	const [showTooltip, setShowTooltip] = useState(false);
 	const [sortedBy, setSortedBy] = useState(initialSorting);
@@ -176,6 +177,8 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	}, [months]);
 
 	useEffect(() => {
+		setIsClientEditing(false)
+
 		if (showOneClientProjects) {
 			const client = clientList.find((c) => c.id.toString() === showOneClientProjects)?.name || '';
 			setCurrentClient(client);
@@ -261,6 +264,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 
 	const returnToProjects = () => {
 		setShowOneClientProjects("");
+		setCurrentClient("");
     router.push("/projects");
 	}
 	return (
@@ -271,8 +275,15 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 						isEditing ? "lg:mr-0" : "lg:mr-1"
 					}`}
 				>
-					{isEditing ? (
-						<EditFormController onClose={() => setIsEditing(false)} />
+					{isEditing || isClientEditing ? (
+						<EditFormController
+							clientName={currentClient}
+							setCurrentClient={setCurrentClient}
+							onClose={() => {
+								setIsEditing(false);
+								setIsClientEditing(false)
+							}}
+						/>
 					) : (
 						<div className="flex text-white items-center">
 							{avatarUrl && (
@@ -288,7 +299,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 							)}
 							<div className="flex flex-col items-start">
 								<div className="flex items-center">
-										{searchParams.has("client") && currentClient ? (
+										{searchParams.has("client") ? (
                     <div>
                       <div className="flex">
                         <IconButton
@@ -307,6 +318,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                         <IconButton
                           className="pt-1 pb-[2px] pl-3"
                           iconSize="w-4 h-4"
+													onClick={() => setIsClientEditing(true)}
                           Icon={SlPencil}
                         />
                       </div>

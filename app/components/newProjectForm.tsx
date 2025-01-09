@@ -13,6 +13,7 @@ import { useUserDataContext } from "../contexts/userDataContext";
 import { useClientDataContext } from "../contexts/clientContext";
 import { useGeneralDataContext } from "../contexts/generalContext";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
+import { blockInvalidChar } from "../helperFunctions";
 import CustomDateInput from "./customDateInput";
 
 interface NewProjectFormProps {
@@ -212,49 +213,62 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 		}
 	};
 
+	const handleSaveClick = (values: FormikValues) => {
+		const errors: Partial<Record<keyof FormikValues, string | {}>> = {};
+
+		if (!values.clientName) {
+			formik.setFieldTouched("clientName", true);
+			errors.clientName = "Client is required";
+		}
+		if (!values.projectName) {
+			formik.setFieldTouched("projectName", true);
+			errors.projectName = "Project name is required";
+		}
+	};
+
 	return (
-		<form onSubmit={handleSubmit} className="flex flex-col">
-			<div className="flex flex-col mt-2 mb-2">
-				<label className="py-1 text-tiny">Project Name</label>
-				<input
-					type="text"
-					name="projectName"
-					value={formik.values.projectName}
-					onChange={formik.handleChange}
-					onBlur={formik.handleBlur}
-					className="h-10 px-2 rounded-sm shadow-top-input-shadow font-bold focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-huge text-contrastBlue min-w-[370px]"
-					placeholder="Project Name"
-				/>
-				{formik.touched.projectName && formik.errors.projectName ? (
-					<p className="text-tiny px-2 text-red-500">
-						{formik.errors.projectName}
-					</p>
-				) : null}
-			</div>
-			<div className="flex flex-col mt-1 mb-1">
-				<label className="py-1 text-tiny">Client</label>
-				<AutocompleteInput
-					ref={clientInputRef}
-					items={clientList}
-					inputName="clientName"
-					value={formik.values.clientName}
-					onItemSelect={handleClientSelect}
-					onChange={handleClientChange}
-					onBlur={formik.handleBlur}
-					isNewItem={isNewClient}
-					inputClassName="h-8 px-2 rounded-sm max-w-[370px]"
-					listClassName="p-2"
-					badgeClassName="top-[7px] right-[7px]"
-					displayKey="name"
-					placeholder="Client"
-				/>
-			</div>
-			{formik.touched.clientName && formik.errors.clientName ? (
-				<p className="text-tiny px-2 text-red-500">
-					{formik.errors.clientName}
-				</p>
-			) : null}
-			{/* {showNewClientModal && (
+    <form onSubmit={handleSubmit} className="flex flex-col">
+      <div className="flex flex-col mt-2 mb-2">
+        <label className="py-1 text-tiny">Project Name</label>
+        <input
+          type="text"
+          name="projectName"
+          value={formik.values.projectName}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className="h-10 px-2 rounded-sm shadow-top-input-shadow font-bold focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-huge text-contrastBlue min-w-[370px]"
+          placeholder="Project Name"
+        />
+        {formik.touched.projectName && formik.errors.projectName ? (
+          <p className="text-tiny px-2 text-red-500">
+            {formik.errors.projectName}
+          </p>
+        ) : null}
+      </div>
+      <div className="flex flex-col mt-1 mb-1">
+        <label className="py-1 text-tiny">Client</label>
+        <AutocompleteInput
+          ref={clientInputRef}
+          items={clientList}
+          inputName="clientName"
+          value={formik.values.clientName}
+          onItemSelect={handleClientSelect}
+          onChange={handleClientChange}
+          onBlur={formik.handleBlur}
+          isNewItem={isNewClient}
+          inputClassName="h-8 px-2 rounded-sm max-w-[370px]"
+          listClassName="p-2"
+          badgeClassName="top-[7px] right-[7px]"
+          displayKey="name"
+          placeholder="Client"
+        />
+      </div>
+      {formik.touched.clientName && formik.errors.clientName ? (
+        <p className="text-tiny px-2 text-red-500">
+          {formik.errors.clientName}
+        </p>
+      ) : null}
+      {/* {showNewClientModal && (
 				<div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
 					<div className="bg-white p-6 rounded-md shadow-md">
 						<p className="mb-4">
@@ -277,7 +291,7 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 					</div>
 				</div>
 			)} */}
-			{/* <div className="flex flex-col mt-1 mb-1">
+      {/* <div className="flex flex-col mt-1 mb-1">
 				<label className="py-1 text-tiny">Budget (optional)</label>
 				<input
 					type="text"
@@ -295,85 +309,90 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 					</div>
 				) : null}
 			</div> */}
-			<div className="flex flex-col mt-1 mb-1">
-				<label className="py-1 text-tiny">Target Hours (optional)</label>
-				<input
-					type="text"
-					name="hours"
-					value={formik.values.hours}
-					onChange={formik.handleChange}
-					onBlur={formik.handleBlur}
-					className="h-8 px-2 text-tiny shadow-top-input-shadow font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none  text-contrastBlue max-w-[370px]"
-					placeholder="Hours"
-				/>
-				{formik.touched.hours && formik.errors.hours ? (
-					<div className="text-tiny px-2 text-red-500">
-						{formik.errors.hours}
-					</div>
-				) : null}
-			</div>
-			<div className="flex flex-row justify-between">
-				<div className="flex flex-col mt-1 mb-2 mr-2 w-full">
-					<label className="py-1 text-tiny">Start Date (optional)</label>
-					<CustomDateInput
-						name="startsOn"
-						errorString="Invalid start date format. Please use dd/Mon/yr."
-						value={formik.values.startsOn}
-						onChange={(value) => {
-							startsOnRef.current = value
-							formik.setFieldValue("startsOn", value)
-						}}
-						onBlur={() => formik.setFieldTouched("startsOn", true)}
-						setError={(error) => {
-							formik.setFieldError("startsOn", error)
-							formik.setFieldTouched("startsOn", true, false);
-						}}
-						setDate={(value) => {
-							startsOnRef.current = value;
-						}}
-						classNameForTextInput='h-8'
-					/>
-					{formik.touched.startsOn && formik.errors.startsOn ? (
-						<div className="text-tiny px-2 text-red-500">
-							{formik.errors.startsOn}
-						</div>
-					) : null}
-				</div>
-				<div className="flex flex-col mt-1 mb-2 w-full ml-2">
-                <label className="py-1 text-tiny">Ends Date (optional)</label>
-						<CustomDateInput
-							name="endsOn"
-							errorString="Invalid end date format. Please use dd/Mon/yr."
-							value={formik.values.endsOn}
-							onChange={(value) => {
-								endsOnRef.current = value;
-								formik.setFieldValue("endsOn", value)
-							}}
-							onBlur={() => formik.setFieldTouched("endsOn", true)}
-							setError={(error) => {
-									formik.setFieldError("endsOn", error)
-									formik.setFieldTouched("endsOn", true, false);
-							}}
-							setDate={(value) => {
-								endsOnRef.current = value
-							}}
-							classNameForTextInput='h-8'
-						/>
-					{formik.touched.endsOn && formik.errors.endsOn ? (
-						<div className="text-tiny px-2 text-red-500">
-							{formik.errors.endsOn}
-						</div>
-					) : null}
-				</div>
-			</div>
-			<button
-				type="submit"
-				className="w-full h-10 text-tiny font-bold bg-tiffany rounded-sm text-white pt-1 mb-4 mt-2 hover:bg-accentgreen"
-				disabled={!formik.isValid}
-			>
-				Save
-			</button>
-			{isModalView && (
+      <div className="flex flex-col mt-1 mb-1">
+        <label className="py-1 text-tiny">Target Hours (optional)</label>
+        <input
+          type="number"
+          name="hours"
+          value={formik.values.hours.toString()}
+          onChange={formik.handleChange}
+          onKeyDown={(e) => {
+            const invalidChars = ["e", "E", "+", "-", ".", ","];
+            blockInvalidChar(e, invalidChars);
+          }}
+          onBlur={formik.handleBlur}
+          className="h-8 px-2 text-tiny shadow-top-input-shadow font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none  text-contrastBlue max-w-[370px]
+					[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          placeholder="Hours"
+        />
+        {formik.touched.hours && formik.errors.hours ? (
+          <div className="text-tiny px-2 text-red-500">
+            {formik.errors.hours}
+          </div>
+        ) : null}
+      </div>
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-col mt-1 mb-2 mr-2 w-full">
+          <label className="py-1 text-tiny">Start Date (optional)</label>
+          <CustomDateInput
+            name="startsOn"
+            errorString="Invalid start date format. Please use dd/Mon/yr."
+            value={formik.values.startsOn}
+            onChange={(value) => {
+              startsOnRef.current = value;
+              formik.setFieldValue("startsOn", value);
+            }}
+            onBlur={() => formik.setFieldTouched("startsOn", true)}
+            setError={(error) => {
+              formik.setFieldError("startsOn", error);
+              formik.setFieldTouched("startsOn", true, false);
+            }}
+            setDate={(value) => {
+              startsOnRef.current = value;
+            }}
+            classNameForTextInput="h-8"
+          />
+          {formik.touched.startsOn && formik.errors.startsOn ? (
+            <div className="text-tiny px-2 text-red-500">
+              {formik.errors.startsOn}
+            </div>
+          ) : null}
+        </div>
+        <div className="flex flex-col mt-1 mb-2 w-full ml-2">
+          <label className="py-1 text-tiny">Ends Date (optional)</label>
+          <CustomDateInput
+            name="endsOn"
+            errorString="Invalid end date format. Please use dd/Mon/yr."
+            value={formik.values.endsOn}
+            onChange={(value) => {
+              endsOnRef.current = value;
+              formik.setFieldValue("endsOn", value);
+            }}
+            onBlur={() => formik.setFieldTouched("endsOn", true)}
+            setError={(error) => {
+              formik.setFieldError("endsOn", error);
+              formik.setFieldTouched("endsOn", true, false);
+            }}
+            setDate={(value) => {
+              endsOnRef.current = value;
+            }}
+            classNameForTextInput="h-8"
+          />
+          {formik.touched.endsOn && formik.errors.endsOn ? (
+            <div className="text-tiny px-2 text-red-500">
+              {formik.errors.endsOn}
+            </div>
+          ) : null}
+        </div>
+      </div>
+      <button
+        type="submit"
+        onClick={() => handleSaveClick(formik.values)}
+        className="w-full h-10 text-tiny font-bold bg-tiffany rounded-sm text-white pt-1 mb-4 mt-2 hover:bg-accentgreen"
+      >
+        Save
+      </button>
+      {isModalView && (
         <button
           onClick={closeModal}
           className="w-full h-10 text-tiny font-bold bg-contrastGrey hover:bg-contrastBlue rounded-sm text-white py-1 mb-1"
@@ -381,8 +400,8 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
           Cancel
         </button>
       )}
-		</form>
-	);
+    </form>
+  );
 };
 
 export default NewProjectForm;

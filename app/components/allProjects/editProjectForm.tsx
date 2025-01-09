@@ -12,6 +12,7 @@ import { AutocompleteInput } from "../autocompleteInput";
 import { useClientDataContext } from "@/app/contexts/clientContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
+import { blockInvalidChar } from "@/app/helperFunctions";
 import CustomDateInput from "../customDateInput";
 import { ARCHIVED_PROJECT_WARNING } from "../constants/archivedStatusStrings";
 import { set } from "lodash";
@@ -247,164 +248,169 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 	// 	}
 	// };
 	return (
-		<form
-			onSubmit={handleSubmit}
-			className="flex flex-col space-y-2 my-2 text-contrastBlue w-full pr-2"
-			onKeyDown={handleKeyDown}
-		>
-			<div className="flex flex-col justify-start w-full">
-				<input
-					type="text"
-					name="projectName"
-					value={formik.values.projectName}
-					onChange={formik.handleChange}
-					onBlur={formik.handleBlur}
-					className="h-10 px-2 rounded-sm shadow-top-input-shadow focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-huge w-full"
-					placeholder="Project Name"
-				/>
-				{formik.touched.projectName && formik.errors.projectName ? (
-					<p className="pl-2 text-2xs text-left font-normal text-red-500">
-						{formik.errors.projectName}
-					</p>
-				) : null}
-			</div>
-			<div className="flex flex-col items-start space-x-0.5 w-full">
-				<div className="flex items-center w-full space-x-1 flex-grow">
-					<label
-						htmlFor="clientName"
-						className="text-white font-normal text-tiny min-w-12 text-left"
-					>
-						Client
-					</label>
-					<AutocompleteInput
-						ref={clientInputRef}
-						items={clientList}
-						inputName="clientName"
-						value={formik.values.clientName}
-						onItemSelect={handleClientSelect}
-						onChange={handleClientChange}
-						onBlur={handleClientBlur}
-						inputClassName="h-6 flex-grow w-full pl-1 py-0 rounded-sm font-normal text-tiny"
-						dropdownClassName="font-normal rounded-sm"
-						displayKey="name"
-						placeholder="Client"
-					/>
-				</div>
-				{formik.touched.clientName && formik.errors.clientName ? (
-					<p className="pl-14 text-2xs text-left font-normal text-red-500">
-						{formik.errors.clientName}
-					</p>
-				) : null}
-			</div>
-			<div className="flex items-center space-x-0.5 w-full">
-				<div className="flex items-center flex-grow space-x-1">
-					<label
-						htmlFor="budget"
-						className="text-white font-normal text-tiny min-w-12 text-left"
-					>
-						Budget
-					</label>
-					<input
-						type="text"
-						name="budget"
-						value={formik.values.budget}
-						disabled={true} // Temporary disabled for future integration.
-						onChange={formik.handleChange}
-						onBlur={formik.handleBlur}
-						id="budget"
-						className="h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none disabled:shadow-none disabled:bg-white/60 disabled:text-gray-500 disabled:cursor-not-allowed"
-						placeholder="$USD"
-					/>
-					{formik.touched.budget && formik.errors.budget ? (
-						<p className="text-red-500">{formik.errors.budget}</p>
-					) : null}
-				</div>
-				<div className="flex items-center flex-grow space-x-1">
-					<label
-						htmlFor="hours"
-						className="text-white font-normal text-tiny min-w-12 text-left pl-1"
-					>
-						Hours
-					</label>
-					<input
-						type="text"
-						name="hours"
-						value={formik.values.hours}
-						onChange={formik.handleChange}
-						onBlur={formik.handleBlur}
-						id="hours"
-						className="h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none"
-						placeholder="Hours"
-					/>
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col space-y-2 my-2 text-contrastBlue w-full pr-2"
+      onKeyDown={handleKeyDown}
+    >
+      <div className="flex flex-col justify-start w-full">
+        <input
+          type="text"
+          name="projectName"
+          value={formik.values.projectName}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className="h-10 px-2 rounded-sm shadow-top-input-shadow focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-huge w-full"
+          placeholder="Project Name"
+        />
+        {formik.touched.projectName && formik.errors.projectName ? (
+          <p className="pl-2 text-2xs text-left font-normal text-red-500">
+            {formik.errors.projectName}
+          </p>
+        ) : null}
+      </div>
+      <div className="flex flex-col items-start space-x-0.5 w-full">
+        <div className="flex items-center w-full space-x-1 flex-grow">
+          <label
+            htmlFor="clientName"
+            className="text-white font-normal text-tiny min-w-12 text-left"
+          >
+            Client
+          </label>
+          <AutocompleteInput
+            ref={clientInputRef}
+            items={clientList}
+            inputName="clientName"
+            value={formik.values.clientName}
+            onItemSelect={handleClientSelect}
+            onChange={handleClientChange}
+            onBlur={handleClientBlur}
+            inputClassName="h-6 flex-grow w-full pl-1 py-0 rounded-sm font-normal text-tiny"
+            dropdownClassName="font-normal rounded-sm"
+            displayKey="name"
+            placeholder="Client"
+          />
+        </div>
+        {formik.touched.clientName && formik.errors.clientName ? (
+          <p className="pl-14 text-2xs text-left font-normal text-red-500">
+            {formik.errors.clientName}
+          </p>
+        ) : null}
+      </div>
+      <div className="flex items-center space-x-0.5 w-full">
+        <div className="flex items-center flex-grow space-x-1">
+          <label
+            htmlFor="budget"
+            className="text-white font-normal text-tiny min-w-12 text-left"
+          >
+            Budget
+          </label>
+          <input
+            type="text"
+            name="budget"
+            value={formik.values.budget}
+            disabled={true} // Temporary disabled for future integration.
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            id="budget"
+            className="h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none disabled:shadow-none disabled:bg-white/60 disabled:text-gray-500 disabled:cursor-not-allowed"
+            placeholder="$USD"
+          />
+          {formik.touched.budget && formik.errors.budget ? (
+            <p className="text-red-500">{formik.errors.budget}</p>
+          ) : null}
+        </div>
+        <div className="flex items-center flex-grow space-x-1">
+          <label
+            htmlFor="hours"
+            className="text-white font-normal text-tiny min-w-12 text-left pl-1"
+          >
+            Hours
+          </label>
+          <input
+            type="number"
+            name="hours"
+            value={formik.values.hours.toString()}
+            onChange={formik.handleChange}
+            onKeyDown={(e) => {
+              const invalidChars = ["e", "E", "+", "-", ".", ","];
+              blockInvalidChar(e, invalidChars);
+            }}
+            onBlur={formik.handleBlur}
+            id="hours"
+            className="h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none
+						[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            placeholder="Hours"
+          />
 
-					{formik.touched.hours && formik.errors.hours ? (
-						<p className="text-red-500">{formik.errors.hours}</p>
-					) : null}
-				</div>
-			</div>
-			<div className="flex items-center space-x-0.5 w-full">
-				<div className="flex items-center flex-grow space-x-1">
-					<label
-						htmlFor="startsOn"
-						className="text-white font-normal text-tiny min-w-12 text-left"
-					>
-						Starts
-					</label>
-					<div className="">
-						<CustomDateInput
-							name="startsOn"
-							errorString="Invalid start date format. Please use dd/Mon/yr."
-							value={formik.values.startsOn}
-							onChange={(value) => formik.setFieldValue("startsOn", value)}
-							onBlur={() => formik.setFieldTouched("startsOn", true)}
-							setError={(error) => formik.setFieldError("startsOn", error)}
-						/>
-					</div>
-				</div>
-				<div className="flex items-center space-x-1 flex-grow">
-					<label
-						htmlFor="endsOn"
-						className="text-white font-normal text-tiny min-w-12 text-left pl-1"
-					>
-						Ends
-					</label>
-					<div className="">
-						<CustomDateInput
-							name="endsOn"
-							errorString="Invalid end date format. Please use dd/Mon/yr."
-							value={formik.values.endsOn}
-							onChange={(value) => formik.setFieldValue("endsOn", value)}
-							onBlur={() => formik.setFieldTouched("endsOn", true)}
-							setError={(error) => {
-								formik.setFieldError("endsOn", error);
-							}}
-						/>
-					</div>
-				</div>
-			</div>
-			{formik.errors.endsOn && (
-				<p className="pl-2 text-2xs text-left font-normal text-red-500">
-					{formik.errors.endsOn}
-				</p>
-			)}
-			{formik.errors.startsOn && (
-				<p className="pl-2 text-2xs text-left font-normal text-red-500">
-					{formik.errors.startsOn}
-				</p>
-			)}
-			<label className="flex items-center justify-between space-x-0.5 cursor-pointer w-[208px]">
-				<input
-					type="checkbox"
-					checked={isArchiveProject}
-					onChange={handleCheckboxChange}
-					className="form-checkbox h-[11px] w-[11px] rounded-sm text-tiffany !ring-0 !ring-offset-0"
-				/>
-				<span className="text-sm leading-[18px] text-white font-normal">
-					Archive project for everyone?
-				</span>
-			</label>
-			<div className="flex items-center justify-between space-x-8 w-full border-t border-gray-600 py-2">
-				{/* <div className="relative flex items-center">
+          {formik.touched.hours && formik.errors.hours ? (
+            <p className="text-red-500">{formik.errors.hours}</p>
+          ) : null}
+        </div>
+      </div>
+      <div className="flex items-center space-x-0.5 w-full">
+        <div className="flex items-center flex-grow space-x-1">
+          <label
+            htmlFor="startsOn"
+            className="text-white font-normal text-tiny min-w-12 text-left"
+          >
+            Starts
+          </label>
+          <div className="">
+            <CustomDateInput
+              name="startsOn"
+              errorString="Invalid start date format. Please use dd/Mon/yr."
+              value={formik.values.startsOn}
+              onChange={(value) => formik.setFieldValue("startsOn", value)}
+              onBlur={() => formik.setFieldTouched("startsOn", true)}
+              setError={(error) => formik.setFieldError("startsOn", error)}
+            />
+          </div>
+        </div>
+        <div className="flex items-center space-x-1 flex-grow">
+          <label
+            htmlFor="endsOn"
+            className="text-white font-normal text-tiny min-w-12 text-left pl-1"
+          >
+            Ends
+          </label>
+          <div className="">
+            <CustomDateInput
+              name="endsOn"
+              errorString="Invalid end date format. Please use dd/Mon/yr."
+              value={formik.values.endsOn}
+              onChange={(value) => formik.setFieldValue("endsOn", value)}
+              onBlur={() => formik.setFieldTouched("endsOn", true)}
+              setError={(error) => {
+                formik.setFieldError("endsOn", error);
+              }}
+            />
+          </div>
+        </div>
+      </div>
+      {formik.errors.endsOn && (
+        <p className="pl-2 text-2xs text-left font-normal text-red-500">
+          {formik.errors.endsOn}
+        </p>
+      )}
+      {formik.errors.startsOn && (
+        <p className="pl-2 text-2xs text-left font-normal text-red-500">
+          {formik.errors.startsOn}
+        </p>
+      )}
+      <label className="flex items-center justify-between space-x-0.5 cursor-pointer w-[208px]">
+        <input
+          type="checkbox"
+          checked={isArchiveProject}
+          onChange={handleCheckboxChange}
+          className="form-checkbox h-[11px] w-[11px] rounded-sm text-tiffany !ring-0 !ring-offset-0"
+        />
+        <span className="text-sm leading-[18px] text-white font-normal">
+          Archive project for everyone?
+        </span>
+      </label>
+      <div className="flex items-center justify-between space-x-8 w-full border-t border-gray-600 py-2">
+        {/* <div className="relative flex items-center">
 					<span
 						className={`py-2 text-tiny font-normal rounded-sm underline text-left  ${archivedStatus ? "text-tiffany" : "text-white"
 							} cursor-pointer`}
@@ -418,47 +424,47 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 						</div>
 					)}
 				</div> */}
-				<div className="flex justify-between w-full space-x-4">
-					<button
-						className={`w-auto py-2 text-tiny text-center text-white font-normal underline`}
-						onClick={() => onClose?.()}
-					>
-						Cancel
-					</button>
-					<button
-						type="submit"
-						disabled={!formik.isValid}
-						className={`w-auto py-2 px-8 text-tiny text-center bg-tiffany hover:bg-accentgreen rounded-sm text-white`}
-					>
-						Save
-					</button>
-				</div>
-			</div>
-			{showNewClientModal && (
-				<div className="fixed inset-0 font-normal bg-gray-800 bg-opacity-50 flex justify-center items-center z-10">
-					<div className="bg-white p-6 rounded-md shadow-md">
-						<p className="mb-4">
-							Is &quot;{formik.values.clientName}&quot; a new client?
-						</p>
-						<div className="flex justify-center">
-							<button
-								className="mr-2 px-4 py-2 text-tiny font-bold bg-tiffany hover:bg-accentgreen rounded-sm text-white"
-								onClick={() => setShowNewClientModal(false)}
-							>
-								Yes
-							</button>
-							<button
-								className="px-4 py-2 text-tiny font-bold bg-contrastGrey hover:bg-contrastBlue rounded-sm text-white"
-								onClick={() => handleNewClientCancel()}
-							>
-								No
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
-		</form>
-	);
+        <div className="flex justify-between w-full space-x-4">
+          <button
+            className={`w-auto py-2 text-tiny text-center text-white font-normal underline`}
+            onClick={() => onClose?.()}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={!formik.isValid}
+            className={`w-auto py-2 px-8 text-tiny text-center bg-tiffany hover:bg-accentgreen rounded-sm text-white`}
+          >
+            Save
+          </button>
+        </div>
+      </div>
+      {showNewClientModal && (
+        <div className="fixed inset-0 font-normal bg-gray-800 bg-opacity-50 flex justify-center items-center z-10">
+          <div className="bg-white p-6 rounded-md shadow-md">
+            <p className="mb-4">
+              Is &quot;{formik.values.clientName}&quot; a new client?
+            </p>
+            <div className="flex justify-center">
+              <button
+                className="mr-2 px-4 py-2 text-tiny font-bold bg-tiffany hover:bg-accentgreen rounded-sm text-white"
+                onClick={() => setShowNewClientModal(false)}
+              >
+                Yes
+              </button>
+              <button
+                className="px-4 py-2 text-tiny font-bold bg-contrastGrey hover:bg-contrastBlue rounded-sm text-white"
+                onClick={() => handleNewClientCancel()}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </form>
+  );
 };
 
 export default EditProjectForm;
