@@ -47,7 +47,6 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<
         useEffect(() => {
           setFilteredItems(items);
         }, [items]);
-        const {setIsInputInFocus} = useGeneralDataContext();
         const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const inputValue = e.target.value.toLowerCase();
 
@@ -93,12 +92,8 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<
                     onChange={handleInputChange}
                     onFocus={()=> {
                         handleInputFocus()
-                        setIsInputInFocus(true)
                     }}
-                    onBlur={(e) => {
-                        handleBlur(e)
-                        setIsInputInFocus(false)
-                    }}
+                    onBlur={handleBlur}
                     autoComplete="off"
                     className={`px-2 text-tiny shadow-top-input-shadow rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-contrastBlue appearance-none ${inputClassName}`}
                     placeholder={placeholder}
