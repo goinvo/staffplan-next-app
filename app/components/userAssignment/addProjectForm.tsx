@@ -454,7 +454,7 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({ user }) => {
           onKeyDown={handleKeyDown}
           className="flex justify-between w-full h-10 pt-3 border"
         >
-          <div className="w-full sm:max-w-[68px] md:max-w-[85px] lg:max-w-[115px]">
+          <div className="w-full sm:max-w-[68px] md:max-w-[103px] lg:max-w-[125px]">
             <AutocompleteInput
               ref={clientInputRef}
               placeholder="Client"
@@ -477,7 +477,7 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({ user }) => {
               </p>
             ) : null}
           </div>
-          <div className="w-full sm:max-w-[140px] md:max-w-[160px] lg:max-w-[180px] sm:ml-[10px] md:ml-[10px] lg:ml-[14px]">
+          <div className="w-full sm:max-w-[220px] md:max-w-[266px] lg:max-w-[258px] sm:pl-3 lg:pl-2 pr-10">
             <AutocompleteInput
               ref={projectInputRef}
               placeholder="Project name"
@@ -499,10 +499,9 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({ user }) => {
               </p>
             ) : null}
           </div>
-          <div className="sm:w-[70px] md:w-[60px]"></div>
         </form>
       </td>
-      <td className="sm:block items-center sm:-ml-5 md:-ml-3 lg:-ml-8 pt-[17px] pb-2 px-0 font-normal align-top">
+      <td className="sm:block items-center pl-[10px] pt-[17px] pb-2 px-0 font-normal align-top">
         <button
           type="submit"
           className="bg-tiffany px-3 py-1 rounded-[3px] text-white font-bold"

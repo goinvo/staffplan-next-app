@@ -13,13 +13,15 @@ interface DropdownMenuProps {
 	textColor: string;
 	menuPositioning?: string;
 	className?: string;
+	menuItemsClassName?: string;
 }
 
 const EllipsisDropdownMenu: React.FC<DropdownMenuProps> = ({
 	options,
 	textColor,
 	menuPositioning,
-	className
+	className,
+	menuItemsClassName
 }) => {
 	const dropdownSelectedItemClass = (isActive: boolean) => {
 		return isActive
@@ -29,7 +31,7 @@ const EllipsisDropdownMenu: React.FC<DropdownMenuProps> = ({
 	return (
 		<Menu as="div" className="relative inline-block text-left z-15">
 			<MenuButton
-				className={`flex items-center text-2xl ${textColor} hover:text-gray-900 sm:p-2 rounded-full ellipsismenu focus:outline-none ${menuPositioning} ${className}`}
+				className={`flex items-center text-2xl ${textColor} hover:text-gray-900 rounded-full ellipsismenu focus:outline-none ${menuPositioning} ${className}`}
 			/>
 
 			<Transition
@@ -41,7 +43,7 @@ const EllipsisDropdownMenu: React.FC<DropdownMenuProps> = ({
 				leaveFrom="transform opacity-100 scale-100"
 				leaveTo="transform opacity-0 scale-95"
 			>
-				<MenuItems className="absolute right-0 mt-2 w-48 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-20" anchor='right start'>
+				<MenuItems className={`absolute right-0 mt-2 w-48 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] ring-1 ring-black ring-opacity-5 focus:outline-none z-20 ${menuItemsClassName}`} anchor='right start'>
 					<div className="py-1">
 						{options.filter(option => option.show).map((option, index) =>
 						(

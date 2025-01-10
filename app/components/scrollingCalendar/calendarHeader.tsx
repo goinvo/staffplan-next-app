@@ -450,66 +450,82 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 					<div className="sm:flex hidden  flex-row justify-between items-start">
 						{columnHeaderTitles?.map((el, i) => {
 							return (
-								<div
-									key={el.title}
-									className={`flex  items-center justify-start text-start ${
-										(isProjectsPage && i === 0 && "sm:max-w-[70px] md:max-w-[103px] lg:max-w-[110px] sm:w-full") ||
-										(isProjectsPage && i === 1 && "sm:max-w-[177px] md:max-w-[183px] lg:max-w-[200px] sm:w-full sm:pl-[13px] md:pl-[5px] lg:pl-0 pl-[5px]") ||
-										(isStaffPlanPage && i === 0 && "sm:max-w-[67px] md:max-w-[67px] lg:max-w-[95px] sm:w-full") ||
-										(isStaffPlanPage && i === 1 && "sm:max-w-[230px] md:max-w-[230px] lg:max-w-[250px] sm:w-full md:pl-[6px] lg:pl-[10px]") ||
-										"w-24"
-									}
+                <div
+                  key={el.title}
+                  className={`flex items-center justify-between text-start sm:w-full ${
+                    (isProjectsPage &&
+                      i === 0 &&
+										`sm:max-w-[88px] md:max-w-[109px] lg:max-w-[125px] sm:w-full 
+											${showOneClientProjects ? "sm:!max-w-full md:!max-w-full lg:!max-w-full sm:w-full" : ""}`) ||
+                    (isProjectsPage &&
+                      i === 1 &&
+                      "sm:max-w-[190px] md:max-w-[240px] sm:w-full sm:pl-[0] md:pl-0 pl-[5px]") ||
+                    (isStaffPlanPage &&
+                      i === 0 &&
+                      "sm:max-w-[67px] md:max-w-[85px] lg:max-w-[110px] sm:w-full") ||
+                    (isStaffPlanPage &&
+                      i === 1 &&
+                      "sm:max-w-[230px] md:max-w-[285px] lg:max-w-[280px] sm:w-full md:pl-[8px]") ||
+                    "w-24"
+                  }
                                 `}
-								>
-									{el.showIcon && (
-										<div
-											className={`mr-1 transform -translate-x-0.5 ${
-												el.onIconClick ? "cursor-pointer" : ""
-											}`}
-											onClick={el?.onIconClick}
-										>
-											<PlusIcon className="w-4 h-4" />
-										</div>
-									)}
-									<div
-										className="flex  items-center justify-start text-start cursor-pointer"
-										onClick={() => {
-											if (el?.onClick) {
-												el.onClick();
-											}
-											handleSorting(el.title);
-										}}
-									>
-										<span>{el.title}</span>
-										<div
-											className={`transform ${
-												sortedBy.title !== el.title ? "opacity-0 -rotate-90" : "opacity-100"
-											} 
+                >
+                  <div className="flex items-center">
+                    {el.showIcon && (
+                      <div
+                        className={`mr-1 transform -translate-x-0.5 ${
+                          el.onIconClick ? "cursor-pointer" : ""
+                        }`}
+                        onClick={el?.onIconClick}
+                      >
+                        <PlusIcon className="w-4 h-4" />
+                      </div>
+                    )}
+                    <div
+                      className="flex items-center justify-start text-start cursor-pointer"
+                      onClick={() => {
+                        if (el?.onClick) {
+                          el.onClick();
+                        }
+                        handleSorting(el.title);
+                      }}
+                    >
+                      <span>{el.title}</span>
+                      <div
+                        className={`transform ${
+                          sortedBy.title !== el.title
+                            ? "opacity-0 -rotate-90"
+                            : "opacity-100"
+                        } 
 											${
-												sortedBy.title === el.title &&
-												sortedBy.sort === SORT_ORDER.ASC
-													? "-rotate-90"
-													: ""
-											} 
+                        sortedBy.title === el.title &&
+                        sortedBy.sort === SORT_ORDER.ASC
+                          ? "-rotate-90"
+                          : ""
+                      } 
 											${
-												sortedBy.title === el.title &&
-												sortedBy.sort === SORT_ORDER.DESC
-													? "rotate-90"
-													: ""
-												} [transition:transform_0.3s_ease-in-out,opacity_0.2s_ease-in-out]`}
-										>
-											<ChevronLeftIcon className="w-4 h-4" />
-										</div>
-									</div>
-								</div>
-							);
+                        sortedBy.title === el.title &&
+                        sortedBy.sort === SORT_ORDER.DESC
+                          ? "rotate-90"
+                          : ""
+                      } [transition:transform_0.3s_ease-in-out,opacity_0.2s_ease-in-out]`}
+                      >
+                        <ChevronLeftIcon className="w-4 h-4" />
+                      </div>
+                    </div>
+                  </div>
+                  {((columnHeaderTitles.length === 1 && i === 0) ||
+                    (columnHeaderTitles.length === 2 && i === 1)) && (
+                    <IconButton
+                      className={`-m-1 sm:ml-0 lg:ml-0 text-black flex items-center justify-center hover:text-contrastGrey`}
+                      onClick={prevWeek}
+                      Icon={ChevronLeftIcon}
+                      iconSize={"h6 w-6"}
+                    />
+                  )}
+                </div>
+              );
 						})}
-						<IconButton
-							className={`-m-1 sm:ml-0 lg:ml-0 text-black flex items-center justify-center hover:text-contrastGrey`}
-							onClick={prevWeek}
-							Icon={ChevronLeftIcon}
-							iconSize={"h6 w-6"}
-						/>
 					</div>
 				</th>
 				{months?.map((month) => {

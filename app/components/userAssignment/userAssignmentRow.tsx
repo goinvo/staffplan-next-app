@@ -148,7 +148,7 @@ export const UserAssignmentRow = ({
 				<div
 					className='flex sm:flex-row flex-col w-full justify-between items-start '
 				>
-					<div className={`${isTempProject ? '' : 'sm:max-w-[70px] md:max-w-[90px] lg:max-w-[120px] w-full pl-[2px]'} ${isFirstClient ? 'mb-1' : ''}`}>
+					<div className={`${isTempProject ? '' : 'sm:max-w-[70px] md:max-w-[110px] lg:max-w-[130px] w-full pl-[2px] sm:mr-1 md:mr-0'} ${isFirstClient ? 'mb-1' : ''}`}>
 						{sortedByClient && isFirstClient && isFirstMonth && (
 							<ClientLabel assignment={assignment} selectedUser={selectedUser} />
 						)}
@@ -157,21 +157,30 @@ export const UserAssignmentRow = ({
 						)}
 						{/* {!isTempProject && <ClientLabel assignment={assignment} selectedUser={selectedUser} />} */}
 					</div>
-					{isFirstMonth && (
+					<div className={`flex justify-between sm:max-w-[260px] w-full`}>
+						{isFirstMonth && (
 						isTempProject ? (
 							<TempProjectLabel assignment={assignment} /> // Render custom label
 						) : (
 							<UserLabel assignment={assignment} selectedUser={selectedUser} clickHandler={handleProjectChange} undoRowRef={undoRowRef} isFirstClient={isFirstClient} />
 						)
 					)}
-					<div className={`text-contrastBlue sm:flex hidden pr-2 sm:pr-1 md:pr-2 flex-col items-end  ${isAssignmentProposed ? "max-w-[75px] w-full" : "max-w-[55px] w-full"}`}>
-						<button className='pt-2 underline' onClick={onChangeStatusButtonClick}>
-							{isAssignmentProposed ? 'Proposed' : 'Plan'}
-						</button>
-						<div className='pt-5'>
-							Actual
-						</div>
-					</div>
+            <div
+              className={`text-contrastBlue sm:flex hidden pr-2 sm:pr-1 md:pr-2 flex-col items-end  ${
+                isAssignmentProposed
+                  ? "max-w-[75px] w-full"
+                  : "max-w-[55px] w-full"
+              }`}
+            >
+              <button
+                className="pt-2 underline"
+                onClick={onChangeStatusButtonClick}
+              >
+                {isAssignmentProposed ? "Proposed" : "Plan"}
+              </button>
+              <div className="pt-5">Actual</div>
+            </div>
+          </div>
 				</div>
 			</td>
 			{months?.map((month: MonthsDataType, monthIndex) => {

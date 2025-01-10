@@ -5,6 +5,7 @@ import { AssignmentType, UserLabelProps, UndoableModifiedAssignment, ProjectType
 import EllipsisDropdownMenu from "../ellipsisDropdownMenu";
 import { useModal } from "@/app/contexts/modalContext";
 import EditAssignmentModal from "./editAssignmentModal";
+import EditProjectModal from "../editProjectModal";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
@@ -12,6 +13,7 @@ import { DELETE_ASSIGNMENT, UPSERT_ASSIGNMENT, UPSERT_PROJECT_WITH_INPUT } from 
 import { useMutation } from "@apollo/client";
 import { useFadeInOutRow } from "../../hooks/useFadeInOutRow";
 import { useClientDataContext } from "@/app/contexts/clientContext";
+import { convertProjectToCSV } from "@/app/helperFunctions";
 
 export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, isFirstClient }: UserLabelProps) => {
 	const { openModal, closeModal } = useModal();
@@ -23,7 +25,8 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 	const canAssignmentBeDeleted = !assignment.workWeeks.some(
 		(week) => (week.actualHours ?? 0) > 0);
 	const showActionsButton = viewer?.id === assignment.assignedUser?.id
-	const showArchiveButton = showActionsButton && !canAssignmentBeDeleted
+	const showArchiveButton = showActionsButton && assignment.project.status !== 'archived'
+	const showUnarchiveButton = showActionsButton && assignment.project.status === 'archived'
 	const showDeleteButton = showActionsButton && canAssignmentBeDeleted
 
 	const { animateRow } = useFadeInOutRow({ rowRef: undoRowRef, minHeight: 0, heightStep: 2, opacityStep: 0.1 })
@@ -226,11 +229,23 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 		await upsertProjectWithInput({ variables: { input } });
 	};
 
+	const downloadCSV = () => {
+			const csv = convertProjectToCSV(assignment.project);
+			const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.setAttribute('download', `${assignment.project.name}.csv`);
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		};
+
 	const assignmentDropMenuOptions = [
 		{
 			component: (
 				<button
-					className="block w-full px-8 py-4 text-sm text-left"
+					className="block w-full px-4 py-2 text-sm text-left"
 					onClick={() =>
 						openModal(
 							<EditAssignmentModal
@@ -246,17 +261,36 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 			show: false,
 		},
 		{
-			component: <button onClick={handleArchiveAssignmentClick} className="block w-full px-8 py-4 text-sm text-left">Archive</button>,
+      component: (
+        <button
+          onClick={() => openModal(<EditProjectModal project={assignment.project} closeModal={closeModal} isModalView/>) }
+          className="block w-full px-4 py-2 text-sm text-left"
+        >
+          Edit project
+        </button>
+      ),
+      show: true,
+    },
+		{
+			component: <button onClick={downloadCSV} className="block w-full px-4 py-2 text-sm text-left">Export CSV</button>,
+			show: true,
+		},
+		{
+			component: <button onClick={handleDeleteAssignmentClick} className="block w-full px-4 py-2 text-sm text-left text-[#FF5E5E] border-t border-t-[#E5E7EB]">Delete me from this project</button>,
+			show: showDeleteButton,
+		},
+		{
+			component: <button onClick={handleArchiveAssignmentClick} className="block w-full px-4 py-2 text-sm text-left text-[#FF5E5E] border-t border-t-[#E5E7EB]">Archive project for everyone</button>,
 			show: showArchiveButton,
 		},
 		{
-			component: <button onClick={handleDeleteAssignmentClick} className="block w-full px-8 py-4 text-sm text-left">Delete</button>,
-			show: showDeleteButton,
+			component: <button onClick={handleArchiveAssignmentClick} className="block w-full px-4 py-2 text-sm text-left border-t border-t-[#E5E7EB]">Unarchive project for everyone</button>,
+			show: showUnarchiveButton,
 		},
 
 	];
 	return (
-		<div className={`w-full ${isAssignmentProposed ? "sm:max-w-[154px] lg:max-w-[175px] w-full md:pl-1 lg:pl-2" : "sm:max-w-[174px] lg:max-w-[195px] w-full md:pl-1 lg:pl-2" } sm:mr-0 mr-2 flex justify-between items-start ${isFirstClient ? "mb-4 sm:mb-0" : ''}`}>
+		<div className={`w-full ${isAssignmentProposed ? "sm:max-w-[185px] w-full md:pl-1 lg:pl-2" : "sm:max-w-[205px] w-full md:pl-1 lg:pl-2" } sm:mr-0 mr-2 flex items-start ${isFirstClient ? "mb-4 sm:mb-0" : ''}`}>
 			<div>
         <button
           className={`pt-0 sm:pt-2  font-bold flex items-center justify-start text-contrastBlue text-start`}
@@ -274,13 +308,14 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
               Unarchive project for everyone
             </span>
           </span>
-        )}
+				)}
       </div>
 			{showActionsButton &&
 				<EllipsisDropdownMenu
 					options={assignmentDropMenuOptions}
 					textColor={"actionbar-text-accent"}
-					className="!px-1 sm:!px-0 md:!px-1"
+					className="ml-2 mt-[2px]"
+					menuItemsClassName="w-56"				
 				/>
 			}
 		</div>
