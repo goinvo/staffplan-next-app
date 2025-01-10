@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ProjectSummaryProps } from "../typeInterfaces";
 import { useGeneralDataContext } from "../contexts/generalContext";
 import { calculatePlanFromToday } from "./scrollingCalendar/helpers";
+import { divideNumberByCommas } from "../helperFunctions";
 
 const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 	const { showSummaries } = useGeneralDataContext();
@@ -29,23 +30,23 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 	};
 
 	const summaries = [
-		{ label: "Target", value: project.hours, unit: "hrs" },
+		{ label: "Target", value: divideNumberByCommas(project.hours), unit: "hrs" },
 		{
 			label: "Plan",
-			value: (plannedHours ?? 0) + (burnedHours ?? 0),
+			value: divideNumberByCommas((plannedHours ?? 0) + (burnedHours ?? 0)),
 			unit: "hrs",
 			alwaysShow: true,
-			tooltip: `Plan = Future Plan (${plannedHours}) + Actual (${burnedHours})`,
+			tooltip: `Plan = Future Plan (${divideNumberByCommas((plannedHours ?? 0))}) + Actual (${divideNumberByCommas(burnedHours ?? 0)})`,
 		},
-		{ label: "Actual", value: burnedHours, unit: "hrs", alwaysShow: true },
+		{ label: "Actual", value: divideNumberByCommas(burnedHours ?? 0), unit: "hrs", alwaysShow: true },
 		{
 			label: "Delta",
 			value: getDeltaValue(),
 			unit: "hrs",
 			alwaysShow: project.hours,
 			tooltip: `Delta = Future Plan (${
-				(plannedHours ?? 0)
-			}) + Actual (${burnedHours}) - Target (${project.hours})`,
+				divideNumberByCommas(plannedHours ?? 0)
+			}) + Actual (${divideNumberByCommas(burnedHours ?? 0)}) - Target (${divideNumberByCommas(project.hours)})`,
 		},
 	];
 	return (
