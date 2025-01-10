@@ -182,14 +182,8 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
           sortBy,
           result.data.currentCompany.projects
         );
-        if (showArchivedProjects && sortedProjectList) {
-          return setProjectList(sortedProjectList);
-        }
-        setProjectList(
-          (sortedProjectList ?? []).filter(
-            (project: ProjectType) => project.status !== "archived"
-          )
-        );
+
+        setProjectList(sortedProjectList ?? []);
       });
   };
 
