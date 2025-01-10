@@ -48,7 +48,7 @@ export const ProjectAssignmentRow = ({
 		}
 	};
 	const { assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
-	const { animateRow } = useFadeInOutRow({ rowRef, setShowUndoRow })
+	const { animateRow } = useFadeInOutRow({ rowRef, setShowUndoRow, maxHeight: 80 })
 	const isModifiedAssignment = (assignmentId: number) =>
 		assignmentsWithUndoActions.some((item) => item.assignment.id === assignmentId);
 	const isWeekWithinProject = (weekNumber: number, year: number) => {
