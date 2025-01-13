@@ -164,7 +164,7 @@ export const UserAssignmentRow = ({
 				<div
 					className='flex sm:flex-row flex-col w-full justify-between items-start '
 				>
-					<div className={`${isTempProject ? '' : 'sm:max-w-[70px] md:max-w-[110px] lg:max-w-[130px] w-full pl-[2px] sm:mr-1 md:mr-0'} ${isFirstClient ? 'mb-1' : ''}`}>
+					<div className={`${isTempProject ? '' : 'sm:max-w-[70px] md:max-w-[110px] lg:max-w-[130px] w-full pl-0 sm:pl-[2px] sm:mr-1 md:mr-0'} ${isFirstClient ? 'mb-1' : ''}`}>
 						{sortedByClient && isFirstClient && isFirstMonth && (
 							<ClientLabel assignment={assignment} selectedUser={selectedUser} />
 						)}

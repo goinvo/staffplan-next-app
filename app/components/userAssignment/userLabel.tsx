@@ -314,7 +314,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 				<EllipsisDropdownMenu
 					options={assignmentDropMenuOptions}
 					textColor={"actionbar-text-accent"}
-					className="ml-2 mt-[2px]"
+					className="ml-2 -mt-[5px] sm:mt-[3px]"
 					menuItemsClassName="w-56"				
 				/>
 			}
