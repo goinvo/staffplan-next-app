@@ -295,7 +295,7 @@ export const AddProjectForm = () => {
           onKeyDown={handleKeyDown}
           className="flex justify-between w-full h-10 pt-3 border"
         >
-          <div className="w-full sm:max-w-[95px] md:max-w-[120px] lg:max-w-[130px]">
+          <div className="w-full sm:max-w-[99px] md:max-w-[120px] lg:max-w-[155px] mr-2">
             <AutocompleteInput
               ref={clientInputRef}
               placeholder="Client"
@@ -318,7 +318,7 @@ export const AddProjectForm = () => {
               </p>
             ) : null}
           </div>
-          <div className="relative w-full sm:max-w-[140px] md:max-w-[152px] lg:max-w-[172px] sm:ml-[10px] md:ml-[10px] lg:ml-0 box-border">
+          <div className="relative w-full sm:max-w-[170px] md:max-w-[220px] sm:pl-[2px] md:pl-1 lg:pr-4 box-border">
             <input
               ref={projectInputRef}
               type="text"
@@ -342,10 +342,9 @@ export const AddProjectForm = () => {
               </p>
             ) : null}
           </div>
-          <div className="w-6"></div>
         </form>
       </td>
-      <td className="sm:block items-center md:-ml-2 lg:-ml-5 pt-[17px] pb-2 px-0 font-normal align-top">
+      <td className="sm:block items-center pl-6 pt-[17px] pb-2 px-0 font-normal align-top">
         <button
           type="button"
           className="bg-tiffany px-3 py-1 rounded-[3px] text-white font-bold"

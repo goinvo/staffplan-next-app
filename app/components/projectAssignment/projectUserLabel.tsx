@@ -188,6 +188,7 @@ export const ProjectUserLabel = ({
 							options={assignmentDropMenuOptions}
 							textColor={"actionbar-text-accent"}
 							menuPositioning="relative -top-2.5"
+							className="pt-[9px]"
 						/>
 					)}
 				</div>

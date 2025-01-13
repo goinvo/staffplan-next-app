@@ -253,7 +253,7 @@ const EditProjectModal = ({ project, closeModal, isModalView }: EditProjectModal
         <input
           type="number"
           name="hours"
-          value={formik.values.hours.toString()}
+          value={formik.values.hours?.toString()}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           onKeyDown={(e) => {
