@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useParams } from "next/navigation";
 
 import { useMutation } from "@apollo/client";
 import { SlPencil } from "react-icons/sl";
@@ -93,7 +93,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	const [sortedBy, setSortedBy] = useState(initialSorting);
 	const [currentClient, setCurrentClient] = useState('')
 
-	const { setHeaderTitleWidth, setDateRange, scrollToTodayFunction } = useGeneralDataContext();
+	const { viewer, setHeaderTitleWidth, setDateRange, scrollToTodayFunction } = useGeneralDataContext();
 	const { setSortOrder: setSortOrderForPeople, setSortBy: setSortByForPeople, sortUserList } = useUserDataContext();
 	const { clientList } = useClientDataContext();
 	const {
@@ -114,6 +114,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	} = calculateTotalHoursPerWeek(assignments as AssignmentType[], months);
 
 	const router = useRouter();
+	const params = useParams()
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 
@@ -279,7 +280,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	}
 	return (
 		<thead className="relative">
-			<tr className="pl-5 border-bottom bg-contrastBlue min-h-28 text-white sm:flex hidden">
+			<tr className={`pl-5 border-bottom bg-contrastBlue min-h-28 text-white sm:flex hidden ${isStaffPlanPage ? "flex" : "hidden" }`}>
 				<th
 					className={`flex w-1/2 sm:w-2/5 px-0 py-5 ${
 						isEditing ? "lg:mr-0" : "lg:mr-1"
@@ -295,7 +296,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 							}}
 						/>
 					) : (
-						<div className="flex text-white items-center">
+						<div className="flex text-white items-center pr-3">
 							{avatarUrl && (
 								<div className="px-2 py-2 relative overflow-hidden w-[92px] h-[67px] aspect-[92/67] mr-4">
 									<Image
@@ -458,6 +459,27 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 			</tr>
 			<tr className="flex sm:justify-normal justify-between border-b border-gray-300 pl-5">
 				<th ref={headerTitleRef} className="px-0 pt-[10px] pb-2 font-normal align-top text-transparentGrey w-1/2 sm:w-2/5">
+					{isStaffPlanPage && (
+            <div className="flex sm:hidden pl-3 content-center">
+              <div className="block sm:hidden pr-2 text-contrastBlue font-bold text-2xl text-left overflow-wrap break-word leading-snug">
+                {userName}
+              </div>
+              {viewer?.id === params.userId && (
+                <IconButton
+                  className="py-1 px-2 "
+                  iconSize="w-4 h-4 text-contrastBlue"
+                  onClick={() => {
+                    if (onClick) {
+                      onClick();
+                    } else {
+                      setIsEditing(true);
+                    }
+                  }}
+                  Icon={SlPencil}
+                />
+              )}
+            </div>
+          )}
 					<div className="sm:flex hidden  flex-row justify-between items-start">
 						{columnHeaderTitles?.map((el, i) => {
 							return (

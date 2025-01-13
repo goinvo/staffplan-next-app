@@ -24,8 +24,6 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 		{ label: 'Actual', value: burnedHours, unit: 'hrs', alwaysShow: true },
 	];
 
-	console.log("summaries: ", summaries);
-
 	return (
 		<td className="font-normal py-2 sm:pl-4 pl-0 pr-0 ml-1 sm:ml-0 w-1/2 sm:w-1/6">
 			{showSummaries && (
