@@ -80,8 +80,16 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 		onCompleted({ upsertProjectWithInput }) {
 			setProjectList((prev) =>
         prev.map((p) => {
-          if (upsertProjectWithInput.id === p.id) {
-            return { ...p, status: upsertProjectWithInput.status };
+					if (upsertProjectWithInput.id === p.id) {
+						return {
+              ...p,
+              name: upsertProjectWithInput.name,
+              client: upsertProjectWithInput.client,
+              hours: upsertProjectWithInput.hours,
+              startsOn: upsertProjectWithInput.startsOn,
+              endsOn: upsertProjectWithInput.endsOn,
+              status: upsertProjectWithInput.status,
+            };
           }
           return p;
         })
