@@ -40,6 +40,7 @@ const UserPage: React.FC = () => {
     ? "http://localhost:3000"
     : "https://app.staffplan.com";
   const isMyStaffPlan = pathname.split("/").pop() === viewer?.id.toString();
+  const currentUserId = Array.isArray(params.userId) ? params.userId[0] : params.userId;
 
 	useEffect(() => {
 		if (userList.length) {
@@ -102,6 +103,7 @@ const UserPage: React.FC = () => {
               return (
                 <UserAssignmentRow
                   key={assignment.id}
+                  currentUserId={currentUserId}
                   assignment={assignment}
                   isFirstMonth={true}
                   isLastMonth={true}

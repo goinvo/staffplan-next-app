@@ -21,6 +21,7 @@ import { mergeClasses } from "@/app/helperFunctions";
 
 interface UserAssignmentRowProps {
 	assignment: AssignmentType;
+	currentUserId: string;
 	isFirstMonth: boolean;
 	isLastMonth: boolean;
 	isFirstClient: boolean;
@@ -33,6 +34,7 @@ interface UserAssignmentRowProps {
 
 export const UserAssignmentRow = ({
 	assignment,
+	currentUserId,
 	isFirstMonth,
 	isLastMonth,
 	isFirstClient,
@@ -43,7 +45,7 @@ export const UserAssignmentRow = ({
 	totalRows
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
-	const { sortBy, newProjectAssignmentId, setNewProjectAssignmentId, refetchUserList, viewsFilterSingleUser, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
+	const { sortBy, newProjectAssignmentId, setNewProjectAssignmentId, setUserList, refetchUserList, viewsFilterSingleUser, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
 
 	const [showUndoRow, setShowUndoRow] = useState<boolean>(false);
 	const rowRef = useRef<HTMLTableRowElement>(null);
@@ -53,11 +55,25 @@ export const UserAssignmentRow = ({
 
 	const { animateRow } = useFadeInOutRow({ rowRef, setShowUndoRow });
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
-		errorPolicy: "all",
-		onCompleted() {
-			refetchUserList();
-		},
-	});
+    errorPolicy: "all",
+		onCompleted({ upsertAssignment }) {
+			if (upsertAssignment) {
+				setUserList(prev => prev.map(user => {
+					if (user.id?.toString() === currentUserId) {
+						const newAssignment = user.assignments.map(a => {
+							if (a.id.toString() === upsertAssignment.id) {
+								return ({ ...a, status: upsertAssignment.status});
+							}
+							return a
+						})
+						return { ...user, assignments: newAssignment };
+					}
+					return user
+				}))
+				refetchUserList();
+			}
+    },
+  });
 
 	useEffect(() => {
 			if (newProjectAssignmentId) {
