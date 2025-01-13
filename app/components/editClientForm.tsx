@@ -60,7 +60,7 @@ const EditClientForm: React.FC<EditClientFormProps> = ({ onClose, clientName, se
     );
     
     if (isClientExist) {
-      errors.clientName = "Client already exist";
+      errors.clientName = "This client name is already taken. Please enter a different name.";
     }
 
     return errors;
