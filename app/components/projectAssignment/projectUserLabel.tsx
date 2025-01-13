@@ -116,6 +116,18 @@ export const ProjectUserLabel = ({
 		});
 
 		if (!errors) {
+			setProjectList(prev => prev.map(p => {
+				if (p.id === project?.id) {
+					const newAssignments = p.assignments?.map(a => {
+						if (a.id === assignment.id) {
+							return ({...a, status: assignment.status === "active" ? "proposed" : "active", })
+						}
+						return a
+					})
+					return ({...p, assignments: newAssignments})
+				}
+				return p
+			}))
 			refetchProjectList();
 		}
 	};
