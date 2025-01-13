@@ -331,8 +331,8 @@ export const AddProjectForm = () => {
               } text-tiny font-bold placeholder:font-normal shadow-top-input-shadow rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none text-contrastBlue appearance-none`}
               placeholder="Project Name"
             />
-            {isNewProject && (
-              <span className="absolute top-[5px] right-[3px] px-1 pt-[3px] pb-1 text-white text-xs leading-[12px] bg-[#AFB3BF] rounded-[3px]">
+            {formik.values.projectName && isNewProject && (
+              <span className="absolute top-[5px] right-[19px] px-1 pt-[3px] pb-1 text-white text-xs leading-[12px] bg-[#AFB3BF] rounded-[3px] pointer-events-none">
                 new
               </span>
             )}

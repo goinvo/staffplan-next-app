@@ -372,7 +372,8 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({ user }) => {
   };
   
   const handleProjectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const isNew = formik.values.clientName
+    const isNewClient = !clientList.some(client => client.name.toLowerCase() === formik.values.clientName.toLowerCase().trimEnd())
+    const isNew = !isNewClient
       ? !projectList.some(project => project.name.toLowerCase() === e.target.value.toLowerCase().trimEnd())
       : true
     const isArchived = projectList.some(
@@ -490,7 +491,7 @@ export const AddProjectForm: React.FC<AddProjectFormProps> = ({ user }) => {
               inputClassName={`h-7 rounded-sm w-full ${isNewProject && "pr-[38px]"} ${isProjectArchived && 'pr-[63x]'}`}
               listClassName="p-2"
               displayKey="name"
-              isNewItem={isNewProject}
+              isNewItem={Boolean(formik.values.projectName) && isNewProject}
               hasStatus={isProjectArchived ? "archived" : ""}
             />
             {formik.touched.projectName && formik.errors.projectName ? (
