@@ -114,12 +114,12 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteProps<
                     </ul>
                 )}
                 {isNewItem &&
-                    <span className={`absolute top-[5px] right-[3px] px-1 pt-[3px] pb-1 text-white text-xs leading-[12px] bg-[#AFB3BF] rounded-[3px] ${badgeClassName}`}>
+                    <span className={`absolute top-[5px] right-[3px] px-1 pt-[3px] pb-1 text-white text-xs leading-[12px] bg-[#AFB3BF] rounded-[3px] pointer-events-none ${badgeClassName}`}>
                         new
                     </span>
                 }
                 {hasStatus && 
-                    <span className={`absolute top-[5px] right-[3px] px-1 pt-[3px] pb-1 text-white text-xs leading-[12px] bg-[#AFB3BF] rounded-[3px] ${badgeClassName}`}>
+                    <span className={`absolute top-[5px] right-[3px] px-1 pt-[3px] pb-1 text-white text-xs leading-[12px] bg-[#AFB3BF] rounded-[3px] pointer-events-none ${badgeClassName}`}>
                         {hasStatus}
                     </span>
                 }
