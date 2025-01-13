@@ -13,6 +13,7 @@ import { DateTime } from "luxon";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { calculatePlanFromToday } from "@/app/components/scrollingCalendar/helpers";
 import { SORT_ORDER } from "@/app/components/scrollingCalendar/constants";
+import { divideNumberByCommas } from "@/app/helperFunctions";
 
 
 
@@ -121,7 +122,6 @@ const ProjectPage: React.FC = () => {
 		return `${formattedStartDate} — ${formattedEndDate}.${endYear}`;
 	}
 
-
 	const columnHeaderTitles = [{ title: 'People', showIcon: true, onIconClick: () => addNewAssignmentRow() }]
 	const totalPlanPerProject = sortedSingleProjectAssignments?.reduce((total, assignment) => {
 		return total + calculatePlanFromToday(assignment);
@@ -142,11 +142,11 @@ const ProjectPage: React.FC = () => {
 		return delta > 0 ? `+${delta}` : `${delta}`;
 	}
 	const projectSummaryInfo = [
-		{ label: 'Target', value: singleProjectPage?.hours, show: !!singleProjectPage?.hours },
-		{ label: 'Plan', value: totalPlanPerProject + totalBurnedPerProject, show: true,tooltip: `Plan = Future Plan (${totalPlanPerProject}) + Actual (${totalBurnedPerProject})` },
-		{ label: 'Actual', value: totalBurnedPerProject, show: true },
-		{ label: 'Delta', value: getDeltaValue(), show: !!singleProjectPage?.hours,
-			 tooltip: `Delta = Future Plan (${totalPlanPerProject}) + Actual (${totalBurnedPerProject}) - Target (${singleProjectPage?.hours})` 
+		{ label: 'Target', value: divideNumberByCommas(singleProjectPage?.hours), show: !!singleProjectPage?.hours },
+		{ label: 'Plan', value: divideNumberByCommas(totalPlanPerProject + totalBurnedPerProject), show: true,tooltip: `Plan = Future Plan (${divideNumberByCommas(totalPlanPerProject)}) + Actual (${divideNumberByCommas(totalBurnedPerProject)})` },
+		{ label: 'Actual', value: divideNumberByCommas(totalBurnedPerProject), show: true },
+		{ label: 'Delta', value:getDeltaValue() ? divideNumberByCommas(getDeltaValue()!) : '', show: !!singleProjectPage?.hours,
+			 tooltip: `Delta = Future Plan (${divideNumberByCommas(totalPlanPerProject)}) + Actual (${divideNumberByCommas(totalBurnedPerProject)}) - Target (${divideNumberByCommas(singleProjectPage?.hours)})` 
 			}
 	]
 	const projectInfoSubtitle = `${singleProjectPage?.client?.name}, ${selectedProjectDates()}`.trimEnd().replace(/,$/, "")

@@ -535,6 +535,12 @@ export const drawBar = (
 	);
 };
 
+export const divideNumberByCommas = (number: number | string) => {
+  const valueToDivide = Number(number);
+
+  return valueToDivide.toLocaleString("en-US");
+};
+
 export const blockInvalidChar = (e: React.KeyboardEvent<HTMLInputElement>, invalidChars: string[]) => invalidChars.includes(e.key) && e.preventDefault();
 
 export const sortSingleProjectByOrder = (

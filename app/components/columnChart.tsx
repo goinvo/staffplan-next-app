@@ -1,4 +1,5 @@
 import React from 'react';
+import { divideNumberByCommas } from '../helperFunctions';
 
 type ChartProps = {
     height: number;
@@ -35,7 +36,7 @@ const ColumnChart = ({
         if (shouldNoRenderAnyHours) {
             return 0;
         }
-        return height || 0;
+        return divideNumberByCommas(height) || 0;
     };
 
     const drawPath = () => (

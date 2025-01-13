@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { UserSummaryProps } from "../typeInterfaces";
 import { useGeneralDataContext } from '../contexts/generalContext';
 import { calculatePlanFromToday } from "./scrollingCalendar/helpers";
+import { divideNumberByCommas } from "../helperFunctions";
 
 
 const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
@@ -16,12 +17,14 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 
 	const { showSummaries } = useGeneralDataContext()
 
-	const planTooltip = `Plan = Future Plan (${planHoursPerAssignment}) + Actual (${burnedHours})`;
+	const planTooltip = `Plan = Future Plan (${divideNumberByCommas(planHoursPerAssignment)}) + Actual (${divideNumberByCommas(burnedHours)})`;
 
 	const summaries = [
 		{ label: 'Plan', value: burnedHours + planHoursPerAssignment, unit: 'hrs', tooltip: planTooltip, alwaysShow: true },
 		{ label: 'Actual', value: burnedHours, unit: 'hrs', alwaysShow: true },
 	];
+
+	console.log("summaries: ", summaries);
 
 	return (
 		<td className="font-normal py-2 sm:pl-4 pl-0 pr-0 ml-1 sm:ml-0 w-1/2 sm:w-1/6">
@@ -43,7 +46,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 								{sum.label}
 							</label>
 							<span className="font-bold text-sm text-right min-w-20">
-								{sum.value}
+								{divideNumberByCommas(sum.value)}
 								<span className="text-sm font-normal pl-1">{sum.unit}</span>
 							</span>
 							{sum.tooltip && showTooltip && (
