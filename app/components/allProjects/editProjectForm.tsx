@@ -23,7 +23,7 @@ interface EditFormProps {
 
 const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 	const { refetchClientList, clientList } = useClientDataContext();
-	const { projectList, refetchProjectList } = useProjectsDataContext();
+	const { projectList, refetchProjectList, setProjectList } = useProjectsDataContext();
 	const { showArchivedProjects } = useGeneralDataContext();
 	const params = useParams();
 	const router = useRouter();
@@ -78,10 +78,23 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 	const [upsertProjectWithInput] = useMutation(UPSERT_PROJECT_WITH_INPUT, {
 		errorPolicy: "all",
 		onCompleted({ upsertProjectWithInput }) {
+			setProjectList((prev) =>
+        prev.map((p) => {
+					if (upsertProjectWithInput.id === p.id) {
+						return {
+              ...p,
+              name: upsertProjectWithInput.name,
+              client: upsertProjectWithInput.client,
+              hours: upsertProjectWithInput.hours,
+              startsOn: upsertProjectWithInput.startsOn,
+              endsOn: upsertProjectWithInput.endsOn,
+              status: upsertProjectWithInput.status,
+            };
+          }
+          return p;
+        })
+      );
 			refetchProjectList();
-			if (isArchiveProject && !showArchivedProjects) {
-				router.push("/projects");
-			}
 		},
 	});
 	const [

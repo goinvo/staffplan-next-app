@@ -103,6 +103,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 		setSortOrder: setSortOrderForProjects,
 		setSortBy: setSortByForProjects,
 		setSortOrderSingleProject,
+		setProjectList,
 		refetchProjectList,
 	} = useProjectsDataContext();
 	const {
@@ -138,7 +139,15 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	
 	const [upsertProjectWithInput] = useMutation(UPSERT_PROJECT_WITH_INPUT, {
     errorPolicy: "all",
-    onCompleted({ upsertProjectWithInput }) {
+		onCompleted({ upsertProjectWithInput }) {
+			setProjectList((prev) =>
+        prev.map((p) => {
+          if (upsertProjectWithInput.id === p.id) {
+            return { ...p, status: upsertProjectWithInput.status };
+          }
+          return p;
+        })
+      );
       refetchProjectList();
     },
 	});
@@ -187,7 +196,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 		} else {
 			setCurrentClient('')
 		}
-  }, [showOneClientProjects]);
+  }, [showOneClientProjects, clientList]);
 
 	useEffect(() => {
 		if (isStaffPlanPage) {

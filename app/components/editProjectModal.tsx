@@ -23,7 +23,7 @@ interface EditProjectModalProps {
 const EditProjectModal = ({ project, closeModal, isModalView }: EditProjectModalProps) => {
   const { clientList, setClientList, refetchClientList } =
     useClientDataContext();
-  const { projectList,  refetchProjectList } = useProjectsDataContext();
+  const { projectList, setProjectList, refetchProjectList } = useProjectsDataContext();
 
   const {
     name,
@@ -56,6 +56,22 @@ const EditProjectModal = ({ project, closeModal, isModalView }: EditProjectModal
   const [upsertProjectWithInput] = useMutation(UPSERT_PROJECT_WITH_INPUT, {
       errorPolicy: "all",
       onCompleted({ upsertProjectWithInput }) {
+        setProjectList((prev) =>
+          prev.map((p) => {
+            if (upsertProjectWithInput.id === p.id) {
+              return {
+                ...p,
+                name: upsertProjectWithInput.name,
+                client: upsertProjectWithInput.client,
+                hours: upsertProjectWithInput.hours,
+                startsOn: upsertProjectWithInput.startsOn,
+                endsOn: upsertProjectWithInput.endsOn,
+                status: upsertProjectWithInput.status,
+              };
+            }
+            return p;
+          })
+        );
         refetchProjectList();
       },
     });
