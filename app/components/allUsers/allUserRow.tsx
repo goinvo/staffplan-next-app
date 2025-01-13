@@ -24,7 +24,7 @@ export const AllUserRow = ({
 	const nonArchivedAssignments = user.assignments.filter(assignment => assignment.status !== 'archived')
 	const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } =
 		calculateTotalHoursPerWeek(nonArchivedAssignments, months as MonthsDataType[]);
-	const { viewer } = useGeneralDataContext();
+	const { viewer, isFirstShowInactiveUsers, isFirstHideInactiveUsers } = useGeneralDataContext();
 
 	const handleUserChange = (user: UserType) => {
 		if (user.id) {
@@ -37,7 +37,9 @@ export const AllUserRow = ({
 	};
 
 	return (
-		<tr className="pl-5 flex sm:justify-normal justify-between border-b border-gray-300 hover:bg-hoverGrey">
+		<tr className={`pl-5 flex sm:justify-normal justify-between border-b border-gray-300 hover:bg-hoverGrey
+		${(isFirstShowInactiveUsers && !user.isActive) ? 'animate-fadeInScale' : ''}
+		${(isFirstHideInactiveUsers && !user.isActive) ? 'animate-fadeOutScale' : ''}`}>
 			{isFirstMonth && (
 				<AllUserLabel clickHandler={handleUserChange} user={user} />
 			)}

@@ -19,7 +19,10 @@ export const AllUserLabel = ({ user, clickHandler }: AllUserLabelProps) => {
 						sizes="(max-width: 640px) 28px, (max-width: 768px) 38px, 38px"
 					/>
 				</div>
-				<button className="sm:px-2 px-1 sm:whitespace-nowrap" onClick={() => clickHandler(user)}>{user.name}</button>
+				<button className="relative sm:px-2 px-1 sm:whitespace-nowrap" onClick={() => clickHandler(user)}>
+					{user.name}
+					{!user.isActive && <span className="absolute top-[90%] left-2 text-sm font-normal">&#40;Deactivated&#41;</span>}
+				</button>
 				{/* <div className="hover:cursor-pointer ml-auto sm:flex hidden">
 					<EllipsisPeopleMenu user={user} />
 				</div> */}

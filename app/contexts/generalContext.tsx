@@ -22,6 +22,8 @@ export interface GeneralDataContextType {
     isInputInFocus: boolean;
     isFirstShowArchivedProjects: boolean;
     isFirstHideArchivedProjects: boolean;
+    isFirstShowInactiveUsers: boolean;
+    isFirstHideInactiveUsers: boolean;
     showArchivedProjects: boolean;
     showInactiveUsers: boolean;
     showArchivedAssignments: boolean;
@@ -31,8 +33,10 @@ export interface GeneralDataContextType {
     setIsAddNewProject: React.Dispatch<React.SetStateAction<boolean>>;
     setShowSummaries: React.Dispatch<React.SetStateAction<boolean>>;
     setIsInputInFocus: React.Dispatch<React.SetStateAction<boolean>>;
-    setIsFirstShowArchivedProjects: React.Dispatch<React.SetStateAction<boolean>>
-    setIsFirstHideArchivedProjects: React.Dispatch<React.SetStateAction<boolean>>
+    setIsFirstShowArchivedProjects: React.Dispatch<React.SetStateAction<boolean>>;
+    setIsFirstHideArchivedProjects: React.Dispatch<React.SetStateAction<boolean>>;
+    setIsFirstShowInactiveUsers: React.Dispatch<React.SetStateAction<boolean>>;
+    setIsFirstHideInactiveUsers: React.Dispatch<React.SetStateAction<boolean>>;
     setShowArchivedProjects: React.Dispatch<React.SetStateAction<boolean>>;
     setShowInactiveUsers: React.Dispatch<React.SetStateAction<boolean>>;
     setShowArchivedAssignments: React.Dispatch<React.SetStateAction<boolean>>;
@@ -73,6 +77,8 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
     const [isFirstShowArchivedProjects, setIsFirstShowArchivedProjects] = useState<boolean>(false);
     const [isFirstHideArchivedProjects, setIsFirstHideArchivedProjects] = useState<boolean>(false);
     const [showArchivedProjects, setShowArchivedProjects] = useState<boolean>(false);
+    const [isFirstShowInactiveUsers, setIsFirstShowInactiveUsers] = useState<boolean>(false);
+    const [isFirstHideInactiveUsers, setIsFirstHideInactiveUsers] = useState<boolean>(false);
     const [showInactiveUsers, setShowInactiveUsers] = useState<boolean>(false);
     const [showArchivedAssignments, setShowArchivedAssignments] = useState<boolean>(false);
     const [rollupSort, setRollupSort] = useState('none')
@@ -114,6 +120,8 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
                 isInputInFocus,
                 isFirstShowArchivedProjects,
                 isFirstHideArchivedProjects,
+                isFirstShowInactiveUsers,
+                isFirstHideInactiveUsers,
                 showArchivedProjects,
                 showInactiveUsers,
                 showArchivedAssignments,
@@ -125,6 +133,8 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
                 setIsInputInFocus,
                 setIsFirstShowArchivedProjects,
                 setIsFirstHideArchivedProjects,
+                setIsFirstShowInactiveUsers,
+                setIsFirstHideInactiveUsers,
                 setShowArchivedProjects,
                 setShowInactiveUsers,
                 setShowArchivedAssignments,

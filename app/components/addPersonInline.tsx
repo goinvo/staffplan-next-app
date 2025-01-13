@@ -54,11 +54,14 @@ export const AddPersonInline = ({ project, assignment }: AddPersonInlineProps) =
         },
     });
 
-    const availableUsers = userList?.filter((user: UserType) => {
-        return !user.assignments?.some((userAssignment: AssignmentType) => {
-            return userAssignment.project.id === project?.id;
-        });
-    });
+    const availableUsers = userList?.filter(
+      (user: UserType) =>
+        user.isActive &&
+        !user.assignments?.some(
+          (userAssignment: AssignmentType) =>
+            userAssignment.project.id === project?.id
+        )
+    );
 
     const handleUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const userId = e.target.value;

@@ -176,8 +176,9 @@ export const ProjectUserLabel = ({
 					)}
 					<div className="flex flex-col items-center justify-center">
 						{!isUserTBD && (
-							<button className="px-2" onClick={() => clickHandler(assignment)}>
+							<button className="relative px-2" onClick={() => clickHandler(assignment)}>
 								{assignment.assignedUser.name}
+								{!assignment.assignedUser.isActive && <span className="absolute top-[90%] left-2 font-normal">&#40;Deactivated&#41;</span>}
 							</button>
 						)}
 					</div>

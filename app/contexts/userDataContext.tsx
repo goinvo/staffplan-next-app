@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useMemo } from "react";
 import { useApolloClient, useQuery } from "@apollo/client";
 import { UserType, AssignmentType, UndoableModifiedAssignment } from "../typeInterfaces";
 import { SORT_ORDER } from "../components/scrollingCalendar/constants";
@@ -19,6 +19,7 @@ type EnqueueTimerParams = {
 export interface UserDataContextType {
     newProjectAssignmentId: number | null;
     userList: UserType[] | [];
+    filteredUserList: UserType[] | [];
     singleUserPage: UserType | null;
     sortOrder: SORT_ORDER;
     sortBy: string;
@@ -29,6 +30,7 @@ export interface UserDataContextType {
     undoModifyAssignment: (assignmentId: number) => void;
     setViewsFilterSingleUser: React.Dispatch<React.SetStateAction<string>>;
     setUserList: React.Dispatch<React.SetStateAction<UserType[] | []>>;
+    setFilteredUserList: React.Dispatch<React.SetStateAction<UserType[] | []>>;
     setSortOrder: React.Dispatch<React.SetStateAction<SORT_ORDER>>;
     setSortBy: React.Dispatch<React.SetStateAction<string>>;
     setViewsFilterPeople: React.Dispatch<React.SetStateAction<string>>;
@@ -56,6 +58,7 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
     const isClient = typeof window !== "undefined";
     const [newProjectAssignmentId, setNewProjectAssignmentId] = useState<number | null>(null);
     const [userList, setUserList] = useState<UserType[] | []>([]);
+    const [filteredUserList, setFilteredUserList] = useState<UserType[] | []>([]);
     const [singleUserPage, setSingleUserPage] = useState<UserType | null>(null);
     const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASC);
     const [sortBy, setSortBy] = useState<string>("Client");
@@ -63,7 +66,7 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
     const [viewsFilterSingleUser, setViewsFilterSingleUser] = useState("byClient");
     const [assignmentsWithUndoActions, setAssignmentsWithUndoActions] = useState<UndoableModifiedAssignment[]>([]);
     const { enqueueTask } = useTaskQueue();
-    const { showArchivedAssignments, viewer } = useGeneralDataContext();
+    const { showArchivedAssignments, viewer, showInactiveUsers, isFirstShowInactiveUsers } = useGeneralDataContext();
 
     const { loading: userListLoading, error: userListError, data: userListData } = useQuery(GET_USER_LIST, {
         context: { headers: { cookie: isClient ? document.cookie : null } },
@@ -114,6 +117,31 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
         [userList, showArchivedAssignments, sortOrder, sortBy]
     );
 
+    const sortedAndFilteredUsers = useMemo(() => {
+        if (!userList.length) return [];
+
+        const sortedList = sortUserListByOrder(sortOrder, userList);
+
+        if (sortedList) {
+
+            const filteredList = isFirstShowInactiveUsers
+                ? [...sortedList.filter(user => user.isActive), ...sortedList.filter(user => !user.isActive)]
+                : sortedList
+
+            const finalFilteredList = !showInactiveUsers
+                ? filteredList.filter((user) => user.isActive)
+                : filteredList;
+            
+            return finalFilteredList;
+        }
+    }, [userList, sortOrder, showInactiveUsers]);
+    
+      useEffect(() => {
+        if (sortedAndFilteredUsers) {
+          setFilteredUserList(sortedAndFilteredUsers);
+        }
+      }, [sortedAndFilteredUsers]);
+
     // Clear timeouts for all undoable modification assignments
     useBeforeUnload(() => {
         assignmentsWithUndoActions.forEach(({ timerId, finalApiCall }) => {
@@ -154,6 +182,7 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
             value={{
                 newProjectAssignmentId,
                 userList,
+                filteredUserList, 
                 singleUserPage,
                 sortOrder,
                 sortBy,
@@ -168,6 +197,7 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
                 setSortBy,
                 setViewsFilterPeople,
                 setUserList,
+                setFilteredUserList,
                 setSingleUserPage,
                 refetchUserList,
                 sortUserList,
