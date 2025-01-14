@@ -18,6 +18,7 @@ import UndoRow from "../undoRow";
 import { UNDO_ARCHIVED_OR_DELETED_PROJECT } from "../constants/undoModifyStrings";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
 import { mergeClasses } from "@/app/helperFunctions";
+import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 
 interface UserAssignmentRowProps {
 	assignment: AssignmentType;
@@ -46,6 +47,7 @@ export const UserAssignmentRow = ({
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
 	const { sortBy, newProjectAssignmentId, setNewProjectAssignmentId, setUserList, refetchUserList, viewsFilterSingleUser, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
+	const { setProjectList } = useProjectsDataContext()
 
 	const [showUndoRow, setShowUndoRow] = useState<boolean>(false);
 	const rowRef = useRef<HTMLTableRowElement>(null);
@@ -69,6 +71,20 @@ export const UserAssignmentRow = ({
 						return { ...user, assignments: newAssignment };
 					}
 					return user
+				}))
+				setProjectList(prev => prev.map(project => {
+					if (project.id === upsertAssignment.project.id) {
+						const newAssignments = project.assignments?.map(a => {
+							if (a.assignedUser.id === upsertAssignment.assignedUser.id) {
+								return { ...a, status: upsertAssignment.status };
+							}
+							return a
+						})
+
+						return ({...project, assignments: newAssignments})
+					}
+
+					return project
 				}))
 				refetchUserList();
 			}
