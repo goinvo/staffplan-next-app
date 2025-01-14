@@ -15,7 +15,7 @@ import { useMutation } from "@apollo/client";
 import { UPSERT_ASSIGNMENT } from "../../gqlQueries";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import UndoRow from "../undoRow";
-import { UNDO_ARCHIVED_OR_DELETED_PROJECT } from "../constants/undoModifyStrings";
+import { UNDO_ARCHIVED_PROJECT_SUBTITLE, UNDO_ARCHIVED_PROJECT_TITLE } from "../constants/undoModifyStrings";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
 import { mergeClasses } from "@/app/helperFunctions";
 
@@ -134,7 +134,7 @@ export const UserAssignmentRow = ({
 	if (showUndoRow && (isModifiedAssignment(assignment.id))) {
 		return (
 			<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.id}`}>
-				<UndoRow onClick={handleUndoModifyAssignment} title={UNDO_ARCHIVED_OR_DELETED_PROJECT} />
+				<UndoRow onClick={handleUndoModifyAssignment} title={UNDO_ARCHIVED_PROJECT_TITLE} subtitle={UNDO_ARCHIVED_PROJECT_SUBTITLE} />
 			</tr>
 		)
 	}
