@@ -343,7 +343,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
           <input
             type="number"
             name="hours"
-            value={formik.values.hours.toString()}
+			value={formik.values.hours?.toString() || ''}
             onChange={formik.handleChange}
             onKeyDown={(e) => {
               const invalidChars = ["e", "E", "+", "-", ".", ","];
