@@ -18,6 +18,7 @@ import UndoRow from "../undoRow";
 import { UNDO_ARCHIVED_OR_DELETED_PROJECT } from "../constants/undoModifyStrings";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
 import { mergeClasses } from "@/app/helperFunctions";
+import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 
 interface UserAssignmentRowProps {
 	assignment: AssignmentType;
@@ -46,12 +47,15 @@ export const UserAssignmentRow = ({
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
 	const { sortBy, newProjectAssignmentId, setNewProjectAssignmentId, setUserList, refetchUserList, viewsFilterSingleUser, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
+	const { undoModifyProject, projectsWithUndoActions } = useProjectsDataContext()
 
 	const [showUndoRow, setShowUndoRow] = useState<boolean>(false);
 	const rowRef = useRef<HTMLTableRowElement>(null);
 	const undoRowRef = useRef<HTMLTableRowElement>(null);
 	const isModifiedAssignment = (assignmentId: number) =>
 		assignmentsWithUndoActions.some((item) => item.assignment.id === assignmentId);
+	const isModifiedProject = (projectId: number) =>
+    projectsWithUndoActions.some((item) => item.project.id === projectId);
 
 	const { animateRow } = useFadeInOutRow({ rowRef, setShowUndoRow });
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
@@ -105,6 +109,12 @@ export const UserAssignmentRow = ({
 		setTimeout(() => animateRow(false), 10);
 	}
 
+	const handleUndoModifyProject = () => {
+    undoModifyProject(assignment.project.id);
+    setShowUndoRow(false);
+    setTimeout(() => animateRow(false), 10);
+  };
+
 	const onChangeStatusButtonClick = async () => {
 		const variables = {
 			id: assignment.id,
@@ -131,10 +141,16 @@ export const UserAssignmentRow = ({
 		runAnimation();
 	}, [assignmentsWithUndoActions, assignment.id])
 
-	if (showUndoRow && (isModifiedAssignment(assignment.id))) {
+	useEffect(() => {
+    if (isModifiedProject(assignment.project.id)) {
+      animateRow(true);
+    }
+	}, [projectsWithUndoActions, assignment.project.id]);
+	
+	if (showUndoRow) {
 		return (
-			<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.id}`}>
-				<UndoRow onClick={handleUndoModifyAssignment} title={UNDO_ARCHIVED_OR_DELETED_PROJECT} />
+			<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.project.id}`}>
+				<UndoRow onClick={handleUndoModifyProject} title={UNDO_ARCHIVED_OR_DELETED_PROJECT} />
 			</tr>
 		)
 	}
