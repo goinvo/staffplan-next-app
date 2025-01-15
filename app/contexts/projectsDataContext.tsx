@@ -9,13 +9,16 @@ import { useGeneralDataContext } from "./generalContext";
 import { useTaskQueue } from "../hooks/useTaskQueue";
 import useBeforeUnload from "../hooks/useBeforeUnload";
 import { SORT_ORDER } from "../components/scrollingCalendar/constants";
+import { useUserDataContext } from "./userDataContext";
 
 type EnqueueTimerParams = {
   project: ProjectType;
   updatedProject: ProjectType;
   finalAction: () => Promise<void>;
-  undoAction: (modifiedAssignments: UndoableModifiedProject[]) => void
+  undoAction: (modifiedAssignments: UndoableModifiedProject[]) => void;
   finalApiCall?: () => void;
+  updateUserList?: (project: ProjectType) => void;
+  updateProjectList?: (project: ProjectType) => void;
 };
 
 export interface ProjectsDataContextType {
@@ -187,8 +190,11 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
       });
   };
 
-  const handleFinalDelete = useCallback((updatedProject: ProjectType) => {
+  const handleFinalDelete = useCallback((updatedProject: ProjectType, updateUserList?: (project: ProjectType) => void, updateProjectList?: (project: ProjectType) => void) => {
     setProjectsWithUndoActions((prev) => prev.filter(({ project: p }) => p.id !== updatedProject.id));
+
+    if (updateUserList) updateUserList(updatedProject);
+    if (updateProjectList) updateProjectList(updatedProject);
   }, []);
 
   // Clear timeouts 
@@ -208,10 +214,10 @@ export const ProjectsListProvider: React.FC<{ children?: ReactNode }> = ({
     setProjectsWithUndoActions((prev) => prev.filter(({ project }) => project.id !== projectId));
   }, [projectsWithUndoActions]);
 
-  const enqueueTimer = ({ project, updatedProject, finalAction, undoAction }: EnqueueTimerParams) => {
+  const enqueueTimer = ({ project, updatedProject, finalAction, undoAction, updateUserList, updateProjectList }: EnqueueTimerParams) => {
     const timerId = enqueueTask(async () => {
       await finalAction();
-      handleFinalDelete(updatedProject);
+      handleFinalDelete(updatedProject, updateUserList, updateProjectList);
     }, 20000);
 
     setProjectsWithUndoActions((prev) => [

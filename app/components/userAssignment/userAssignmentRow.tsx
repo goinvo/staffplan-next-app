@@ -47,13 +47,15 @@ export const UserAssignmentRow = ({
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
 	const { sortBy, newProjectAssignmentId, setNewProjectAssignmentId, setUserList, refetchUserList, viewsFilterSingleUser, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
-	const { setProjectList } = useProjectsDataContext()
+	const { setProjectList, undoModifyProject, projectsWithUndoActions } = useProjectsDataContext()
 
 	const [showUndoRow, setShowUndoRow] = useState<boolean>(false);
 	const rowRef = useRef<HTMLTableRowElement>(null);
 	const undoRowRef = useRef<HTMLTableRowElement>(null);
 	const isModifiedAssignment = (assignmentId: number) =>
 		assignmentsWithUndoActions.some((item) => item.assignment.id === assignmentId);
+	const isModifiedProject = (projectId: number) =>
+    projectsWithUndoActions.some((item) => item.project.id === projectId);
 
 	const { animateRow } = useFadeInOutRow({ rowRef, setShowUndoRow });
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
@@ -121,6 +123,12 @@ export const UserAssignmentRow = ({
 		setTimeout(() => animateRow(false), 10);
 	}
 
+	const handleUndoModifyProject = () => {
+    undoModifyProject(assignment.project.id);
+    setShowUndoRow(false);
+    setTimeout(() => animateRow(false), 10);
+  };
+
 	const onChangeStatusButtonClick = async () => {
 		const variables = {
 			id: assignment.id,
@@ -147,10 +155,16 @@ export const UserAssignmentRow = ({
 		runAnimation();
 	}, [assignmentsWithUndoActions, assignment.id])
 
-	if (showUndoRow && (isModifiedAssignment(assignment.id))) {
+	useEffect(() => {
+    if (isModifiedProject(assignment.project.id)) {
+      animateRow(true);
+    }
+	}, [projectsWithUndoActions, assignment.project.id]);
+	
+	if (showUndoRow) {
 		return (
-			<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.id}`}>
-				<UndoRow onClick={handleUndoModifyAssignment} title={UNDO_ARCHIVED_PROJECT_TITLE} subtitle={UNDO_ARCHIVED_PROJECT_SUBTITLE} />
+			<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.project.id}`}>
+				<UndoRow onClick={handleUndoModifyProject} title={UNDO_ARCHIVED_PROJECT_TITLE} subtitle={UNDO_ARCHIVED_PROJECT_SUBTITLE} />
 			</tr>
 		)
 	}

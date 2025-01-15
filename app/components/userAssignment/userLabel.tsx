@@ -1,7 +1,7 @@
 'use client'
 import React, { useCallback } from "react";
 
-import { AssignmentType, UserLabelProps, UndoableModifiedAssignment, ProjectType } from "../../typeInterfaces";
+import { AssignmentType, UserLabelProps, UndoableModifiedAssignment, UndoableModifiedProject, ProjectType } from "../../typeInterfaces";
 import EllipsisDropdownMenu from "../ellipsisDropdownMenu";
 import { useModal } from "@/app/contexts/modalContext";
 import EditAssignmentModal from "./editAssignmentModal";
@@ -10,14 +10,16 @@ import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { DELETE_ASSIGNMENT, UPSERT_ASSIGNMENT, UPSERT_PROJECT_WITH_INPUT } from "@/app/gqlQueries";
-import { useMutation } from "@apollo/client";
+import { useApolloClient, useMutation } from "@apollo/client";
 import { useFadeInOutRow } from "../../hooks/useFadeInOutRow";
 import { useClientDataContext } from "@/app/contexts/clientContext";
 import { convertProjectToCSV } from "@/app/helperFunctions";
 
 export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, isFirstClient }: UserLabelProps) => {
 	const { openModal, closeModal } = useModal();
+	const client = useApolloClient()
 	const { setSingleUserPage, setUserList, enqueueTimer, refetchUserList } = useUserDataContext()
+	const { enqueueTimer: enqueueProjectTimer } = useProjectsDataContext();
 	const { viewer } = useGeneralDataContext()
 	const { refetchClientList } = useClientDataContext()
 	const { setProjectList, refetchProjectList } = useProjectsDataContext();
@@ -47,30 +49,35 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 	const [upsertProjectWithInput] = useMutation(UPSERT_PROJECT_WITH_INPUT, {
     errorPolicy: "all",
 		onCompleted({ upsertProjectWithInput }) {
-			if (upsertProjectWithInput) {
-
-				refetchProjectList();
-        refetchUserList();
-				const updatedAssignments = selectedUser.assignments.map((a) => {
-          if (a.project.id === upsertProjectWithInput.id) {
-            return {
-              ...a,
-              project: { ...a.project, status: upsertProjectWithInput.status },
-            };
-          }
-
-          return a;
-				});
-				
-				const updatedSelectedUser = {
-          ...selectedUser,
-          assignments: updatedAssignments,
-				};
-
-				setSingleUserPage(updatedSelectedUser);
-			}
     },
-  });
+	});
+	
+	const updateUserList = (updatedProject: ProjectType) => {
+		setUserList(prev => prev.map(u => {
+			if (u.id === viewer?.id && updatedProject?.assignments?.some((a: AssignmentType)=> a.assignedUser.id === viewer?.id)) {
+				const updatedAssignments = u.assignments.map(assignment => {
+					if (assignment.project.id === updatedProject.id) {
+						return ({...assignment, project: {...assignment.project, status: updatedProject.status}})
+					}
+					return assignment
+				})
+
+				return { ...u, assignments: updatedAssignments };
+			}
+			return u
+		}))
+    refetchUserList();
+	}
+
+	const updateProjectList = (updatedProject: ProjectType) => {
+		setProjectList(prev => prev.map(p => {
+			if (p.id === updatedProject.id) {
+        return { ...p, status: updatedProject.status };
+      }
+			return p
+		}))
+		refetchProjectList();
+	};
 
 	const updateAssignmentStatus = async (upsertAssignment: AssignmentType) => {
 		await animateRow(true)
@@ -175,7 +182,35 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 		[]
 	);
 
+	const undoArchivedProjectStatus = useCallback(
+			async (projectsWithUndoActions: UndoableModifiedProject[]) => {
+				const projectBeforeModified = projectsWithUndoActions.find((p: UndoableModifiedProject) => p.project.id === assignment.project.id)
+				const input = {
+          id: assignment?.project?.id,
+          name: assignment?.project?.name,
+          clientId: assignment?.project?.client?.id,
+          status: projectBeforeModified?.project.status || "confirmed",
+        };
+				try {
+					await upsertProjectWithInput({ variables: {input} });
+				} catch (error) {
+					console.error('Error updating project:', error);
+				}
+			},
+			[]
+	);
 
+	const updateCache = async () => {
+    await animateRow(true);
+    client.cache.modify({
+      id: client.cache.identify({ __typename: "Project", id: assignment.project.id }),
+      fields: {
+        status() {
+          return "archived";
+        },
+      },
+    });
+  };
 
 	const handleArchiveAssignmentClick = async () => {
 		if (assignment.project && assignment.project.isTempProject) {
@@ -215,6 +250,47 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 		}
 	};
 
+	const handleArchiveProjectClick = async (project: ProjectType) => {
+			const {id, name, client: projectClient, status} = project
+			if (status === "archived") {
+        const input = {
+          id: id,
+          name: name,
+          clientId: projectClient.id,
+          status: "unconfirmed",
+        };
+        const { data } = await upsertProjectWithInput({ variables: { input } });
+        if (data) {
+          client.cache.modify({
+            id: client.cache.identify({ __typename: "Project", id: id }),
+            fields: {
+              status() {
+                return data.upsertProject.status;
+              },
+            },
+          });
+        }
+        return;
+      }
+				const input = {
+					id: id,
+					name: name,
+					clientId: projectClient.id,
+					status: "archived",
+				};
+			try {
+				const response = await upsertProjectWithInput({ variables: { input } });
+				if (response && response.data) {
+					const updatedProject = response.data.upsertProjectWithInput;
+					const undoAction = (projectsWithUndoActions: UndoableModifiedProject[]) => { undoArchivedProjectStatus(projectsWithUndoActions); }
+					enqueueProjectTimer({ project, updatedProject, finalAction: updateCache, undoAction, updateUserList, updateProjectList });
+				}
+			} catch (error) {
+				console.error('Error updating project:', error);
+			}
+	
+		}
+
 	const handleDeleteAssignmentClick = () => {
 		enqueueTimer({ assignment, updatedAssignment: assignment, finalAction: undoableDeleteAssignment, finalApiCall: finalDeletingAssignment });
 	}
@@ -225,8 +301,12 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 			name: project.name,
 			clientId: project.client.id,
 			status: "unconfirmed",
-	};
-		await upsertProjectWithInput({ variables: { input } });
+		};
+		const { data } = await upsertProjectWithInput({ variables: { input } });
+		if (data.upsertProjectWithInput) {
+			updateUserList(data.upsertProjectWithInput);
+			updateProjectList(data.upsertProjectWithInput);
+		}
 	};
 
 	const downloadCSV = () => {
@@ -280,11 +360,18 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 			show: showDeleteButton,
 		},
 		{
-			component: <button onClick={handleArchiveAssignmentClick} className="block w-full px-4 py-2 text-sm text-left text-[#FF5E5E] border-t border-t-[#E5E7EB]">Archive project for everyone</button>,
-			show: showArchiveButton,
-		},
+      component: (
+        <button
+          onClick={() => { handleArchiveProjectClick(assignment.project) }}
+          className="block w-full px-4 py-2 text-sm text-left text-[#FF5E5E] border-t border-t-[#E5E7EB]"
+        >
+          Archive project for everyone
+        </button>
+      ),
+      show: showArchiveButton,
+    },
 		{
-			component: <button onClick={handleArchiveAssignmentClick} className="block w-full px-4 py-2 text-sm text-left border-t border-t-[#E5E7EB]">Unarchive project for everyone</button>,
+			component: <button onClick={() => handleUnarchiveProject(assignment.project)} className="block w-full px-4 py-2 text-sm text-left border-t border-t-[#E5E7EB]">Unarchive project for everyone</button>,
 			show: showUnarchiveButton,
 		},
 
