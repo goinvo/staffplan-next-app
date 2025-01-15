@@ -49,10 +49,20 @@ const config: Config = {
           "0%": { opacity: "1", height: "100px" },
           "100%": { opacity: "0", height: "0" },
         },
+        fadeInPage: {
+          from: { opacity: "0.1" },
+          to: { opacity: "1" },
+        },
+        fadeOutPage: {
+          from: { opacity: "1" },
+          to: { opacity: "0.1" },
+        },
       },
       animation: {
         fadeInScale: "fadeInScale 0.7s ease-in-out",
-        fadeOutScale: 'fadeOutScale 0.7s ease-in-out',
+        fadeOutScale: "fadeOutScale 0.7s ease-in-out",
+        fadeInPage: "fadeInPage 750ms ease-out forwards",
+        fadeOutPage: "fadeOutPage 750ms ease-in forwards",
       },
     },
   },
