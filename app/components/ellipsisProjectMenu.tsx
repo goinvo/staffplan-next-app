@@ -2,7 +2,7 @@
 import React, { BaseSyntheticEvent, Fragment, useState, RefObject, useCallback } from "react";
 import { Menu, MenuItem, MenuButton, MenuItems, Transition } from "@headlessui/react";
 
-import { UPSERT_PROJECT } from "../gqlQueries";
+import { DELETE_ASSIGNMENT, UPSERT_PROJECT } from "../gqlQueries";
 import { useApolloClient, useMutation } from "@apollo/client";
 import { useRouter } from "next/navigation";
 import { convertProjectToCSV } from "../helperFunctions";
@@ -12,7 +12,9 @@ import AddProjectModal from "./addProjectModal";
 import { ProjectType, UndoableModifiedProject } from "../typeInterfaces";
 import { useFadeInOutRow } from "../hooks/useFadeInOutRow";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
+import { useGeneralDataContext } from "../contexts/generalContext";
 import EditProjectModal from "./editProjectModal";
+import { useUserDataContext } from "../contexts/userDataContext";
 interface EllipsisProjectMenuProps {
 	project: ProjectType
 	undoRowRef: RefObject<HTMLTableRowElement>;
@@ -22,7 +24,11 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 	const { openModal, closeModal } = useModal();
 	const client = useApolloClient()
 	const { animateRow } = useFadeInOutRow({ rowRef: undoRowRef, minHeight: 0, heightStep: 2 })
-	const { enqueueTimer } = useProjectsDataContext()
+	const { enqueueTimer, setProjectList } = useProjectsDataContext()
+	const { setUserList } = useUserDataContext()
+	const { viewer } = useGeneralDataContext()
+
+	const showDeleteButton = project.assignments?.some(a => a.assignedUser?.id === viewer?.id)
 
 	const router = useRouter();
 	const {
@@ -39,10 +45,52 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 		isActive
 			? "w-full px-4 py-2 block hover:text-accentgreen hover:cursor-pointer text-sm text-left"
 			: "text-gray-900 block w-full px-4 py-2 text-sm text-left";
+	
 	const [
 		upsertProject,
 		{ data: mutationData, loading: mutationLoading, error: mutationError },
 	] = useMutation(UPSERT_PROJECT, { errorPolicy: "all", fetchPolicy: 'no-cache' });
+
+	const [deleteAssignment] = useMutation(DELETE_ASSIGNMENT, {
+			errorPolicy: "all",
+			context: {
+				fetchOptions: {
+					keepalive: true,
+				},
+			},
+	})
+
+	const handleDeleteAssignment = async () => {
+		const assignmentId = project.assignments?.find(a => a.assignedUser?.id === viewer?.id)?.id
+
+		const variables = {
+      assignmentId: assignmentId,
+		};
+		
+		const { data } = await deleteAssignment({ variables });
+		
+		const deleteAssignmentId = data.deleteAssignment.id;
+
+		setUserList(prev => prev.map(user => {
+			if (user.id === viewer?.id) {
+				const updateAssignments = user.assignments.filter(a => a.id !== deleteAssignmentId)
+
+				return ({...user, assignments: updateAssignments})
+			}
+			return user
+		}))
+
+		setProjectList(prev => prev.map(p => {
+			if (p.id === project.id) {
+				const updateAssignments = p.assignments?.filter(a => a.id !== deleteAssignmentId)
+
+				return ({...p, assignments: updateAssignments})
+			}
+
+			return p
+		}))
+	}
+	
 	const handleProjectChange = () => {
 		router.push(`projects/${id}`);
 	};
@@ -232,6 +280,11 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 								Export CSV
 							</button>
 						</MenuItem>
+						{showDeleteButton && <MenuItem>
+							<button className="w-full px-4 py-2 text-sm text-left text-[#FF5E5E] hover:text-accentgreen border-t border-t-[#E5E7EB]" onClick={handleDeleteAssignment}>
+								Delete me from this project
+							</button>
+						</MenuItem>}
 					</div>
 					<div
 						id={`${project.status}`}
