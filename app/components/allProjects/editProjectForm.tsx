@@ -12,7 +12,7 @@ import { AutocompleteInput } from "../autocompleteInput";
 import { useClientDataContext } from "@/app/contexts/clientContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
-import { blockInvalidChar } from "@/app/helperFunctions";
+import { blockInvalidChar, divideNumberByCommas } from "@/app/helperFunctions";
 import CustomDateInput from "../customDateInput";
 import { ARCHIVED_PROJECT_WARNING } from "../constants/archivedStatusStrings";
 import { set } from "lodash";
@@ -246,6 +246,13 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 			clientInputRef?.current.focus();
 		}
 	};
+
+	const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value.replace(/,/g, "");
+    if (!isNaN(Number(value))) {
+      formik.setFieldValue("hours", Number(value));
+    }
+	};
 	// temporary commented
 	// const setTotalCost = (
 	// 	event: React.ChangeEvent<HTMLInputElement>,
@@ -341,14 +348,10 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
             Hours
           </label>
           <input
-            type="number"
+            type="text"
             name="hours"
-			value={formik.values.hours?.toString() || ''}
-            onChange={formik.handleChange}
-            onKeyDown={(e) => {
-              const invalidChars = ["e", "E", "+", "-", ".", ","];
-              blockInvalidChar(e, invalidChars);
-            }}
+            value={formik.values.hours ? divideNumberByCommas(formik.values.hours) : ""}
+            onChange={(e) => handleHoursChange(e)}
             onBlur={formik.handleBlur}
             id="hours"
             className="h-6 w-full pl-1 shadow-top-input-shadow text-tiny font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outline-none

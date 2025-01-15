@@ -13,7 +13,7 @@ import { useUserDataContext } from "../contexts/userDataContext";
 import { useClientDataContext } from "../contexts/clientContext";
 import { useGeneralDataContext } from "../contexts/generalContext";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
-import { blockInvalidChar } from "../helperFunctions";
+import { blockInvalidChar, divideNumberByCommas } from "../helperFunctions";
 import CustomDateInput from "./customDateInput";
 
 interface NewProjectFormProps {
@@ -226,6 +226,13 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
 		}
 	};
 
+	const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value.replace(/,/g, "");
+		if (!isNaN(Number(value))) {
+			formik.setFieldValue("hours", Number(value));
+		}
+	};
+
 	return (
     <form onSubmit={handleSubmit} className="flex flex-col">
       <div className="flex flex-col mt-2 mb-2">
@@ -312,14 +319,10 @@ const NewProjectForm = ({ closeModal, isModalView }: NewProjectFormProps) => {
       <div className="flex flex-col mt-1 mb-1">
         <label className="py-1 text-tiny">Target Hours (optional)</label>
         <input
-          type="number"
-          name="hours"
-          value={formik.values.hours.toString()}
-          onChange={formik.handleChange}
-          onKeyDown={(e) => {
-            const invalidChars = ["e", "E", "+", "-", ".", ","];
-            blockInvalidChar(e, invalidChars);
-          }}
+          type="text"
+					name="hours"
+					value={formik.values.hours ? divideNumberByCommas(formik.values.hours) : ""}
+					onChange={(e) => handleHoursChange(e)}
           onBlur={formik.handleBlur}
           className="h-8 px-2 text-tiny shadow-top-input-shadow font-normal rounded-sm focus:border-tiffany focus:ring-2 focus:ring-tiffany border-none focus:border-tiffany outlined-none  text-contrastBlue max-w-[370px]
 					[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
