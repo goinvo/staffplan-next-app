@@ -19,6 +19,7 @@ const PeopleView: React.FC = () => {
     ? "http://localhost:3000"
     : "https://app.staffplan.com";
 
+  const [isVisible] = useState(true);
   const [initialSorting, setInitialSorting] = useState<{title: string; sort: SORT_ORDER}>(() => {
     if (typeof window !== "undefined" && localStorage) {
       const savedInitialSorting = localStorage.getItem("peoplePageSorting");
@@ -66,25 +67,28 @@ const PeopleView: React.FC = () => {
 	return (
     <>
       {filteredUserList.length ? (
-        <ScrollingCalendar
-          title="People"
-          columnHeaderTitles={columnHeaderTitles}
-          assignments={allAssignments}
-          initialSorting={initialSorting}
+        <div className={`${isVisible ? "animate-fadeInPage" : "animate-fadeOutPage"}`}
         >
-          {filteredUserList?.map((user: UserType, index: number) => {
-            return (
-              <AllUserRow
-                key={index}
-                user={user}
-                monthData={{ monthLabel: "", year: 0 }}
-                isFirstMonth={true}
-                isLastMonth={true}
-              />
-            );
-          })}
-          <InlineButtonInactiveUser />
-        </ScrollingCalendar>
+          <ScrollingCalendar
+            title="People"
+            columnHeaderTitles={columnHeaderTitles}
+            assignments={allAssignments}
+            initialSorting={initialSorting}
+          >
+            {filteredUserList?.map((user: UserType, index: number) => {
+              return (
+                <AllUserRow
+                  key={index}
+                  user={user}
+                  monthData={{ monthLabel: "", year: 0 }}
+                  isFirstMonth={true}
+                  isLastMonth={true}
+                />
+              );
+            })}
+            <InlineButtonInactiveUser />
+          </ScrollingCalendar>
+        </div>
       ) : (
         <LoadingSpinner />
       )}

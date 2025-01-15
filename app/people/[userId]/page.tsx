@@ -21,6 +21,7 @@ const UserPage: React.FC = () => {
   const params = useParams();
   const pathname = usePathname();
 
+  const [isVisible] = useState(true);
   const [initialSorting, setInitialSorting] = useState<{title: string; sort: SORT_ORDER}>(() => {
     if (typeof window !== "undefined" && localStorage) {
       const savedInitialSorting = localStorage.getItem("staffPlanPageSorting");
@@ -75,52 +76,58 @@ const UserPage: React.FC = () => {
 	return (
     <>
       {singleUserPage && userList.length ? (
-        <ScrollingCalendar
-          columnHeaderTitles={columnsHeaderTitles}
-          avatarUrl={singleUserPage.avatarUrl}
-          userName={singleUserPage.name}
-          isActiveUser={singleUserPage.isActive}
-          assignments={singleUserPage.assignments}
-          initialSorting={initialSorting}
-          editable={isMyStaffPlan}
-          onClick={isMyStaffPlan ? () => router.push(`${homepageUrl}/settings/profile`) : undefined}
+        <div className={`${isVisible ? "animate-fadeInPage" : "animate-fadeOutPage"}`}
         >
-          {[
-            <AddProjectForm
-              user={singleUserPage}
-              key="addForm"
-            />,
-            ...singleUserPage?.assignments?.map(
-            (
-              assignment: AssignmentType,
-              rowIndex: number,
-              allAssignments: AssignmentType[]
-            ) => {
-              const isFirstClient =
-                rowIndex ===
-                allAssignments.findIndex(
-                  (a) => a.project.client.id === assignment.project.client.id
-                );
-              return (
-                <UserAssignmentRow
-                  key={assignment.id}
-                  currentUserId={currentUserId}
-                  assignment={assignment}
-                  isFirstMonth={true}
-                  isLastMonth={true}
-                  isFirstClient={isFirstClient}
-                  selectedUser={singleUserPage}
-                  rowIndex={rowIndex}
-                  totalRows={singleUserPage?.assignments?.length || 0}
-                  inputRefs={inputRefs}
-                />
-              );
+          <ScrollingCalendar
+            columnHeaderTitles={columnsHeaderTitles}
+            avatarUrl={singleUserPage.avatarUrl}
+            userName={singleUserPage.name}
+            isActiveUser={singleUserPage.isActive}
+            assignments={singleUserPage.assignments}
+            initialSorting={initialSorting}
+            editable={isMyStaffPlan}
+            onClick={
+              isMyStaffPlan
+                ? () => router.push(`${homepageUrl}/settings/profile`)
+                : undefined
             }
-            )]}
-          <InlineButtonArchivedAssignments/>
-          <ApproveHours />
-          <ColumnChartsRow />
-        </ScrollingCalendar>
+          >
+            {[
+              <AddProjectForm user={singleUserPage} key="addForm" />,
+              ...singleUserPage?.assignments?.map(
+                (
+                  assignment: AssignmentType,
+                  rowIndex: number,
+                  allAssignments: AssignmentType[]
+                ) => {
+                  const isFirstClient =
+                    rowIndex ===
+                    allAssignments.findIndex(
+                      (a) =>
+                        a.project.client.id === assignment.project.client.id
+                    );
+                  return (
+                    <UserAssignmentRow
+                      key={assignment.id}
+                      currentUserId={currentUserId}
+                      assignment={assignment}
+                      isFirstMonth={true}
+                      isLastMonth={true}
+                      isFirstClient={isFirstClient}
+                      selectedUser={singleUserPage}
+                      rowIndex={rowIndex}
+                      totalRows={singleUserPage?.assignments?.length || 0}
+                      inputRefs={inputRefs}
+                    />
+                  );
+                }
+              ),
+            ]}
+            <InlineButtonArchivedAssignments />
+            <ApproveHours />
+            <ColumnChartsRow />
+          </ScrollingCalendar>
+        </div>
       ) : (
         <LoadingSpinner />
       )}

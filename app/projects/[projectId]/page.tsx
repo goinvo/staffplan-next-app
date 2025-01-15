@@ -22,6 +22,7 @@ const ProjectPage: React.FC = () => {
 	const selectedProjectId = decodeURIComponent(params.projectId.toString());
 	const inputRefs = useRef<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>([]);
 
+	const [isVisible] = useState(true);
 	const [initialSorting, setInitialSorting] = useState<{title: string; sort: SORT_ORDER}>(() => {
     if (typeof window !== "undefined" && localStorage) {
       const savedInitialSorting = localStorage.getItem("projectPageSorting");
@@ -154,7 +155,7 @@ const ProjectPage: React.FC = () => {
 	return (
     <>
       {singleProjectPage && projectList.length ? (
-        <>
+        <div className={`${isVisible ? 'animate-fadeInPage' : 'animate-fadeOutPage'}`}>
           <ScrollingCalendar
             columnHeaderTitles={columnHeaderTitles}
             title={singleProjectPage.name}
@@ -185,7 +186,7 @@ const ProjectPage: React.FC = () => {
               }
             )}
           </ScrollingCalendar>
-        </>
+        </div>
       ) : (
         <LoadingSpinner />
       )}

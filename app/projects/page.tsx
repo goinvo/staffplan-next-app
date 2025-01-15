@@ -18,6 +18,7 @@ const ProjectsView: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const [isVisible] = useState(true);
 	const [initialSorting, setInitialSorting] = useState<{title: string; sort: SORT_ORDER}>(() => {
     if (typeof window !== "undefined" && localStorage) {
       const savedInitialSorting = localStorage.getItem("projectsPageSorting");
@@ -77,30 +78,30 @@ const ProjectsView: React.FC = () => {
       {isProjectDataLoading ? (
         <LoadingSpinner />
       ) : filteredProjectList.length ? (
-        <ScrollingCalendar
-          title="Projects"
-          columnHeaderTitles={columnHeaderTitles}
-          assignments={assignments}
-          initialSorting={initialSorting}
-        >
-          {[
-            <AddProjectForm
-              key="addForm"
-            />,
-            ...filteredProjectList.map((project: ProjectType) => (
-              <AllProjectRow
-                key={project.id}
-                project={project}
-                monthData={{ monthLabel: "", year: 0 }}
-                isFirstMonth={true}
-                isLastMonth={true}
-              />
-            )),
+        <div className={`${isVisible ? 'animate-fadeInPage' : 'animate-fadeOutPage'}`}>
+          <ScrollingCalendar
+            title="Projects"
+            columnHeaderTitles={columnHeaderTitles}
+            assignments={assignments}
+            initialSorting={initialSorting}
+          >
+            {[
+              <AddProjectForm key="addForm" />,
+              ...filteredProjectList.map((project: ProjectType) => (
+                <AllProjectRow
+                  key={project.id}
+                  project={project}
+                  monthData={{ monthLabel: "", year: 0 }}
+                  isFirstMonth={true}
+                  isLastMonth={true}
+                />
+              )),
             ]}
-            <InlineButtonArchivedProject/>
-        </ScrollingCalendar>
+            <InlineButtonArchivedProject />
+          </ScrollingCalendar>
+        </div>
       ) : (
-        <CreateProjectForm/>
+        <CreateProjectForm />
       )}
     </>
   );
