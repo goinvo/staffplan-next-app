@@ -15,7 +15,7 @@ import { useMutation } from "@apollo/client";
 import { UPSERT_ASSIGNMENT } from "../../gqlQueries";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import UndoRow from "../undoRow";
-import { UNDO_ARCHIVED_OR_DELETED_PROJECT } from "../constants/undoModifyStrings";
+import { UNDO_ARCHIVED_PROJECT_SUBTITLE, UNDO_ARCHIVED_PROJECT_TITLE } from "../constants/undoModifyStrings";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
 import { mergeClasses } from "@/app/helperFunctions";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
@@ -47,7 +47,7 @@ export const UserAssignmentRow = ({
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
 	const { sortBy, newProjectAssignmentId, setNewProjectAssignmentId, setUserList, refetchUserList, viewsFilterSingleUser, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
-	const { undoModifyProject, projectsWithUndoActions } = useProjectsDataContext()
+	const { setProjectList, undoModifyProject, projectsWithUndoActions } = useProjectsDataContext()
 
 	const [showUndoRow, setShowUndoRow] = useState<boolean>(false);
 	const rowRef = useRef<HTMLTableRowElement>(null);
@@ -73,6 +73,20 @@ export const UserAssignmentRow = ({
 						return { ...user, assignments: newAssignment };
 					}
 					return user
+				}))
+				setProjectList(prev => prev.map(project => {
+					if (project.id === upsertAssignment.project.id) {
+						const newAssignments = project.assignments?.map(a => {
+							if (a.assignedUser.id === upsertAssignment.assignedUser.id) {
+								return { ...a, status: upsertAssignment.status };
+							}
+							return a
+						})
+
+						return ({...project, assignments: newAssignments})
+					}
+
+					return project
 				}))
 				refetchUserList();
 			}
@@ -150,7 +164,7 @@ export const UserAssignmentRow = ({
 	if (showUndoRow) {
 		return (
 			<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.project.id}`}>
-				<UndoRow onClick={handleUndoModifyProject} title={UNDO_ARCHIVED_OR_DELETED_PROJECT} />
+				<UndoRow onClick={handleUndoModifyProject} title={UNDO_ARCHIVED_PROJECT_TITLE} subtitle={UNDO_ARCHIVED_PROJECT_SUBTITLE} />
 			</tr>
 		)
 	}

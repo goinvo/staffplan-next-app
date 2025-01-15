@@ -310,6 +310,7 @@ export const UPSERT_ASSIGNMENT = gql`
 				id
 				name
 				avatarUrl
+				isActive
 			}
 			workWeeks {
 				id
