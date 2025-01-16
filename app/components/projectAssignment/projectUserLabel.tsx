@@ -128,7 +128,19 @@ export const ProjectUserLabel = ({
 				}
 				return p
 			}))
-			refetchProjectList();
+			setUserList(prev => prev.map(u => {
+				if (u.id === assignment.assignedUser.id) {
+					const newAssignments = u.assignments.map(a => {
+						if (a.id === assignment.id) {
+							return ({...a, status: assignment.status === "active" ? "proposed" : "active"})
+						}
+						return a
+					})
+
+					return ({...u, assignments: newAssignments})
+				}
+				return u
+			}))
 		}
 	};
 	const assignmentDropMenuOptions = [
