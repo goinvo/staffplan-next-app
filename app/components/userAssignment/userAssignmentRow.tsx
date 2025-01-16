@@ -15,7 +15,7 @@ import { useMutation } from "@apollo/client";
 import { UPSERT_ASSIGNMENT } from "../../gqlQueries";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import UndoRow from "../undoRow";
-import { UNDO_ARCHIVED_PROJECT_SUBTITLE, UNDO_ARCHIVED_PROJECT_TITLE } from "../constants/undoModifyStrings";
+import { UNDO_ARCHIVED_OR_DELETED_PROJECT, UNDO_ARCHIVED_PROJECT_SUBTITLE, UNDO_ARCHIVED_PROJECT_TITLE } from "../constants/undoModifyStrings";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
 import { mergeClasses } from "@/app/helperFunctions";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
@@ -46,7 +46,7 @@ export const UserAssignmentRow = ({
 	totalRows
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
-	const { sortBy, newProjectAssignmentId, setNewProjectAssignmentId, setUserList, refetchUserList, viewsFilterSingleUser, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
+	const { deleteAssignment, sortBy, newProjectAssignmentId, setNewProjectAssignmentId, setUserList, refetchUserList, viewsFilterSingleUser, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
 	const { setProjectList, undoModifyProject, projectsWithUndoActions } = useProjectsDataContext()
 
 	const [showUndoRow, setShowUndoRow] = useState<boolean>(false);
@@ -162,11 +162,20 @@ export const UserAssignmentRow = ({
 	}, [projectsWithUndoActions, assignment.project.id]);
 	
 	if (showUndoRow) {
-		return (
-			<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.project.id}`}>
-				<UndoRow onClick={handleUndoModifyProject} title={UNDO_ARCHIVED_PROJECT_TITLE} subtitle={UNDO_ARCHIVED_PROJECT_SUBTITLE} />
-			</tr>
-		)
+		if (deleteAssignment === "archive") {
+			return (
+				<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.project.id}`}>
+					<UndoRow onClick={handleUndoModifyProject} title={UNDO_ARCHIVED_PROJECT_TITLE} subtitle={UNDO_ARCHIVED_PROJECT_SUBTITLE} />
+				</tr>
+			)
+		}
+		if (deleteAssignment === "deleteMe") {
+			return (
+				<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.id}`}>
+					<UndoRow onClick={handleUndoModifyAssignment} title={UNDO_ARCHIVED_OR_DELETED_PROJECT} />
+				</tr>
+			)
+		}
 	}
 
 	const sortedByClient = sortBy === "Client";

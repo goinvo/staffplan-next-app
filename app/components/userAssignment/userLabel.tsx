@@ -18,7 +18,7 @@ import { convertProjectToCSV } from "@/app/helperFunctions";
 export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, isFirstClient }: UserLabelProps) => {
 	const { openModal, closeModal } = useModal();
 	const client = useApolloClient()
-	const { setSingleUserPage, setUserList, enqueueTimer, refetchUserList } = useUserDataContext()
+	const { setSingleUserPage, setUserList, enqueueTimer, refetchUserList, setDeleteAssignment } = useUserDataContext()
 	const { enqueueTimer: enqueueProjectTimer } = useProjectsDataContext();
 	const { viewer } = useGeneralDataContext()
 	const { refetchClientList } = useClientDataContext()
@@ -356,13 +356,19 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 			show: true,
 		},
 		{
-			component: <button onClick={handleDeleteAssignmentClick} className="block w-full px-4 py-2 text-sm text-left text-[#FF5E5E] border-t border-t-[#E5E7EB]">Delete me from this project</button>,
+			component: <button onClick={() => {
+				setDeleteAssignment("deleteMe");
+				handleDeleteAssignmentClick()
+			}} className="block w-full px-4 py-2 text-sm text-left text-[#FF5E5E] border-t border-t-[#E5E7EB]">Delete me from this project</button>,
 			show: showDeleteButton,
 		},
 		{
       component: (
         <button
-          onClick={() => { handleArchiveProjectClick(assignment.project) }}
+					onClick={() => {
+						setDeleteAssignment("archive");
+						handleArchiveProjectClick(assignment.project)
+					}}
           className="block w-full px-4 py-2 text-sm text-left text-[#FF5E5E] border-t border-t-[#E5E7EB]"
         >
           Archive project for everyone

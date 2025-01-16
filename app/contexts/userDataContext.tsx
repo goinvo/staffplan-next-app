@@ -17,6 +17,7 @@ type EnqueueTimerParams = {
     finalApiCall?: () => void;
 };
 export interface UserDataContextType {
+    deleteAssignment: 'archive' | 'deleteMe' | '';
     newProjectAssignmentId: number | null;
     userList: UserType[] | [];
     filteredUserList: UserType[] | [];
@@ -26,6 +27,7 @@ export interface UserDataContextType {
     viewsFilterPeople: string;
     viewsFilterSingleUser: string;
     assignmentsWithUndoActions: UndoableModifiedAssignment[]
+    setDeleteAssignment: React.Dispatch<React.SetStateAction<'archive' | 'deleteMe' | ''>>;
     setNewProjectAssignmentId: React.Dispatch<React.SetStateAction<number | null>>;
     undoModifyAssignment: (assignmentId: number) => void;
     setViewsFilterSingleUser: React.Dispatch<React.SetStateAction<string>>;
@@ -56,6 +58,7 @@ export const useUserDataContext = () => {
 export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: any }> = ({ children }) => {
     const client = useApolloClient();
     const isClient = typeof window !== "undefined";
+    const [deleteAssignment, setDeleteAssignment] = useState<'archive' | 'deleteMe' | ''>('')
     const [newProjectAssignmentId, setNewProjectAssignmentId] = useState<number | null>(null);
     const [userList, setUserList] = useState<UserType[] | []>([]);
     const [filteredUserList, setFilteredUserList] = useState<UserType[] | []>([]);
@@ -180,6 +183,7 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
     return (
         <UserDataContext.Provider
             value={{
+                deleteAssignment,
                 newProjectAssignmentId,
                 userList,
                 filteredUserList, 
@@ -189,6 +193,7 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
                 viewsFilterPeople,
                 viewsFilterSingleUser,
                 assignmentsWithUndoActions,
+                setDeleteAssignment,
                 setNewProjectAssignmentId,
                 handleFinalDelete,
                 undoModifyAssignment,
