@@ -30,23 +30,37 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 	};
 
 	const summaries = [
-		{ label: "Target", value: divideNumberByCommas(project.hours), unit: "hrs" },
+		{
+			label: "Target",
+			value: divideNumberByCommas(project.hours),
+			alwaysShow: project.hours > 0,
+			unit: "hrs",
+		},
 		{
 			label: "Plan",
 			value: divideNumberByCommas((plannedHours ?? 0) + (burnedHours ?? 0)),
 			unit: "hrs",
 			alwaysShow: true,
-			tooltip: `Plan = Future Plan (${divideNumberByCommas((plannedHours ?? 0))}) + Actual (${divideNumberByCommas(burnedHours ?? 0)})`,
+			tooltip: `Plan = Future Plan (${divideNumberByCommas(
+				plannedHours ?? 0
+			)}) + Actual (${divideNumberByCommas(burnedHours ?? 0)})`,
 		},
-		{ label: "Actual", value: divideNumberByCommas(burnedHours ?? 0), unit: "hrs", alwaysShow: true },
+		{
+			label: "Actual",
+			value: divideNumberByCommas(burnedHours ?? 0),
+			unit: "hrs",
+			alwaysShow: true,
+		},
 		{
 			label: "Delta",
 			value: getDeltaValue(),
 			unit: "hrs",
 			alwaysShow: project.hours,
-			tooltip: `Delta = Future Plan (${
-				divideNumberByCommas(plannedHours ?? 0)
-			}) + Actual (${divideNumberByCommas(burnedHours ?? 0)}) - Target (${divideNumberByCommas(project.hours)})`,
+			tooltip: `Delta = Future Plan (${divideNumberByCommas(
+				plannedHours ?? 0
+			)}) + Actual (${divideNumberByCommas(
+				burnedHours ?? 0
+			)}) - Target (${divideNumberByCommas(project.hours)})`,
 		},
 	];
 	return (
@@ -60,7 +74,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({ project }) => {
 					onClick={() => setShowTooltip(!showTooltip)}
 				>
 					{summaries.map((summary, index) =>
-						summary.value || summary.alwaysShow ? (
+						summary.value && summary.alwaysShow ? (
 							<div
 								key={index}
 								className={`sm:flex justify-between space-x-1 cursor-pointer relative ${
