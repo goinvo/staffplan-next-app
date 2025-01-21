@@ -14,6 +14,7 @@ import { useApolloClient, useMutation } from "@apollo/client";
 import { useFadeInOutRow } from "../../hooks/useFadeInOutRow";
 import { useClientDataContext } from "@/app/contexts/clientContext";
 import { convertProjectToCSV } from "@/app/helperFunctions";
+import { usePathname } from "next/navigation";
 
 export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, isFirstClient }: UserLabelProps) => {
 	const { openModal, closeModal } = useModal();
@@ -23,6 +24,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 	const { viewer } = useGeneralDataContext()
 	const { refetchClientList } = useClientDataContext()
 	const { setProjectList, refetchProjectList } = useProjectsDataContext();
+	const pathname = usePathname();
 	const isAssignmentProposed = assignment.status === "proposed";
 	const canAssignmentBeDeleted = !assignment.workWeeks.some(
 		(week) => (week.actualHours ?? 0) > 0);
@@ -30,6 +32,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 	const showArchiveButton = showActionsButton && assignment.project.status !== 'archived'
 	const showUnarchiveButton = showActionsButton && assignment.project.status === 'archived'
 	const showDeleteButton = showActionsButton && canAssignmentBeDeleted
+	const isMyStaffPlan = pathname.split("/").pop() === viewer?.id.toString();
 
 	const { animateRow } = useFadeInOutRow({ rowRef: undoRowRef, minHeight: 0, heightStep: 2, opacityStep: 0.1 })
 
@@ -308,7 +311,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 			updateProjectList(data.upsertProjectWithInput);
 		}
 	};
-
+	const hideInMyStaffplan = async () => {};
 	const downloadCSV = () => {
 			const csv = convertProjectToCSV(assignment.project);
 			const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -351,6 +354,10 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
       ),
       show: true,
     },
+	{
+		component: <button onClick={hideInMyStaffplan} className="block w-full px-4 py-2 text-sm text-left">Hide in My Staffplan</button>,
+		show: isMyStaffPlan,
+	},
 		{
 			component: <button onClick={downloadCSV} className="block w-full px-4 py-2 text-sm text-left">Export CSV</button>,
 			show: true,
@@ -376,6 +383,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 		},
 
 	];
+	console.log(assignment,'assignment')
 	return (
 		<div className={`w-full ${isAssignmentProposed ? "sm:max-w-[185px] w-full md:pl-1 lg:pl-2" : "sm:max-w-[205px] w-full md:pl-1 lg:pl-2" } sm:mr-0 mr-2 flex items-start ${isFirstClient ? "mb-4 sm:mb-0" : ''}`}>
 			<div>

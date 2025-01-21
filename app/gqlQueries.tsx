@@ -122,6 +122,7 @@ export const GET_USER_LIST = gql`
 					estimatedWeeklyHours
 					status 
 					canBeDeleted
+					focused
 					assignedUser {
 						id
 						name
