@@ -60,7 +60,7 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
     const [userList, setUserList] = useState<UserType[] | []>([]);
     const [filteredUserList, setFilteredUserList] = useState<UserType[] | []>([]);
     const [singleUserPage, setSingleUserPage] = useState<UserType | null>(null);
-    const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASC);
+    const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASC_COVERED);
     const [sortBy, setSortBy] = useState<string>("Client");
     const [viewsFilterPeople, setViewsFilterPeople] = useState("abcUserName");
     const [viewsFilterSingleUser, setViewsFilterSingleUser] = useState("byClient");

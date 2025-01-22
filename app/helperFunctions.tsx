@@ -865,7 +865,8 @@ export const sortUserListByOrder = (
   sortOrder: SORT_ORDER,
   userList: UserType[]
 ) => {
-  const arrayToSort = [...userList];
+	const arrayToSort = [...userList];
+
   if (sortOrder === SORT_ORDER.ASC) {
     return arrayToSort.sort((a, b) => {
       const userA = a.name.toLowerCase();
@@ -892,6 +893,36 @@ export const sortUserListByOrder = (
       }
       return 0;
     });
+	}
+
+	const arrayWithTotalHoursToSort = arrayToSort.map((arr) => {
+    const totalAssignmentsHours = arr.assignments.reduce((acc, assignment) => {
+      const totalHours = assignment.workWeeks.reduce((hours, week) => {
+        const now = DateTime.now();
+        const currentWeekNumber = now.weekNumber;
+        const currentYear = now.year;
+
+        if ( week.year >= currentYear && week.cweek >= currentWeekNumber && assignment.status !== "archived") {
+          hours += week.estimatedHours ? week.estimatedHours : 0;
+        }
+
+        return hours;
+      }, 0);
+
+      acc += totalHours;
+
+      return acc;
+    }, 0);
+
+    return { ...arr, totalHours: totalAssignmentsHours };
+  });
+	
+	if (sortOrder === SORT_ORDER.ASC_COVERED) {
+    return arrayWithTotalHoursToSort.sort((a, b) => a.totalHours - b.totalHours);
+  }
+
+  if (sortOrder === SORT_ORDER.DESC_COVERED) {
+    return arrayWithTotalHoursToSort.sort((a, b) => b.totalHours - a.totalHours);
   }
   return userList;
 };

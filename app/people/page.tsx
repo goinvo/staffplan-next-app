@@ -25,7 +25,7 @@ const PeopleView: React.FC = () => {
       const savedInitialSorting = localStorage.getItem("peoplePageSorting");
       return savedInitialSorting
         ? JSON.parse(savedInitialSorting)
-        : { title: "People", sort: SORT_ORDER.ASC };
+        : { title: "People", sort: SORT_ORDER.ASC_COVERED };
     }
   });
 
@@ -58,7 +58,7 @@ const PeopleView: React.FC = () => {
 
 	const getAllAssignments = (users: UserType[]): AssignmentType[] => {
 		return users?.flatMap(user =>
-			user.assignments.filter(assignment => assignment.status !== 'archived')
+			user.assignments.filter(assignment => assignment.project.status !== 'archived')
 		);
   };
   
