@@ -13,6 +13,8 @@ import AirTableFormModal from "./airTableFormModal";
 import { useGeneralDataContext } from "../contexts/generalContext";
 import EllipsisDropdownMenu from "./ellipsisDropdownMenu";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
+import { usePrefab } from "@prefab-cloud/prefab-cloud-react";
+import MagnifyingGlassIcon from "@heroicons/react/24/solid/MagnifyingGlassIcon";
 
 type Link = {
   href: string;
@@ -57,7 +59,7 @@ const Navbar: React.FC = () => {
         : {}),
     },
   ];
-	
+
 	const ellipsisDropdownMenuOptions = [
 		{
 			component: <Link href={"https://github.com/goinvo/staffplan-next-app"} className="px-4 py-2 block" rel="noopener noreferrer" target="_blank">{"Open Source"}</Link>,
@@ -72,6 +74,7 @@ const Navbar: React.FC = () => {
 			show: true,
 		},
 	];
+	const {isEnabled} = usePrefab();
 	return (
 		<nav className="navbar bg-gray-100 pl-6 pr-0 sm:px-5 h-14 flex justify-between items-center">
 			<div className="flex items-center pl-1 sm:pl-0 sm:space-x-4 space-x-1 h-full">
@@ -101,17 +104,18 @@ const Navbar: React.FC = () => {
 					className="px-8"
 				/>
 			</div>
-			{/* Temporary commented */}
-			{/* <div className="flex ml-auto items-center bg-contrastBlue rounded-2xl overflow-hidden min-w-[225px] h-8">
-				<div className="flex ml-3 items-center">
-					<MagnifyingGlassIcon className="h-4 w-4 text-contrastGrey" />
+			{isEnabled("react-enable-search") && (
+				<div className="flex ml-auto items-center bg-contrastBlue rounded-2xl overflow-hidden min-w-[225px] h-8">
+					<div className="flex ml-3 items-center">
+						<MagnifyingGlassIcon className="h-4 w-4 text-contrastGrey" />
+					</div>
+					<input
+						type="text"
+						placeholder="Search"
+						className="flex py-1 pl-2 bg-contrastBlue text-white text-sm border-none outline-none focus:ring-0 focus:border-none"
+					/>
 				</div>
-				<input
-					type="text"
-					placeholder="Search"
-					className="flex py-1 pl-2 bg-contrastBlue text-white text-sm border-none outline-none focus:ring-0 focus:border-none"
-				/>
-			</div> */}
+			)}
 			<div className="flex items-center sm:space-x-4 py-4 sm:ml-2">
 				<div>
 					{/* Temporary commented */}
