@@ -120,7 +120,7 @@ export const GET_USER_LIST = gql`
 					startsOn
 					endsOn
 					estimatedWeeklyHours
-					status 
+					status
 					canBeDeleted
 					assignedUser {
 						id
@@ -262,6 +262,7 @@ export const GET_VIEWER = gql`
 		viewer {
 			name
 			id
+			email
 			avatarUrl
 			role
 		}

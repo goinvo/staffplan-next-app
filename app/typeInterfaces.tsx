@@ -182,6 +182,7 @@ export interface UserSummaryProps {
 export interface ViewerType {
 	name: string;
 	id: string;
+	email: string;
 	role: string;
 }
 
@@ -277,7 +278,7 @@ export interface UndoableModifiedProject {
 }
 
 export type ClassValue = string | undefined | { [key: string]: boolean };
-  
+
 export type ProjectSummaryInfoItem = {
 	label: string;
 	value?: string | number;
