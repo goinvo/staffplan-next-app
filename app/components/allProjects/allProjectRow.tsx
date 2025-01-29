@@ -23,6 +23,8 @@ import { UPSERT_PROJECT_WITH_INPUT } from "@/app/gqlQueries";
 
 export const AllProjectRow = ({
 	project,
+	projects,
+	rowIndex,
 	isFirstMonth,
 	isLastMonth,
 	months,
@@ -34,9 +36,11 @@ export const AllProjectRow = ({
 	const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } =
 		calculateTotalHoursPerWeek(project.assignments as AssignmentType[], months as MonthsDataType[]);
 
-	const { newProjectId, projectsWithUndoActions, setNewProjectId, undoModifyProject, refetchProjectList } = useProjectsDataContext()
+	const { sortBy, newProjectId, projectsWithUndoActions, setNewProjectId, undoModifyProject, refetchProjectList } = useProjectsDataContext()
 	const { isFirstShowArchivedProjects, isFirstHideArchivedProjects } = useGeneralDataContext();
 	const { animateRow } = useFadeInOutRow({ rowRef, setShowUndoRow, maxHeight: 102 });
+
+	const isNewClient = projects?.[rowIndex - 1]?.client?.id !== project.client.id
 
 	const [upsertProjectWithInput] = useMutation(UPSERT_PROJECT_WITH_INPUT, {
 			errorPolicy: "all",
@@ -44,7 +48,7 @@ export const AllProjectRow = ({
 				refetchProjectList();
 			},
 	});
-	
+
 	const isModifiedProject = (projectId: number) =>
 		projectsWithUndoActions.some((item) => item.project.id === projectId);
 	const handleProjectChange = (project: ProjectType) => {
@@ -92,12 +96,20 @@ export const AllProjectRow = ({
 	}
 
 	return (
-		<tr ref={rowRef} key={`project-${project.id}`} className={`pl-5 flex sm:justify-normal justify-between opacity-100 h-auto border-b border-gray-300 hover:bg-hoverGrey ${project.status === 'proposed' ? 'bg-diagonal-stripes' : ''}
+		<tr ref={rowRef} key={`project-${project.id}`} className={`pl-5 flex sm:justify-normal justify-between opacity-100 h-auto border-gray-300 hover:bg-hoverGrey ${project.status === 'proposed' ? 'bg-diagonal-stripes' : ''}
 			delay-100 ${ (newProjectId === Number(project.id) || (isFirstShowArchivedProjects && project.status === 'archived')) ? 'animate-fadeInScale' : ''}
-			${isFirstHideArchivedProjects && project.status === 'archived' ? 'animate-fadeOutScale' : ''}`}> 
+			${isFirstHideArchivedProjects && project.status === 'archived' ? 'animate-fadeOutScale' : ''}
+			${(isNewClient && sortBy === 'Clients' && rowIndex !== 0 || (sortBy === 'Projects' && rowIndex !== 0)) ? 'border-t' : ''}
+			${rowIndex === projects.length - 1 ? 'border-b' : ''} `}> 
 			<td className='sm:block flex items-center pt-1 pb-2 px-0 font-normal align-top w-1/2 sm:w-2/5'>
 				{isFirstMonth && (
-					<AllProjectLabel undoRowRef={undoRowRef} clickHandler={handleProjectChange} project={project} handleUnarchiveProject={handleUnarchiveProject} />
+					<AllProjectLabel
+            undoRowRef={undoRowRef}
+						isNewClient={isNewClient}
+            clickHandler={handleProjectChange}
+            project={project}
+            handleUnarchiveProject={handleUnarchiveProject}
+          />
 
 				)}
 			</td>

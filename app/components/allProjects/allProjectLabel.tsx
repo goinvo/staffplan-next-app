@@ -7,13 +7,14 @@ import IconButton from "../iconButton";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 
 export const AllProjectLabel = ({
-	project,
+  project,
+  isNewClient,
   clickHandler,
   handleUnarchiveProject,
 	undoRowRef,
 }: AllProjectLabelProps) => {
   const router = useRouter();
-  const { showOneClientProjects, setShowOneClientProjects } = useProjectsDataContext()
+  const { sortBy, showOneClientProjects, setShowOneClientProjects } = useProjectsDataContext()
 
   const handleClientClick = (client: string) => {
     const encodedClient = client.replace(/[\s,]/g, "_");
@@ -35,7 +36,7 @@ export const AllProjectLabel = ({
 
       {/*  <span className="sm:hidden block mr-2">{project.client.name}</span> */}
 
-      {!showOneClientProjects &&<span
+      {!showOneClientProjects && <span
         className="block w-auto sm:max-w-[100px] md:max-w-[125px] lg:max-w-[145px] sm:w-full sm:mr-0 mr-2 cursor-pointer"
         onClick={() => {
           if (showOneClientProjects === project.client.id.toString()) {
@@ -46,7 +47,7 @@ export const AllProjectLabel = ({
           }
         }}
       >
-        {project.client.name}
+        {isNewClient || sortBy === 'Projects' ? project.client.name : ''}
       </span>}
       <div
         className={`flex w-auto sm:max-w-[170px] md:max-w-[220px] sm:w-full sm:ml-2 lg:ml-0 sm:mr-0 mr-2 sm:mt-0 mt-2 ${
