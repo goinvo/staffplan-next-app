@@ -131,6 +131,13 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	const isProjectsPage = pathname.includes("projects") && pathname.split("/").length === 2;
 	const isPeoplePage = pathname.includes("people") && pathname.split("/").length === 2;
 
+	const peoplePageSortingTitle = {
+    sortAsc: "alpha",
+    sortDesc: "alpha",
+    sortAscCovered: "least covered",
+    sortDescCovered: "most covered",
+  };
+
 	useKeyboardNavigation({
     getNextWeeksPerView,
 		getPrevWeeksPerView,
@@ -265,12 +272,28 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 		if (sortedBy.title !== title) {
 			setSortedBy({ title, sort: SORT_ORDER.ASC });
 		} else {
-			if (sortedBy.sort === SORT_ORDER.ASC) {
-				setSortedBy({ ...sortedBy, sort: SORT_ORDER.DESC });
-			} else {
-				setSortedBy({ ...sortedBy, sort: SORT_ORDER.ASC });
-			}
-		}
+      if (isPeoplePage) {
+        if (sortedBy.sort === SORT_ORDER.ASC_COVERED) {
+          setSortedBy({ ...sortedBy, sort: SORT_ORDER.DESC_COVERED });
+        }
+
+        if (sortedBy.sort === SORT_ORDER.DESC_COVERED) {
+          setSortedBy({ ...sortedBy, sort: SORT_ORDER.ASC });
+        }
+
+        if (sortedBy.sort === SORT_ORDER.ASC) {
+          setSortedBy({ ...sortedBy, sort: SORT_ORDER.DESC });
+        }
+
+        if (sortedBy.sort === SORT_ORDER.DESC) {
+          setSortedBy({ ...sortedBy, sort: SORT_ORDER.ASC_COVERED });
+        }
+      } else if (sortedBy.sort === SORT_ORDER.ASC) {
+        setSortedBy({ ...sortedBy, sort: SORT_ORDER.DESC });
+      } else {
+        setSortedBy({ ...sortedBy, sort: SORT_ORDER.ASC });
+      }
+    }
 	};
 
 	const returnToProjects = () => {
@@ -523,7 +546,10 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                         handleSorting(el.title);
                       }}
                     >
-                      <span>{el.title}</span>
+											<span>{el.title}</span>
+											{isPeoplePage && (
+                        <span className="ml-1 mr-[2px]">&#40;{peoplePageSortingTitle[sortedBy.sort]}&#41;</span>
+                      )}
                       <div
                         className={`transform ${
                           sortedBy.title !== el.title
@@ -532,13 +558,13 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                         } 
 											${
                         sortedBy.title === el.title &&
-                        sortedBy.sort === SORT_ORDER.ASC
+                        (sortedBy.sort === SORT_ORDER.ASC || sortedBy.sort === SORT_ORDER.ASC_COVERED)
                           ? "-rotate-90"
                           : ""
                       } 
 											${
                         sortedBy.title === el.title &&
-                        sortedBy.sort === SORT_ORDER.DESC
+                        (sortedBy.sort === SORT_ORDER.DESC || sortedBy.sort === SORT_ORDER.DESC_COVERED)
                           ? "rotate-90"
                           : ""
                       } [transition:transform_0.3s_ease-in-out,opacity_0.2s_ease-in-out]`}
