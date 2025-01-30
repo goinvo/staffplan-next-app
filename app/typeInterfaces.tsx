@@ -159,14 +159,14 @@ export interface UserLabelProps {
 	assignment: AssignmentType;
 	selectedUser: UserType;
 	clickHandler: (assignment: AssignmentType) => void;
-	undoRowRef: RefObject<HTMLTableRowElement>;
+	undoRowRef: RefObject<HTMLTableRowElement | null>;
 	isFirstClient?: boolean;
 }
 export interface ProjectLabelProps {
 	project?: ProjectType;
 	assignment: AssignmentType;
 	clickHandler: (assignment: AssignmentType) => void;
-	undoRowRef: RefObject<HTMLTableRowElement>;
+	undoRowRef: RefObject<HTMLTableRowElement | null>;
 }
 export interface ClientLabelProps {
 	assignment: AssignmentType;

@@ -3,7 +3,7 @@
 import { useRef } from "react";
 
 interface FadeInOutRowOptions {
-    rowRef: React.RefObject<HTMLTableRowElement>;
+    rowRef: React.RefObject<HTMLTableRowElement | null>;
     setShowUndoRow?: React.Dispatch<React.SetStateAction<boolean>>;
     minHeight?: number;
     maxHeight?: number;
