@@ -21,6 +21,7 @@ export interface AllUserAccumulatorProps {
 }
 export interface AllProjectLabelProps {
 	project: ProjectType;
+	isNewClient: boolean;
 	clickHandler: (project: ProjectType) => void;
 	handleUnarchiveProject: (project: ProjectType) => void;
 	undoRowRef: RefObject<HTMLTableRowElement>;
@@ -28,6 +29,8 @@ export interface AllProjectLabelProps {
 
 export interface AllProjectRowProps {
 	project: ProjectType;
+	projects: ProjectType[];
+	rowIndex: number;
 	isFirstMonth: boolean;
 	isLastMonth: boolean;
 	monthData: { monthLabel: string; year: number };
@@ -182,6 +185,7 @@ export interface UserSummaryProps {
 export interface ViewerType {
 	name: string;
 	id: string;
+	email: string;
 	role: string;
 }
 
@@ -277,7 +281,7 @@ export interface UndoableModifiedProject {
 }
 
 export type ClassValue = string | undefined | { [key: string]: boolean };
-  
+
 export type ProjectSummaryInfoItem = {
 	label: string;
 	value?: string | number;

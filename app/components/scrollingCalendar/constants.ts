@@ -31,4 +31,6 @@ export enum PROJECT_DATES_TYPE {
 export enum SORT_ORDER {
   ASC = "sortAsc",
   DESC = "sortDesc",
+  ASC_COVERED = "sortAscCovered",
+  DESC_COVERED = "sortDescCovered",
 }

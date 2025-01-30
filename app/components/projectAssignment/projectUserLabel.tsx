@@ -128,7 +128,19 @@ export const ProjectUserLabel = ({
 				}
 				return p
 			}))
-			refetchProjectList();
+			setUserList(prev => prev.map(u => {
+				if (u.id === assignment.assignedUser.id) {
+					const newAssignments = u.assignments.map(a => {
+						if (a.id === assignment.id) {
+							return ({...a, status: assignment.status === "active" ? "proposed" : "active"})
+						}
+						return a
+					})
+
+					return ({...u, assignments: newAssignments})
+				}
+				return u
+			}))
 		}
 	};
 	const assignmentDropMenuOptions = [
@@ -163,7 +175,6 @@ export const ProjectUserLabel = ({
 			show: canDeleteAssignment,
 		},
 	];
-
 	return (
 		<td className="px-0 pr-0 pt-2 pb-2 font-normal flex align-center sm:w-2/5 w-1/2">
 			<div className="flex flex-row justify-between sm:items-start items-center">

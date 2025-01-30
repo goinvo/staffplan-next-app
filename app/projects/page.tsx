@@ -71,7 +71,7 @@ const ProjectsView: React.FC = () => {
     return () => setIsAddNewProject(false)
   }, [])
 
-	const assignments = filteredProjectList?.flatMap((project: ProjectType) => project.assignments || []);
+  const assignments = filteredProjectList?.flatMap((project: ProjectType) => project.assignments || []);
 
 	return (
     <>
@@ -87,10 +87,12 @@ const ProjectsView: React.FC = () => {
           >
             {[
               <AddProjectForm key="addForm" />,
-              ...filteredProjectList.map((project: ProjectType) => (
+              ...filteredProjectList.map((project: ProjectType, rowIndex: number) => (
                 <AllProjectRow
                   key={project.id}
                   project={project}
+                  projects={filteredProjectList}
+                  rowIndex={rowIndex}
                   monthData={{ monthLabel: "", year: 0 }}
                   isFirstMonth={true}
                   isLastMonth={true}

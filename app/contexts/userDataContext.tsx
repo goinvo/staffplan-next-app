@@ -8,6 +8,7 @@ import { sortSingleUser, sortSingleUserByOrder, sortUserList, sortUserListByOrde
 import { useGeneralDataContext } from "./generalContext";
 import { useTaskQueue } from '../hooks/useTaskQueue'
 import useBeforeUnload from "../hooks/useBeforeUnload";
+import { PrefabProvider } from "@prefab-cloud/prefab-cloud-react";
 
 type EnqueueTimerParams = {
     assignment: AssignmentType;
@@ -63,13 +64,19 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
     const [userList, setUserList] = useState<UserType[] | []>([]);
     const [filteredUserList, setFilteredUserList] = useState<UserType[] | []>([]);
     const [singleUserPage, setSingleUserPage] = useState<UserType | null>(null);
-    const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASC);
+    const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASC_COVERED);
     const [sortBy, setSortBy] = useState<string>("Client");
     const [viewsFilterPeople, setViewsFilterPeople] = useState("abcUserName");
     const [viewsFilterSingleUser, setViewsFilterSingleUser] = useState("byClient");
     const [assignmentsWithUndoActions, setAssignmentsWithUndoActions] = useState<UndoableModifiedAssignment[]>([]);
     const { enqueueTask } = useTaskQueue();
     const { showArchivedAssignments, viewer, showInactiveUsers, isFirstShowInactiveUsers } = useGeneralDataContext();
+    const onPrefabError = (reason: any) => {
+        console.error(reason);
+    };
+    const contextAttributes = {
+        user: { key: "abcdef", email: viewer?.email || "" },
+    };
 
     const { loading: userListLoading, error: userListError, data: userListData } = useQuery(GET_USER_LIST, {
         context: { headers: { cookie: isClient ? document.cookie : null } },
@@ -134,11 +141,11 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
             const finalFilteredList = !showInactiveUsers
                 ? filteredList.filter((user) => user.isActive)
                 : filteredList;
-            
+
             return finalFilteredList;
         }
     }, [userList, sortOrder, showInactiveUsers]);
-    
+
       useEffect(() => {
         if (sortedAndFilteredUsers) {
           setFilteredUserList(sortedAndFilteredUsers);
@@ -181,36 +188,42 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
     };
 
     return (
+      <PrefabProvider
+        apiKey={process.env.NEXT_PUBLIC_PREFAB_API_KEY}
+        contextAttributes={contextAttributes}
+        onError={onPrefabError}
+      >
         <UserDataContext.Provider
-            value={{
-                deleteAssignment,
-                newProjectAssignmentId,
-                userList,
-                filteredUserList, 
-                singleUserPage,
-                sortOrder,
-                sortBy,
-                viewsFilterPeople,
-                viewsFilterSingleUser,
-                assignmentsWithUndoActions,
-                setDeleteAssignment,
-                setNewProjectAssignmentId,
-                handleFinalDelete,
-                undoModifyAssignment,
-                setViewsFilterSingleUser,
-                setSortOrder,
-                setSortBy,
-                setViewsFilterPeople,
-                setUserList,
-                setFilteredUserList,
-                setSingleUserPage,
-                refetchUserList,
-                sortUserList,
-                setSelectedUserData,
-                enqueueTimer,
-            }}
+          value={{
+            deleteAssignment,
+            newProjectAssignmentId,
+            userList,
+            filteredUserList,
+            singleUserPage,
+            sortOrder,
+            sortBy,
+            viewsFilterPeople,
+            viewsFilterSingleUser,
+            assignmentsWithUndoActions,
+            setDeleteAssignment,
+            setNewProjectAssignmentId,
+            handleFinalDelete,
+            undoModifyAssignment,
+            setViewsFilterSingleUser,
+            setSortOrder,
+            setSortBy,
+            setViewsFilterPeople,
+            setUserList,
+            setFilteredUserList,
+            setSingleUserPage,
+            refetchUserList,
+            sortUserList,
+            setSelectedUserData,
+            enqueueTimer,
+          }}
         >
-            {children}
+          {children}
         </UserDataContext.Provider>
+      </PrefabProvider>
     );
 };

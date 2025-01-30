@@ -36,13 +36,14 @@ export const useKeyboardNavigation = ({
       if (isInteractiveElement) {
         return;
       }
-
       switch (event.key.toLowerCase()) {
         case "m":
           router.push(`/people/${encodeURIComponent(viewer.id)}`);
           break;
         case "p":
-          router.push(`/projects`);
+          if (!(event.metaKey || event.ctrlKey)) {
+            router.push(`/projects`);
+          }
           break;
         case "e":
           router.push(`/people`);

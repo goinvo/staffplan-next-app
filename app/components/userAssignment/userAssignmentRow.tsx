@@ -77,7 +77,7 @@ export const UserAssignmentRow = ({
 				setProjectList(prev => prev.map(project => {
 					if (project.id === upsertAssignment.project.id) {
 						const newAssignments = project.assignments?.map(a => {
-							if (a.assignedUser.id === upsertAssignment.assignedUser.id) {
+							if (a.assignedUser?.id === upsertAssignment.assignedUser.id) {
 								return { ...a, status: upsertAssignment.status };
 							}
 							return a

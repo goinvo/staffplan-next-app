@@ -21,7 +21,7 @@ export const AllUserRow = ({
 	months
 }: AllUserRowProps) => {
 	const router = useRouter();
-	const nonArchivedAssignments = user.assignments.filter(assignment => assignment.status !== 'archived')
+	const nonArchivedAssignments = user.assignments.filter(assignment => assignment.project.status !== 'archived')
 	const { totalActualHours, totalEstimatedHours, proposedEstimatedHours, maxTotalHours } =
 		calculateTotalHoursPerWeek(nonArchivedAssignments, months as MonthsDataType[]);
 	const { viewer, isFirstShowInactiveUsers, isFirstHideInactiveUsers } = useGeneralDataContext();

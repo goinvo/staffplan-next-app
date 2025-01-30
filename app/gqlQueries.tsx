@@ -62,6 +62,7 @@ export const GET_PROJECT_DATA = gql`
 						name
 						id
 						avatarUrl
+						isActive
 					}
 					endsOn
 					startsOn
@@ -124,6 +125,7 @@ export const GET_USER_LIST = gql`
 					assignedUser {
 						id
 						name
+						isActive
 					}
 					project {
 						id
@@ -179,6 +181,7 @@ export const GET_ALL_CLIENTS_DATA = gql`
 							name
 							id
 							avatarUrl
+							isActive
 						}
 						id
 						startsOn
@@ -259,6 +262,7 @@ export const GET_VIEWER = gql`
 		viewer {
 			name
 			id
+			email
 			avatarUrl
 			role
 		}
@@ -438,6 +442,7 @@ export const UPSERT_PROJECT = gql`
           id
           name
           avatarUrl
+		  isActive
         }
         project {
           id
@@ -494,6 +499,7 @@ export const UPSERT_PROJECT_WITH_INPUT = gql`
           id
           name
           avatarUrl
+		  isActive
         }
         project {
           id
