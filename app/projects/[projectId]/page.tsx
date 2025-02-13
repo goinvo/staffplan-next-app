@@ -19,7 +19,7 @@ import { divideNumberByCommas } from "@/app/helperFunctions";
 
 const ProjectPage: React.FC = () => {
 	const params = useParams();
-	const selectedProjectId = decodeURIComponent(params.projectId.toString());
+	const selectedProjectId = decodeURIComponent((params.projectId || '').toString());
 	const inputRefs = useRef<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>([]);
 
 	const [isVisible] = useState(true);
@@ -147,7 +147,7 @@ const ProjectPage: React.FC = () => {
 		{ label: 'Plan', value: divideNumberByCommas(totalPlanPerProject + totalBurnedPerProject), show: true,tooltip: `Plan = Future Plan (${divideNumberByCommas(totalPlanPerProject)}) + Actual (${divideNumberByCommas(totalBurnedPerProject)})` },
 		{ label: 'Actual', value: divideNumberByCommas(totalBurnedPerProject), show: true },
 		{ label: 'Delta', value:getDeltaValue() ? divideNumberByCommas(getDeltaValue()!) : '', show: !!singleProjectPage?.hours,
-			 tooltip: `Delta = Future Plan (${divideNumberByCommas(totalPlanPerProject)}) + Actual (${divideNumberByCommas(totalBurnedPerProject)}) - Target (${divideNumberByCommas(singleProjectPage?.hours)})` 
+			 tooltip: `Delta = Future Plan (${divideNumberByCommas(totalPlanPerProject)}) + Actual (${divideNumberByCommas(totalBurnedPerProject)}) - Target (${divideNumberByCommas(singleProjectPage?.hours)})`
 			}
 	]
 	const projectInfoSubtitle = `${singleProjectPage?.client?.name}, ${selectedProjectDates()}`.trimEnd().replace(/,$/, "")
