@@ -16,7 +16,6 @@ import { SORT_ORDER } from "@/app/components/scrollingCalendar/constants";
 import { divideNumberByCommas } from "@/app/helperFunctions";
 
 
-
 const ProjectPage: React.FC = () => {
 	const params = useParams();
 	const selectedProjectId = decodeURIComponent((params.projectId || '').toString());
