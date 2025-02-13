@@ -74,6 +74,7 @@ const Navbar: React.FC = () => {
 			show: true,
 		},
 	];
+
 	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const {isEnabled} = usePrefab();
 
