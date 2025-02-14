@@ -21,7 +21,7 @@ const EditUserForm: React.FC<EditFormProps> = ({
     const { userList } = useUserDataContext();
 
     const params = useParams();
-    const selectedUserId = decodeURIComponent(params.userId.toString());
+    const selectedUserId = decodeURIComponent((params.userId || '').toString());
     const selectedUser = userList.find(
         (user: UserType) => user.id?.toString() === selectedUserId.toString()
     );

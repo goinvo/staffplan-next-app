@@ -74,7 +74,10 @@ const Navbar: React.FC = () => {
 			show: true,
 		},
 	];
+
+	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const {isEnabled} = usePrefab();
+
 	return (
 		<nav className="navbar bg-gray-100 pl-6 pr-0 sm:px-5 h-14 flex justify-between items-center">
 			<div className="flex items-center pl-1 sm:pl-0 sm:space-x-4 space-x-1 h-full">

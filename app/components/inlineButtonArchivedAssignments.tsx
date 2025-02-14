@@ -13,7 +13,7 @@ const InlineButtonArchivedAssignments: React.FC = () => {
   const { userList, singleUserPage, setSelectedUserData } = useUserDataContext();
   const { projectList } = useProjectsDataContext();
 
-  const userId = decodeURIComponent(params?.userId?.toString());
+  const userId = decodeURIComponent(params?.userId?.toString() || '');
 
   const archivedAssignments = viewer?.id.toString() === userId
     ? userList.find((user) => user.id?.toString() === viewer?.id.toString())?.assignments.filter((a) => a.project.status === "archived") || []

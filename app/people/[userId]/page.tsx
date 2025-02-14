@@ -45,13 +45,13 @@ const UserPage: React.FC = () => {
 
 	useEffect(() => {
 		if (userList.length) {
-			const userId = decodeURIComponent(params?.userId?.toString());
+			const userId = decodeURIComponent(params?.userId?.toString() || '');
       if (userId) {
 				setSelectedUserData(parseInt(userId));
 			}
 		}
   }, [userList, params.userId, setSelectedUserData]);
-  
+
   useEffect(() => {
     return () => {
       setIsAddNewProject(false)
@@ -109,7 +109,7 @@ const UserPage: React.FC = () => {
                   return (
                     <UserAssignmentRow
                       key={assignment.id}
-                      currentUserId={currentUserId}
+                      currentUserId={currentUserId || ''}
                       assignment={assignment}
                       isFirstMonth={true}
                       isLastMonth={true}

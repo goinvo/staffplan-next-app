@@ -27,7 +27,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 	const { showArchivedProjects } = useGeneralDataContext();
 	const params = useParams();
 	const router = useRouter();
-	const selectedProjectId = decodeURIComponent(params.projectId.toString());
+	const selectedProjectId = decodeURIComponent((params.projectId || "").toString());
 	const selectedProject = projectList.find(
 		(project: ProjectType) => project.id.toString() === selectedProjectId
 	);
