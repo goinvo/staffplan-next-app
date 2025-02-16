@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
-
 import UserSummary from "../userSummary";
 import { UserLabel } from "./userLabel";
 import { WorkWeekInput } from "./workWeekInput";
