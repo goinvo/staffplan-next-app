@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, KeyboardEvent } from "react";
-import { Formik, FormikValues, FormikHelpers } from "formik";
+import { Formik, FormikValues, FormikHelpers, FieldInputProps } from "formik";
 import { useMutation } from "@apollo/client";
 import { isNil } from "lodash";
 
@@ -42,12 +42,17 @@ interface FillForwardVariablesType {
 }
 
 type HandlePressEnterOrEscape = (
-  event: KeyboardEvent<HTMLInputElement>, 
+  event: KeyboardEvent<HTMLInputElement>,
   values: FormikValues,
-  setFieldValue: FormikHelpers<any>["setFieldValue"], 
-  fieldName: string, 
-  prevValue: number | string 
+  setFieldValue: FormikHelpers<any>["setFieldValue"],
+  fieldName: string,
+  prevValue: number | string
 ) => void;
+
+type HandleChangeInCustomInput = (
+	event: React.ChangeEvent<HTMLInputElement>,
+	handleChange: FieldInputProps<any>['onChange']
+) => void
 
 export const WorkWeekInput = ({
 	assignment,
@@ -213,6 +218,18 @@ export const WorkWeekInput = ({
     }
 	}
 
+	const handleChangeInCustomInput: HandleChangeInCustomInput = (event, handleChange) => {
+		const inputValue = event.target.value;
+		if (/^\d*$/.test(inputValue)) {
+			const numericValue = parseInt(inputValue, 10);
+			if (numericValue >= 0 && numericValue <= 168) {
+				handleChange(event);
+			} else if (inputValue === "") {
+				handleChange(event);
+			}
+		}
+	}
+
 	return (
 		<Formik
 			onSubmit={(e) => upsertWorkWeekValues(e)}
@@ -229,10 +246,10 @@ export const WorkWeekInput = ({
 				<>
 					<CustomInput
 						className="sm:block hidden"
-						value={values.estimatedHours || ''}
+						value={values.estimatedHours}
 						name="estimatedHours"
 						id={`estHours-${assignment?.id}-${cweek}-${year}`}
-						onChange={handleChange}
+						onChange={(e) => handleChangeInCustomInput( e, handleChange )}
 						onBlur={(e) => {
 							handleBlur("estimatedHours");
 							if (dirty) {
@@ -254,7 +271,7 @@ export const WorkWeekInput = ({
 							value={values.actualHours}
 							name="actualHours"
 							id={`actHours-${assignment?.id}-${cweek}-${year}`}
-							onChange={handleChange}
+							onChange={(e) => handleChangeInCustomInput( e, handleChange )}
 							onBlur={(e) => {
 								handleBlur("actualHours");
 								if (dirty) {
@@ -268,7 +285,7 @@ export const WorkWeekInput = ({
 									handlePressEnterOrEscape(e, values, setFieldValue, 'actualHours', initialValues.actualHours);
 								}
 								tabbingAndArrowNavigation(e, rowIndex, cellIndex, inputRefs, totalRows, true)
-								
+
 							}}
 						/>
 					)}
