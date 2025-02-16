@@ -15,9 +15,12 @@ import { useMutation } from "@apollo/client";
 import { UPSERT_ASSIGNMENT } from "../../gqlQueries";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import UndoRow from "../undoRow";
-import { UNDO_ARCHIVED_OR_DELETED_PROJECT, UNDO_ARCHIVED_PROJECT_SUBTITLE, UNDO_ARCHIVED_PROJECT_TITLE } from "../constants/undoModifyStrings";
+import {
+	UNDO_ARCHIVED_PROJECT_SUBTITLE,
+	UNDO_ARCHIVED_PROJECT_TITLE,
+	UNDO_DELETED_PERSON_TITLE
+} from "../constants/undoModifyStrings";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
-import { mergeClasses } from "@/app/helperFunctions";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 
 interface UserAssignmentRowProps {
@@ -46,7 +49,7 @@ export const UserAssignmentRow = ({
 	totalRows
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
-	const { deleteAssignment, sortBy, newProjectAssignmentId, setNewProjectAssignmentId, setUserList, refetchUserList, viewsFilterSingleUser, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
+	const { deleteAssignment, sortBy, newProjectAssignmentId, setNewProjectAssignmentId, setUserList, refetchUserList, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
 	const { setProjectList, undoModifyProject, projectsWithUndoActions } = useProjectsDataContext()
 
 	const [showUndoRow, setShowUndoRow] = useState<boolean>(false);
@@ -98,7 +101,7 @@ export const UserAssignmentRow = ({
 				setTimeout(() => {setNewProjectAssignmentId(null)}, 1000)
 			}
 	}, [newProjectAssignmentId]);
-	
+
 	const handleProjectChange = (assignment: AssignmentType) => {
 		router.push("/projects/" + assignment.project.id);
 	};
@@ -160,7 +163,7 @@ export const UserAssignmentRow = ({
       animateRow(true);
     }
 	}, [projectsWithUndoActions, assignment.project.id]);
-	
+
 	if (showUndoRow) {
 		if (deleteAssignment === "archive") {
 			return (
@@ -170,9 +173,11 @@ export const UserAssignmentRow = ({
 			)
 		}
 		if (deleteAssignment === "deleteMe") {
+			const name = assignment.assignedUser ? assignment.assignedUser.name.split(' ')[0] : "person"
+
 			return (
 				<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.id}`}>
-					<UndoRow onClick={handleUndoModifyAssignment} title={UNDO_ARCHIVED_OR_DELETED_PROJECT} />
+					<UndoRow onClick={handleUndoModifyAssignment} title={UNDO_DELETED_PERSON_TITLE.replace("{name}",name)}/>
 				</tr>
 			)
 		}
