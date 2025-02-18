@@ -28,8 +28,8 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 	const { setUserList } = useUserDataContext()
 	const { viewer } = useGeneralDataContext()
 
-	const showDeleteButton = project.assignments?.find(a => a.assignedUser?.id === viewer?.id)?.workWeeks.some(week => week.actualHours)
-
+	const showDeleteButton = project.assignments?.find(a => a.assignedUser?.id === viewer?.id) && !project.assignments?.find(a => a.assignedUser?.id === viewer?.id)?.workWeeks.some(week => week.actualHours)
+	
 	const router = useRouter();
 	const {
 		client: { id: clientId },
@@ -280,7 +280,7 @@ export default function EllipsisProjectMenu({ project, undoRowRef }: EllipsisPro
 								Export CSV
 							</button>
 						</MenuItem>
-						{!showDeleteButton && <MenuItem>
+						{showDeleteButton && <MenuItem>
 							<button className="w-full px-4 py-2 text-sm text-left text-[#FF5E5E] hover:text-accentgreen border-t border-t-[#E5E7EB]" onClick={handleDeleteAssignment}>
 								Delete me from this project
 							</button>
