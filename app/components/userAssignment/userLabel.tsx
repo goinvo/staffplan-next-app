@@ -26,10 +26,9 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 	const isAssignmentProposed = assignment.status === "proposed";
 	const canAssignmentBeDeleted = !assignment.workWeeks.some(
 		(week) => (week.actualHours ?? 0) > 0);
-	const showActionsButton = viewer?.id === assignment.assignedUser?.id
-	const showArchiveButton = showActionsButton && assignment.project.status !== 'archived'
-	const showUnarchiveButton = showActionsButton && assignment.project.status === 'archived'
-	const showDeleteButton = showActionsButton && canAssignmentBeDeleted
+	const showArchiveButton = assignment.project.status !== 'archived'
+	const showUnarchiveButton = assignment.project.status === 'archived'
+	const showDeleteButton = canAssignmentBeDeleted
 
 	const { animateRow } = useFadeInOutRow({ rowRef: undoRowRef, minHeight: 0, heightStep: 2, opacityStep: 0.1 })
 
@@ -403,14 +402,14 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
           </span>
 				)}
       </div>
-			{showActionsButton &&
+			
 				<EllipsisDropdownMenu
 					options={assignmentDropMenuOptions}
 					textColor={"actionbar-text-accent"}
 					className="ml-2 -mt-[5px] sm:mt-[3px]"
 					menuItemsClassName="w-56"				
 				/>
-			}
+			
 		</div>
 	);
 };
