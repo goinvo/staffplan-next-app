@@ -69,8 +69,8 @@ const UserPage: React.FC = () => {
     { title: "Client", showIcon: false },
     {
       title: "Projects",
-      showIcon: true,
-      onIconClick: () => setIsAddNewProject(true),
+      showIcon: !!singleUserPage?.isActive,
+      onIconClick: singleUserPage?.isActive ? () => setIsAddNewProject(true) : null,
     },
   ];
 	return (
