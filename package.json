@@ -24,7 +24,7 @@
     "next": "^15.1.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-icons": "^5.4.0",
+    "react-icons": "^5.5.0",
     "react-router-dom": "^7.1.3",
     "react-select": "^5.9.0",
     "react-spinners": "^0.15.0",
