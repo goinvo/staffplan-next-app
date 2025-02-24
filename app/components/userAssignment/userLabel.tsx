@@ -358,7 +358,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 			component: <button onClick={() => {
 				setDeleteAssignment("deleteMe");
 				handleDeleteAssignmentClick()
-			}} className="block w-full px-4 py-2 text-sm text-left text-[#FF5E5E] border-t border-t-[#E5E7EB]">Delete me from this project</button>,
+			}} className="block w-full px-4 py-2 text-sm text-left text-[#FF5E5E] border-t border-t-[#E5E7EB]">Delete {assignment.assignedUser.name.split(' ')[0]} from this project</button>,
 			show: showDeleteButton,
 		},
 		{
