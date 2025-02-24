@@ -11,7 +11,7 @@ interface FadeInOutRowOptions {
     opacityStep?: number;
 }
 
-export const useFadeInOutRow = ({ rowRef, setShowUndoRow, opacityStep = 0.05, heightStep = 4, minHeight = 26, maxHeight = 100 }: FadeInOutRowOptions) => {
+export const useFadeInOutRow = ({ rowRef, setShowUndoRow, opacityStep = 0.05, heightStep = 4, minHeight = 80, maxHeight = 80 }: FadeInOutRowOptions) => {
     const animationFrameId = useRef<number | null>(null);
     const isAnimating = useRef(false);
 
