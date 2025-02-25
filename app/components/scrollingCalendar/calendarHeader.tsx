@@ -144,7 +144,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 		setDateRange,
     months,
 	});
-	
+
 	const [upsertProjectWithInput] = useMutation(UPSERT_PROJECT_WITH_INPUT, {
     errorPolicy: "all",
 		onCompleted({ upsertProjectWithInput }) {
@@ -159,7 +159,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
       refetchProjectList();
     },
 	});
-	
+
 	const handleUnarchiveProject = async () => {
 		const input = {
 			id: id,
@@ -192,7 +192,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 	useEffect(() => {
 		if (months.length) {
 			setIsTodayInView(isTodayInRange(months))
-		};
+		}
 	}, [months]);
 
 	useEffect(() => {
@@ -651,15 +651,19 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 					</div>
 				</th>
 			</tr>
-			<button
-				className={`absolute -top-[12px] left-1/2 transform -translate-x-1/2 bg-[#AFB3BF] text-[#151F33] rounded-[3px] px-[10px] py-[2px] shadow-[0_4px_4px_0_rgba(0,0,0,0.25)]
-                    opacity-0 pointer-events-none ${
-											!isTodayInView ? "opacity-100 pointer-events-auto" : ""
-										} transition-opacity duration-300 `}
-				onClick={scrollToTodayFunction}
-			>
-				Today
-			</button>
+			<tr>
+				<th>
+					<button
+						className={`absolute -top-[12px] left-1/2 transform -translate-x-1/2 bg-[#AFB3BF] text-[#151F33] font-normal rounded-[3px] px-[10px] py-[2px] shadow-[0_4px_4px_0_rgba(0,0,0,0.25)]
+							opacity-0 pointer-events-none ${
+													!isTodayInView ? "opacity-100 pointer-events-auto" : ""
+												} transition-opacity duration-300 `}
+						onClick={scrollToTodayFunction}
+					>
+						Today
+					</button>
+				</th>
+			</tr>
 		</thead>
 	);
 };

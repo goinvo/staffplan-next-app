@@ -26,10 +26,9 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 	const isAssignmentProposed = assignment.status === "proposed";
 	const canAssignmentBeDeleted = !assignment.workWeeks.some(
 		(week) => (week.actualHours ?? 0) > 0);
-	const showActionsButton = viewer?.id === assignment.assignedUser?.id
-	const showArchiveButton = showActionsButton && assignment.project.status !== 'archived'
-	const showUnarchiveButton = showActionsButton && assignment.project.status === 'archived'
-	const showDeleteButton = showActionsButton && canAssignmentBeDeleted
+	const showArchiveButton = assignment.project.status !== 'archived'
+	const showUnarchiveButton = assignment.project.status === 'archived'
+	const showDeleteButton = canAssignmentBeDeleted
 
 	const { animateRow } = useFadeInOutRow({ rowRef: undoRowRef, minHeight: 0, heightStep: 2, opacityStep: 0.1 })
 
@@ -359,7 +358,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 			component: <button onClick={() => {
 				setDeleteAssignment("deleteMe");
 				handleDeleteAssignmentClick()
-			}} className="block w-full px-4 py-2 text-sm text-left text-[#FF5E5E] border-t border-t-[#E5E7EB]">Delete me from this project</button>,
+			}} className="block w-full px-4 py-2 text-sm text-left text-[#FF5E5E] border-t border-t-[#E5E7EB]">Delete {assignment.assignedUser.name.split(' ')[0]} from this project</button>,
 			show: showDeleteButton,
 		},
 		{
@@ -403,14 +402,14 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
           </span>
 				)}
       </div>
-			{showActionsButton &&
+			
 				<EllipsisDropdownMenu
 					options={assignmentDropMenuOptions}
 					textColor={"actionbar-text-accent"}
 					className="ml-2 -mt-[5px] sm:mt-[3px]"
 					menuItemsClassName="w-56"				
 				/>
-			}
+			
 		</div>
 	);
 };

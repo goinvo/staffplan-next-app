@@ -1,4 +1,5 @@
 import Link from "next/link"
+import React from "react";
 
 const footerItems = [
   { href: "", label: "Copyright" },
@@ -26,7 +27,7 @@ const Footer: React.FC = () => {
     <footer className="w-full navbar flex justify-start align-middle px-4 py-2">
       <div className="leading-[10px]">
         {footerItems.map((item, index) => (
-          <>
+          <React.Fragment key={index}>
             {item.href ? (
               <Link
                 key={index}
@@ -45,7 +46,7 @@ const Footer: React.FC = () => {
                 {item.label}
               </span>
             )}
-          </>
+          </React.Fragment>
         ))}
       </div>
     </footer>
