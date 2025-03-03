@@ -2,34 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 @import "tailwindcss";
-
-/* add this to copy the configuration settings from your project */
 @config "./../tailwind.config.ts";
 
 :root {
-	--color-accentlightgreen: "#72DDC3";
-	--color-accentgreen: "#02AAA4";
-	--color-accentgrey: "#7084A3";
-	--color-tiffany: "#27B5B0";
-	--color-transparentGrey: "#AABBCC";
-	--color-transparentBlue: "#37455e";
-	--color-hoverGrey: "#e3e4ee";
-	--color-lightGrey: "#dddeeb";
-	--color-blueGreyLight: "#ced0dd";
-	--color-contrastBlue: "#23324C";
-	--color-contrastGrey: "#aeb3c0";
-	--color-selectedColumnBg: "#dfe0ec";
-	--animate-fadeInScale: "fadeInScale 0.7s ease-in-out";
-	--animate-fadeOutScale: "fadeOutScale 0.7s ease-in-out";
-	--animate-fadeInPage: "fadeInPage 750ms ease-out forwards";
-	--animate-fadeOutPage: "fadeOutPage 750ms ease-in forwards";
-	--text-2xs: "10px";
-	--text-tiny: "14px";
-	--text-huge: "28px";
-	--inset-shadow-top-input-shadow: "inset 0 2px 1.5px rgba(199, 199, 199, 1)";
-	--bg-image-diagonal-stripes: "repeating-linear-gradient(135deg, #e9eaf2, #e9eaf2 10px, #e4e5ef 10px, #e4e5ef 20px)";
-	--bg-image-pencil-strokes: "linear-gradient(45deg, #ffffff1a 25%, transparent 25%, transparent 50%, #ffffff1a 50%, #ffffff1a 75%, transparent 75%, transparent)";
-	--bg-pencil-strokes: "4px 4px";
 	--foreground-rgb: 0, 0, 0;
 	--background-start-rgb: 214, 219, 220;
 	--background-end-rgb: 255, 255, 255;
@@ -157,40 +132,81 @@
 	background-color: var(--sidebar-planned-bg);
 	border-bottom: 1px solid var(--sidebar-planned-border);
 }
+@theme {
+	--color-accentlightgreen: #72ddc3;
+	--color-accentgreen: #02aaa4;
+	--color-accentgrey: #7084a3;
+	--color-tiffany: #27b5b0;
+	--color-transparentGrey: #aabbcc;
+	--color-transparentBlue: #37455e;
+	--color-hoverGrey: #e3e4ee;
+	--color-lightGrey: #dddeeb;
+	--color-blueGreyLight: #ced0dd;
+	--color-contrastBlue: #23324c;
+	--color-contrastGrey: #aeb3c0;
+	--color-selectedColumnBg: #dfe0ec;
+	--text-2xs: 10px;
+	--text-tiny: 14px;
+	--text-huge: 28px;
+	--shadow-top-input-shadow: inset 0 2px 1.5px rgba(199, 199, 199, 1);
+	--background-image-diagonal-stripes: repeating-linear-gradient(
+		135deg,
+		#e9eaf2,
+		#e9eaf2 10px,
+		#e4e5ef 10px,
+		#e4e5ef 20px
+	);
+	--background-image-pencil-strokes: linear-gradient(
+		45deg,
+		#ffffff1a 25%,
+		transparent 25%,
+		transparent 50%,
+		#ffffff1a 50%,
+		#ffffff1a 75%,
+		transparent 75%,
+		transparent
+	);
+  
+	--background-size-pencil-strokes: 4px 4px;
 
-@keyframes fadeInScale {
-	0% {
-		opacity: "0";
-		height: "0";
+	--animate-fade-in-scale: fade-in-scale 0.7s ease-in-out;
+	@keyframes fade-in-scale {
+		0% {
+			opacity: 0;
+			height: 0;
+		}
+		100% {
+			opacity: 1;
+			height: 100px;
+		}
 	}
-	100% {
-		opacity: "1";
-		height: "100px";
+	--animate-fade-out-scale: fade-out-scale 0.7s ease-in-out;
+	@keyframes fade-out-scale {
+		0% {
+			opacity: 1;
+			height: 100px;
+		}
+		100% {
+			opacity: 0;
+			height: 0;
+		}
 	}
-}
-@keyframes fadeOutScale {
-	0% {
-		opacity: "1";
-		height: "100px";
+	--animate-fade-in-page: fade-in-page 750ms ease-out forwards;
+	@keyframes fade-in-page {
+		from {
+			opacity: 0.1;
+		}
+		to {
+			opacity: 1;
+		}
 	}
-	100% {
-		opacity: "0";
-		height: "0";
-	}
-}
-@keyframes fadeInPage {
-	from {
-		opacity: "0.1";
-	}
-	to {
-		opacity: "1";
-	}
-}
-@keyframes fadeOutPage {
-	from {
-		opacity: "1";
-	}
-	to {
-		opacity: "0.1";
+	--animate-fade-out-page: fade-out-page 750ms ease-in forwards;
+	@keyframes fade-out-page {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0.1;
+		}
 	}
 }
