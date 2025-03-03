@@ -1,6 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import "tailwindcss";
+
+/* add this to copy the configuration settings from your project */
+@config "./../tailwind.config.ts";
 
 :root {
   --foreground-rgb: 0, 0, 0;
