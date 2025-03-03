@@ -4,6 +4,85 @@
 @import "tailwindcss";
 @config "./../tailwind.config.ts";
 
+@theme {
+	--color-accentlightgreen: #72ddc3;
+	--color-accentgreen: #02aaa4;
+	--color-accentgrey: #7084a3;
+	--color-tiffany: #27b5b0;
+	--color-transparentGrey: #aabbcc;
+	--color-transparentBlue: #37455e;
+	--color-hoverGrey: #e3e4ee;
+	--color-lightGrey: #dddeeb;
+	--color-blueGreyLight: #ced0dd;
+	--color-contrastBlue: #23324c;
+	--color-contrastGrey: #aeb3c0;
+	--color-selectedColumnBg: #dfe0ec;
+	--text-2xs: 10px;
+	--text-tiny: 14px;
+	--text-huge: 28px;
+	--shadow-top-input-shadow: inset 0 2px 1.5px rgba(199, 199, 199, 1);
+	--background-image-diagonal-stripes: repeating-linear-gradient(
+		135deg,
+		#e9eaf2,
+		#e9eaf2 10px,
+		#e4e5ef 10px,
+		#e4e5ef 20px
+	);
+	--background-image-pencil-strokes: linear-gradient(
+		45deg,
+		#ffffff1a 25%,
+		transparent 25%,
+		transparent 50%,
+		#ffffff1a 50%,
+		#ffffff1a 75%,
+		transparent 75%,
+		transparent
+	);
+
+  
+
+	--animate-fade-in-scale: fade-in-scale 0.7s ease-in-out;
+	@keyframes fade-in-scale {
+		0% {
+			opacity: 0;
+			height: 0;
+		}
+		100% {
+			opacity: 1;
+			height: 100px;
+		}
+	}
+	--animate-fade-out-scale: fade-out-scale 0.7s ease-in-out;
+	@keyframes fade-out-scale {
+		0% {
+			opacity: 1;
+			height: 100px;
+		}
+		100% {
+			opacity: 0;
+			height: 0;
+		}
+	}
+	--animate-fade-in-page: fade-in-page 750ms ease-out forwards;
+	@keyframes fade-in-page {
+		from {
+			opacity: 0.1;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+	--animate-fade-out-page: fade-out-page 750ms ease-in forwards;
+	@keyframes fade-out-page {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0.1;
+		}
+	}
+}
+
 :root {
 	--foreground-rgb: 0, 0, 0;
 	--background-start-rgb: 214, 219, 220;
@@ -35,6 +114,16 @@
 	--sidebar-target-border: #7c8491;
 	--sidebar-planned-bg: #ecf7f8;
 	--sidebar-planned-border: #30b7b3;
+  --background-image-pencil-strokes: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.1) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.1) 75%,
+    transparent 75%,
+    transparent
+  );
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -132,81 +221,8 @@
 	background-color: var(--sidebar-planned-bg);
 	border-bottom: 1px solid var(--sidebar-planned-border);
 }
-@theme {
-	--color-accentlightgreen: #72ddc3;
-	--color-accentgreen: #02aaa4;
-	--color-accentgrey: #7084a3;
-	--color-tiffany: #27b5b0;
-	--color-transparentGrey: #aabbcc;
-	--color-transparentBlue: #37455e;
-	--color-hoverGrey: #e3e4ee;
-	--color-lightGrey: #dddeeb;
-	--color-blueGreyLight: #ced0dd;
-	--color-contrastBlue: #23324c;
-	--color-contrastGrey: #aeb3c0;
-	--color-selectedColumnBg: #dfe0ec;
-	--text-2xs: 10px;
-	--text-tiny: 14px;
-	--text-huge: 28px;
-	--shadow-top-input-shadow: inset 0 2px 1.5px rgba(199, 199, 199, 1);
-	--background-image-diagonal-stripes: repeating-linear-gradient(
-		135deg,
-		#e9eaf2,
-		#e9eaf2 10px,
-		#e4e5ef 10px,
-		#e4e5ef 20px
-	);
-	--background-image-pencil-strokes: linear-gradient(
-		45deg,
-		#ffffff1a 25%,
-		transparent 25%,
-		transparent 50%,
-		#ffffff1a 50%,
-		#ffffff1a 75%,
-		transparent 75%,
-		transparent
-	);
-  
-	--background-size-pencil-strokes: 4px 4px;
 
-	--animate-fade-in-scale: fade-in-scale 0.7s ease-in-out;
-	@keyframes fade-in-scale {
-		0% {
-			opacity: 0;
-			height: 0;
-		}
-		100% {
-			opacity: 1;
-			height: 100px;
-		}
-	}
-	--animate-fade-out-scale: fade-out-scale 0.7s ease-in-out;
-	@keyframes fade-out-scale {
-		0% {
-			opacity: 1;
-			height: 100px;
-		}
-		100% {
-			opacity: 0;
-			height: 0;
-		}
-	}
-	--animate-fade-in-page: fade-in-page 750ms ease-out forwards;
-	@keyframes fade-in-page {
-		from {
-			opacity: 0.1;
-		}
-		to {
-			opacity: 1;
-		}
-	}
-	--animate-fade-out-page: fade-out-page 750ms ease-in forwards;
-	@keyframes fade-out-page {
-		from {
-			opacity: 1;
-		}
-		to {
-			opacity: 0.1;
-		}
-	}
+.enddate-stripes {
+  background-image: var(--background-image-pencil-strokes);
+  background-size: 4px 4px
 }
