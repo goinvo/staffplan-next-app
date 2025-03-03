@@ -58,12 +58,12 @@ const config: Config = {
           to: { opacity: "0.1" },
         },
       },
-      animation: {
-        fadeInScale: "fadeInScale 0.7s ease-in-out",
-        fadeOutScale: "fadeOutScale 0.7s ease-in-out",
-        fadeInPage: "fadeInPage 750ms ease-out forwards",
-        fadeOutPage: "fadeOutPage 750ms ease-in forwards",
-      },
+      // animation: {
+      //   fadeInScale: "fadeInScale 0.7s ease-in-out",
+      //   fadeOutScale: "fadeOutScale 0.7s ease-in-out",
+      //   fadeInPage: "fadeInPage 750ms ease-out forwards",
+      //   fadeOutPage: "fadeOutPage 750ms ease-in forwards",
+      // },
     },
   },
   plugins: [require("@tailwindcss/forms")],
