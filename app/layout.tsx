@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "./globals.css";
+import { GoogleAnalytics } from '@next/third-parties/google'
 import RootLayoutContents from "./layoutContents";
-
 const open_sans = Open_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -18,6 +18,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 		<html lang="en">
 			<body className={open_sans.className}>
 				<RootLayoutContents>
+			<GoogleAnalytics gaId='G-DF2LWWYFZ3' />
 					{children}
 				</RootLayoutContents>
 			</body>
