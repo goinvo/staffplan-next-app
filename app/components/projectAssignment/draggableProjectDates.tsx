@@ -84,7 +84,7 @@ const DraggableDates: FC<DraggableDatesProps> = ({
         e.currentTarget.style.opacity = '1';
     };
 
-    const isEndDateWeekStyles = "bg-pencil-strokes bg-[length:pencil-strokes]"
+    const isEndDateWeekStyles = "enddate-stripes"
     const projectDatesStyles = "cursor-pointer navbar"
 
     return (

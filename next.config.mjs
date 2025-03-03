@@ -20,6 +20,36 @@ const nextConfig = {
 				hostname: 'app.staffplan.com',
 				port: '',
 				pathname: '/rails/active_storage/**',
+			},
+			{
+				protocol: 'https',
+				hostname:'secure.gravatar.com',
+				pathname: '**',
+			},
+			{
+				protocol: 'https',
+				hostname:'www.gravatar.com',
+				pathname: '**',
+			},
+			{
+				protocol: 'https',
+				hostname:'staffplan.fermion.dev',
+				pathname: '**',
+			},
+			{
+				protocol: 'https',
+				hostname:'localhost',
+				pathname: '**',
+			},
+			{
+				protocol: 'https',
+				hostname:'app.staffplan.com',
+				pathname: '**',
+			},
+			{
+				protocol: 'https',
+				hostname:'staffplan.com',
+				pathname: '**',
 			}
 		]
 	}
