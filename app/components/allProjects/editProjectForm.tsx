@@ -16,6 +16,7 @@ import { blockInvalidChar, divideNumberByCommas } from "@/app/helperFunctions";
 import CustomDateInput from "../customDateInput";
 import { ARCHIVED_PROJECT_WARNING } from "../constants/archivedStatusStrings";
 import { set } from "lodash";
+import { useUserDataContext } from "@/app/contexts/userDataContext";
 
 interface EditFormProps {
 	onClose?: () => void;
@@ -24,6 +25,7 @@ interface EditFormProps {
 const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
 	const { refetchClientList, clientList } = useClientDataContext();
 	const { projectList, refetchProjectList, setProjectList } = useProjectsDataContext();
+	const { refetchUserList } = useUserDataContext();
 	const { showArchivedProjects } = useGeneralDataContext();
 	const params = useParams();
 	const router = useRouter();
@@ -95,6 +97,7 @@ const EditProjectForm: React.FC<EditFormProps> = ({ onClose }) => {
         })
       );
 			refetchProjectList();
+			refetchUserList();
 		},
 	});
 	const [
