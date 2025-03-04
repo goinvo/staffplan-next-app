@@ -6,7 +6,7 @@ import { useProjectsDataContext } from "../contexts/projectsDataContext";
 import { useGeneralDataContext } from "../contexts/generalContext";
 import { useUserDataContext } from "../contexts/userDataContext";
 
-const InlineButtonArchivedAssignments: React.FC = () => {
+const InlineButtonHiddenAssignments: React.FC = () => {
   const params = useParams();
 
   const { viewer, showArchivedAssignments, setShowArchivedAssignments } = useGeneralDataContext();
@@ -16,22 +16,25 @@ const InlineButtonArchivedAssignments: React.FC = () => {
   const userId = decodeURIComponent(params?.userId?.toString() || '');
 
   const archivedAssignments = viewer?.id.toString() === userId
-    ? userList.find((user) => user.id?.toString() === viewer?.id.toString())?.assignments.filter((a) => a.project.status === "archived") || []
+    ? userList.find((user) => user.id?.toString() === viewer?.id.toString())?.assignments.filter((a) => !a.focused) || []
     : []
+  console.log(archivedAssignments)
 
   const label = showArchivedAssignments
-    ? `Hide ${archivedAssignments.length} archived ${archivedAssignments.length > 1 ? 'projects' : 'project'}`
-    : `Show ${archivedAssignments.length} archived ${archivedAssignments.length > 1 ? 'projects' : 'project'}`
+    ? `Hide ${archivedAssignments.length} archived ${archivedAssignments.length > 1 ? 'projects' : 'project'}` // TODO here text
+    : `Show ${archivedAssignments.length} hidden ${archivedAssignments.length > 1 ? 'projects' : 'project'}`
 
   return (
     <>
       {archivedAssignments.length > 0 ? (
-          <button
-            className="ml-8 sm:ml-5 mt-2 py-1"
-            onClick={() => setShowArchivedAssignments(!showArchivedAssignments)}
-          >
-            {label}
-          </button>
+          <div className="ml-8 sm:ml-5 mt-2 py-1">
+            <button
+              onClick={() => null}
+            >
+              {label}
+            </button>
+            <p>Total includes hours from hidden project</p>
+          </div>
       ) : (
         <></>
       )}
@@ -39,4 +42,4 @@ const InlineButtonArchivedAssignments: React.FC = () => {
   );
 };
 
-export default InlineButtonArchivedAssignments;
+export default InlineButtonHiddenAssignments;

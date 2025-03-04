@@ -45,6 +45,7 @@ export interface AssignmentType {
 	project: ProjectType;
 	startsOn: string | null;
 	status: string;
+	focused: boolean;
 	workWeeks: WorkWeekType[];
 	estimatedWeeklyHours: number;
 }

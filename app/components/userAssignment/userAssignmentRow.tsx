@@ -17,7 +17,7 @@ import UndoRow from "../undoRow";
 import {
 	UNDO_ARCHIVED_PROJECT_SUBTITLE,
 	UNDO_ARCHIVED_PROJECT_TITLE,
-	UNDO_DELETED_PERSON_TITLE
+	UNDO_DELETED_PERSON_TITLE, UNDO_HIDE_PROJECT_TITLE
 } from "../constants/undoModifyStrings";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
@@ -177,6 +177,13 @@ export const UserAssignmentRow = ({
 			return (
 				<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.id}`}>
 					<UndoRow onClick={handleUndoModifyAssignment} title={UNDO_DELETED_PERSON_TITLE.replace("{name}",name)}/>
+				</tr>
+			)
+		}
+		if (deleteAssignment === "hide") {
+			return (
+				<tr ref={undoRowRef} className="flex justify-center" key={`undo-${assignment.project.id}`}>
+					<UndoRow onClick={handleUndoModifyAssignment} title={UNDO_HIDE_PROJECT_TITLE} />
 				</tr>
 			)
 		}

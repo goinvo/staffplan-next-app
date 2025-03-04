@@ -18,7 +18,7 @@ type EnqueueTimerParams = {
     finalApiCall?: () => void;
 };
 export interface UserDataContextType {
-    deleteAssignment: 'archive' | 'deleteMe' | '';
+    deleteAssignment: 'archive' | 'deleteMe' | 'hide' | '';
     newProjectAssignmentId: number | null;
     userList: UserType[] | [];
     filteredUserList: UserType[] | [];
@@ -28,7 +28,7 @@ export interface UserDataContextType {
     viewsFilterPeople: string;
     viewsFilterSingleUser: string;
     assignmentsWithUndoActions: UndoableModifiedAssignment[]
-    setDeleteAssignment: React.Dispatch<React.SetStateAction<'archive' | 'deleteMe' | ''>>;
+    setDeleteAssignment: React.Dispatch<React.SetStateAction<'archive' | 'deleteMe' | 'hide' | ''>>;
     setNewProjectAssignmentId: React.Dispatch<React.SetStateAction<number | null>>;
     undoModifyAssignment: (assignmentId: number) => void;
     setViewsFilterSingleUser: React.Dispatch<React.SetStateAction<string>>;
@@ -59,7 +59,7 @@ export const useUserDataContext = () => {
 export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: any }> = ({ children }) => {
     const client = useApolloClient();
     const isClient = typeof window !== "undefined";
-    const [deleteAssignment, setDeleteAssignment] = useState<'archive' | 'deleteMe' | ''>('')
+    const [deleteAssignment, setDeleteAssignment] = useState<'archive' | 'deleteMe' | 'hide' | '' >('')
     const [newProjectAssignmentId, setNewProjectAssignmentId] = useState<number | null>(null);
     const [userList, setUserList] = useState<UserType[] | []>([]);
     const [filteredUserList, setFilteredUserList] = useState<UserType[] | []>([]);
