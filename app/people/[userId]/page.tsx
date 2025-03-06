@@ -95,6 +95,7 @@ const UserPage: React.FC = () => {
             >
                 {[
                     <AddProjectForm user={singleUserPage} key="addForm"/>,
+
                     ...singleUserPage?.assignments?.map(
                         (
                             assignment: AssignmentType,
@@ -123,10 +124,11 @@ const UserPage: React.FC = () => {
                             );
                         }
                     ),
+                    <InlineButtonHiddenAssignments key='inlineButtonHidden'/>,
+
                 ]}
                 <div className="h-[100px] w-full border-t border-gray-300 flex flex-col items-start justify-start">
                     <InlineButtonArchivedAssignments/>
-                    <InlineButtonHiddenAssignments/>
                 </div>
                 <ApproveHours/>
                 <ColumnChartsRow/>
