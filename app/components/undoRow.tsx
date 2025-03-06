@@ -12,7 +12,7 @@ const UndoRow: React.FC<UndoRowProps> = ({
   subtitle,
 }) => {
   return (
-    <td className="text-contrastBlue opacity-1 w-full h-[100px] p-3">
+    <td className="text-contrastBlue w-full h-[100px] p-3">
       <div className="flex flex-col justify-center align-middle w-full h-full bg-[#7DE2DF]">
         {title && <span className="font-bold text-sm text-center">{title}</span>}
         {subtitle && <span className="font-normal text-sm text-center">{subtitle}</span>}
