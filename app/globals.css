@@ -1,38 +1,129 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import "tailwindcss";
+@config "./../tailwind.config.ts";
+
+@theme {
+	--color-accentlightgreen: #72ddc3;
+	--color-accentgreen: #02aaa4;
+	--color-accentgrey: #7084a3;
+	--color-tiffany: #27b5b0;
+	--color-transparentGrey: #aabbcc;
+	--color-transparentBlue: #37455e;
+	--color-hoverGrey: #e3e4ee;
+	--color-lightGrey: #dddeeb;
+	--color-blueGreyLight: #ced0dd;
+	--color-contrastBlue: #23324c;
+	--color-contrastGrey: #aeb3c0;
+	--color-selectedColumnBg: #dfe0ec;
+	--text-2xs: 10px;
+	--text-tiny: 14px;
+	--text-huge: 28px;
+	--shadow-top-input-shadow: inset 0 2px 1.5px rgba(199, 199, 199, 1);
+	--background-image-diagonal-stripes: repeating-linear-gradient(
+		135deg,
+		#e9eaf2,
+		#e9eaf2 10px,
+		#e4e5ef 10px,
+		#e4e5ef 20px
+	);
+	--background-image-pencil-strokes: linear-gradient(
+		45deg,
+		#ffffff1a 25%,
+		transparent 25%,
+		transparent 50%,
+		#ffffff1a 50%,
+		#ffffff1a 75%,
+		transparent 75%,
+		transparent
+	);
+
+  
+
+	--animate-fade-in-scale: fade-in-scale 0.7s ease-in-out;
+	@keyframes fade-in-scale {
+		0% {
+			opacity: 0;
+			height: 0;
+		}
+		100% {
+			opacity: 1;
+			height: 100px;
+		}
+	}
+	--animate-fade-out-scale: fade-out-scale 0.7s ease-in-out;
+	@keyframes fade-out-scale {
+		0% {
+			opacity: 1;
+			height: 100px;
+		}
+		100% {
+			opacity: 0;
+			height: 0;
+		}
+	}
+	--animate-fade-in-page: fade-in-page 750ms ease-out forwards;
+	@keyframes fade-in-page {
+		from {
+			opacity: 0.1;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+	--animate-fade-out-page: fade-out-page 750ms ease-in forwards;
+	@keyframes fade-out-page {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0.1;
+		}
+	}
+}
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+	--foreground-rgb: 0, 0, 0;
+	--background-start-rgb: 214, 219, 220;
+	--background-end-rgb: 255, 255, 255;
 
-  --accent-green: #72DDC3;
-  --accent-light-green:rgb(123, 238, 209);
-  --accent-blue: #3758F9;
-  --accent-grey: #7084A3;
-  
-  --navbar-bg: #121F35;
-  --navbar-main: #FFFFFF;
-  --navbar-accent: var(--accent-green);
+	--accent-green: #72ddc3;
+	--accent-light-green: rgb(123, 238, 209);
+	--accent-blue: #3758f9;
+	--accent-grey: #7084a3;
 
-  --actionbar-bg: #435064;
-  --actionbar-main: var(--accent-green);
-  --actionbar-search: #8899A8;
+	--navbar-bg: #121f35;
+	--navbar-main: #ffffff;
+	--navbar-accent: var(--accent-green);
 
-  --timeline-accent: var(--accent-green);
-  --timeline-grid-bg: #E9EAF2;
-  --timeline-grid-gap-bg: #F0F0F6;
-  --timeline-grid-border: #FAFAFA;
-  --timeline-bar-bg: #E5E7EB;
-  --timeline-bar-fill: #02AAA4;
-  --timeline-actual: #7084A3;
-  --timeline-stroke-below: #D1D5DB;
+	--actionbar-bg: #435064;
+	--actionbar-main: var(--accent-green);
+	--actionbar-search: #8899a8;
 
-  --sidebar-target-bg: #F5F5F5;
-  --sidebar-target-border: #7C8491;
-  --sidebar-planned-bg: #ECF7F8;
-  --sidebar-planned-border: #30B7B3;
+	--timeline-accent: var(--accent-green);
+	--timeline-grid-bg: #e9eaf2;
+	--timeline-grid-gap-bg: #f0f0f6;
+	--timeline-grid-border: #fafafa;
+	--timeline-bar-bg: #e5e7eb;
+	--timeline-bar-fill: #02aaa4;
+	--timeline-actual: #7084a3;
+	--timeline-stroke-below: #d1d5db;
+
+	--sidebar-target-bg: #f5f5f5;
+	--sidebar-target-border: #7c8491;
+	--sidebar-planned-bg: #ecf7f8;
+	--sidebar-planned-border: #30b7b3;
+  --background-image-pencil-strokes: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.1) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.1) 75%,
+    transparent 75%,
+    transparent
+  );
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -45,88 +136,93 @@
 } */
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+	.text-balance {
+		text-wrap: balance;
+	}
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;
+	display: none;
 }
 
 .scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
 }
 
 .navbar {
-  background-color: var(--navbar-bg);
-  color: var(--navbar-main);
+	background-color: var(--navbar-bg);
+	color: var(--navbar-main);
 }
 
 .navbar-text-accent {
-  color: var(--navbar-accent);
+	color: var(--navbar-accent);
 }
 
 .navbar-border-accent {
-  border-color: var(--navbar-accent);
+	border-color: var(--navbar-accent);
 }
 
 .actionbar {
-  background-color: var(--actionbar-bg);
-  color: var(--actionbar-main);
+	background-color: var(--actionbar-bg);
+	color: var(--actionbar-main);
 }
 
 .actionbar-bg-accent {
-  background-color: var(--actionbar-main);
+	background-color: var(--actionbar-main);
 }
 
 .actionbar-text-accent {
-  color: var(--actionbar-bg);
+	color: var(--actionbar-bg);
 }
 
 .actionbar-text-search {
-  color: var(--actionbar-search);
+	color: var(--actionbar-search);
 }
 
 .actionbar-border-accent {
-  border-color: var(--actionbar-main);
+	border-color: var(--actionbar-main);
 }
 
 .actionbar-search {
-  background-color: var(--actionbar-search);
+	background-color: var(--actionbar-search);
 }
 
 .ellipsismenu:after {
-  content: '\2807';
-  }
+	content: "\2807";
+}
 
 .timeline-bar-bg {
-  background-color: var(--timeline-bar-bg);
+	background-color: var(--timeline-bar-bg);
 }
 
 .timeline-grid-bg {
-  background-color: var(--timeline-grid-bg);
+	background-color: var(--timeline-grid-bg);
 }
 
 .timeline-grid-gap-bg {
-  background-color: var(--timeline-grid-gap-bg);
+	background-color: var(--timeline-grid-gap-bg);
 }
 
 .timeline-grid-border {
-  border-color: var(--timeline-grid-border);
+	border-color: var(--timeline-grid-border);
 }
 
 .timeline-text-accent {
-  color: var(--timeline-accent);
+	color: var(--timeline-accent);
 }
 
 .sidebar-target-div {
-  background-color: var(--sidebar-target-bg);
-  border-bottom: 1px solid var(--sidebar-target-border);
+	background-color: var(--sidebar-target-bg);
+	border-bottom: 1px solid var(--sidebar-target-border);
 }
 
 .sidebar-planned-div {
-  background-color: var(--sidebar-planned-bg);
-  border-bottom: 1px solid var(--sidebar-planned-border);
+	background-color: var(--sidebar-planned-bg);
+	border-bottom: 1px solid var(--sidebar-planned-border);
+}
+
+.enddate-stripes {
+  background-image: var(--background-image-pencil-strokes);
+  background-size: 4px 4px
 }
