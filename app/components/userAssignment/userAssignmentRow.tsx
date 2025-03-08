@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from "react";
+import React, {useState, useRef, useEffect, useCallback} from "react";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
 import UserSummary from "../userSummary";
@@ -9,8 +9,8 @@ import { WorkWeekInput } from "./workWeekInput";
 import { ClientLabel } from "./clientLabel";
 import { TempProjectLabel } from "./tempProjectLabel";
 import { currentWeek, currentYear } from "../scrollingCalendar/helpers";
-import { AssignmentType, MonthsDataType, UserType } from "@/app/typeInterfaces";
-import { useMutation } from "@apollo/client";
+import {AssignmentType, MonthsDataType, UndoableModifiedAssignment, UserType} from "@/app/typeInterfaces";
+import {useApolloClient, useMutation} from "@apollo/client";
 import { UPSERT_ASSIGNMENT } from "../../gqlQueries";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import UndoRow from "../undoRow";
@@ -21,6 +21,10 @@ import {
 } from "../constants/undoModifyStrings";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
+import { MdVisibility, MdVisibilityOff } from "react-icons/md";
+
+import IconButton from "@/app/components/iconButton";
+import {useGeneralDataContext} from "@/app/contexts/generalContext";
 
 interface UserAssignmentRowProps {
 	assignment: AssignmentType;
@@ -48,16 +52,20 @@ export const UserAssignmentRow = ({
 	totalRows
 }: UserAssignmentRowProps) => {
 	const router = useRouter();
-	const { deleteAssignment, sortBy, newProjectAssignmentId, setNewProjectAssignmentId, setUserList, refetchUserList, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
+	const { deleteAssignment, sortBy,enqueueTimer, newProjectAssignmentId, setNewProjectAssignmentId, setUserList, refetchUserList, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
+	const { showHiddenAssignments } = useGeneralDataContext();
 	const { setProjectList, undoModifyProject, projectsWithUndoActions } = useProjectsDataContext()
-
+	const client = useApolloClient()
 	const [showUndoRow, setShowUndoRow] = useState<boolean>(false);
+	const [showTooltip, setShowTooltip] = useState<boolean>(false);
 	const rowRef = useRef<HTMLTableRowElement>(null);
 	const undoRowRef = useRef<HTMLTableRowElement>(null);
 	const isModifiedAssignment = (assignmentId: number) =>
 		assignmentsWithUndoActions.some((item) => item.assignment.id === assignmentId);
 	const isModifiedProject = (projectId: number) =>
     projectsWithUndoActions.some((item) => item.project.id === projectId);
+	const showHideButton = assignment.focused
+
 
 	const { animateRow } = useFadeInOutRow({ rowRef, setShowUndoRow });
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
@@ -199,6 +207,25 @@ export const UserAssignmentRow = ({
 		{ 'bg-diagonal-stripes': isAssignmentProposed }
 	); */
 
+
+	const showHiddenProject = async (project: any) => {
+		const {id} = project
+
+		const variables = {
+			id: assignment.id,
+			projectId: id,
+			userId: assignment.assignedUser.id,
+			status: assignment.status,
+			focused: true
+		};
+
+		try {
+			const response = await upsertAssignment({ variables});
+		} catch (error) {
+			console.error('Error updating project:', error);
+		}
+	}
+
 	return (
 		<tr
 			ref={rowRef}
@@ -223,7 +250,41 @@ export const UserAssignmentRow = ({
 						)}
 						{/* {!isTempProject && <ClientLabel assignment={assignment} selectedUser={selectedUser} />} */}
 					</div>
-					<div className={`flex justify-between sm:max-w-[260px] w-full`}>
+					<div className={`flex justify-between sm:max-w-[280px] w-full`}>
+						<div className='flex items-start pt-2 relative'
+						>
+							{showHiddenAssignments &&
+							!showHideButton
+								?
+								<div onMouseEnter={() => setShowTooltip(true)}
+									 onMouseLeave={() => setShowTooltip(false)}
+								>
+									<IconButton
+									className="pl-4"
+									iconSize="w-4 h-4"
+									onClick={() => {
+										setShowTooltip(false)
+										showHiddenProject(assignment.project)}
+									}
+									Icon={MdVisibilityOff}
+									/>
+								</div>
+								: <div className='w-8'></div>
+
+								// TODO add icon for hide project
+							// 	<IconButton
+							// 	className="py-1 pl-4 "
+							// 	iconSize="w-4 h-4"
+							// 	onClick={() => null}
+							// 	Icon={MdVisibility}
+							// />
+							}
+							{showTooltip &&
+								<div className="absolute top-1/2 left-1/2 bg-gray-700 text-white text-xs rounded px-2 py-1 z-50 shadow-lg min-w-40">
+									Show in My StaffPlan
+								</div>
+							}
+						</div>
 						{isFirstMonth && (
 						isTempProject ? (
 							<TempProjectLabel assignment={assignment} /> // Render custom label

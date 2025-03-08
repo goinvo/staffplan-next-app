@@ -27,6 +27,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 	const canAssignmentBeDeleted = !assignment.workWeeks.some(
 		(week) => (week.actualHours ?? 0) > 0);
 	const showArchiveButton = assignment.project.status !== 'archived'
+	const showHideButton = assignment.focused
 	const showUnarchiveButton = assignment.project.status === 'archived'
 	const showDeleteButton = canAssignmentBeDeleted
 
@@ -410,7 +411,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 					Hide in My StaffPlan
 				</button>
 			),
-			show: true,
+			show: showHideButton,
 		},
 		{
 			component: <button onClick={downloadCSV} className="block w-full px-4 py-2 text-sm text-left">Export CSV</button>,

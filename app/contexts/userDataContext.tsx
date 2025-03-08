@@ -117,10 +117,18 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
 
             const filteredAssignments = assignmentsToSort.filter((a) => {
                 if (showArchivedAssignments && viewer?.id.toString() === newSelectedId.toString()) {
-                    return true;
+                    if (showHiddenAssignments) {
+                      return true
+                    } else {
+                        return a.focused
+                    }
                 }
                 if (showHiddenAssignments && viewer?.id.toString() === newSelectedId.toString()) {
-                    return a.focused;
+                    if (showArchivedAssignments){
+                        return true
+                    } else {
+                        return a.project.status !== "archived"
+                    }
                 }
                 return a.project.status !== "archived" && a.focused;
             });
