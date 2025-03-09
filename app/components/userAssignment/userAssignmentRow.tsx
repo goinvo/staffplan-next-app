@@ -260,13 +260,13 @@ export const UserAssignmentRow = ({
 									 onMouseLeave={() => setShowTooltip(false)}
 								>
 									<IconButton
-									className="pl-4"
-									iconSize="w-4 h-4"
-									onClick={() => {
-										setShowTooltip(false)
-										showHiddenProject(assignment.project)}
-									}
-									Icon={MdVisibilityOff}
+										className="pl-4"
+										iconSize="w-4 h-4"
+										onClick={() => {
+											setShowTooltip(false)
+											showHiddenProject(assignment.project)}
+										}
+										Icon={MdVisibilityOff}
 									/>
 								</div>
 								: <div className='w-8'></div>
