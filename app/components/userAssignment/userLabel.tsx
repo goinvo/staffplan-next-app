@@ -27,6 +27,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 	const canAssignmentBeDeleted = !assignment.workWeeks.some(
 		(week) => (week.actualHours ?? 0) > 0);
 	const showArchiveButton = assignment.project.status !== 'archived'
+	const showHideButton = assignment.focused
 	const showUnarchiveButton = assignment.project.status === 'archived'
 	const showDeleteButton = canAssignmentBeDeleted
 
@@ -50,7 +51,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 		onCompleted({ upsertProjectWithInput }) {
     },
 	});
-	
+
 	const updateUserList = (updatedProject: ProjectType) => {
 		setUserList(prev => prev.map(u => {
 			if (u.id === viewer?.id && updatedProject?.assignments?.some((a: AssignmentType)=> a.assignedUser.id === viewer?.id)) {
@@ -162,6 +163,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 			console.log("Error deleting assignment.:", error)
 		}
 	}
+
 	const undoArchivedStatus = useCallback(
 		async (assignmentsWithUndoActions: UndoableModifiedAssignment[]) => {
 			const projectId = assignment.project.id;
@@ -171,6 +173,26 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 				projectId: projectId,
 				userId: assignment.assignedUser.id,
 				status: assignmentBeforeModified?.assignment?.status || 'active'
+			};
+			try {
+				await upsertAssignment({ variables });
+			} catch (error) {
+				console.error('Error updating assignment:', error);
+			}
+		},
+		[]
+	);
+
+	const undoHideProject = useCallback(
+		async (assignmentsWithUndoActions: UndoableModifiedAssignment[]) => {
+			const projectId = assignment.project.id;
+			const assignmentBeforeModified = assignmentsWithUndoActions.find((el: UndoableModifiedAssignment) => el.assignment.id === assignment.id)
+			const variables = {
+				id: assignment.id,
+				projectId: projectId,
+				userId: assignment.assignedUser.id,
+				status: assignmentBeforeModified?.assignment?.status || 'active',
+				focused: true
 			};
 			try {
 				await upsertAssignment({ variables });
@@ -250,45 +272,44 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 	};
 
 	const handleArchiveProjectClick = async (project: ProjectType) => {
-			const {id, name, client: projectClient, status} = project
-			if (status === "archived") {
-        const input = {
-          id: id,
-          name: name,
-          clientId: projectClient.id,
-          status: "unconfirmed",
-        };
-        const { data } = await upsertProjectWithInput({ variables: { input } });
-        if (data) {
-          client.cache.modify({
-            id: client.cache.identify({ __typename: "Project", id: id }),
-            fields: {
-              status() {
-                return data.upsertProject.status;
-              },
-            },
-          });
-        }
-        return;
-      }
-				const input = {
-					id: id,
-					name: name,
-					clientId: projectClient.id,
-					status: "archived",
-				};
-			try {
-				const response = await upsertProjectWithInput({ variables: { input } });
-				if (response && response.data) {
-					const updatedProject = response.data.upsertProjectWithInput;
-					const undoAction = (projectsWithUndoActions: UndoableModifiedProject[]) => { undoArchivedProjectStatus(projectsWithUndoActions); }
-					enqueueProjectTimer({ project, updatedProject, finalAction: updateCache, undoAction, updateUserList, updateProjectList });
-				}
-			} catch (error) {
-				console.error('Error updating project:', error);
+		const {id, name, client: projectClient, status} = project
+		if (status === "archived") {
+			const input = {
+			  id: id,
+			  name: name,
+			  clientId: projectClient.id,
+			  status: "unconfirmed",
+			};
+			const { data } = await upsertProjectWithInput({ variables: { input } });
+			if (data) {
+			  client.cache.modify({
+				id: client.cache.identify({ __typename: "Project", id: id }),
+				fields: {
+				  status() {
+					return data.upsertProject.status;
+				  },
+				},
+			  });
 			}
-	
+        	return;
+      	}
+		const input = {
+			id: id,
+			name: name,
+			clientId: projectClient.id,
+			status: "archived",
+		};
+		try {
+			const response = await upsertProjectWithInput({ variables: { input } });
+			if (response && response.data) {
+				const updatedProject = response.data.upsertProjectWithInput;
+				const undoAction = (projectsWithUndoActions: UndoableModifiedProject[]) => { undoArchivedProjectStatus(projectsWithUndoActions); }
+				enqueueProjectTimer({ project, updatedProject, finalAction: updateCache, undoAction, updateUserList, updateProjectList });
+			}
+		} catch (error) {
+			console.error('Error updating project:', error);
 		}
+	}
 
 	const handleDeleteAssignmentClick = () => {
 		enqueueTimer({ assignment, updatedAssignment: assignment, finalAction: undoableDeleteAssignment, finalApiCall: finalDeletingAssignment });
@@ -307,6 +328,33 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 			updateProjectList(data.upsertProjectWithInput);
 		}
 	};
+
+	const handleHideProject = async (project: ProjectType) => {
+		const {id} = project
+
+		const variables = {
+			id: assignment.id,
+			projectId: id,
+			userId: assignment.assignedUser.id,
+			status: assignment.status,
+			focused: false
+		};
+
+		try {
+			const response = await upsertAssignment({ variables});
+			if (response && response.data) {
+				const updatedAssignment = response.data.upsertAssignment
+				const undoAction = (undoableAssignments: UndoableModifiedAssignment[]) => { undoHideProject(undoableAssignments); }
+				enqueueTimer({
+					assignment,
+					updatedAssignment,
+					finalAction: updateCache,
+					undoAction });
+			}
+		} catch (error) {
+			console.error('Error updating project:', error);
+		}
+	}
 
 	const downloadCSV = () => {
 			const csv = convertProjectToCSV(assignment.project);
@@ -350,6 +398,21 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
       ),
       show: true,
     },
+		{
+			component: (
+				<button
+					onClick={() => {
+						handleHideProject(assignment.project)
+						setDeleteAssignment("hide")
+						}
+					}
+					className="block w-full px-4 py-2 text-sm text-left"
+				>
+					Hide in My StaffPlan
+				</button>
+			),
+			show: showHideButton,
+		},
 		{
 			component: <button onClick={downloadCSV} className="block w-full px-4 py-2 text-sm text-left">Export CSV</button>,
 			show: true,
@@ -402,14 +465,14 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
           </span>
 				)}
       </div>
-			
+
 				<EllipsisDropdownMenu
 					options={assignmentDropMenuOptions}
 					textColor={"actionbar-text-accent"}
 					className="ml-2 -mt-[5px] sm:mt-[3px]"
-					menuItemsClassName="w-56"				
+					menuItemsClassName="w-56"
 				/>
-			
+
 		</div>
 	);
 };

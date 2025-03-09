@@ -88,8 +88,7 @@ export const ProjectAssignmentRow = ({
 
 	return (
 		<tr ref={rowRef} key={`assignment-${assignment.id}`} className={`${isUserTBD ? 'sm:flex hidden' : 'flex'} border-b border-gray-300 hover:bg-hoverGrey ${assignment.status === 'proposed' ? 'bg-diagonal-stripes' :
-			''
-			} pl-5`}>
+			''} pl-5`}>
 			{isFirstMonth && (
 				<ProjectUserLabel
 					project={project}

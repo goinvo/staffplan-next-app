@@ -100,16 +100,16 @@ export const AllProjectRow = ({
 			delay-100 ${ (newProjectId === Number(project.id) || (isFirstShowArchivedProjects && project.status === 'archived')) ? 'animate-fadeInScale' : ''}
 			${isFirstHideArchivedProjects && project.status === 'archived' ? 'animate-fadeOutScale' : ''}
 			${(isNewClient && sortBy === 'Clients' && rowIndex !== 0 || (sortBy === 'Projects' && rowIndex !== 0)) ? 'border-t' : ''}
-			${rowIndex === projects.length - 1 ? 'border-b' : ''} `}> 
+			${rowIndex === projects.length - 1 ? 'border-b' : ''} `}>
 			<td className='sm:block flex items-center pt-1 pb-2 px-0 font-normal align-top w-1/2 sm:w-2/5'>
 				{isFirstMonth && (
 					<AllProjectLabel
-            undoRowRef={undoRowRef}
+            			undoRowRef={undoRowRef}
 						isNewClient={isNewClient}
-            clickHandler={handleProjectChange}
-            project={project}
-            handleUnarchiveProject={handleUnarchiveProject}
-          />
+            			clickHandler={handleProjectChange}
+						project={project}
+            			handleUnarchiveProject={handleUnarchiveProject}
+          			/>
 
 				)}
 			</td>

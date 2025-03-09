@@ -121,6 +121,7 @@ export const GET_USER_LIST = gql`
 					endsOn
 					estimatedWeeklyHours
 					status
+					focused
 					canBeDeleted
 					assignedUser {
 						id
@@ -188,6 +189,7 @@ export const GET_ALL_CLIENTS_DATA = gql`
 						estimatedWeeklyHours
 						endsOn
 						status
+						focused
 						workWeeks {
 							actualHours
 							estimatedHours
@@ -235,6 +237,7 @@ export const GET_ALL_PROJECTS_DATA = gql`
 					estimatedWeeklyHours
 					endsOn
 					status
+					focused
 					workWeeks {
 						actualHours
 						estimatedHours
@@ -292,6 +295,7 @@ export const UPSERT_ASSIGNMENT = gql`
 		$projectId: ID!
 		$userId: ID!
 		$status: String!
+		$focused: Boolean
 		$startsOn: ISO8601Date
 		$endsOn: ISO8601Date
 		$estimatedWeeklyHours: Int
@@ -301,6 +305,7 @@ export const UPSERT_ASSIGNMENT = gql`
 			projectId: $projectId
 			userId: $userId
 			status: $status
+			focused: $focused
 			startsOn: $startsOn
 			endsOn: $endsOn
 			estimatedWeeklyHours: $estimatedWeeklyHours
@@ -309,6 +314,7 @@ export const UPSERT_ASSIGNMENT = gql`
 			startsOn
 			endsOn
 			status
+			focused
 			estimatedWeeklyHours
 			assignedUser {
 				id
@@ -430,6 +436,7 @@ export const UPSERT_PROJECT = gql`
         startsOn
         endsOn
         status
+        focused
         estimatedWeeklyHours
         canBeDeleted
         workWeeks {
@@ -487,6 +494,7 @@ export const UPSERT_PROJECT_WITH_INPUT = gql`
         startsOn
         endsOn
         status
+        focused
         estimatedWeeklyHours
         canBeDeleted
         workWeeks {
