@@ -16,11 +16,10 @@ import { useGeneralDataContext } from "../contexts/generalContext";
 import EditProjectModal from "./editProjectModal";
 import { useUserDataContext } from "../contexts/userDataContext";
 interface EllipsisProjectMenuProps {
-	project: ProjectType
-	undoRowRef: RefObject<HTMLTableRowElement>;
-	showButtonShowProjectInMyStaffPlan: boolean | undefined;
-	assignment: AssignmentType | undefined;
-
+    project: ProjectType
+    undoRowRef: RefObject<HTMLTableRowElement | null>;
+    showButtonShowProjectInMyStaffPlan: boolean | undefined;
+    assignment: AssignmentType | undefined;
 }
 
 export default function EllipsisProjectMenu({ project, undoRowRef, showButtonShowProjectInMyStaffPlan, assignment }: EllipsisProjectMenuProps) {

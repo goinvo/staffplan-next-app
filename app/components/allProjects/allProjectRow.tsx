@@ -38,7 +38,7 @@ export const AllProjectRow = ({
 
 	const { sortBy, newProjectId, projectsWithUndoActions, setNewProjectId, undoModifyProject, refetchProjectList } = useProjectsDataContext()
 	const { isFirstShowArchivedProjects, isFirstHideArchivedProjects } = useGeneralDataContext();
-	const { animateRow } = useFadeInOutRow({ rowRef, setShowUndoRow, maxHeight: 102 });
+	const { animateRow } = useFadeInOutRow({ rowRef: rowRef as React.RefObject<HTMLTableRowElement>, setShowUndoRow, maxHeight: 102 });
 
 	const isNewClient = projects?.[rowIndex - 1]?.client?.id !== project.client.id
 
