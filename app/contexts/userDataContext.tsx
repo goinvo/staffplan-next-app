@@ -18,7 +18,7 @@ type EnqueueTimerParams = {
     finalApiCall?: () => void;
 };
 export interface UserDataContextType {
-    deleteAssignment: 'archive' | 'deleteMe' | '';
+    deleteAssignment: 'archive' | 'deleteMe' | 'hide' | '';
     newProjectAssignmentId: number | null;
     userList: UserType[] | [];
     filteredUserList: UserType[] | [];
@@ -28,7 +28,7 @@ export interface UserDataContextType {
     viewsFilterPeople: string;
     viewsFilterSingleUser: string;
     assignmentsWithUndoActions: UndoableModifiedAssignment[]
-    setDeleteAssignment: React.Dispatch<React.SetStateAction<'archive' | 'deleteMe' | ''>>;
+    setDeleteAssignment: React.Dispatch<React.SetStateAction<'archive' | 'deleteMe' | 'hide' | ''>>;
     setNewProjectAssignmentId: React.Dispatch<React.SetStateAction<number | null>>;
     undoModifyAssignment: (assignmentId: number) => void;
     setViewsFilterSingleUser: React.Dispatch<React.SetStateAction<string>>;
@@ -59,7 +59,7 @@ export const useUserDataContext = () => {
 export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: any }> = ({ children }) => {
     const client = useApolloClient();
     const isClient = typeof window !== "undefined";
-    const [deleteAssignment, setDeleteAssignment] = useState<'archive' | 'deleteMe' | ''>('')
+    const [deleteAssignment, setDeleteAssignment] = useState<'archive' | 'deleteMe' | 'hide' | '' >('')
     const [newProjectAssignmentId, setNewProjectAssignmentId] = useState<number | null>(null);
     const [userList, setUserList] = useState<UserType[] | []>([]);
     const [filteredUserList, setFilteredUserList] = useState<UserType[] | []>([]);
@@ -70,7 +70,7 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
     const [viewsFilterSingleUser, setViewsFilterSingleUser] = useState("byClient");
     const [assignmentsWithUndoActions, setAssignmentsWithUndoActions] = useState<UndoableModifiedAssignment[]>([]);
     const { enqueueTask } = useTaskQueue();
-    const { showArchivedAssignments, viewer, showInactiveUsers, isFirstShowInactiveUsers } = useGeneralDataContext();
+    const { showArchivedAssignments, viewer, showInactiveUsers, isFirstShowInactiveUsers, showHiddenAssignments } = useGeneralDataContext();
     const onPrefabError = (reason: any) => {
         console.error(reason);
     };
@@ -115,16 +115,30 @@ export const UserListProvider: React.FC<{ children?: ReactNode; initialData?: an
                 ? selectedUser.assignments.filter((a) => Number(a.project.id) !== newProjectAssignmentId)
                 : selectedUser.assignments;
 
-            const filteredAssignments = showArchivedAssignments && viewer?.id.toString() === newSelectedId.toString()
-                ? assignmentsToSort
-                : assignmentsToSort.filter((a) => a.project.status !== "archived");
+            const filteredAssignments = assignmentsToSort.filter((a) => {
+                if (showArchivedAssignments && viewer?.id.toString() === newSelectedId.toString()) {
+                    if (showHiddenAssignments) {
+                      return true
+                    } else {
+                        return a.focused
+                    }
+                }
+                if (showHiddenAssignments && viewer?.id.toString() === newSelectedId.toString()) {
+                    if (showArchivedAssignments){
+                        return true
+                    } else {
+                        return a.project.status !== "archived"
+                    }
+                }
+                return a.project.status !== "archived" && a.focused;
+            });
 
             const singleUser = sortSingleUserByOrder(sortOrder, sortBy, { ...selectedUser, assignments: filteredAssignments })
             const singleUserToSet = { ...singleUser, assignments: [...newAssignment, ...singleUser.assignments] };
 
             setSingleUserPage(singleUserToSet);
         },
-        [userList, showArchivedAssignments, sortOrder, sortBy]
+        [userList, showArchivedAssignments, sortOrder, sortBy, showHiddenAssignments]
     );
 
     const sortedAndFilteredUsers = useMemo(() => {

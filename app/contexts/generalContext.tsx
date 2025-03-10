@@ -27,6 +27,7 @@ export interface GeneralDataContextType {
     showArchivedProjects: boolean;
     showInactiveUsers: boolean;
     showArchivedAssignments: boolean;
+    showHiddenAssignments: boolean;
     rollupSort: string;
     assignmentSort: string;
     setHeaderTitleWidth: React.Dispatch<React.SetStateAction<number | null>>;
@@ -40,6 +41,7 @@ export interface GeneralDataContextType {
     setShowArchivedProjects: React.Dispatch<React.SetStateAction<boolean>>;
     setShowInactiveUsers: React.Dispatch<React.SetStateAction<boolean>>;
     setShowArchivedAssignments: React.Dispatch<React.SetStateAction<boolean>>;
+    setShowHiddenAssignments: React.Dispatch<React.SetStateAction<boolean>>;
     setRollupSort: React.Dispatch<React.SetStateAction<string>>;
     setAssignmentSort: React.Dispatch<React.SetStateAction<string>>;
     setDateRange: React.Dispatch<React.SetStateAction<string>>;
@@ -81,6 +83,7 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
     const [isFirstHideInactiveUsers, setIsFirstHideInactiveUsers] = useState<boolean>(false);
     const [showInactiveUsers, setShowInactiveUsers] = useState<boolean>(false);
     const [showArchivedAssignments, setShowArchivedAssignments] = useState<boolean>(false);
+    const [showHiddenAssignments, setShowHiddenAssignments] = useState<boolean>(false);
     const [rollupSort, setRollupSort] = useState('none')
     const [assignmentSort, setAssignmentSort] = useState('slim')
     const scrollToTodayFunction = () => {
@@ -127,6 +130,8 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
                 showArchivedAssignments,
                 rollupSort,
                 assignmentSort,
+                showHiddenAssignments,
+                setShowHiddenAssignments,
                 setHeaderTitleWidth,
                 setIsAddNewProject,
                 setShowSummaries,

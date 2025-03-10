@@ -26,14 +26,12 @@ const InlineButtonArchivedAssignments: React.FC = () => {
   return (
     <>
       {archivedAssignments.length > 0 ? (
-        <div className="h-[100px] w-full border-t border-gray-300">
           <button
             className="ml-8 sm:ml-5 mt-2 py-1"
             onClick={() => setShowArchivedAssignments(!showArchivedAssignments)}
           >
             {label}
           </button>
-        </div>
       ) : (
         <></>
       )}

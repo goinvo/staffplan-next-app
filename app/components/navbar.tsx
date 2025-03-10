@@ -24,6 +24,8 @@ type Link = {
 };
 
 const Navbar: React.FC = () => {
+
+	const {isEnabled} = usePrefab();
 	const { viewer } = useGeneralDataContext();
 	const { showOneClientProjects, setShowOneClientProjects } = useProjectsDataContext()
 	const fullPathName = usePathname();
@@ -75,8 +77,6 @@ const Navbar: React.FC = () => {
 		},
 	];
 
-	// eslint-disable-next-line react-hooks/rules-of-hooks
-	const {isEnabled} = usePrefab();
 
 	return (
 		<nav className="navbar bg-gray-100 pl-6 pr-0 sm:px-5 h-14 flex justify-between items-center">

@@ -333,34 +333,33 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 							)}
 							<div className="flex flex-col items-start">
 								<div className="flex items-center">
-										{searchParams.has("client") ? (
-                    <div>
-                      <div className="flex">
-                        <IconButton
-                          className="pr-2 pb-[1px]"
-                          iconSize="w-3 h-3"
-														onClick={() => returnToProjects()}
-                          Icon={RxArrowLeft}
-                        />
-                        <div className="text-base font-normal">Projects</div>
-                      </div>
-
-                      <div className="flex pl-[19px]">
-                        <span className="text-huge text-left overflow-wrap break-word leading-snug">
-                          {currentClient}
-                        </span>
-                        <IconButton
-                          className="pt-1 pb-[2px] pl-3"
-                          iconSize="w-4 h-4"
-													onClick={() => setIsClientEditing(true)}
-                          Icon={SlPencil}
-                        />
-                      </div>
-                    </div>
+									{searchParams.has("client") ? (
+										<div>
+									  		<div className="flex">
+											<IconButton
+											  className="pr-2 pb-[1px]"
+											  iconSize="w-3 h-3"
+											  onClick={() => returnToProjects()}
+											  Icon={RxArrowLeft}
+											/>
+											<div className="text-base font-normal">Projects</div>
+											</div>
+											<div className="flex pl-[19px]">
+												<span className="text-huge text-left overflow-wrap break-word leading-snug">
+												  {currentClient}
+												</span>
+												<IconButton
+												  className="pt-1 pb-[2px] pl-3"
+												  iconSize="w-4 h-4"
+												  onClick={() => setIsClientEditing(true)}
+												  Icon={SlPencil}
+												/>
+											</div>
+										</div>
                   ) : (
                     <div className="text-huge text-left overflow-wrap break-word leading-snug">
-												{title || userName}
-												{!isActiveUser && <span className="block text-sm leading-[14px] font-normal">&#40;Deactivated&#41;</span>}
+						{title || userName}
+						{!isActiveUser && <span className="block text-sm leading-[14px] font-normal">&#40;Deactivated&#41;</span>}
                     </div>
                   )}
 									{editable && (
@@ -404,9 +403,8 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 						return (
 							<th
 								key={`month-${month.monthLabel}-week-${week.weekNumberOfTheYear}`}
-								className={`sm:block hidden relative px-1 ${
-									isCurrentWeek ? "navbar font-bold" : "font-normal"
-								}`}
+								className={`sm:block hidden relative px-1 
+								${ isCurrentWeek ? "navbar font-bold" : "font-normal"}`}
 							>
 								{draggableDates && (
 									<DraggableDates
