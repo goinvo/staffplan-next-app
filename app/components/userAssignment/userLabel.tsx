@@ -391,7 +391,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
       component: (
         <button
           onClick={() => openModal(<EditProjectModal project={assignment.project} closeModal={closeModal} isModalView/>) }
-          className="block w-full px-4 py-2 text-sm text-left"
+          className="block w-full px-4 py-2 text-sm text-left cursor-pointer"
         >
           Edit project
         </button>
@@ -406,7 +406,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 						setDeleteAssignment("hide")
 						}
 					}
-					className="block w-full px-4 py-2 text-sm text-left"
+					className="block w-full px-4 py-2 text-sm text-left cursor-pointer"
 				>
 					Hide in My StaffPlan
 				</button>
@@ -414,14 +414,14 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 			show: showHideButton,
 		},
 		{
-			component: <button onClick={downloadCSV} className="block w-full px-4 py-2 text-sm text-left">Export CSV</button>,
+			component: <button onClick={downloadCSV} className="block w-full px-4 py-2 text-sm text-left cursor-pointer">Export CSV</button>,
 			show: true,
 		},
 		{
 			component: <button onClick={() => {
 				setDeleteAssignment("deleteMe");
 				handleDeleteAssignmentClick()
-			}} className="block w-full px-4 py-2 text-sm text-left text-[#FF5E5E] border-t border-t-[#E5E7EB]">Delete {assignment.assignedUser.name.split(' ')[0]} from this project</button>,
+			}} className="block w-full px-4 py-2 text-sm text-left text-[#FF5E5E] border-t border-t-[#E5E7EB] cursor-pointer">Delete {assignment.assignedUser.name.split(' ')[0]} from this project</button>,
 			show: showDeleteButton,
 		},
 		{
@@ -431,7 +431,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 						setDeleteAssignment("archive");
 						handleArchiveProjectClick(assignment.project)
 					}}
-          className="block w-full px-4 py-2 text-sm text-left text-[#FF5E5E] border-t border-t-[#E5E7EB]"
+          className="block w-full px-4 py-2 text-sm text-left text-[#FF5E5E] border-t border-t-[#E5E7EB] cursor-pointer"
         >
           Archive project for everyone
         </button>
@@ -439,7 +439,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
       show: showArchiveButton,
     },
 		{
-			component: <button onClick={() => handleUnarchiveProject(assignment.project)} className="block w-full px-4 py-2 text-sm text-left border-t border-t-[#E5E7EB]">Unarchive project for everyone</button>,
+			component: <button onClick={() => handleUnarchiveProject(assignment.project)} className="block w-full px-4 py-2 text-sm text-left border-t border-t-[#E5E7EB] cursor-pointer">Unarchive project for everyone</button>,
 			show: showUnarchiveButton,
 		},
 
@@ -448,7 +448,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 		<div className={`w-full ${isAssignmentProposed ? "sm:max-w-[185px] w-full md:pl-1 lg:pl-2" : "sm:max-w-[205px] w-full md:pl-1 lg:pl-2" } sm:mr-0 mr-2 flex items-start ${isFirstClient ? "mb-4 sm:mb-0" : ''}`}>
 			<div>
         <button
-          className={`pt-0 sm:pt-2  font-bold flex items-center justify-start text-contrastBlue text-start`}
+          className={`pt-0 sm:pt-2  font-bold flex items-center justify-start text-contrastBlue text-start cursor-pointer`}
           onClick={() => clickHandler(assignment)}
         >
           {assignment.project.name}

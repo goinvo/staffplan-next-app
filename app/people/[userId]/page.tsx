@@ -127,11 +127,11 @@ const UserPage: React.FC = () => {
                     <InlineButtonHiddenAssignments key='inlineButtonHidden'/>,
 
                 ]}
-                <tr>
-                <td className="h-[100px] w-full border-t border-gray-300 flex flex-col items-start justify-start">
-                    <InlineButtonArchivedAssignments/>
-                </td>
-                </tr>
+                  {/* <tr>
+                  <td className="h-[100px] w-full border-t border-gray-300 flex flex-col items-start justify-start">
+                      <InlineButtonArchivedAssignments/>
+                  </td>
+                  </tr> */}
                 <ApproveHours/>
                 <ColumnChartsRow/>
             </ScrollingCalendar>

@@ -300,7 +300,7 @@ export const UserAssignmentRow = ({
               }`}
             >
               <button
-                className="pt-2 underline"
+                className="pt-2 underline cursor-pointer"
                 onClick={onChangeStatusButtonClick}
               >
                 {isAssignmentProposed ? "Proposed" : "Plan"}
