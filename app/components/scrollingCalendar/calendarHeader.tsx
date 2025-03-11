@@ -653,8 +653,8 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 				<th>
 					<button
 						className={`absolute -top-[12px] left-1/2 transform -translate-x-1/2 bg-[#AFB3BF] text-[#151F33] font-normal rounded-[3px] px-[10px] py-[2px] shadow-[0_4px_4px_0_rgba(0,0,0,0.25)]
-							opacity-0 pointer-events-none ${
-													!isTodayInView ? "opacity-100 pointer-events-auto" : ""
+							opacity-0 ${
+													!isTodayInView ? "opacity-100 pointer-events-auto cursor-pointer " : ""
 												} transition-opacity duration-300 `}
 						onClick={scrollToTodayFunction}
 					>
