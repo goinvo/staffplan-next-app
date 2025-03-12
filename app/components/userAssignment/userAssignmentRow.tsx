@@ -260,7 +260,7 @@ export const UserAssignmentRow = ({
 									 onMouseLeave={() => setShowTooltip(false)}
 								>
 									<IconButton
-										className="pl-4"
+										className="pl-3"
 										iconSize="w-4 h-4"
 										onClick={() => {
 											setShowTooltip(false)
@@ -281,7 +281,7 @@ export const UserAssignmentRow = ({
 							}
 							{showTooltip &&
 								<div className="absolute top-1/2 left-1/2 bg-gray-700 text-white text-xs rounded px-2 py-1 z-50 shadow-lg min-w-40">
-									Show in My StaffPlan
+						 			Show in My StaffPlan
 								</div>
 							}
 						</div>

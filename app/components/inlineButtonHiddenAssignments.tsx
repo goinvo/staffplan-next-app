@@ -72,7 +72,7 @@ const InlineButtonHiddenAssignments: React.FC = () => {
               >
                 {label}
               </button>
-              {!showHiddenAssignments && <p>Total includes hours from hidden project</p>}
+              {!showHiddenAssignments && <p>Total includes hours from hidden projects</p>}
             </td>
             {!showHiddenAssignments && months?.map((month) => {
               return month.weeks.map((week) => {
