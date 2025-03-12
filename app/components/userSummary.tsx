@@ -20,8 +20,8 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 	const planTooltip = `Plan = Future Plan (${divideNumberByCommas(planHoursPerAssignment)}) + Actual (${divideNumberByCommas(burnedHours)})`;
 
 	const summaries = [
-		{ label: 'Plan', value: burnedHours + planHoursPerAssignment, unit: 'hrs', tooltip: planTooltip, alwaysShow: true },
-		{ label: 'Actual', value: burnedHours, unit: 'hrs', alwaysShow: true },
+		{ label: 'Plan', value: burnedHours + planHoursPerAssignment, unit: 'hrs', tooltip: planTooltip, alwaysShow: true, style: 'pt-1' },
+		{ label: 'Actual', value: burnedHours, unit: 'hrs', alwaysShow: true, style: 'mt-[-7px]' },
 	];
 
 	return (
@@ -36,7 +36,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({ assignment }) => {
 					(sum.value || sum.alwaysShow) ? (
 						<div
 							key={index}
-							className="sm:flex justify-between space-x-1 cursor-pointer relative"
+							className={`sm:flex justify-between space-x-1 cursor-pointer relative ${sum.style}`}
 						>
 							<label
 								className="cursor-pointer text-sm leading-[18px] whitespace-nowrap text-right flex-shrink-0
