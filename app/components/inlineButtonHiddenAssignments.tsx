@@ -64,14 +64,15 @@ const InlineButtonHiddenAssignments: React.FC = () => {
   return (
     <>
       {focusedAssignments.length > 0 ? (
-          <tr className="flex sm:justify-normal justify-between bg-white-300 hover:bg-hoverGrey pl-5 border-t border-gray-300">
+          <tr className="flex sm:justify-normal justify-between bg-white-300 hover:bg-hoverGrey pl-5">
             <td className={`pl-3 sm:px-0 py-1 sm:pt-1 sm:pb-2 font-normal align-top w-1/2 sm:w-2/5`}>
               <button
                   onClick={() => setShowHiddenAssignments(!showHiddenAssignments)}
+                  className="cursor-pointer"
               >
                 {label}
               </button>
-              {!showHiddenAssignments && <p>Total includes hours from hidden project</p>}
+              {!showHiddenAssignments && <p>Total includes hours from hidden projects</p>}
             </td>
             {!showHiddenAssignments && months?.map((month) => {
               return month.weeks.map((week) => {

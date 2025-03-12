@@ -281,7 +281,7 @@ export const UserAssignmentRow = ({
 							}
 							{showTooltip &&
 								<div className="absolute top-1/2 left-1/2 bg-gray-700 text-white text-xs rounded px-2 py-1 z-50 shadow-lg min-w-40">
-									Show in My StaffPlan
+						 			Show in My StaffPlan
 								</div>
 							}
 						</div>
@@ -300,12 +300,12 @@ export const UserAssignmentRow = ({
               }`}
             >
               <button
-                className="pt-2 underline"
+                className="pt-2 underline cursor-pointer"
                 onClick={onChangeStatusButtonClick}
               >
                 {isAssignmentProposed ? "Proposed" : "Plan"}
               </button>
-              <div className="pt-5">Actual</div>
+              <div className="pt-3">Actual</div>
             </div>
           </div>
 				</div>
