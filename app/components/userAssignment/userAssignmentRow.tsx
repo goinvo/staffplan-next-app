@@ -260,7 +260,7 @@ export const UserAssignmentRow = ({
 									 onMouseLeave={() => setShowTooltip(false)}
 								>
 									<IconButton
-										className="pl-4"
+										className="pl-3"
 										iconSize="w-4 h-4"
 										onClick={() => {
 											setShowTooltip(false)
