@@ -75,7 +75,6 @@ const InlineButtonHiddenAssignments: React.FC = () => {
 				focusedAssignments.length > 1 ? "projects" : "project"
 		  }`;
 
-	console.log(totalActualHours, "total actuals");
 	return (
 		<>
 			{focusedAssignments.length > 0 ? (
