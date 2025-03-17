@@ -26,7 +26,6 @@ export const AllProjectLabel = ({
 
   const showButtonShowProjectInMyStaffPlan = project.assignments?.find(a => a.assignedUser?.id === viewer?.id)
       && !project.assignments?.find(a => a.assignedUser?.id === viewer?.id)?.focused
-      && !project.assignments?.find(a => a.assignedUser?.id === viewer?.id)?.workWeeks.some(week => week.actualHours)
 
   const assignment = project.assignments?.find(a => a.assignedUser?.id === viewer?.id)
 
