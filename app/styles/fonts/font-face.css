@@ -1,0 +1,11 @@
+/* Google Font - Jura */
+@import url('https://fonts.googleapis.com/css2?family=Jura:wght@300;400;500;600;700&display=swap');
+
+/* Custom Font - Alyrak */
+@font-face {
+  font-family: 'Alyrak';
+  src: url('/fonts/alyrak/alyrak.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}

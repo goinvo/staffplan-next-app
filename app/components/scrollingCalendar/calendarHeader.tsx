@@ -13,6 +13,7 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 
 import ColumnChart from "../columnChart";
 import IconButton from "../iconButton";
+import Y2KAvatar from "../y2kAvatar";
 
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
@@ -322,7 +323,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 						<div className="flex text-white items-center pr-3">
 							{avatarUrl && (
 								<div className="px-2 py-2 relative overflow-hidden w-[92px] h-[67px] aspect-[92/67] mr-4">
-									<Image
+									<Y2KAvatar
 										src={decodeURIComponent(avatarUrl)}
 										fill
 										sizes="(max-width: 640px) 80px, (max-width: 768px) 92px, 92px"
@@ -345,7 +346,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 											<div className="text-base font-normal">Projects</div>
 											</div>
 											<div className="flex pl-[19px]">
-												<span className="text-huge text-left overflow-wrap break-word leading-snug">
+												<span className="text-huge text-left overflow-wrap break-word leading-snug y2k-client-name">
 												  {currentClient}
 												</span>
 												<IconButton

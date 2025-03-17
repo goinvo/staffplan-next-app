@@ -15,6 +15,7 @@ import EllipsisDropdownMenu from "./ellipsisDropdownMenu";
 import { useProjectsDataContext } from "../contexts/projectsDataContext";
 import { usePrefab } from "@prefab-cloud/prefab-cloud-react";
 import MagnifyingGlassIcon from "@heroicons/react/24/solid/MagnifyingGlassIcon";
+import { ThemeToggle } from "./themeToggle";
 
 type Link = {
   href: string;
@@ -120,6 +121,7 @@ const Navbar: React.FC = () => {
 				</div>
 			)}
 			<div className="flex items-center sm:space-x-4 py-4 sm:ml-2">
+				<ThemeToggle />
 				<div>
 					{/* Temporary commented */}
           {/* <button

@@ -2,6 +2,7 @@ import Image from "next/image";
 import React from "react";
 import { AllUserLabelProps } from "../../typeInterfaces";
 import EllipsisPeopleMenu from "../ellipsisPeopleMenu";
+import Y2KAvatar from "../y2kAvatar";
 
 export const AllUserLabel = ({ user, clickHandler }: AllUserLabelProps) => {
 	return (
@@ -11,9 +12,9 @@ export const AllUserLabel = ({ user, clickHandler }: AllUserLabelProps) => {
 					className="px-2 py-2 relative overflow-hidden w-[38px] h-[28px] aspect-w-38 aspect-h-28 cursor-pointer"
 					onClick={() => clickHandler(user)}
 				>
-					<Image
-						src={`${decodeURIComponent(user.avatarUrl)}`}
-						alt="client avatar"
+					<Y2KAvatar
+						src={user.avatarUrl || "/default-avatar.png"}
+						alt={`${user.name} avatar`}
 						className="rounded-md object-cover"
 						fill
 						sizes="(max-width: 640px) 28px, (max-width: 768px) 38px, 38px"

@@ -448,7 +448,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 		<div className={`w-full ${isAssignmentProposed ? "sm:max-w-[185px] w-full md:pl-1 lg:pl-2" : "sm:max-w-[205px] w-full md:pl-1 lg:pl-2" } sm:mr-0 mr-2 flex items-start ${isFirstClient ? "mb-4 sm:mb-0" : ''}`}>
 			<div>
         <button
-          className={`pt-0 sm:pt-2  font-bold flex items-center justify-start text-contrastBlue text-start cursor-pointer`}
+          className={`pt-0 sm:pt-2 font-bold flex items-center justify-start text-contrastBlue text-start cursor-pointer y2k-project-name`}
           onClick={() => clickHandler(assignment)}
         >
           {assignment.project.name}

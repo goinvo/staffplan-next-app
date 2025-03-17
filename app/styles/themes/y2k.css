@@ -1,0 +1,654 @@
+:root[data-theme="y2k"] {
+    /* Two-color palette */
+    --palette-green: #29B5B0;
+    --palette-dark: #15191A;
+    --palette-green-as-rgb: 41, 181, 176;
+    --palette-dark-as-rgb: 21, 25, 26;
+    --palette-green-transparent: rgba(41, 181, 176, 0.1);
+
+    /* Base colors */
+    --foreground-rgb: 21, 25, 26;
+    --background-start-rgb: var(--palette-dark-as-rgb);
+    --background-end-rgb: var(--palette-dark-as-rgb);
+
+    /* Accent colors*/
+    --accent-green: #15191A;
+    --accent-light-green: var(--palette-green-as-rgb);
+    --accent-blue: #15191A;
+    --accent-grey: rgba(21, 25, 26, 0.6);
+    --color-tiffany: #29B5B0;
+
+    /* UI Section colors */
+    --navbar-bg: #15191A;
+    --navbar-main: #29B5B0;
+    --navbar-accent: #29B5B0;
+
+    --actionbar-bg: #15191A;
+    --actionbar-main: #29B5B0;
+    --actionbar-search: #29B5B0;
+
+    /* Typography */
+    --font-primary: 'Jura', sans-serif;
+    --font-secondary: 'Alyrak', monospace;
+
+    /* Timeline elements */
+    --timeline-accent: #15191A;
+    --timeline-grid-bg: rgba(21, 25, 26, 0.2);
+    --timeline-grid-gap-bg: rgba(41, 181, 176, 0.1);
+    --timeline-grid-border: #29B5B0;
+    --timeline-bar-bg: rgba(21, 25, 26, 0.2);
+    --timeline-bar-fill: #15191A;
+    --timeline-actual: #15191A;
+    --timeline-stroke-below: rgba(21, 25, 26, 0.4);
+
+    /* Y2K-specific styles */
+    --background-image-pencil-strokes: linear-gradient(45deg,
+            rgba(21, 25, 26, 0.2) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(21, 25, 26, 0.2) 50%,
+            rgba(21, 25, 26, 0.2) 75%,
+            transparent 75%,
+            transparent);
+}
+
+/* Apply Y2K-specific styles */
+:root[data-theme="y2k"] body {
+    font-family: var(--font-primary);
+    background-color: rgb(var(--background-start-rgb));
+    color: rgb(var(--foreground-rgb));
+}
+
+:root[data-theme="y2k"] h1,
+:root[data-theme="y2k"] nav + div h1,
+:root[data-theme="y2k"] [data-testid="projects-page"] h1,
+:root[data-theme="y2k"] [data-testid="people-page"] h1,
+:root[data-theme="y2k"] main > div > h1 {
+  font-size: 2.5rem !important;
+  line-height: 1.2 !important;
+  margin-bottom: 0.5rem !important;
+  letter-spacing: 0.02em !important;
+}
+
+:root[data-theme="y2k"] h1,
+:root[data-theme="y2k"] h2,
+:root[data-theme="y2k"] h3,
+:root[data-theme="y2k"] h4 {
+    font-family: var(--font-secondary);
+}
+
+/* Owner name should use Alyrak font */
+:root[data-theme="y2k"] .owner-name {
+    font-family: var(--font-secondary);
+    font-style: normal !important;
+}
+
+:root[data-theme="y2k"] .navbar {
+    border-bottom: 2px solid #15191A;
+}
+
+/* Remove borders from buttons but keep for inputs */
+:root[data-theme="y2k"] button {
+    border: none;
+}
+
+:root[data-theme="y2k"] input,
+:root[data-theme="y2k"] select {
+    border-radius: 0;
+    border: 2px solid var(--palette-green);
+    box-shadow: none; /* Remove shadows */
+    background-color: var(--palette-dark) !important;
+    color: var(--palette-green);
+}
+
+/* Add green borders for estHours inputs */
+:root[data-theme="y2k"] input.est-hours-input {
+    background-color: var(--palette-dark) !important;
+    border: 2px solid var(--palette-green);
+}
+
+/* Replace contrastBlue with green */
+:root[data-theme="y2k"] .text-contrastBlue {
+    color: var(--palette-green) !important;
+}
+
+:root[data-theme="y2k"] .bg-selectedColumnBg {
+    background-color: transparent !important;
+    outline: 2px solid var(--palette-green) !important;
+    border: none !important;
+}
+
+:root[data-theme="y2k"] .bg-contrastBlue {
+    background-color: var(--palette-green) !important;
+}
+
+:root[data-theme="y2k"] .bg-contrastGrey {
+    background-color: var(--palette-green) !important;
+}
+
+:root[data-theme="y2k"] .border-contrastBlue {
+    border-color: var(--palette-green) !important;
+}
+
+/* Update hover effects */
+:root[data-theme="y2k"] .hover\:bg-hoverGrey:hover {
+    background-color: transparent !important;
+    outline: 2px solid var(--palette-green) !important;
+    border: none !important;
+}
+
+/* Footer text should be green */
+:root[data-theme="y2k"] footer p,
+:root[data-theme="y2k"] footer a {
+    color: var(--palette-green);
+}
+
+/* Make all footer text green */
+:root[data-theme="y2k"] footer .text-contrastGrey,
+:root[data-theme="y2k"] footer span,
+:root[data-theme="y2k"] footer a {
+  color: var(--palette-green) !important;
+}
+
+/* Target specifically only the gradient dividers with the exact class */
+/* Target elements with all three gradient-related classes */
+/* :root[data-theme="y2k"] [class*="a"][class*="linear-gradient"][class*="nth-child(n+7):nth-last-child(n+2)"][class*="contrastGrey"] {
+  background-image: linear-gradient(to right, transparent 99%, var(--palette-green) 1%) !important;
+}
+ */
+
+
+/* Target specifically only the gradient dividers with the exact class */
+/* :root[data-theme="y2k"] .\[\&\:nth-child\(n\+7\)\:nth-last-child\(n\+2\)\]\:bg-\[linear-gradient\(to_right\,_transparent_99\%\,_theme\(colors\.contrastGrey\)_1\%\)\] {
+  background-image: linear-gradient(to right, transparent 99%, var(--palette-green) 1%) !important;
+} */
+
+/* Ensure spans get the green color regardless of other classes */
+:root[data-theme="y2k"] footer div > span {
+  color: var(--palette-green) !important;
+}
+
+/* Font overrides for specific elements */
+:root[data-theme="y2k"] .y2k-client-name {
+    font-family: var(--font-secondary);
+}
+
+:root[data-theme="y2k"] .y2k-project-name {
+    font-family: var(--font-primary) !important;
+    max-width: calc(100% - 30px) !important; /* Make space for the ellipsis */
+}
+
+/* Calendar header background to black */
+:root[data-theme="y2k"] thead tr.bg-contrastBlue {
+    background-color: var(--palette-dark) !important;
+}
+
+/* Change SVG bars to theme green */
+:root[data-theme="y2k"] svg path {
+    fill: var(--palette-green) !important;
+}
+
+/* For the proposed hours bars (lighter green bars) */
+:root[data-theme="y2k"] svg path:nth-child(2),
+:root[data-theme="y2k"] svg path:last-child {
+    fill: rgba(41, 181, 176, 0.7) !important; /* Semi-transparent version of palette-green */
+}
+
+/* Change the text color of numbers above bars to theme green */
+:root[data-theme="y2k"] .text-white {
+    color: var(--palette-green) !important;
+}
+
+/* Change column chart spans to theme green */
+:root[data-theme="y2k"] .absolute span {
+    color: var(--palette-green) !important;
+}
+
+/* Ensure the input fields use the palette dark background */
+:root[data-theme="y2k"] input {
+    background-color: var(--palette-dark) !important;
+    color: var(--palette-green) !important;
+    border-color: var(--palette-green) !important;
+}
+
+/* Override diagonal stripes for proposed assignments in Y2K theme */
+:root[data-theme="y2k"] .bg-diagonal-stripes {
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--palette-green-transparent),
+    var(--palette-green-transparent) 10px,
+    var(--palette-dark) 10px,
+    var(--palette-dark) 20px
+  ) !important;
+}
+
+/* Style the Plan/Proposed button in the Y2K theme */
+:root[data-theme="y2k"] .text-contrastBlue button.underline {
+  font-family: 'Jura', sans-serif !important;
+  color: var(--palette-green) !important;
+  text-decoration-color: var(--palette-green) !important;
+}
+
+/* Change border color to green for Y2K theme */
+:root[data-theme="y2k"] .border-gray-300,
+:root[data-theme="y2k"] tr.border-t.border-gray-300 {
+  border-color: var(--palette-green) !important;
+}
+
+/* Fix hover displacement by ensuring consistent box model */
+:root[data-theme="y2k"] tr.hover\:bg-hoverGrey {
+  box-sizing: border-box;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparents;
+}
+calen
+:root[data-theme="y2k"] tr.hover\:bg-hoverGrey:hover {
+  background-color: rgba(41, 181, 176, 0.1) !important;
+  border-color: var(--palette-green) !important;
+}
+
+/* Style My StaffPlan link with transparent fill and green border */
+:root[data-theme="y2k"] a[href*="/people/"]:has(~ a[href="/people"]):not(:has(~ a[href="/people"]:has(~ a[href="/projects"]))) {
+  background-color: transparent !important;
+  border: 1px solid var(--palette-green) !important;
+  border-radius: 0 !important;
+  color: var(--palette-green) !important;
+}
+
+:root[data-theme="y2k"] a[href*="/people/"]:has(~ a[href="/people"]):not(:has(~ a[href="/people"]:has(~ a[href="/projects"]))):hover {
+  background-color: transparent !important;
+}
+
+/* Style the My StaffPlan button */
+:root[data-theme="y2k"] a[href*="/people/"]:first-child {
+  background-color: var(--palette-dark) !important;
+  border: 1px solid var(--palette-green) !important;
+  color: var(--palette-green) !important;
+  border-radius: 0 !important;
+}
+
+/* Style My StaffPlan button when active/selected */
+:root[data-theme="y2k"] a[href*="/people/"]:first-child.bg-contrastBlue {
+  background-color: var(--palette-dark) !important;
+  border: 1px solid var(--palette-green) !important;
+  color: var(--palette-green) !important;
+}
+
+/* Style My StaffPlan button on hover */
+:root[data-theme="y2k"] a[href*="/people/"]:first-child:hover {
+  background-color: var(--palette-dark) !important;
+  border: 1px solid var(--palette-green) !important;
+}
+
+/* Fix My StaffPlan button styling - restore background and remove underline */
+:root[data-theme="y2k"] a[href^="/people/"] {
+  background-color: var(--palette-dark) !important;
+  border: 1px solid var(--palette-green) !important;
+  color: var(--palette-green) !important;
+  text-decoration: none !important;
+  font-family: var(--font-primary) !important; /* Use Jura instead of Alyrak */
+}
+
+/* Make sure hover doesn't add underline to My StaffPlan */
+:root[data-theme="y2k"] a[href^="/people/"]:hover {
+  text-decoration: none !important;
+  background-color: var(--palette-dark) !important;
+}
+
+/* Make sure active state also has proper styling */
+:root[data-theme="y2k"] a[href^="/people/"].bg-contrastBlue {
+  background-color: var(--palette-dark) !important;
+  text-decoration: none !important;
+  border: 1px solid var(--palette-green) !important;
+}
+
+/* Remove all border rounding in Y2K theme */
+:root[data-theme="y2k"] * {
+  border-radius: 0 !important;
+}
+
+/* Specifically target common Tailwind border-radius classes */
+:root[data-theme="y2k"] .rounded-md,
+:root[data-theme="y2k"] .rounded-lg,
+:root[data-theme="y2k"] .rounded-xl,
+:root[data-theme="y2k"] .rounded-2xl,
+:root[data-theme="y2k"] .rounded-full,
+:root[data-theme="y2k"] .rounded,
+:root[data-theme="y2k"] .rounded-sm {
+  border-radius: 0 !important;
+}
+
+/* Specifically target the search input in the navbar */
+:root[data-theme="y2k"] .bg-contrastBlue.rounded-2xl {
+  border-radius: 0 !important;
+}
+
+/* Ensure nav links also have no rounding */
+:root[data-theme="y2k"] nav a,
+:root[data-theme="y2k"] nav button {
+  border-radius: 0 !important;
+}
+
+/* Make column header titles green */
+:root[data-theme="y2k"] th span {
+  color: var(--palette-green) !important;
+}
+
+/* Make plus icon and dropdown arrows green */
+:root[data-theme="y2k"] .w-4.h-4,
+:root[data-theme="y2k"] svg.w-4.h-4 {
+  color: var(--palette-green) !important;
+  stroke: var(--palette-green) !important;
+  fill: none !important;
+}
+
+/* Make dropdown menu icons green strokes with no fill */
+:root[data-theme="y2k"] .ellipsismenu svg,
+:root[data-theme="y2k"] svg[stroke="currentColor"] {
+  stroke: var(--palette-green) !important;
+  fill: none !important;
+}
+
+/* Target the specific text for Client and Projects */
+:root[data-theme="y2k"] [data-column-title="Client"] span,
+:root[data-theme="y2k"] [data-column-title="Project"] span,
+:root[data-theme="y2k"] div:has(> .PlusIcon) + div span {
+  color: var(--palette-green) !important;
+}
+
+/* Fix for the transition property in calendarHeader */
+:root[data-theme="y2k"] [class*="[transition:transform"] {
+  transition: transform 0.3s ease-in-out, opacity 0.2s ease-in-out !important;
+}
+
+/* Make the ellipsis menu and the rectangle behind it green */
+:root[data-theme="y2k"] .ellipsismenu::after {
+  background-color: var(--palette-green) !important;
+  color: var(--palette-green) !important;
+}
+
+/* Make the background behind the dots not filled */
+:root[data-theme="y2k"] .ellipsismenu::before,
+:root[data-theme="y2k"] .ellipsismenu::after {
+  background-color: transparent !important;
+}
+
+/* Make column header PlusIcon and chevron icons use stroke only with no fill */
+:root[data-theme="y2k"] .PlusIcon,
+:root[data-theme="y2k"] th .w-4.h-4 {
+  fill: none !important;
+  stroke: var(--palette-green) !important;
+  color: var(--palette-green) !important;
+}
+
+/* Target the ChevronLeftIcon and ChevronRightIcon used in dropdowns and week navigation */
+:root[data-theme="y2k"] svg.w-4.h-4,
+:root[data-theme="y2k"] svg.h6.w-6 {
+  fill: none !important;
+  stroke: var(--palette-green) !important;
+  color: var(--palette-green) !important;
+}
+
+/* Specifically target week navigation arrows */
+:root[data-theme="y2k"] [class*="hover:text-contrastGrey"] svg {
+  fill: none !important;
+  stroke: var(--palette-green) !important;
+}
+
+/* Ensure the ChevronLeftIcon in the sorting dropdown has no fill */
+:root[data-theme="y2k"] [class*="transform"] svg {
+  fill: none !important;
+  stroke: var(--palette-green) !important;
+  color: var(--palette-green) !important;
+}
+
+/* Make column chart bars use theme green fill */
+:root[data-theme="y2k"] svg[viewBox^="0 0 34"] path {
+  fill: var(--palette-green) !important;
+}
+
+/* For proposed hours bars (lighter green) in the column chart */
+:root[data-theme="y2k"] svg[viewBox^="0 0 34"] path:nth-child(2) {
+  fill: rgba(41, 181, 176, 0.7) !important;
+}
+
+/* Remove fill from icon arrows, only use stroke */
+:root[data-theme="y2k"] svg path button,
+:root[data-theme="y2k"] button svg,
+:root[data-theme="y2k"] .w-4.h-4,
+:root[data-theme="y2k"] .h6.w-6,
+:root[data-theme="y2k"] [class*="hover:text-contrastGrey"] svg,
+:root[data-theme="y2k"] [class*="transform"] svg {
+  fill: transparent !important;
+  color: transparent !important;
+  stroke: var(--palette-green) !important;
+}
+
+/* Ensure the plus icon also has no fill */
+:root[data-theme="y2k"] .PlusIcon,
+:root[data-theme="y2k"] button svg.w-4.h-4 {
+  fill: none !important;
+  stroke: var(--palette-green) !important;
+}
+
+/* Fix ellipsis dropdown alignment in Y2K theme */
+:root[data-theme="y2k"] .y2k-project-name {
+  font-family: var(--font-primary) !important;
+}
+
+/* Adjust ellipsis dropdown position */
+:root[data-theme="y2k"] .y2k-project-name + .ml-2 {
+  margin-left: 0 !important;
+  position: absolute !important;
+  right: 16px !important; /* Position to the left of the "Plan" label */
+  top: 8px !important; /* Align vertically */
+}
+
+/* Ensure proper positioning in the container */
+:root[data-theme="y2k"] div:has(> .y2k-project-name) {
+  position: relative !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: space-between !important;
+}
+
+/* Ensure the ellipsis dots themselves align properly */
+:root[data-theme="y2k"] .ellipsismenu {
+  color: var(--palette-green) !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Apply Jura font (primary font) to specific elements */
+:root[data-theme="y2k"] button[data-theme="y2k"],
+:root[data-theme="y2k"] button[aria-label="Switch to y2k theme"] {
+  font-family: var(--font-primary) !important;
+}
+
+/* People and Project names in their respective menus */
+:root[data-theme="y2k"] a[href^="/people/"] span,
+:root[data-theme="y2k"] table tr td a[href^="/projects/"] {
+  font-family: var(--font-primary) !important;
+}
+
+/* "Show X archived projects" link */
+:root[data-theme="y2k"] a[href*="archived=true"],
+:root[data-theme="y2k"] button:has(span:contains("Show")):has(span:contains("archived projects")) {
+  font-family: var(--font-primary) !important;
+}
+
+/* Dropdown labels */
+:root[data-theme="y2k"] .relative select option,
+:root[data-theme="y2k"] [role="menu"] button,
+:root[data-theme="y2k"] [role="menuitem"] {
+  font-family: var(--font-primary) !important;
+}
+
+/* Apply Alyrak font (secondary font) to page labels and user name */
+:root[data-theme="y2k"] h1,
+:root[data-theme="y2k"] nav + div h1 {
+  font-family: var(--font-secondary) !important;
+}
+
+/* Projects and People page labels */
+:root[data-theme="y2k"] [data-testid="projects-page"] h1,
+:root[data-theme="y2k"] [data-testid="people-page"] h1 {
+  font-family: var(--font-secondary) !important;
+  text-transform: uppercase !important;
+  font-size: 6rem !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* Current user name in My StaffPlan */
+:root[data-theme="y2k"] .text-huge {
+  font-family: var(--font-secondary) !important;
+  font-size: 3.2rem !important;
+  line-height: 1.1 !important;
+  text-transform: uppercase !important;
+}
+
+/* Ensure page title headings use Alyrak */
+:root[data-theme="y2k"] main > div > h1 {
+  font-family: var(--font-secondary) !important;
+  font-size: 6rem !important;
+  font-weight: normal !important;
+}
+
+/* Style dropdown menus with green border and black fill */
+:root[data-theme="y2k"] [role="menu"],
+:root[data-theme="y2k"] .absolute.right-0.mt-2.w-48 {
+  background-color: var(--palette-dark) !important;
+  border: 1px solid var(--palette-green) !important;
+  color: var(--palette-green) !important;
+}
+
+/* Style dropdown menu items */
+:root[data-theme="y2k"] [role="menuitem"],
+:root[data-theme="y2k"] [role="menu"] button,
+:root[data-theme="y2k"] [role="menu"] a {
+  color: var(--palette-green) !important;
+  background-color: var(--palette-dark) !important;
+}
+
+/* Fix for the tooltip text specifically */
+:root[data-theme="y2k"] .absolute.-top-\[8px\].left-\[110\%\].w-32.py-1 {
+    font-style: italic !important;
+}
+
+/* Make "Archive/Unarchive project for everyone" text in dropdown menu italicized */
+:root[data-theme="y2k"] button:contains("Archive project for everyone"),
+:root[data-theme="y2k"] button:contains("Unarchive project for everyone"),
+:root[data-theme="y2k"] [role="menu"] button:contains("Archive project"),
+:root[data-theme="y2k"] .group-hover\:opacity-100,
+:root[data-theme="y2k"] span.absolute.-top-\[8px\].w-32,
+:root[data-theme="y2k"] span:contains("Archive project for everyone"),
+:root[data-theme="y2k"] span:contains("Unarchive project for everyone") {
+  font-style: italic !important;
+}
+
+/* Target tooltip specifically by its position and class structure */
+:root[data-theme="y2k"] .group span.absolute {
+  font-style: italic !important;
+}
+
+/* Target carets more specifically */
+:root[data-theme="y2k"] .ChevronLeftIcon,
+:root[data-theme="y2k"] .ChevronRightIcon,
+:root[data-theme="y2k"] button svg[viewBox="0 0 24 24"],
+:root[data-theme="y2k"] div[class*="cursor-pointer"] svg,
+:root[data-theme="y2k"] th svg {
+  fill: none !important;
+  stroke: var(--palette-green) !important;
+  color: var(--palette-green) !important;
+}
+
+/* Target page title headings more explicitly */
+:root[data-theme="y2k"] [data-testid="projects-page"] h1,
+:root[data-theme="y2k"] [data-testid="people-page"] h1,
+:root[data-theme="y2k"] div[role="main"] > div > h1 {
+  font-family: var(--font-secondary) !important;
+  font-size: 6rem !important;
+  text-transform: uppercase !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0.02em !important;
+  font-weight: normal !important;
+}
+
+/* Override client column width in Y2K theme om My Staffplan */
+:root[data-theme="y2k"] div[class*="sm:max-w-[67px]"][class*="md:max-w-[85px]"][class*="lg:max-w-[110px]"] {
+  max-width: 162px !important;
+}
+
+/* Override projects column width in Y2K theme on Projects page */
+:root[data-theme="y2k"] div[class*="sm:max-w-[190px]"][class*="md:max-w-[240px]"] {
+    max-width: 200px !important;
+  }
+
+@media (min-width: 1024px) {
+  :root[data-theme="y2k"] div[class*="lg:max-w-[110px]"] {
+    max-width: 162px !important;
+  }
+}
+
+/* Style People and Projects nav buttons - active state with underline instead of background */
+:root[data-theme="y2k"] a[href="/people"],
+:root[data-theme="y2k"] a[href="/projects"] {
+  color: var(--palette-green) !important;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+/* Style active state specifically */
+:root[data-theme="y2k"] a[href="/people"].bg-contrastBlue,
+:root[data-theme="y2k"] a[href="/projects"].bg-contrastBlue {
+  background-color: transparent !important;
+  text-decoration: underline !important;
+  text-decoration-color: var(--palette-green) !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 4px !important;
+}
+
+/* Ensure hover states maintain consistency */
+:root[data-theme="y2k"] a[href="/people"]:hover,
+:root[data-theme="y2k"] a[href="/projects"]:hover {
+  background-color: transparent !important;
+  text-decoration: underline !important;
+  text-decoration-color: var(--palette-green) !important;
+}
+
+/* Target the specific title heading in the page */
+:root[data-theme="y2k"] .text-huge.text-left.overflow-wrap.break-word.leading-snug {
+  font-family: var(--font-secondary) !important;
+  font-size: 6rem !important;
+  text-transform: uppercase !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0.02em !important;
+  font-weight: normal !important;
+}
+
+/* Target arrows and dropdown icons more precisely */
+:root[data-theme="y2k"] button svg.h6.w-6,
+:root[data-theme="y2k"] [class*="transform"] svg.w-4.h-4,
+:root[data-theme="y2k"] div[class*="cursor-pointer"] svg.w-4.h-4,
+:root[data-theme="y2k"] div.flex.items-center svg.w-4.h-4 {
+  fill: none !important;
+  stroke: var(--palette-green) !important;
+  color: var(--palette-green) !important;
+}
+
+/* Specifically target SVG paths to ensure no fill */
+:root[data-theme="y2k"] button svg.h6.w-6 path,
+:root[data-theme="y2k"] [class*="transform"] svg.w-4.h-4 path,
+:root[data-theme="y2k"] div[class*="cursor-pointer"] svg.w-4.h-4 path,
+:root[data-theme="y2k"] div.flex.items-center svg.w-4.h-4 path {
+  fill: none !important;
+  stroke: var(--palette-green) !important;
+}
+
+/* Make sure any nested SVG elements have no fill */
+:root[data-theme="y2k"] svg * {
+  fill: inherit !important;
+  stroke: inherit !important;
+}

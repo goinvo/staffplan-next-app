@@ -1,0 +1,56 @@
+:root {
+  /* Animation Variables - Shared across themes */
+  --animate-fade-in-scale: fade-in-scale 0.7s ease-in-out;
+  --animate-fade-out-scale: fade-out-scale 0.7s ease-in-out;
+  --animate-fade-in-page: fade-in-page 750ms ease-out forwards;
+  --animate-fade-out-page: fade-out-page 750ms ease-in forwards;
+  
+  /* Text sizing */
+  --text-2xs: 10px;
+  --text-tiny: 14px;
+  --text-huge: 28px;
+  
+  /* Shadow effects */
+  --shadow-top-input-shadow: inset 0 2px 1.5px rgba(199, 199, 199, 1);
+}
+
+/* Animation keyframes */
+@keyframes fade-in-scale {
+  0% {
+    opacity: 0;
+    height: 0;
+  }
+  100% {
+    opacity: 1;
+    height: 100px;
+  }
+}
+
+@keyframes fade-out-scale {
+  0% {
+    opacity: 1;
+    height: 100px;
+  }
+  100% {
+    opacity: 0;
+    height: 0;
+  }
+}
+
+@keyframes fade-in-page {
+  from {
+    opacity: 0.1;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out-page {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.1;
+  }
+}

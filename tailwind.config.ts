@@ -5,22 +5,31 @@ const config: Config = {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/**/*.{js,jsx,ts,tsx}",
-    "./app/global.css",
   ],
   theme: {
     extend: {
-      // backgroundImage: {
-      //   "diagonal-stripes":
-      //     "repeating-linear-gradient(135deg, #e9eaf2, #e9eaf2 10px, #e4e5ef 10px, #e4e5ef 20px)",
-      //   "pencil-strokes":
-      //     "linear-gradient(45deg, #ffffff1a 25%, transparent 25%, transparent 50%, #ffffff1a 50%, #ffffff1a 75%, transparent 75%, transparent)",
-      // },
-      // backgroundSize: {
-      //   "pencil-strokes": "4px 4px",
-      // },
+      colors: {
+        // These will pull from your CSS variables
+        accentgreen: "var(--accent-green)",
+        accentlightgreen: "var(--accent-light-green)",
+        accentblue: "var(--accent-blue)",
+        accentgrey: "var(--accent-grey)",
+        tiffany: "var(--color-tiffany)",
+        contrastBlue: "var(--navbar-bg)",
+      },
+      fontFamily: {
+        sans: ["var(--font-primary)"],
+        display: ["var(--font-secondary)"],
+      },
+      backgroundColor: {
+        primary: "rgb(var(--background-start-rgb))",
+      },
+      textColor: {
+        primary: "rgb(var(--foreground-rgb))",
+      },
     },
   },
   plugins: [require("@tailwindcss/forms")],
 };
+
 export default config;

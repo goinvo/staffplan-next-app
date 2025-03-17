@@ -1,6 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Import theme files */
+@import "./styles/fonts/font-face.css";
+@import "./styles/themes/base.css";
+@import "./styles/themes/default.css";
+@import "./styles/themes/y2k.css";
+
 @import "tailwindcss";
 @config "./../tailwind.config.ts";
 

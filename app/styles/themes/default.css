@@ -1,0 +1,41 @@
+:root {
+  /* Base colors */
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  
+  /* Accent colors */
+  --accent-green: #72ddc3;
+  --accent-light-green: rgb(123, 238, 209);
+  --accent-blue: #3758f9;
+  --accent-grey: #7084a3;
+  --color-tiffany: #27b5b0;
+  
+  /* UI Section colors */
+  --navbar-bg: #121f35;
+  --navbar-main: #ffffff;
+  --navbar-accent: var(--accent-green);
+  
+  --actionbar-bg: #435064;
+  --actionbar-main: var(--accent-green);
+  --actionbar-search: #8899a8;
+  
+  /* Typography */
+  --font-primary: 'Inter', system-ui, sans-serif;
+  --font-secondary: 'Inter', system-ui, sans-serif;
+  
+  /* Timeline elements */
+  --timeline-accent: var(--accent-green);
+  --timeline-grid-bg: #e9eaf2;
+  --timeline-grid-gap-bg: #f0f0f6;
+  --timeline-grid-border: #fafafa;
+  --timeline-bar-bg: #e5e7eb;
+  --timeline-bar-fill: #02aaa4;
+  --timeline-actual: #7084a3;
+  --timeline-stroke-below: #d1d5db;
+}
+
+/* Apply theme classes */
+.theme-default {
+  color-scheme: light;
+}
