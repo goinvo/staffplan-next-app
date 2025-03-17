@@ -519,7 +519,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                       "sm:max-w-[67px] md:max-w-[85px] lg:max-w-[110px] sm:w-full") ||
                     (isStaffPlanPage &&
                       i === 1 &&
-                      "sm:max-w-[230px] md:max-w-[285px] lg:max-w-[280px] sm:w-full md:pl-[8px]") ||
+                      "sm:max-w-[230px] md:max-w-[285px] lg:max-w-[280px] sm:w-full md:pl-[8px] outline ml-8") ||
                     "w-24"
                   }
                                 `}
