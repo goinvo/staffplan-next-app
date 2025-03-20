@@ -1,5 +1,8 @@
 # [StaffPlan](https://www.staffplan.com)
-Design your work future.
+
+### Still on spreadsheets? More like spreadsh*ts.
+
+Because when your plan goes sideways, everyone’s stepping in it.
 
 ## Development
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
