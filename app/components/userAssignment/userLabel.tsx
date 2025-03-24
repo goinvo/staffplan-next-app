@@ -231,6 +231,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
         },
       },
     });
+	refetchUserList();
   };
 
 	const handleArchiveAssignmentClick = async () => {
@@ -331,7 +332,6 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 
 	const handleHideProject = async (project: ProjectType) => {
 		const {id} = project
-
 		const variables = {
 			id: assignment.id,
 			projectId: id,
@@ -339,7 +339,6 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 			status: assignment.status,
 			focused: false
 		};
-
 		try {
 			const response = await upsertAssignment({ variables});
 			if (response && response.data) {
