@@ -54,7 +54,7 @@ export const UserAssignmentRow = ({
 	const router = useRouter();
 	const { deleteAssignment, sortBy,enqueueTimer, newProjectAssignmentId, setNewProjectAssignmentId, setUserList, refetchUserList, assignmentsWithUndoActions, undoModifyAssignment } = useUserDataContext()
 	const { showHiddenAssignments } = useGeneralDataContext();
-	const { setProjectList, undoModifyProject, projectsWithUndoActions } = useProjectsDataContext()
+	const { setProjectList, undoModifyProject, projectsWithUndoActions,refetchProjectList } = useProjectsDataContext()
 	const client = useApolloClient()
 	const [showUndoRow, setShowUndoRow] = useState<boolean>(false);
 	const [showTooltip, setShowTooltip] = useState<boolean>(false);
@@ -99,6 +99,7 @@ export const UserAssignmentRow = ({
 					return project
 				}))
 				refetchUserList();
+				refetchProjectList();
 			}
     },
   });
