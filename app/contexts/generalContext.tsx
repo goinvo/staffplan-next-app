@@ -111,7 +111,6 @@ export const GeneralDataProvider: React.FC<{ children?: ReactNode }> = ({
             setViewer(viewerData.viewer);
         }
     }, [viewerData]);
-
     return (
         <GeneralDataContext.Provider
             value={{
