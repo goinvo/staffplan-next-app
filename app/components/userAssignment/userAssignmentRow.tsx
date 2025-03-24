@@ -289,7 +289,7 @@ export const UserAssignmentRow = ({
 						isTempProject ? (
 							<TempProjectLabel assignment={assignment} /> // Render custom label
 						) : (
-							<UserLabel assignment={assignment} selectedUser={selectedUser} clickHandler={handleProjectChange} undoRowRef={undoRowRef} isFirstClient={isFirstClient} />
+							<UserLabel assignment={assignment} selectedUser={selectedUser} clickHandler={handleProjectChange} undoRowRef={undoRowRef} isFirstClient={isFirstClient}/>
 						)
 					)}
             <div
