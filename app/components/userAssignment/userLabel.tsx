@@ -232,6 +232,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
       },
     });
 	refetchUserList();
+	refetchProjectList();
   };
 
 	const handleArchiveAssignmentClick = async () => {
