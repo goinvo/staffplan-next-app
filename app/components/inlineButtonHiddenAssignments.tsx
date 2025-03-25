@@ -74,7 +74,7 @@ const InlineButtonHiddenAssignments: React.FC = () => {
 		: `Show ${focusedAssignments.length} hidden ${
 				focusedAssignments.length > 1 ? "projects" : "project"
 		  }`;
-
+	if (!focusedAssignments.length) setShowHiddenAssignments(false);
 	return (
 		<>
 			{focusedAssignments.length > 0 ? (

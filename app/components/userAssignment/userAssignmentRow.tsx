@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { DateTime } from "luxon";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import UserSummary from "../userSummary";
 import { UserLabel } from "./userLabel";
 import { WorkWeekInput } from "./workWeekInput";
@@ -69,11 +69,10 @@ export const UserAssignmentRow = ({
 		setNewProjectAssignmentId,
 		setUserList,
 		refetchUserList,
-		userList,
 		assignmentsWithUndoActions,
 		undoModifyAssignment,
 	} = useUserDataContext();
-	const { showHiddenAssignments, viewer, setShowHiddenAssignments } =
+	const { showHiddenAssignments } =
 		useGeneralDataContext();
 	const {
 		setProjectList,
@@ -93,7 +92,6 @@ export const UserAssignmentRow = ({
 	const isModifiedProject = (projectId: number) =>
 		projectsWithUndoActions.some((item) => item.project.id === projectId);
 	const showHideButton = assignment.focused;
-	const params = useParams();
 
 	const { animateRow } = useFadeInOutRow({ rowRef, setShowUndoRow });
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
@@ -268,21 +266,7 @@ export const UserAssignmentRow = ({
 		{ 'border-b border-gray-300': !sortedByClient || isLastRow },
 		{ 'bg-diagonal-stripes': isAssignmentProposed }
 	); */
-	const userId = decodeURIComponent(params?.userId?.toString() || "");
 	
-	const toggleShowHiddenAssignments = () => {
-		const focusedAssignments =
-		viewer?.id.toString() === userId
-			? userList
-					.find(
-						(user: UserType) => user.id?.toString() === viewer?.id.toString()
-					)
-					?.assignments.filter((a: AssignmentType) => !a.focused) || []
-			: [];
-			if (focusedAssignments.length === 1) {
-				setShowHiddenAssignments(!showHiddenAssignments);
-			}
-	}
 	const showHiddenProject = async (project: any) => {
 		const { id } = project;
 
@@ -365,7 +349,6 @@ export const UserAssignmentRow = ({
 											onClick={() => {
 												setShowTooltip(false);
 												showHiddenProject(assignment.project);
-												toggleShowHiddenAssignments();
 											}}
 											Icon={MdVisibilityOff}
 										/>
