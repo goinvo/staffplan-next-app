@@ -362,7 +362,7 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 			const url = URL.createObjectURL(blob);
 			const link = document.createElement('a');
 			link.href = url;
-			link.setAttribute('download', `${assignment.project.name}.csv`);
+			link.setAttribute('download', `${assignment.project.client.name}-${assignment.project.name}.csv`);
 			document.body.appendChild(link);
 			link.click();
 			document.body.removeChild(link);

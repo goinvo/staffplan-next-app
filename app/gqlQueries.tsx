@@ -139,6 +139,29 @@ export const GET_USER_LIST = gql`
 							name
 							avatarUrl
 						}
+						assignments {
+							id
+							startsOn
+							endsOn
+							estimatedWeeklyHours
+							status
+							focused
+							canBeDeleted
+							assignedUser {
+								id
+								name
+								isActive
+							}
+							workWeeks {
+								project {
+									name
+								}
+								actualHours
+								estimatedHours
+								cweek
+								year
+							}
+						}
 					}
 
 					workWeeks {
@@ -282,11 +305,11 @@ export const DELETE_ASSIGNMENT = gql`
 `;
 
 export const DELETE_PROJECT = gql`
-	mutation DeleteProject($projectId:ID!){
-		deleteProject(projectId:$projectId){
-		  id
+	mutation DeleteProject($projectId: ID!) {
+		deleteProject(projectId: $projectId) {
+			id
 		}
-  	}
+	}
 `;
 
 export const UPSERT_ASSIGNMENT = gql`
@@ -369,157 +392,157 @@ export const UPSERT_CLIENT = gql`
 `;
 
 export const UPSERT_CLIENT_WITH_INPUT = gql`
-  mutation UpsertClientWithInput($input: ClientAttributes!) {
-    upsertClientWithInput(input: $input) {
-      id
-      name
-      description
-      status
-      avatarUrl
-    }
-  }
+	mutation UpsertClientWithInput($input: ClientAttributes!) {
+		upsertClientWithInput(input: $input) {
+			id
+			name
+			description
+			status
+			avatarUrl
+		}
+	}
 `;
 
 export const UPSERT_PROJECT = gql`
-  mutation UpsertProjectUpdate(
-    $id: ID
-    $clientId: ID
-    $name: String
-    $status: String
-    $startsOn: ISO8601Date
-    $endsOn: ISO8601Date
-    $rateType: String
-    $cost: Float
-    $hours: Int
-    $fte: Float
-    $hourlyRate: Int
-    $assignments: [AssignmentAttributes!]
-  ) {
-    upsertProject(
-      id: $id
-      clientId: $clientId
-      name: $name
-      status: $status
-      startsOn: $startsOn
-      endsOn: $endsOn
-      cost: $cost
-      hours: $hours
-      fte: $fte
-      rateType: $rateType
-      hourlyRate: $hourlyRate
-      assignments: $assignments
-    ) {
-      id
-      client {
-        id
-        name
-        avatarUrl
-      }
-      name
-      status
-      cost
-      paymentFrequency
-      startsOn
-      endsOn
-      hours
-      fte
-      rateType
-      hourlyRate
-      workWeeks {
-        actualHours
-        estimatedHours
-        cweek
-        year
-      }
-      assignments {
-        id
-        startsOn
-        endsOn
-        status
-        focused
-        estimatedWeeklyHours
-        canBeDeleted
-        workWeeks {
-          actualHours
-          estimatedHours
-          cweek
-          year
-        }
-        assignedUser {
-          id
-          name
-          avatarUrl
-		  isActive
-        }
-        project {
-          id
-          name
-			client {
-			name
+	mutation UpsertProjectUpdate(
+		$id: ID
+		$clientId: ID
+		$name: String
+		$status: String
+		$startsOn: ISO8601Date
+		$endsOn: ISO8601Date
+		$rateType: String
+		$cost: Float
+		$hours: Int
+		$fte: Float
+		$hourlyRate: Int
+		$assignments: [AssignmentAttributes!]
+	) {
+		upsertProject(
+			id: $id
+			clientId: $clientId
+			name: $name
+			status: $status
+			startsOn: $startsOn
+			endsOn: $endsOn
+			cost: $cost
+			hours: $hours
+			fte: $fte
+			rateType: $rateType
+			hourlyRate: $hourlyRate
+			assignments: $assignments
+		) {
 			id
+			client {
+				id
+				name
+				avatarUrl
 			}
-        }
-      }
-    }
-  }
+			name
+			status
+			cost
+			paymentFrequency
+			startsOn
+			endsOn
+			hours
+			fte
+			rateType
+			hourlyRate
+			workWeeks {
+				actualHours
+				estimatedHours
+				cweek
+				year
+			}
+			assignments {
+				id
+				startsOn
+				endsOn
+				status
+				focused
+				estimatedWeeklyHours
+				canBeDeleted
+				workWeeks {
+					actualHours
+					estimatedHours
+					cweek
+					year
+				}
+				assignedUser {
+					id
+					name
+					avatarUrl
+					isActive
+				}
+				project {
+					id
+					name
+					client {
+						name
+						id
+					}
+				}
+			}
+		}
+	}
 `;
 
 export const UPSERT_PROJECT_WITH_INPUT = gql`
-  mutation UpsertProjectWithInput($input: ProjectAttributes!) {
-    upsertProjectWithInput(input: $input) {
-      id
-      client {
-        id
-        name
-        avatarUrl
-      }
-      name
-      status
-      cost
-      paymentFrequency
-      startsOn
-      endsOn
-      hours
-      fte
-      rateType
-      hourlyRate
-      workWeeks {
-        actualHours
-        estimatedHours
-        cweek
-        year
-      }
-      assignments {
-        id
-        startsOn
-        endsOn
-        status
-        focused
-        estimatedWeeklyHours
-        canBeDeleted
-        workWeeks {
-          actualHours
-          estimatedHours
-          cweek
-          year
-        }
-        assignedUser {
-          id
-          name
-          avatarUrl
-		  isActive
-        }
-        project {
-          id
-          name
-          client {
-            name
-            id
-          }
-        }
-      }
-    }
-  }
+	mutation UpsertProjectWithInput($input: ProjectAttributes!) {
+		upsertProjectWithInput(input: $input) {
+			id
+			client {
+				id
+				name
+				avatarUrl
+			}
+			name
+			status
+			cost
+			paymentFrequency
+			startsOn
+			endsOn
+			hours
+			fte
+			rateType
+			hourlyRate
+			workWeeks {
+				actualHours
+				estimatedHours
+				cweek
+				year
+			}
+			assignments {
+				id
+				startsOn
+				endsOn
+				status
+				focused
+				estimatedWeeklyHours
+				canBeDeleted
+				workWeeks {
+					actualHours
+					estimatedHours
+					cweek
+					year
+				}
+				assignedUser {
+					id
+					name
+					avatarUrl
+					isActive
+				}
+				project {
+					id
+					name
+					client {
+						name
+						id
+					}
+				}
+			}
+		}
+	}
 `;
 
 export const UPSERT_WORKWEEK = gql`

@@ -1049,52 +1049,52 @@ export const sortUserList = (sortMethod: string, userList: UserType[]) => {
 };
 
 export const convertProjectToCSV = (data: ProjectType): string => {
-	const assignments = data.assignments || []
-	const sortedWorkWeeks = sortWeeklyHoursByDate(calculateWeeklyHoursForCSV(assignments))
-	const { totalEstimatedHoursPerProject, totalActualHoursPerProject } = calculateWeeklyHoursPerProjectForCSV(sortedWorkWeeks)
+	const assignments = data.assignments || [];
+	
+	const sortedWorkWeeks = sortWeeklyHoursByDate(calculateWeeklyHoursForCSV(assignments));
+	const { totalEstimatedHoursPerProject, totalActualHoursPerProject } = calculateWeeklyHoursPerProjectForCSV(sortedWorkWeeks);
 	const deltaHours = (totalActualHoursPerProject - totalEstimatedHoursPerProject);
+  
 	const headers = [
-		'Project Name',
-		'Starts date',
-		'Ends date',
-		'Work week',
-		'Actual Hours',
-		'Planned Hours',
-		'Total Hours'
+	  'Project Name',
+	  'Starts date',
+	  'Ends date',
+	  'Work week',
+	  'Actual Hours',
+	  'Planned Hours',
+	  'Total Hours'
 	].join(';');
-
+  
 	const projectRows = sortedWorkWeeks.map((week, index) => [
-		index === 0 ? data.name : '',
-		index === 0 ? data.startsOn || '' : '',
-		index === 0 ? data.endsOn || '' : '',
-		weekNumberToDateRange(week.week, week.year),
-		week.totalActualHours || '0',
-		week.totalEstimatedHours || '0'
+	  index === 0 ? data.name : '',
+	  index === 0 ? data.startsOn || '' : '',
+	  index === 0 ? data.endsOn || '' : '',
+	  weekNumberToDateRange(week.week, week.year),
+	  week.totalActualHours || '0',
+	  week.totalEstimatedHours || '0',
+	  (week.totalActualHours || 0) + (week.totalEstimatedHours || 0)
 	].join(';')).join('\n');
-
+  
 	const summaryRows = [
-		`Burned;;;;;;${totalActualHoursPerProject}`,
-		`Planned;;;;;;${totalEstimatedHoursPerProject}`,
-		`Delta;;;;;;${deltaHours}`,
-		`Targeted;;;;;;${data.hours || ''}`
+	  `Target;;;;;;${data.hours || ''}`,
+	  `Plan;;;;;;${totalEstimatedHoursPerProject}`,
+	  `Actual;;;;;;${totalActualHoursPerProject}`,
+	  `Delta;;;;;;${deltaHours}`,
 	].join('\n');
-
+  
 	const usersByMonth = groupAndSumWeeksByMonthForUsers(assignments);
-
+  
 	const userRows = usersByMonth.map(user => {
-		const userMonths = user.months.map(month => `${month.monthLabel}`);
-
-		const userNameRow = `${user.userName};${userMonths.join(';')}`;
-
-		const burnedHoursRow = `Burned Hours;${user.months.map(month => `${month.totalActualHours || 0}`).join(';')}`;
-
-		const estimatedHoursRow = `Planned Hours;${user.months.map(month => `${month.totalEstimatedHours || 0}`).join(';')}`;
-
-		return `${userNameRow}\n${burnedHoursRow}\n${estimatedHoursRow}`;
-	}).join('\n\n');
-
+	  const userMonths = user.months.map(month => `${month.monthLabel}`);
+	  const burnedHours = user.months.map(month => `${month.totalActualHours || 0}`);
+	  const estimatedHours = user.months.map(month => `${month.totalEstimatedHours || 0}`);
+	  return `${user.userName};${userMonths.join(';')};;;${burnedHours.join(';')};${estimatedHours.join(';')}`;
+	}).join('\n');
 	return `${headers}\n${projectRows}\n${summaryRows}\n\n${userRows}`;
-};
+  };
+  
+  
+  
 
 export const mergeClasses = (...classes: ClassValue[]): string => {
 	return classes
