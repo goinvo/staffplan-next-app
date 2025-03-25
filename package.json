@@ -14,7 +14,7 @@
     "@apollo/experimental-nextjs-app-support": "^0.11.10",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
-    "@next/third-parties": "^15.2.3",
+    "@next/third-parties": "^15.2.4",
     "@prefab-cloud/prefab-cloud-react": "^0.4.4",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/postcss": "^4.0.15",
@@ -35,7 +35,7 @@
   "devDependencies": {
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-react": "^7.26.3",
-    "@babel/preset-typescript": "^7.26.0",
+    "@babel/preset-typescript": "^7.27.0",
     "@swc/jest": "^0.2.37",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
