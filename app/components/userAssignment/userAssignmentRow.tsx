@@ -284,7 +284,6 @@ export const UserAssignmentRow = ({
 			console.error("Error updating project:", error);
 		}
 	};
-
 	return (
 		<tr
 			ref={rowRef}
