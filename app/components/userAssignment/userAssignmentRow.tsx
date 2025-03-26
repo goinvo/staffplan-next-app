@@ -395,7 +395,7 @@ export const UserAssignmentRow = ({
 							>
 								{isAssignmentProposed ? "Proposed" : "Plan"}
 							</button>
-							<div className="pt-3">Actual</div>
+							<div className="pt-5">Actual</div>
 						</div>
 					</div>
 				</div>

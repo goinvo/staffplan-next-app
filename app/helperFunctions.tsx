@@ -5,12 +5,19 @@ import {
 	UserAssignmentDataMapType,
 	UserType,
 	WorkWeekBlockMemberType,
-	ClassValue
+	ClassValue,
 } from "./typeInterfaces";
 import { SORT_ORDER } from "./components/scrollingCalendar/constants";
 import _ from "lodash";
 import { DateTime, Interval } from "luxon";
-import { calculateWeeklyHoursForCSV, calculateWeeklyHoursPerProjectForCSV, groupAndSumWeeksByMonthForUsers, sortWeeklyHoursByDate, weekNumberToDateRange } from "./components/scrollingCalendar/helpers";
+import {
+	calculatePlanFromToday,
+	calculateWeeklyHoursForCSV,
+	calculateWeeklyHoursPerProjectForCSV,
+	groupAndSumWeeksByMonthForUsers,
+	sortWeeklyHoursByDate,
+	weekNumberToDateRange,
+} from "./components/scrollingCalendar/helpers";
 export function matchWorkWeeks(
 	prevWeeks: WorkWeekBlockMemberType[],
 	currWeeks: WorkWeekBlockMemberType[]
@@ -470,12 +477,12 @@ export const drawFTELabels = (
 									{hasSameProject
 										? ""
 										: workWeekBlock.workWeek.project &&
-											workWeekBlock.workWeek.project.name
-											? workWeekBlock.workWeek.project.name
-											: workWeekBlock.workWeek.user &&
-												workWeekBlock.workWeek.user.name
-												? workWeekBlock.workWeek.user.name
-												: ""}
+										  workWeekBlock.workWeek.project.name
+										? workWeekBlock.workWeek.project.name
+										: workWeekBlock.workWeek.user &&
+										  workWeekBlock.workWeek.user.name
+										? workWeekBlock.workWeek.user.name
+										: ""}
 								</div>
 							</div>
 						);
@@ -536,48 +543,54 @@ export const drawBar = (
 };
 
 export const divideNumberByCommas = (number: number | string) => {
-  const valueToDivide = Number(number);
+	const valueToDivide = Number(number);
 
-  return valueToDivide.toLocaleString("en-US");
+	return valueToDivide.toLocaleString("en-US");
 };
 
-export const blockInvalidChar = (e: React.KeyboardEvent<HTMLInputElement>, invalidChars: string[]) => invalidChars.includes(e.key) && e.preventDefault();
+export const blockInvalidChar = (
+	e: React.KeyboardEvent<HTMLInputElement>,
+	invalidChars: string[]
+) => invalidChars.includes(e.key) && e.preventDefault();
 
 export const sortSingleProjectByOrder = (
-  sortOrder: SORT_ORDER,
-  assignments: AssignmentType[]
+	sortOrder: SORT_ORDER,
+	assignments: AssignmentType[]
 ) => {
-  const arrayToSort = assignments?.length ? [...assignments] : [];
-  if (sortOrder === SORT_ORDER.ASC) {
-    return arrayToSort.sort((a, b) => {
-      const userA = a.assignedUser ? a.assignedUser.name.toLowerCase() : "";
-      const userB = b.assignedUser ? b.assignedUser.name.toLowerCase() : "";
-      if (userA < userB) {
-        return -1;
-      }
-      if (userA > userB) {
-        return 1;
-      }
-      return 0;
-    });
-  }
-  if (sortOrder === SORT_ORDER.DESC) {
-    return arrayToSort.sort((a, b) => {
-      const userA = a.assignedUser ? a.assignedUser.name.toLowerCase() : "";
-      const userB = b.assignedUser ? b.assignedUser.name.toLowerCase() : "";
-      if (userA < userB) {
-        return 1;
-      }
-      if (userA > userB) {
-        return -1;
-      }
-      return 0;
-    });
-  }
-  return assignments;
+	const arrayToSort = assignments?.length ? [...assignments] : [];
+	if (sortOrder === SORT_ORDER.ASC) {
+		return arrayToSort.sort((a, b) => {
+			const userA = a.assignedUser ? a.assignedUser.name.toLowerCase() : "";
+			const userB = b.assignedUser ? b.assignedUser.name.toLowerCase() : "";
+			if (userA < userB) {
+				return -1;
+			}
+			if (userA > userB) {
+				return 1;
+			}
+			return 0;
+		});
+	}
+	if (sortOrder === SORT_ORDER.DESC) {
+		return arrayToSort.sort((a, b) => {
+			const userA = a.assignedUser ? a.assignedUser.name.toLowerCase() : "";
+			const userB = b.assignedUser ? b.assignedUser.name.toLowerCase() : "";
+			if (userA < userB) {
+				return 1;
+			}
+			if (userA > userB) {
+				return -1;
+			}
+			return 0;
+		});
+	}
+	return assignments;
 };
 
-export const sortSingleProject = (sortMethod: string, assignments: AssignmentType[]) => {
+export const sortSingleProject = (
+	sortMethod: string,
+	assignments: AssignmentType[]
+) => {
 	const arrayToSort = assignments?.length ? [...assignments] : [];
 	if (sortMethod === "abcUserName") {
 		return arrayToSort.sort((a, b) => {
@@ -594,14 +607,8 @@ export const sortSingleProject = (sortMethod: string, assignments: AssignmentTyp
 	}
 	if (sortMethod === "startDate") {
 		return arrayToSort.sort((a, b) => {
-			const userA =
-				a.startsOn
-					? a.startsOn
-					: "";
-			const userB =
-				b.startsOn
-					? b.startsOn
-					: "";
+			const userA = a.startsOn ? a.startsOn : "";
+			const userB = b.startsOn ? b.startsOn : "";
 			if (userA < userB) {
 				return -1;
 			}
@@ -613,10 +620,8 @@ export const sortSingleProject = (sortMethod: string, assignments: AssignmentTyp
 	}
 	if (sortMethod === "status") {
 		return arrayToSort.sort((a, b) => {
-			const userA =
-				a.status ? a.status : "";
-			const userB =
-				b.status ? b.status : "";
+			const userA = a.status ? a.status : "";
+			const userB = b.status ? b.status : "";
 			if (userA < userB) {
 				return -1;
 			}
@@ -630,65 +635,65 @@ export const sortSingleProject = (sortMethod: string, assignments: AssignmentTyp
 };
 
 export const sortProjectListByOrder = (
-  sortOrder: SORT_ORDER,
-  sortBy: string,
-  projectList: ProjectType[]
+	sortOrder: SORT_ORDER,
+	sortBy: string,
+	projectList: ProjectType[]
 ) => {
-  const arrayToSort = [...projectList];
+	const arrayToSort = [...projectList];
 
-  if (sortBy === "Projects" && sortOrder === SORT_ORDER.ASC) {
-    return arrayToSort.sort((a, b) => {
-      const projectA = a.name.toLowerCase();
-      const projectB = b.name.toLowerCase();
-      if (projectA < projectB) {
-        return -1;
-      }
-      if (projectA > projectB) {
-        return 1;
-      }
-      return 0;
-    });
-  }
-  if (sortBy === "Projects" && sortOrder === SORT_ORDER.DESC) {
-    return arrayToSort.sort((a, b) => {
-      const projectA = a.name.toLowerCase();
-      const projectB = b.name.toLowerCase();
-      if (projectA < projectB) {
-        return 1;
-      }
-      if (projectA > projectB) {
-        return -1;
-      }
-      return 0;
-    });
-  }
+	if (sortBy === "Projects" && sortOrder === SORT_ORDER.ASC) {
+		return arrayToSort.sort((a, b) => {
+			const projectA = a.name.toLowerCase();
+			const projectB = b.name.toLowerCase();
+			if (projectA < projectB) {
+				return -1;
+			}
+			if (projectA > projectB) {
+				return 1;
+			}
+			return 0;
+		});
+	}
+	if (sortBy === "Projects" && sortOrder === SORT_ORDER.DESC) {
+		return arrayToSort.sort((a, b) => {
+			const projectA = a.name.toLowerCase();
+			const projectB = b.name.toLowerCase();
+			if (projectA < projectB) {
+				return 1;
+			}
+			if (projectA > projectB) {
+				return -1;
+			}
+			return 0;
+		});
+	}
 
-  if (sortBy === "Clients" && sortOrder === SORT_ORDER.ASC) {
-    return arrayToSort.sort((a, b) => {
-      const projectA = a.client.name.toLowerCase();
-      const projectB = b.client.name.toLowerCase();
-      if (projectA < projectB) {
-        return -1;
-      }
-      if (projectA > projectB) {
-        return 1;
-      }
-      return 0;
-    });
-  }
-  if (sortBy === "Clients" && sortOrder === SORT_ORDER.DESC) {
-    return arrayToSort.sort((a, b) => {
-      const projectA = a.client.name.toLowerCase();
-      const projectB = b.client.name.toLowerCase();
-      if (projectA < projectB) {
-        return 1;
-      }
-      if (projectA > projectB) {
-        return -1;
-      }
-      return 0;
-    });
-  }
+	if (sortBy === "Clients" && sortOrder === SORT_ORDER.ASC) {
+		return arrayToSort.sort((a, b) => {
+			const projectA = a.client.name.toLowerCase();
+			const projectB = b.client.name.toLowerCase();
+			if (projectA < projectB) {
+				return -1;
+			}
+			if (projectA > projectB) {
+				return 1;
+			}
+			return 0;
+		});
+	}
+	if (sortBy === "Clients" && sortOrder === SORT_ORDER.DESC) {
+		return arrayToSort.sort((a, b) => {
+			const projectA = a.client.name.toLowerCase();
+			const projectB = b.client.name.toLowerCase();
+			if (projectA < projectB) {
+				return 1;
+			}
+			if (projectA > projectB) {
+				return -1;
+			}
+			return 0;
+		});
+	}
 };
 
 export const sortProjectList = (
@@ -697,18 +702,18 @@ export const sortProjectList = (
 ) => {
 	const arrayToSort = [...projectList];
 	if (sortMethod === "abcProjectName") {
-    	return arrayToSort.sort((a, b) => {
-      const projectA = a.name.toLowerCase();
-      const projectB = b.name.toLowerCase();
-      if (projectA < projectB) {
-        return -1;
-      }
-      if (projectA > projectB) {
-        return 1;
-      }
-      return 0;
-    });
-  }
+		return arrayToSort.sort((a, b) => {
+			const projectA = a.name.toLowerCase();
+			const projectB = b.name.toLowerCase();
+			if (projectA < projectB) {
+				return -1;
+			}
+			if (projectA > projectB) {
+				return 1;
+			}
+			return 0;
+		});
+	}
 	if (sortMethod === "status") {
 		return arrayToSort.sort((a, b) => {
 			const projectA = a.status.toLowerCase();
@@ -759,58 +764,58 @@ export const sortProjectList = (
 };
 
 export const sortSingleUserByOrder = (
-  sortOrder: SORT_ORDER,
-  sortBy: string,
-  user: UserType
+	sortOrder: SORT_ORDER,
+	sortBy: string,
+	user: UserType
 ) => {
-  const arrayToSort = user.assignments?.length ? [...user.assignments] : [];
-  const sortedAssignments = { ...user, assignments: arrayToSort };
+	const arrayToSort = user.assignments?.length ? [...user.assignments] : [];
+	const sortedAssignments = { ...user, assignments: arrayToSort };
 
-  if (sortBy === "Projects" && sortOrder === SORT_ORDER.ASC) {
-    sortedAssignments.assignments.sort((a, b) => {
-      const projectA = a.project.name.toLowerCase();
-      const projectB = b.project.name.toLowerCase();
-      return projectA.localeCompare(projectB);
-    });
-  }
-  if (sortBy === "Projects" && sortOrder === SORT_ORDER.DESC) {
-    sortedAssignments.assignments.sort((a, b) => {
-      const projectA = a.project.name.toLowerCase();
-      const projectB = b.project.name.toLowerCase();
-      return projectB.localeCompare(projectA);
-    });
-  }
+	if (sortBy === "Projects" && sortOrder === SORT_ORDER.ASC) {
+		sortedAssignments.assignments.sort((a, b) => {
+			const projectA = a.project.name.toLowerCase();
+			const projectB = b.project.name.toLowerCase();
+			return projectA.localeCompare(projectB);
+		});
+	}
+	if (sortBy === "Projects" && sortOrder === SORT_ORDER.DESC) {
+		sortedAssignments.assignments.sort((a, b) => {
+			const projectA = a.project.name.toLowerCase();
+			const projectB = b.project.name.toLowerCase();
+			return projectB.localeCompare(projectA);
+		});
+	}
 
-  if (sortBy === "Client" && sortOrder === SORT_ORDER.ASC) {
-    sortedAssignments.assignments.sort((a, b) => {
-      const clientA = a.project.client.name.toLowerCase();
+	if (sortBy === "Client" && sortOrder === SORT_ORDER.ASC) {
+		sortedAssignments.assignments.sort((a, b) => {
+			const clientA = a.project.client.name.toLowerCase();
 			const clientB = b.project.client.name.toLowerCase();
-			
-      if (clientA !== clientB) {
-        return clientA.localeCompare(clientB);
+
+			if (clientA !== clientB) {
+				return clientA.localeCompare(clientB);
 			}
-			
-      const projectA = a.project.name.toLowerCase();
-      const projectB = b.project.name.toLowerCase();
-      return projectA.localeCompare(projectB);
-    });
-  }
-  if (sortBy === "Client" && sortOrder === SORT_ORDER.DESC) {
-    sortedAssignments.assignments.sort((a, b) => {
-      const clientA = a.project.client.name.toLowerCase();
+
+			const projectA = a.project.name.toLowerCase();
+			const projectB = b.project.name.toLowerCase();
+			return projectA.localeCompare(projectB);
+		});
+	}
+	if (sortBy === "Client" && sortOrder === SORT_ORDER.DESC) {
+		sortedAssignments.assignments.sort((a, b) => {
+			const clientA = a.project.client.name.toLowerCase();
 			const clientB = b.project.client.name.toLowerCase();
-			
-      if (clientA !== clientB) {
-        return clientB.localeCompare(clientA);
-      }
 
-      const projectA = a.project.name.toLowerCase();
-      const projectB = b.project.name.toLowerCase();
-      return projectA.localeCompare(projectB);
-    });
-  }
+			if (clientA !== clientB) {
+				return clientB.localeCompare(clientA);
+			}
 
-  return sortedAssignments;
+			const projectA = a.project.name.toLowerCase();
+			const projectB = b.project.name.toLowerCase();
+			return projectA.localeCompare(projectB);
+		});
+	}
+
+	return sortedAssignments;
 };
 
 export const sortSingleUser = (sortMethod: string, user: UserType) => {
@@ -841,7 +846,6 @@ export const sortSingleUser = (sortMethod: string, user: UserType) => {
 			}
 			return 0;
 		});
-
 	}
 	if (sortMethod === "startDate") {
 		sortedAssignments.assignments.sort((a, b) => {
@@ -862,69 +866,77 @@ export const sortSingleUser = (sortMethod: string, user: UserType) => {
 };
 
 export const sortUserListByOrder = (
-  sortOrder: SORT_ORDER,
-  userList: UserType[]
+	sortOrder: SORT_ORDER,
+	userList: UserType[]
 ) => {
 	const arrayToSort = [...userList];
 
-  if (sortOrder === SORT_ORDER.ASC) {
-    return arrayToSort.sort((a, b) => {
-      const userA = a.name.toLowerCase();
-      const userB = b.name.toLowerCase();
-      if (userA < userB) {
-        return -1;
-      }
-      if (userA > userB) {
-        return 1;
-      }
-      return 0;
-    });
-  }
+	if (sortOrder === SORT_ORDER.ASC) {
+		return arrayToSort.sort((a, b) => {
+			const userA = a.name.toLowerCase();
+			const userB = b.name.toLowerCase();
+			if (userA < userB) {
+				return -1;
+			}
+			if (userA > userB) {
+				return 1;
+			}
+			return 0;
+		});
+	}
 
-  if (sortOrder === SORT_ORDER.DESC) {
-    return arrayToSort.sort((a, b) => {
-      const userA = a.name.toLowerCase();
-      const userB = b.name.toLowerCase();
-      if (userA < userB) {
-        return 1;
-      }
-      if (userA > userB) {
-        return -1;
-      }
-      return 0;
-    });
+	if (sortOrder === SORT_ORDER.DESC) {
+		return arrayToSort.sort((a, b) => {
+			const userA = a.name.toLowerCase();
+			const userB = b.name.toLowerCase();
+			if (userA < userB) {
+				return 1;
+			}
+			if (userA > userB) {
+				return -1;
+			}
+			return 0;
+		});
 	}
 
 	const arrayWithTotalHoursToSort = arrayToSort.map((arr) => {
-    const totalAssignmentsHours = arr.assignments.reduce((acc, assignment) => {
-      const totalHours = assignment.workWeeks.reduce((hours, week) => {
-        const now = DateTime.now();
-        const currentWeekNumber = now.weekNumber;
-        const currentYear = now.year;
+		const totalAssignmentsHours = arr.assignments.reduce((acc, assignment) => {
+			const totalHours = assignment.workWeeks.reduce((hours, week) => {
+				const now = DateTime.now();
+				const currentWeekNumber = now.weekNumber;
+				const currentYear = now.year;
 
-        if ( week.year >= currentYear && week.cweek >= currentWeekNumber && assignment.status !== "archived") {
-          hours += week.estimatedHours ? week.estimatedHours : 0;
-        }
+				if (
+					week.year >= currentYear &&
+					week.cweek >= currentWeekNumber &&
+					assignment.status !== "archived"
+				) {
+					hours += week.estimatedHours ? week.estimatedHours : 0;
+				}
 
-        return hours;
-      }, 0);
+				return hours;
+			}, 0);
 
-      acc += totalHours;
+			acc += totalHours;
 
-      return acc;
-    }, 0);
+			return acc;
+		}, 0);
 
-    return { ...arr, totalHours: totalAssignmentsHours };
-  });
-	
+		return { ...arr, totalHours: totalAssignmentsHours };
+	});
+
 	if (sortOrder === SORT_ORDER.ASC_COVERED) {
-    return arrayWithTotalHoursToSort.sort((a, b) => a.totalHours - b.totalHours);
-  }
+		return arrayWithTotalHoursToSort.sort(
+			(a, b) => a.totalHours - b.totalHours
+		);
+	}
 
-  if (sortOrder === SORT_ORDER.DESC_COVERED) {
-    return arrayWithTotalHoursToSort.sort((a, b) => b.totalHours - a.totalHours);
-  }
-  return userList;
+	if (sortOrder === SORT_ORDER.DESC_COVERED) {
+		return arrayWithTotalHoursToSort.sort(
+			(a, b) => b.totalHours - a.totalHours
+		);
+	}
+	return userList;
 };
 
 export const sortUserList = (sortMethod: string, userList: UserType[]) => {
@@ -1050,58 +1062,79 @@ export const sortUserList = (sortMethod: string, userList: UserType[]) => {
 
 export const convertProjectToCSV = (data: ProjectType): string => {
 	const assignments = data.assignments || [];
-	
-	const sortedWorkWeeks = sortWeeklyHoursByDate(calculateWeeklyHoursForCSV(assignments));
-	const { totalEstimatedHoursPerProject, totalActualHoursPerProject } = calculateWeeklyHoursPerProjectForCSV(sortedWorkWeeks);
-	const deltaHours = (totalActualHoursPerProject - totalEstimatedHoursPerProject);
-  
+
+	const sortedWorkWeeks = sortWeeklyHoursByDate(
+		calculateWeeklyHoursForCSV(assignments)
+	);
+	const { totalActualHoursPerProject } =
+		calculateWeeklyHoursPerProjectForCSV(sortedWorkWeeks);
+	const totalEstimatedHoursPerProject =
+		(data.assignments?.reduce((total, assignment) => {
+			return total + calculatePlanFromToday(assignment);
+		}, 0) || 0) + totalActualHoursPerProject;
+	const deltaHours = totalEstimatedHoursPerProject - data.hours;
+	const formattedDates = (date: string | null) => {
+		if (!date) return null;
+		return DateTime.fromISO(date).toFormat("dd.LL.yyyy");
+	};
 	const headers = [
-	  'Project Name',
-	  'Starts date',
-	  'Ends date',
-	  'Work week',
-	  'Actual Hours',
-	  'Planned Hours',
-	  'Total Hours'
-	].join(';');
-  
-	const projectRows = sortedWorkWeeks.map((week, index) => [
-	  index === 0 ? data.name : '',
-	  index === 0 ? data.startsOn || '' : '',
-	  index === 0 ? data.endsOn || '' : '',
-	  weekNumberToDateRange(week.week, week.year),
-	  week.totalActualHours || '0',
-	  week.totalEstimatedHours || '0',
-	  (week.totalActualHours || 0) + (week.totalEstimatedHours || 0)
-	].join(';')).join('\n');
-  
+		"Project Name",
+		"Start Date",
+		"End Date",
+		"Work Week",
+		"Plan Hours",
+		"Actual Hours",
+		"Total Hours",
+	].join(";");
+
+	const projectRows = sortedWorkWeeks
+		.map((week, index) =>
+			[
+				index === 0 ? data.name : "",
+				index === 0 ? formattedDates(data.startsOn) || "" : "",
+				index === 0 ? formattedDates(data.endsOn) || "" : "",
+				weekNumberToDateRange(week.week, week.year),
+				week.totalEstimatedHours || "0",
+				week.totalActualHours || "0",
+				"",
+			].join(";")
+		)
+		.join("\n");
+
 	const summaryRows = [
-	  `Target;;;;;;${data.hours || ''}`,
-	  `Plan;;;;;;${totalEstimatedHoursPerProject}`,
-	  `Actual;;;;;;${totalActualHoursPerProject}`,
-	  `Delta;;;;;;${deltaHours}`,
-	].join('\n');
-  
+		`Target;;;;;;${data.hours || ""}`,
+		`Plan (Future Plan + Actual);;;;;;${totalEstimatedHoursPerProject}`,
+		`Actual;;;;;;${totalActualHoursPerProject}`,
+		`Delta;;;;;;${deltaHours}`,
+	].join("\n");
+
 	const usersByMonth = groupAndSumWeeksByMonthForUsers(assignments);
-  
-	const userRows = usersByMonth.map(user => {
-	  const userMonths = user.months.map(month => `${month.monthLabel}`);
-	  const burnedHours = user.months.map(month => `${month.totalActualHours || 0}`);
-	  const estimatedHours = user.months.map(month => `${month.totalEstimatedHours || 0}`);
-	  return `${user.userName};${userMonths.join(';')};;;${burnedHours.join(';')};${estimatedHours.join(';')}`;
-	}).join('\n');
+
+	// Now, generate separate rows for each month in userMonths
+	const userRows = usersByMonth
+		.map((user) => {
+			return user.months
+				.map((month) => {
+					const userMonths = `${month.monthLabel}`;
+					const burnedHours = `${month.totalActualHours || 0}`;
+					const estimatedHours = `${month.totalEstimatedHours || 0}`;
+
+					// For each month, return a row with the same user data but the month-specific data
+					return `${user.userName};${userMonths};;;${estimatedHours};${burnedHours}`;
+				})
+				.join("\n"); // Join months to separate rows
+		})
+		.join("\n"); // Join users to separate rows
+
 	return `${headers}\n${projectRows}\n${summaryRows}\n\n${userRows}`;
-  };
-  
-  
-  
+};
 
 export const mergeClasses = (...classes: ClassValue[]): string => {
 	return classes
 		.flatMap((cls) => {
-			if (typeof cls === 'string' || typeof cls === 'undefined') {
+			if (typeof cls === "string" || typeof cls === "undefined") {
 				return cls;
-			} else if (typeof cls === 'object' && cls !== null) {
+			} else if (typeof cls === "object" && cls !== null) {
 				return Object.entries(cls)
 					.filter(([, condition]) => condition)
 					.map(([className]) => className);
@@ -1109,5 +1142,5 @@ export const mergeClasses = (...classes: ClassValue[]): string => {
 			return [];
 		})
 		.filter(Boolean)
-		.join(' ');
+		.join(" ");
 };

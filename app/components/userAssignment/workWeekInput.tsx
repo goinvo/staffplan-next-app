@@ -268,6 +268,7 @@ export const WorkWeekInput = ({
 					/>
 					{isPastOrCurrentWeek(cweek, year) && (
 						<CustomInput
+							className="pt-2"
 							value={values.actualHours}
 							name="actualHours"
 							id={`actHours-${assignment?.id}-${cweek}-${year}`}
