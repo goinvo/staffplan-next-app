@@ -14,6 +14,7 @@ export const GET_ASSIGNMENT_DATA = gql`
 				startsOn
 				endsOn
 				hourlyRate
+				hours
 				users {
 					id
 					name
@@ -57,6 +58,7 @@ export const GET_PROJECT_DATA = gql`
 				endsOn
 				rateType
 				hourlyRate
+				hours
 				assignments {
 					assignedUser {
 						name
@@ -96,6 +98,7 @@ export const GET_USER_ASSIGNMENTS = gql`
 			project {
 				name
 				id
+				hours
 				client {
 					name
 					avatarUrl
@@ -134,6 +137,7 @@ export const GET_USER_LIST = gql`
 						startsOn
 						endsOn
 						status
+						hours
 						client {
 							id
 							name
