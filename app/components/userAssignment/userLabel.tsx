@@ -338,11 +338,11 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 			projectId: id,
 			userId: assignment.assignedUser.id,
 			status: assignment.status,
-			focused: false
+			focused: !assignment.focused
 		};
 		try {
 			const response = await upsertAssignment({ variables});
-			if (response && response.data) {
+			if (response && response.data && !response.data.upsertAssignment.focused) {
 				const updatedAssignment = response.data.upsertAssignment
 				const undoAction = (undoableAssignments: UndoableModifiedAssignment[]) => { undoHideProject(undoableAssignments); }
 				enqueueTimer({
@@ -350,6 +350,9 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 					updatedAssignment,
 					finalAction: updateCache,
 					undoAction });
+			}
+			if (response && response.data && response.data.upsertAssignment.focused) {
+				updateCache()
 			}
 		} catch (error) {
 			console.error('Error updating project:', error);
@@ -412,6 +415,21 @@ export const UserLabel = ({ assignment, selectedUser, clickHandler, undoRowRef, 
 				</button>
 			),
 			show: showHideButton,
+		},
+		{
+			component: (
+				<button
+					onClick={() => {
+						handleHideProject(assignment.project)
+						setDeleteAssignment("hide")
+						}
+					}
+					className="block w-full px-4 py-2 text-sm text-left cursor-pointer"
+				>
+					Show in My StaffPlan
+				</button>
+			),
+			show: !showHideButton,
 		},
 		{
 			component: <button onClick={downloadCSV} className="block w-full px-4 py-2 text-sm text-left cursor-pointer">Export CSV</button>,
