@@ -25,10 +25,19 @@ export const AllProjectLabel = ({
 		router.push(`/projects?client=${encodeURIComponent(encodedClient)}`);
 	};
 
-	const showButtonShowProjectInMyStaffPlan =
-		project.assignments?.find((a) => a.assignedUser?.id === viewer?.id) &&
-		!project.assignments?.find((a) => a.assignedUser?.id === viewer?.id)
-			?.focused;
+	const toggleShowHideInMyStaffPlan = () => {
+		const assignment = project.assignments?.find(
+			(a) => a.assignedUser?.id === viewer?.id
+		);
+		if (assignment) {
+			if (!assignment.focused) {
+				return "hide";
+			} else {
+				return "show";
+			}
+		}
+		return;
+	};
 
 	const assignment = project.assignments?.find(
 		(a) => a.assignedUser?.id === viewer?.id
@@ -76,7 +85,7 @@ export const AllProjectLabel = ({
 				}`}
 			>
 				<div className="w-3 mr-2  pt-0.5 relative right-5">
-					{showButtonShowProjectInMyStaffPlan && (
+					{toggleShowHideInMyStaffPlan() === "hide" && (
 						<MdVisibilityOff className="w-4 h-4 " />
 					)}
 				</div>
@@ -104,9 +113,7 @@ export const AllProjectLabel = ({
 					<EllipsisProjectMenu
 						undoRowRef={undoRowRef}
 						project={project}
-						showButtonShowProjectInMyStaffPlan={
-							showButtonShowProjectInMyStaffPlan
-						}
+						toggleShowHideInMyStaffPlan={toggleShowHideInMyStaffPlan}
 						assignment={assignment}
 					/>
 				</div>
