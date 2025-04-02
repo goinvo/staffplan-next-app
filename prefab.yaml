@@ -1,0 +1,24 @@
+   version: 1
+   flag_defaults:
+     # Default values used when not overridden by an environment
+     default:
+       bool_flags: {}
+       string_flags: {}
+       double_flags: {}
+       int_flags: {}
+
+   evaluation_rules:
+     # Development environment (for local testing)
+     - environment: development
+       serve_from: prefab
+       rules: []
+
+     # Staging environment
+     - environment: staging
+       serve_from: prefab
+       rules: []
+
+     # Production environment
+     - environment: production
+       serve_from: prefab
+       rules: []

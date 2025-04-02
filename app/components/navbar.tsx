@@ -18,15 +18,15 @@ import MagnifyingGlassIcon from "@heroicons/react/24/solid/MagnifyingGlassIcon";
 import { ThemeToggle } from "./themeToggle";
 
 type Link = {
-  href: string;
-  label: string;
-  isActive: boolean | RegExpMatchArray | null;
-  onClick?: () => void;
+	href: string;
+	label: string;
+	isActive: boolean | RegExpMatchArray | null;
+	onClick?: () => void;
 };
 
 const Navbar: React.FC = () => {
 
-	const {isEnabled} = usePrefab();
+	const { isEnabled } = usePrefab();
 	const { viewer } = useGeneralDataContext();
 	const { showOneClientProjects, setShowOneClientProjects } = useProjectsDataContext()
 	const fullPathName = usePathname();
@@ -43,25 +43,25 @@ const Navbar: React.FC = () => {
 		? "http://localhost:3000"
 		: "https://app.staffplan.com";
 	const links: Link[] = [
-    {
-      href: `/people/${myPlanUrl()}`,
-      label: "My StaffPlan",
-      isActive: myStaffPlanCheck,
-    },
-    {
-      href: "/people",
-      label: "People",
-      isActive: pathname === "people" && !myStaffPlanCheck,
-    },
-    {
-      href: "/projects",
-      label: "Projects",
-      isActive: pathname === "projects",
-      ...(showOneClientProjects
-        ? { onClick: () => setShowOneClientProjects("") }
-        : {}),
-    },
-  ];
+		{
+			href: `/people/${myPlanUrl()}`,
+			label: "My StaffPlan",
+			isActive: myStaffPlanCheck,
+		},
+		{
+			href: "/people",
+			label: "People",
+			isActive: pathname === "people" && !myStaffPlanCheck,
+		},
+		{
+			href: "/projects",
+			label: "Projects",
+			isActive: pathname === "projects",
+			...(showOneClientProjects
+				? { onClick: () => setShowOneClientProjects("") }
+				: {}),
+		},
+	];
 
 	const ellipsisDropdownMenuOptions = [
 		{
@@ -92,8 +92,8 @@ const Navbar: React.FC = () => {
 							}`}
 						onClick={() => {
 							if (link.onClick) {
-                link.onClick();
-              }
+								link.onClick();
+							}
 						}}
 					>
 						{link.label}
@@ -121,10 +121,13 @@ const Navbar: React.FC = () => {
 				</div>
 			)}
 			<div className="flex items-center sm:space-x-4 py-4 sm:ml-2">
-				<ThemeToggle />
+				 {/* Theme toggle - only shown in dev environment or when feature flag is enabled */}
+				{(process.env.NEXT_PUBLIC_NODE_ENV === 'development' || isEnabled("enable-theme-switcher")) && (
+					<ThemeToggle />
+				)}
 				<div>
 					{/* Temporary commented */}
-          {/* <button
+					{/* <button
             className="sm:inline-flex hidden items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue"
             onClick={() =>
               openModal(<AirTableFormModal closeModal={closeModal} />)
@@ -132,14 +135,14 @@ const Navbar: React.FC = () => {
           >
             Feedback
           </button> */}
-          <Link
-            href='mailto:staffplan@goinvo.com'
-            target="_blank"
-            rel="noopener noreferrer"
-            className="sm:inline-flex hidden items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue"
-          >
-            Feedback
-          </Link>
+					<Link
+						href='mailto:staffplan@goinvo.com'
+						target="_blank"
+						rel="noopener noreferrer"
+						className="sm:inline-flex hidden items-center text-base px-4 py-2 rounded-md hover:bg-contrastBlue"
+					>
+						Feedback
+					</Link>
 				</div>
 				<EllipsisDropdownMenu
 					options={ellipsisDropdownMenuOptions}
