@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { AllProjectLabelProps } from "../../typeInterfaces";
@@ -7,6 +7,9 @@ import IconButton from "../iconButton";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
+import { useMutation } from "@apollo/client";
+import { UPSERT_ASSIGNMENT } from "@/app/gqlQueries";
+import { useUserDataContext } from "@/app/contexts/userDataContext";
 
 export const AllProjectLabel = ({
 	project,
@@ -16,15 +19,63 @@ export const AllProjectLabel = ({
 	undoRowRef,
 }: AllProjectLabelProps) => {
 	const router = useRouter();
-	const { sortBy, showOneClientProjects, setShowOneClientProjects } =
-		useProjectsDataContext();
-	const { viewer } = useGeneralDataContext();
+    const [showTooltip, setShowTooltip] = useState<boolean>(false);
+	const {
+		sortBy,
+		showOneClientProjects,
+		setShowOneClientProjects,
+		setProjectList,
+		refetchProjectList,
+	} = useProjectsDataContext();
+	const { setUserList, refetchUserList } = useUserDataContext();
 
+	const { viewer } = useGeneralDataContext();
 	const handleClientClick = (client: string) => {
 		const encodedClient = client.replace(/[\s,]/g, "_");
 		router.push(`/projects?client=${encodeURIComponent(encodedClient)}`);
 	};
+	const assignment = project.assignments?.find(
+		(a) => a.assignedUser?.id === viewer?.id
+	);
+	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
+		errorPolicy: "all",
+		onCompleted({ upsertAssignment }) {
+			if (upsertAssignment) {
+				setUserList((prev) =>
+					prev.map((user) => {
+						if (user.id?.toString() === assignment?.assignedUser.id) {
+							const newAssignment = user.assignments.map((a) => {
+								if (a.id.toString() === upsertAssignment.id) {
+									return { ...a, status: upsertAssignment.status };
+								}
+								return a;
+							});
+							return { ...user, assignments: newAssignment };
+						}
+						return user;
+					})
+				);
+				setProjectList((prev) =>
+					prev.map((project) => {
+						if (project.id === upsertAssignment.project.id) {
+							const newAssignments = project.assignments?.map((a) => {
+								if (a.assignedUser?.id === upsertAssignment.assignedUser.id) {
+									return { ...a, status: upsertAssignment.status };
+								}
+								return a;
+							});
 
+							return { ...project, assignments: newAssignments };
+						}
+
+						return project;
+					})
+				);
+				refetchUserList();
+				refetchProjectList();
+			}
+		},
+	});
 	const toggleShowHideInMyStaffPlan = () => {
 		const assignment = project.assignments?.find(
 			(a) => a.assignedUser?.id === viewer?.id
@@ -39,9 +90,21 @@ export const AllProjectLabel = ({
 		return;
 	};
 
-	const assignment = project.assignments?.find(
-		(a) => a.assignedUser?.id === viewer?.id
-	);
+	const showHiddenProject = async (assignment: any) => {
+		const { id } = project;
+		const variables = {
+			id: assignment?.id,
+			projectId: id,
+			userId: assignment?.assignedUser.id,
+			status: assignment?.status,
+			focused: true,
+		};
+		try {
+			const response = await upsertAssignment({ variables });
+		} catch (error) {
+			console.error("Error updating project:", error);
+		}
+	};
 
 	return (
 		<div
@@ -86,8 +149,27 @@ export const AllProjectLabel = ({
 			>
 				<div className="w-3 mr-2  pt-0.5 relative right-5">
 					{toggleShowHideInMyStaffPlan() === "hide" && (
-						<MdVisibilityOff className="w-4 h-4 " />
+            	<div
+              onMouseEnter={() => setShowTooltip(true)}
+              onMouseLeave={() => setShowTooltip(false)}
+            >
+						<IconButton
+							iconSize="w-4 h-4"
+							onClick={() => {
+								setShowTooltip(false);
+								showHiddenProject(assignment);
+							}}
+							Icon={MdVisibilityOff}
+						/>
+            </div>
+            
+						// <MdVisibilityOff className="w-4 h-4" />
 					)}
+          	{showTooltip && (
+								<div className="absolute top-1/2 left-1/2 bg-gray-700 text-white text-xs rounded px-2 py-1 z-50 shadow-lg min-w-40">
+									Show in My StaffPlan
+								</div>
+							)}
 				</div>
 				<div className="flex flex-col items-start relative right-4.5">
 					<button
