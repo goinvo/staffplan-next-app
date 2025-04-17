@@ -46,7 +46,7 @@ export const AllProjectLabel = ({
 	return (
 		<div
 			className={`flex items-start sm:flex-row flex-col pt-2 ${
-				showOneClientProjects ? "justify-start" : "justify-between"
+				showOneClientProjects ? "pl-5" : "justify-between"
 			}`}
 		>
 			{/* <IconButton
