@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 
-const homepageURL = process.env.HOMEPAGE_URL || "http://localhost:3000"
+const homepageURL = process.env.NEXT_PUBLIC_HOMEPAGE_URL || "http://localhost:3000"
 const nextConfig = {
 	async redirects() {
 		return [
