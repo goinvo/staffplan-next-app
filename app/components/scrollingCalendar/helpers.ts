@@ -1271,23 +1271,23 @@ export const calculateTotalHoursForApprove = (
   });
 
   const calculateAssignment = (assignment: AssignmentType) => {
-    if (assignment.estimatedWeeklyHours) {
-      months.forEach((month) => {
-        month.weeks.forEach((week) => {
-          const weekExistsWithEstimatedHours = assignment.workWeeks?.some(
-            (w) =>
-              w.cweek === week.weekNumberOfTheYear &&
-              w.year === month.year &&
-              w.actualHours !== undefined &&
-              w.actualHours !== null
-          );
-          if (!weekExistsWithEstimatedHours) {
-            const key = `${month.year}-${week.weekNumberOfTheYear}`;
-            totalHoursForApprove[key] += assignment.estimatedWeeklyHours;
-          }
-        });
-      });
-    }
+    // if (assignment.estimatedWeeklyHours) {
+    //   months.forEach((month) => {
+    //     month.weeks.forEach((week) => {
+    //       const weekExistsWithEstimatedHours = assignment.workWeeks?.some(
+    //         (w) =>
+    //           w.cweek === week.weekNumberOfTheYear &&
+    //           w.year === month.year &&
+    //           w.actualHours !== undefined &&
+    //           w.actualHours !== null
+    //       );
+    //       if (!weekExistsWithEstimatedHours) {
+    //         const key = `${month.year}-${week.weekNumberOfTheYear}`;
+    //         totalHoursForApprove[key] += assignment.estimatedWeeklyHours;
+    //       }
+    //     });
+    //   });
+    // }
     assignment.workWeeks.forEach((weekData) => {
       const key = `${weekData.year}-${weekData.cweek}`;
       if (!totalHoursForApprove[key]) {
