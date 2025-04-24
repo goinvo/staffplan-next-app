@@ -1,19 +1,34 @@
-'use client'
+"use client";
 
 import React, { useEffect, KeyboardEvent } from "react";
 import { Formik, FormikValues, FormikHelpers, FieldInputProps } from "formik";
 import { useMutation } from "@apollo/client";
 import { isNil } from "lodash";
 
-import { AssignmentType, WorkWeekType, MonthsDataType } from "@/app/typeInterfaces";
+import {
+	AssignmentType,
+	WorkWeekType,
+	MonthsDataType,
+} from "@/app/typeInterfaces";
 import { UPSERT_WORKWEEKS, UPSERT_WORKWEEK } from "@/app/gqlQueries";
 import { CustomInput } from "../cutomInput";
-import { assignmentContainsCWeek, isPastOrCurrentWeek, filterWeeksForFillForward, getWeekNumbersPerScreen, currentWeek, currentYear, tabbingAndArrowNavigation, updateOrInsertWorkWeek, updateOrInsertWorkWeekInProject, updateProjectAssignments, updateUserAssignments } from "../scrollingCalendar/helpers";
+import {
+	assignmentContainsCWeek,
+	isPastOrCurrentWeek,
+	filterWeeksForFillForward,
+	getWeekNumbersPerScreen,
+	currentWeek,
+	currentYear,
+	tabbingAndArrowNavigation,
+	updateOrInsertWorkWeek,
+	updateOrInsertWorkWeekInProject,
+	updateProjectAssignments,
+	updateUserAssignments,
+} from "../scrollingCalendar/helpers";
 import { useUserDataContext } from "@/app/contexts/userDataContext";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
 import useIsMobile from "@/app/hooks/useIsMobileWidth";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
-
 
 interface WorkWeekInputProps {
 	withinProjectDates?: boolean;
@@ -23,10 +38,12 @@ interface WorkWeekInputProps {
 	year: number;
 	monthLabel: string;
 	months: MonthsDataType[];
-	rowIndex: number,
-	cellIndex: number,
-	totalRows: number,
-	inputRefs: React.MutableRefObject<Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>>;
+	rowIndex: number;
+	cellIndex: number;
+	totalRows: number;
+	inputRefs: React.MutableRefObject<
+		Array<[Array<HTMLInputElement | null>, Array<HTMLInputElement | null>]>
+	>;
 }
 export interface WorkWeekValues {
 	cweek: number;
@@ -38,21 +55,21 @@ export interface WorkWeekValues {
 
 interface FillForwardVariablesType {
 	assignmentId: string;
-	workWeeks?: WorkWeekValues[]
+	workWeeks?: WorkWeekValues[];
 }
 
 type HandlePressEnterOrEscape = (
-  event: KeyboardEvent<HTMLInputElement>,
-  values: FormikValues,
-  setFieldValue: FormikHelpers<any>["setFieldValue"],
-  fieldName: string,
-  prevValue: number | string
+	event: KeyboardEvent<HTMLInputElement>,
+	values: FormikValues,
+	setFieldValue: FormikHelpers<any>["setFieldValue"],
+	fieldName: string,
+	prevValue: number | string
 ) => void;
 
 type HandleChangeInCustomInput = (
 	event: React.ChangeEvent<HTMLInputElement>,
-	handleChange: FieldInputProps<any>['onChange']
-) => void
+	handleChange: FieldInputProps<any>["onChange"]
+) => void;
 
 export const WorkWeekInput = ({
 	assignment,
@@ -63,34 +80,44 @@ export const WorkWeekInput = ({
 	rowIndex,
 	cellIndex,
 	totalRows,
-	monthLabel
+	monthLabel,
 }: WorkWeekInputProps) => {
-	const weekWithinAssignmentDates = assignmentContainsCWeek(assignment, cweek, year)
-	const existingWorkWeek = assignment?.workWeeks.find((week) => week.cweek === cweek && week.year === year);
-	const isMobile = useIsMobile()
+	const weekWithinAssignmentDates = assignmentContainsCWeek(
+		assignment,
+		cweek,
+		year
+	);
+	const existingWorkWeek = assignment?.workWeeks.find(
+		(week) => week.cweek === cweek && week.year === year
+	);
+	const isMobile = useIsMobile();
 
 	const actualValueToShow = () => {
-		if (isMobile && !isNil(existingWorkWeek?.actualHours)) return existingWorkWeek?.actualHours || ''
-		// if (isMobile && !existingWorkWeek?.actualHours) return assignment?.estimatedWeeklyHours || ''
-		return existingWorkWeek?.actualHours || ''
-	}
+		if (isMobile && !isNil(existingWorkWeek?.actualHours)) {
+			return existingWorkWeek?.actualHours || "";
+		}
+
+		return existingWorkWeek?.actualHours || "";
+	};
 	const initialValues = {
 		actualHours: actualValueToShow(),
 		estimatedHours:
-			existingWorkWeek?.estimatedHours ?? (weekWithinAssignmentDates && assignment?.estimatedWeeklyHours || ""),
+			existingWorkWeek?.estimatedHours ??
+			((weekWithinAssignmentDates && assignment?.estimatedWeeklyHours) || ""),
 		assignmentId: assignment?.id,
 		cweek: cweek,
 		year: year,
 	};
 
-
-	const { project: { id: projectId } } = assignment;
+	const {
+		project: { id: projectId },
+	} = assignment;
 	const { assignedUser } = assignment || {};
-	const userId = assignedUser?.id || '';
+	const userId = assignedUser?.id || "";
 
 	const [upsertWorkWeek] = useMutation(UPSERT_WORKWEEK, {
 		onCompleted: async ({ upsertWorkWeek }) => {
-			const { assignmentId, id, ...workWeek } = upsertWorkWeek
+			const { assignmentId, id, ...workWeek } = upsertWorkWeek;
 			const updatedUserList = updateOrInsertWorkWeek(
 				userList,
 				userId,
@@ -105,8 +132,8 @@ export const WorkWeekInput = ({
 				workWeek
 			);
 			setUserList(updatedUserList);
-			setProjectList(updatedProjectList)
-		}
+			setProjectList(updatedProjectList);
+		},
 	});
 	const [upsertWorkWeeks] = useMutation(UPSERT_WORKWEEKS, {
 		onCompleted: async ({ upsertWorkWeeks }) => {
@@ -123,29 +150,35 @@ export const WorkWeekInput = ({
 				upsertWorkWeeks.id,
 				upsertWorkWeeks.workWeeks
 			);
-			setProjectList(updatedProjectList)
-			setUserList(updatedUserList)
-		}
+			setProjectList(updatedProjectList);
+			setUserList(updatedUserList);
+		},
 	});
-	const { userList, setUserList } = useUserDataContext()
+	const { userList, setUserList } = useUserDataContext();
 	const { projectList, setProjectList } = useProjectsDataContext();
 
 	useEffect(() => {
-		const currentWeekExists = months?.some(month =>
-			month.weeks.some(week =>
-				week.weekNumberOfTheYear === currentWeek && month.year === currentYear
+		const currentWeekExists = months?.some((month) =>
+			month.weeks.some(
+				(week) =>
+					week.weekNumberOfTheYear === currentWeek && month.year === currentYear
 			)
 		);
 
-		const allWeeksInFuture = months?.every(month =>
-			month.weeks.every(week =>
-				(month.year > currentYear) || (month.year === currentYear && week.weekNumberOfTheYear > currentWeek)
+		const allWeeksInFuture = months?.every((month) =>
+			month.weeks.every(
+				(week) =>
+					month.year > currentYear ||
+					(month.year === currentYear && week.weekNumberOfTheYear > currentWeek)
 			)
 		);
 
 		if (currentWeekExists) {
 			if (inputRefs.current[rowIndex] && inputRefs.current[rowIndex][1]) {
-				inputRefs.current[rowIndex][1] = inputRefs.current[rowIndex][1].slice(0, 3);
+				inputRefs.current[rowIndex][1] = inputRefs.current[rowIndex][1].slice(
+					0,
+					3
+				);
 			}
 		}
 		if (!currentWeekExists && allWeeksInFuture) {
@@ -169,13 +202,17 @@ export const WorkWeekInput = ({
 			variables.actHours = parseInt(values.actualHours);
 		}
 		upsertWorkWeek({
-			variables
-		})
+			variables,
+		});
 	};
 
 	const onFillForwardClick = async (
-		targetCweek: number, targetYear: number, targetMonth: number, values: FormikValues) => {
-		if (values.estimatedHours === '') {
+		targetCweek: number,
+		targetYear: number,
+		targetMonth: number,
+		values: FormikValues
+	) => {
+		if (values.estimatedHours === "") {
 			return;
 		}
 		const variables: FillForwardVariablesType = {
@@ -184,41 +221,63 @@ export const WorkWeekInput = ({
 
 		const weekNumbersPerScreen = getWeekNumbersPerScreen(months);
 
-		const filteredWeeks = filterWeeksForFillForward(weekNumbersPerScreen, targetCweek, targetYear, targetMonth, assignment?.endsOn);
+		const filteredWeeks = filterWeeksForFillForward(
+			weekNumbersPerScreen,
+			targetCweek,
+			targetYear,
+			targetMonth,
+			assignment?.endsOn
+		);
 
-		variables.workWeeks = filteredWeeks.map(week => ({
+		variables.workWeeks = filteredWeeks.map((week) => ({
 			cweek: week.cweek,
 			estimatedHours: parseInt(values.estimatedHours),
-			year: week.year
+			year: week.year,
 		}));
 
 		upsertWorkWeeks({
-			variables
-		})
-	}
+			variables,
+		});
+	};
 
-
-	const createEstimatedRef = (el: HTMLInputElement | null, rowIndex: number, cellIndex: number) => {
+	const createEstimatedRef = (
+		el: HTMLInputElement | null,
+		rowIndex: number,
+		cellIndex: number
+	) => {
 		if (el) {
 			inputRefs.current[rowIndex][0][cellIndex] = el; // [0] For estimated inputs
 		}
 	};
-	const createActualRef = (el: HTMLInputElement | null, rowIndex: number, cellIndex: number) => {
+	const createActualRef = (
+		el: HTMLInputElement | null,
+		rowIndex: number,
+		cellIndex: number
+	) => {
 		if (el) {
 			inputRefs.current[rowIndex][1][cellIndex] = el; // [1] For actual inputs
 		}
 	};
 
-	const handlePressEnterOrEscape: HandlePressEnterOrEscape = (event, values, setFieldValue, fieldName, prevValue) => {
+	const handlePressEnterOrEscape: HandlePressEnterOrEscape = (
+		event,
+		values,
+		setFieldValue,
+		fieldName,
+		prevValue
+	) => {
 		if (event.key === "Enter") {
-      upsertWorkWeekValues(values);
-    }
-    if (event.key === "Escape") {
-      setFieldValue(fieldName, prevValue);
-    }
-	}
+			upsertWorkWeekValues(values);
+		}
+		if (event.key === "Escape") {
+			setFieldValue(fieldName, prevValue);
+		}
+	};
 
-	const handleChangeInCustomInput: HandleChangeInCustomInput = (event, handleChange) => {
+	const handleChangeInCustomInput: HandleChangeInCustomInput = (
+		event,
+		handleChange
+	) => {
 		const inputValue = event.target.value;
 		if (/^\d*$/.test(inputValue)) {
 			const numericValue = parseInt(inputValue, 10);
@@ -228,7 +287,7 @@ export const WorkWeekInput = ({
 				handleChange(event);
 			}
 		}
-	}
+	};
 
 	return (
 		<Formik
@@ -236,34 +295,45 @@ export const WorkWeekInput = ({
 			initialValues={initialValues}
 			enableReinitialize
 		>
-			{({
-				handleChange,
-				values,
-				handleBlur,
-				setFieldValue,
-				dirty
-			}) => (
+			{({ handleChange, values, handleBlur, setFieldValue, dirty }) => (
 				<>
 					<CustomInput
 						className="sm:block hidden"
 						value={values.estimatedHours}
 						name="estimatedHours"
 						id={`estHours-${assignment?.id}-${cweek}-${year}`}
-						onChange={(e) => handleChangeInCustomInput( e, handleChange )}
+						onChange={(e) => handleChangeInCustomInput(e, handleChange)}
 						onBlur={(e) => {
 							handleBlur("estimatedHours");
 							if (dirty) {
 								upsertWorkWeekValues(values);
 							}
 						}}
-						onFillForwardClick={() => onFillForwardClick(cweek, year, Number(monthLabel), values)}
-						ref={(el: HTMLInputElement) => createEstimatedRef(el, rowIndex, cellIndex)}
+						onFillForwardClick={() =>
+							onFillForwardClick(cweek, year, Number(monthLabel), values)
+						}
+						ref={(el: HTMLInputElement) =>
+							createEstimatedRef(el, rowIndex, cellIndex)
+						}
 						onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
 							if (dirty) {
-								handlePressEnterOrEscape(e, values, setFieldValue, 'estimatedHours', initialValues.estimatedHours);
+								handlePressEnterOrEscape(
+									e,
+									values,
+									setFieldValue,
+									"estimatedHours",
+									initialValues.estimatedHours
+								);
 							}
 
-							tabbingAndArrowNavigation(e, rowIndex, cellIndex, inputRefs, totalRows, false)
+							tabbingAndArrowNavigation(
+								e,
+								rowIndex,
+								cellIndex,
+								inputRefs,
+								totalRows,
+								false
+							);
 						}}
 					/>
 					{isPastOrCurrentWeek(cweek, year) && (
@@ -272,7 +342,7 @@ export const WorkWeekInput = ({
 							value={values.actualHours}
 							name="actualHours"
 							id={`actHours-${assignment?.id}-${cweek}-${year}`}
-							onChange={(e) => handleChangeInCustomInput( e, handleChange )}
+							onChange={(e) => handleChangeInCustomInput(e, handleChange)}
 							onBlur={(e) => {
 								handleBlur("actualHours");
 								if (dirty) {
@@ -280,13 +350,27 @@ export const WorkWeekInput = ({
 								}
 							}}
 							showFillForward={false}
-							ref={(el: HTMLInputElement) => createActualRef(el, rowIndex, cellIndex)}
+							ref={(el: HTMLInputElement) =>
+								createActualRef(el, rowIndex, cellIndex)
+							}
 							onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
 								if (dirty) {
-									handlePressEnterOrEscape(e, values, setFieldValue, 'actualHours', initialValues.actualHours);
+									handlePressEnterOrEscape(
+										e,
+										values,
+										setFieldValue,
+										"actualHours",
+										initialValues.actualHours
+									);
 								}
-								tabbingAndArrowNavigation(e, rowIndex, cellIndex, inputRefs, totalRows, true)
-
+								tabbingAndArrowNavigation(
+									e,
+									rowIndex,
+									cellIndex,
+									inputRefs,
+									totalRows,
+									true
+								);
 							}}
 						/>
 					)}
