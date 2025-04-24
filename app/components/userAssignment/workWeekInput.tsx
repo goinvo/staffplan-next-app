@@ -71,7 +71,7 @@ export const WorkWeekInput = ({
 
 	const actualValueToShow = () => {
 		if (isMobile && !isNil(existingWorkWeek?.actualHours)) return existingWorkWeek?.actualHours || ''
-		if (isMobile && !existingWorkWeek?.actualHours) return assignment?.estimatedWeeklyHours || ''
+		// if (isMobile && !existingWorkWeek?.actualHours) return assignment?.estimatedWeeklyHours || ''
 		return existingWorkWeek?.actualHours || ''
 	}
 	const initialValues = {
