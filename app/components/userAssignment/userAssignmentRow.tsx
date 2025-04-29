@@ -12,7 +12,6 @@ import { currentWeek, currentYear } from "../scrollingCalendar/helpers";
 import {
 	AssignmentType,
 	MonthsDataType,
-	UndoableModifiedAssignment,
 	UserType,
 } from "@/app/typeInterfaces";
 import { useApolloClient, useMutation } from "@apollo/client";
@@ -27,11 +26,10 @@ import {
 } from "../constants/undoModifyStrings";
 import { useFadeInOutRow } from "@/app/hooks/useFadeInOutRow";
 import { useProjectsDataContext } from "@/app/contexts/projectsDataContext";
-import { MdVisibility, MdVisibilityOff } from "react-icons/md";
+import { MdVisibilityOff } from "react-icons/md";
 
 import IconButton from "@/app/components/iconButton";
 import { useGeneralDataContext } from "@/app/contexts/generalContext";
-import { set } from "lodash";
 
 interface UserAssignmentRowProps {
 	assignment: AssignmentType;
@@ -83,6 +81,7 @@ export const UserAssignmentRow = ({
 	const client = useApolloClient();
 	const [showUndoRow, setShowUndoRow] = useState<boolean>(false);
 	const [showTooltip, setShowTooltip] = useState<boolean>(false);
+	const [localStatus, setLocalStatus] = useState<String>(assignment.status);
 	const rowRef = useRef<HTMLTableRowElement>(null);
 	const undoRowRef = useRef<HTMLTableRowElement>(null);
 	const isModifiedAssignment = (assignmentId: number) =>
@@ -96,6 +95,21 @@ export const UserAssignmentRow = ({
 	const { animateRow } = useFadeInOutRow({ rowRef, setShowUndoRow });
 	const [upsertAssignment] = useMutation(UPSERT_ASSIGNMENT, {
 		errorPolicy: "all",
+		optimisticResponse: ({ id, projectId, userId, status }) => ({
+			upsertAssignment: {
+				__typename: "Assignment",
+				id,
+				status,
+				project: {
+					__typename: "Project",
+					id: projectId,
+				},
+				assignedUser: {
+					__typename: "User",
+					id: userId,
+				},
+			},
+		}),
 		onCompleted({ upsertAssignment }) {
 			if (upsertAssignment) {
 				setUserList((prev) =>
@@ -177,18 +191,20 @@ export const UserAssignmentRow = ({
 	};
 
 	const onChangeStatusButtonClick = async () => {
-		const variables = {
-			id: assignment.id,
-			projectId: assignment?.project.id,
-			userId: selectedUser.id,
-			status: assignment.status === "active" ? "proposed" : "active",
-		};
-
+		const newStatus = assignment.status === "active" ? "proposed" : "active";
+	
+		setLocalStatus(newStatus);
+	
 		await upsertAssignment({
-			variables,
+			variables: {
+				id: assignment.id,
+				projectId: assignment?.project.id,
+				userId: selectedUser.id,
+				status: newStatus,
+			},
 		});
 	};
-	const isAssignmentProposed = assignment.status === "proposed";
+	const isAssignmentProposed = localStatus === "proposed";
 	const isTempProject = assignment.project.isTempProject;
 
 	useEffect(() => {
