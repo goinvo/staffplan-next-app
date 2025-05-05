@@ -570,6 +570,7 @@ export const UPSERT_WORKWEEK = gql`
 			actualHours
 			year
 			cweek
+			isDeleted
 		}
 	}
 `;
