@@ -237,6 +237,7 @@ export interface WorkWeekProps {
 }
 
 export interface WorkWeekType {
+  	isDeleted?: boolean;
 	id?: number;
 	actualHours?: number;
 	estimatedHours?: number;

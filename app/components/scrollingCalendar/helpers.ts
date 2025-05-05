@@ -1039,8 +1039,9 @@ export const updateOrInsertWorkWeekInProject = (
             const canBeDeleted = !updatedWorkWeeks.some(
               (week) => (week.actualHours ?? 0) > 0
             );
+            const removeDeletedWeeks = updatedWorkWeeks.filter((week) => !week.isDeleted)
             const updatedFields = {
-              workWeeks: updatedWorkWeeks,
+              workWeeks: removeDeletedWeeks,
               canBeDeleted: canBeDeleted,
             };
             return {
@@ -1088,9 +1089,10 @@ export const updateOrInsertWorkWeek = (
           } else {
             updatedWorkWeeks = [...assignment.workWeeks, workWeek];
           }
+          const removeDeletedWeeks = updatedWorkWeeks.filter((week) => !week.isDeleted)
           return {
             ...assignment,
-            workWeeks: updatedWorkWeeks,
+            workWeeks: removeDeletedWeeks,
           };
         }
         return assignment;
