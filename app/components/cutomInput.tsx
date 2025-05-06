@@ -79,7 +79,7 @@ export const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(({
                 }}
                 onKeyDown={onKeyDown}
                 disabled={disabled}
-                className="bg-white text-center sm:text-base text-2xl rounded-sm shadow-top-input-shadow sm:w-[34px] w-[68px] sm:h-[25px] h-[50px] focus:border-tiffany focus:ring-1 focus:ring-tiffany border-none outlined-none mb-0 px-0 py-0"
+                className={`${disabled ? "timeline-grid-bg" : "bg-white shadow-top-input-shadow"} text-center sm:text-base text-2xl rounded-sm sm:w-[34px] w-[68px] sm:h-[25px] h-[50px] focus:border-tiffany focus:ring-1 focus:ring-tiffany border-none outlined-none mb-0 px-0 py-0`}
                 autoComplete="off"
                 ref={(el) => {
                     inputRef.current = el;
