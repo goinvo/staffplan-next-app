@@ -288,7 +288,7 @@ export const WorkWeekInput = ({
 			}
 		}
 	};
-
+	const deactivatedUser = !assignedUser.isActive
 	return (
 		<Formik
 			onSubmit={(e) => upsertWorkWeekValues(e)}
@@ -303,6 +303,7 @@ export const WorkWeekInput = ({
 						name="estimatedHours"
 						id={`estHours-${assignment?.id}-${cweek}-${year}`}
 						onChange={(e) => handleChangeInCustomInput(e, handleChange)}
+						disabled={deactivatedUser}
 						onBlur={(e) => {
 							handleBlur("estimatedHours");
 							if (dirty) {
@@ -353,6 +354,7 @@ export const WorkWeekInput = ({
 							ref={(el: HTMLInputElement) =>
 								createActualRef(el, rowIndex, cellIndex)
 							}
+							disabled={deactivatedUser}
 							onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
 								if (dirty) {
 									handlePressEnterOrEscape(

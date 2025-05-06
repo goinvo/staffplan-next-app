@@ -205,7 +205,8 @@ export const WorkWeekInput = ({
       setFieldValue(fieldName, prevValue);
     }
 	}
-
+	const deactivatedUser = !assignedUser?.isActive
+	console.log(deactivatedUser,'deactivated')
 	return (
 		<>
 			<Formik
@@ -221,6 +222,7 @@ export const WorkWeekInput = ({
 							name="estimatedHours"
 							id={`estHours-${assignment?.id}-${cweek}-${year}`}
 							onChange={handleChange}
+							disabled={!isUserTBD && !assignedUser?.isActive}
 							onBlur={(e) => {
 								handleBlur("estimatedHours");
 								if (dirty) {
@@ -249,7 +251,7 @@ export const WorkWeekInput = ({
 								}
 							}}
 							showFillForward={false}
-							disabled={isUserTBD}
+							disabled={isUserTBD || deactivatedUser}
 							ref={(el: HTMLInputElement) => createActualRef(el, rowIndex, cellIndex)}
 							onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
 								if (dirty) {
