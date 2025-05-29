@@ -206,7 +206,6 @@ export const WorkWeekInput = ({
     }
 	}
 	const deactivatedUser = !assignedUser?.isActive
-	console.log(deactivatedUser,'deactivated')
 	return (
 		<>
 			<Formik
