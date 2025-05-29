@@ -321,11 +321,6 @@ export const UserListProvider: React.FC<{
 	};
 
 	return (
-		<PrefabProvider
-			apiKey={process.env.NEXT_PUBLIC_PREFAB_API_KEY}
-			contextAttributes={contextAttributes}
-			onError={onPrefabError}
-		>
 			<UserDataContext.Provider
 				value={{
 					deleteAssignment,
@@ -357,6 +352,5 @@ export const UserListProvider: React.FC<{
 			>
 				{children}
 			</UserDataContext.Provider>
-		</PrefabProvider>
 	);
 };
